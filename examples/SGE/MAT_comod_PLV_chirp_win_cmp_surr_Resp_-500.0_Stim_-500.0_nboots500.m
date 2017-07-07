@@ -1,0 +1,4 @@
+-o /home/knight/duration_PLV/Scripts/NotBackedUp/SGEout
+-e /home/knight/duration_PLV/Scripts/NotBackedUp/SGEout
+-N crpPAC_RvS
+-v event1="Resp",win_start1="-500",win_end1="0",event2="Stim",win_start2="-500",win_end2="0",run_surrogate="1"
