@@ -121,10 +121,11 @@ clear data trial_info
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_manual.mat'));
 
 % Toss trials based on behavior and cleaning with Bob
-trial_info_clean = SBJ05_reject_behavior(SBJ,trial_info,proc_vars.event_type,proc_vars.trial_lim_sec,RT_std_thresh);
+trial_info_clean = SBJ05_reject_behavior(SBJ,trial_info,pipeline_id,proc_vars.event_type,...
+                                proc_vars.trial_lim_sec,proc_vars.RT_std_thresh);
 
 %% ========================================================================
-%   Step 9- Choose Thresholds for Variance-Based Trial Rejection
+%   Step 9a- Prepare Variance Estimates for Variance-Based Trial Rejection
 %  ========================================================================
 % Load data for visualization
 % load(strcat(preproc_dir,SBJ,'_proc_vars.mat'));
@@ -155,18 +156,18 @@ trials_dif = ft_preprocessing(cfg,trials);
 [trial_mat,~] = fn_format_trials_ft2KLA(trials);
 var_mat = std(trial_mat,0,3);
 ch_var_mean = mean(var_mat,2);
-ch_var_thresh = mean(ch_var_mean)+std(ch_var_mean)*var_std_warning_thresh;
+ch_var_thresh = mean(ch_var_mean)+std(ch_var_mean)*proc_vars.var_std_warning_thresh;
 
 trial_var_mean = mean(var_mat,1);
-trial_var_thresh = mean(trial_var_mean)+std(trial_var_mean)*var_std_warning_thresh;
+trial_var_thresh = mean(trial_var_mean)+std(trial_var_mean)*proc_vars.var_std_warning_thresh;
 
 [trial_mat_dif,~] = fn_format_trials_ft2KLA(trials_dif);
 var_mat_dif = std(trial_mat_dif,0,3);
 ch_var_mean_dif = mean(var_mat_dif,2);
-ch_var_dif_thresh = mean(ch_var_mean_dif)+std(ch_var_mean_dif)*var_std_warning_thresh;
+ch_var_dif_thresh = mean(ch_var_mean_dif)+std(ch_var_mean_dif)*proc_vars.var_std_warning_thresh;
 
 trial_var_mean_dif = mean(var_mat_dif,1);
-trial_var_dif_thresh = mean(trial_var_mean_dif)+std(trial_var_mean_dif)*var_std_warning_thresh;
+trial_var_dif_thresh = mean(trial_var_mean_dif)+std(trial_var_mean_dif)*proc_vars.var_std_warning_thresh;
 
 % Report on potentially bad channels
 fprintf('==============================================================================================\n');
@@ -182,6 +183,9 @@ disp(find(abs(trial_var_mean_dif) > trial_var_dif_thresh));
 fprintf('\n');
 fprintf('==============================================================================================\n');
 
+%% ========================================================================
+%   Step 9b- Choose Thresholds for Variance-Based Trial Rejection
+%  ========================================================================
 % Visualize data to set limits for variance-based rejection
 cfg_reject = [];
 cfg_reject.method = 'summary';
@@ -198,8 +202,6 @@ artifact_params.std_limit_diff = 7;
 artifact_params.hard_threshold_diff = 100; % only one trial above 100 (I think)
 
 % Comment here potential bad trials and channels:
-%   Suspect Trials: 42, 118, 172***
-%   Suspect Channels: LIN5-6, RIN5-6, ROF6-7
 
 %% ========================================================================
 %   Step 10- Reject Bad Trials Based on Variance

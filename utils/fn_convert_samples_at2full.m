@@ -1,4 +1,4 @@
-function orig_times = fn_convert_evnt_times_at2full(times,analysis_time,sample_rate)
+function orig_times = fn_convert_samples_at2full(times,analysis_time,sample_rate)
 %% Convert time markers from trimmed analysis_time to original time
 %   times [int array] - time points (samples) in time series already cut by analysis_time
 

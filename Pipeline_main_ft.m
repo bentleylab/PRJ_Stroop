@@ -121,11 +121,11 @@ clear data trial_info
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_manual.mat'));
 
 % Toss trials based on behavior and cleaning with Bob
-trial_info_clean = SBJ05_reject_behavior(SBJ,trial_info,proc_vars.event_type,...
+trial_info_clean = SBJ05_reject_behavior(SBJ,trial_info,pipeline_id,proc_vars.event_type,...
                                 proc_vars.trial_lim_sec,proc_vars.RT_std_thresh);
 
 %% ========================================================================
-%   Step 9- Choose Thresholds for Variance-Based Trial Rejection
+%   Step 9a- Prepare Variance Estimates for Variance-Based Trial Rejection
 %  ========================================================================
 % Load data for visualization
 % load(strcat(preproc_dir,SBJ,'_proc_vars.mat'));
@@ -183,6 +183,9 @@ disp(find(abs(trial_var_mean_dif) > trial_var_dif_thresh));
 fprintf('\n');
 fprintf('==============================================================================================\n');
 
+%% ========================================================================
+%   Step 9b- Choose Thresholds for Variance-Based Trial Rejection
+%  ========================================================================
 % Visualize data to set limits for variance-based rejection
 cfg_reject = [];
 cfg_reject.method = 'summary';
@@ -191,16 +194,16 @@ ft_rejectvisual(cfg_reject,trials);
 % Visualize Derivative
 ft_rejectvisual(cfg_reject,trials_dif);
 
-% Choose thresholds based on plots above
-artifact_params.std_limit_raw = 7;
-artifact_params.hard_threshold_raw = 300; % trials go up to ~300, then outlier start
+% Comment in evernote note on bad trials and channels!
+% Then the following variables should be written into SBJ_vars:
 
-artifact_params.std_limit_diff = 7;
-artifact_params.hard_threshold_diff = 100; % only one trial above 100 (I think)
+% % Choose thresholds based on plots above
+% artifact_params.std_limit_raw = 7;
+% artifact_params.hard_threshold_raw = 300; % trials go up to ~300, then outlier start
+% 
+% artifact_params.std_limit_diff = 7;
+% artifact_params.hard_threshold_diff = 100; % only one trial above 100 (I think)
 
-% Comment here potential bad trials and channels:
-%   Suspect Trials: 42, 118, 172***
-%   Suspect Channels: LIN5-6, RIN5-6, ROF6-7
 
 %% ========================================================================
 %   Step 10- Reject Bad Trials Based on Variance

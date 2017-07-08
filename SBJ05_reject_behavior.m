@@ -1,4 +1,4 @@
-function trial_info_clean = SBJ05_reject_behavior(SBJ,trial_info,event_type,trial_lim_s,RT_std_thresh)
+function trial_info_clean = SBJ05_reject_behavior(SBJ,trial_info,pipeline_id,event_type,trial_lim_s,RT_std_thresh)
 % Select data of interest and reject all bad trials and channels to get
 % final clean dataset for processing
 % Criteria:
@@ -32,7 +32,7 @@ SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars
 eval(SBJ_vars_cmd);
 
 %% Load data
-load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',SBJ_vars.line_filt_id,'.mat'));
+load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
 load(strcat(SBJ_vars.dirs.events,SBJ,'_bob_bad_epochs.mat'));
 
 %% Select channels and events of interest
@@ -62,17 +62,17 @@ trials_sample_idx = fn_epoch_cuts_datapad(1:size(data.trial{1},2),events,events,
 skip_bob = [];
 for epoch_ix = 1:size(trials_sample_idx,1)
     if ~isempty(intersect(trials_sample_idx(epoch_ix,:),bob_bad_samples))
-        skip_bob = [skip_bob epoch_ix];
+        skip_bob = [skip_bob; epoch_ix];
     end
 end
 
 % Find RT outliers
 RT_mean = nanmean(trial_info.response_time);
 RT_std  = nanstd(trial_info.response_time);
-skip_rt_outlier = find(abs(trial_info.response_time-RT_mean)>RT_std_thresh*RT_std)';
+skip_rt_outlier = find(abs(trial_info.response_time-RT_mean)>RT_std_thresh*RT_std);
 
 % Compile all a priori bad trials
-skip_trial_ix = unique([skip_bad skip_rt1 skip_rt2 skip_err skip_bob skip_rt_outlier]);
+skip_trial_ix = unique([skip_bad; skip_rt1; skip_rt2; skip_err; skip_bob; skip_rt_outlier]);
 ok_trial_ix = setdiff(1:length(trial_info.resp_onset),skip_trial_ix);
 
 %% Compile Bad Trials
