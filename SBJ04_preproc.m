@@ -1,36 +1,14 @@
-function SBJ04_preproc(SBJ,pipeline_id,demean_yn,hp_freq,lp_freq,line_filt)
+function SBJ04_preproc(SBJ,pipeline_id)
 %% Preprocess data using fieldtrip
 % Inputs:
 %   SBJ [str]- name of the subject
-%   line_filt [str]- type of line noise filter
-%       'bandstop'- traditional bandstop filter
-%       'dft'- fieldtrip sinusoid regression
-%       'cleanline'- Tim Mullen's cleanline function
+%   pipeline_id [str] - name of the pipeline containing proc_vars struct
 
 % Parameters
 psd_bp       = 'yes';          % plot psds after filtering?
 psd_reref    = 'yes';          % plot psds after rereferencing?
 psd_line     = 'yes';          % plot psds after filtering out line noise?
 psd_fig_type = 'jpg';
-
-hp_order = 4;
-if ~isempty(hp_freq)
-    hp_yn = 'yes';
-end
-if ~isempty(lp_freq)
-    lp_yn = 'yes';
-end
-% demean_yn   = 'yes';
-% hp_yn       = 'yes';
-% lp_yn       = 'yes';
-% hp_freq     = 0.5;
-% hp_order    = 4;            % Leaving blank causes instability error, 1 or 2 works
-% lp_freq     = 300;
-
-% line_filt   = 'bandstop';       % 'dft','bandstop', or 'cleanline'
-% cleanline   = 'yes';                % Use Tim Mullen's cleanline function
-% dft_yn      = 'no';
-% bs_yn       = 'no';                % Parameters for this in SBJ_vars
 
 % Directories
 addpath(genpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/'));
@@ -39,8 +17,8 @@ ft_defaults
 
 %% Load data
 fprintf('============== Loading Data %s ==============\n',SBJ);
-SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
-eval(SBJ_vars_cmd);
+eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
+eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
 
 import_filename = [SBJ_vars.dirs.import SBJ '_1000hz.mat'];
 load(import_filename);
@@ -49,12 +27,14 @@ data_orig = data;
 %% High and low pass data
 fprintf('============== High and Low Pass Filtering %s ==============\n',SBJ);
 cfg           = [];
-cfg.demean    = demean_yn;
-cfg.lpfilter  = lp_yn;
-cfg.lpfreq    = lp_freq;
-cfg.hpfilter  = hp_yn;
-cfg.hpfreq    = hp_freq;
-cfg.hpfiltord = hp_order;
+cfg.demean    = proc_vars.demean_yn;
+cfg.lpfilter  = proc_vars.lp_yn;
+cfg.lpfreq    = proc_vars.lp_freq;
+cfg.hpfilter  = proc_vars.hp_yn;
+cfg.hpfreq    = proc_vars.hp_freq;
+if isfield(proc_vars,'hp_order')
+    cfg.hpfiltord = proc_vars.hp_order;
+end
 data = ft_preprocessing(cfg,data);
 data_bp = data;
 
@@ -110,12 +90,12 @@ end
 %% Filter out line noise
 fprintf('============== Filtering Line Noise %s via %s ==============\n',SBJ,line_filt);
 
-if strcmp(line_filt,'dft')
+if strcmp(proc_vars.notch_type,'dft')
     cfg           = [];
     cfg.dftfilter = 'yes'; % line noise removal using discrete fourier transform
     cfg.dftfreq   = SBJ_vars.notch_freqs;
     data = ft_preprocessing(cfg,data);
-elseif strcmp(line_filt,'bandstop')
+elseif strcmp(proc_vars.notch_type,'bandstop')
     % Calculate frequency limits
     bs_freq_lim = NaN([length(SBJ_vars.notch_freqs) 2]);
     for f_ix = 1:length(SBJ_vars.notch_freqs)
@@ -125,10 +105,10 @@ elseif strcmp(line_filt,'bandstop')
     cfg.bsfilter = 'yes';
     cfg.bsfreq   = bs_freq_lim;
     data = ft_preprocessing(cfg,data);
-elseif strcmp(line_filt,'cleanline')
+elseif strcmp(proc_vars.notch_type,'cleanline')
     data = fn_cleanline(data,SBJ_vars.notch_freqs);
 else
-    error('ERROR: line_filt type not in [dft, bandstop, cleanline]');
+    error('ERROR: proc_vars.notch_type type not in [dft, bandstop, cleanline]');
 end
 
 if strcmp(psd_line,'yes')

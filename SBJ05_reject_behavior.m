@@ -1,4 +1,4 @@
-function trial_info_clean = SBJ05_reject_behavior(SBJ,trial_info,pipeline_id,event_type,trial_lim_s,RT_std_thresh)
+function trial_info_clean = SBJ05_reject_behavior(SBJ,trial_info,pipeline_id)
 % Select data of interest and reject all bad trials and channels to get
 % final clean dataset for processing
 % Criteria:
@@ -17,14 +17,6 @@ function trial_info_clean = SBJ05_reject_behavior(SBJ,trial_info,pipeline_id,eve
 % Outputs:
 %   trial_info_clean_behav [struct]- saves out final version after tossing all bad trials
 
-% Parameters
-if isempty(RT_std_thresh)
-    RT_std_thresh = 3;
-end
-if isempty(trial_lim_s)
-    trial_lim_s = [-0.500 2.5];
-end
-
 % Directories
 addpath('/home/knight/hoycw/PRJ_Stroop/scripts/');
 addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
@@ -32,20 +24,29 @@ SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars
 eval(SBJ_vars_cmd);
 
 %% Load data
+eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
 load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
 load(strcat(SBJ_vars.dirs.events,SBJ,'_bob_bad_epochs.mat'));
 
+% Parameters
+if ~isfield(proc_vars.RT_std_thresh)
+    proc_vars.RT_std_thresh = 3;
+end
+if ~isfield(proc_vars.trial_lim_s)
+    proc_vars.trial_lim_s = [-0.500 2.5];
+end
+
 %% Select channels and events of interest
-if strcmp(event_type,'stim')
+if strcmp(proc_vars.event_type,'stim')
     events = trial_info.word_onset;
-elseif strcmp(event_type,'resp')
+elseif strcmp(proc_vars.event_type,'resp')
     events = trial_info.resp_onset;
 else
-    error(stract('ERROR: unknown event_type ',event_type));
+    error(stract('ERROR: unknown event_type ',proc_vars.event_type));
 end
 
 % Convert trial_lim into samples
-trial_lim = trial_lim_s*data.fsample;
+trial_lim = proc_vars.trial_lim_s*data.fsample;
 
 %% Reject known artifacts
 skip_rt1 = find(trial_info.resp_onset==-1); % this may be unnecessary, not sure if I make any -1 at some point...
@@ -69,7 +70,7 @@ end
 % Find RT outliers
 RT_mean = nanmean(trial_info.response_time);
 RT_std  = nanstd(trial_info.response_time);
-skip_rt_outlier = find(abs(trial_info.response_time-RT_mean)>RT_std_thresh*RT_std);
+skip_rt_outlier = find(abs(trial_info.response_time-RT_mean)>proc_vars.RT_std_thresh*RT_std);
 
 % Compile all a priori bad trials
 skip_trial_ix = unique([skip_bad; skip_rt1; skip_rt2; skip_err; skip_bob; skip_rt_outlier]);
@@ -77,10 +78,10 @@ ok_trial_ix = setdiff(1:length(trial_info.resp_onset),skip_trial_ix);
 
 %% Compile Bad Trials
 trial_info_clean = trial_info;
-trial_info_clean.event_type = event_type;
+trial_info_clean.event_type = proc_vars.event_type;
 trial_info_clean.trial_lim = trial_lim;
-trial_info_clean.trial_lim_s = trial_lim_s;
-trial_info_clean.RT_std_thresh = RT_std_thresh;
+trial_info_clean.trial_lim_s = proc_vars.trial_lim_s;
+trial_info_clean.RT_std_thresh = proc_vars.RT_std_thresh;
 
 % Document bad trials
 trial_info_clean.bad_trials.RT = trial_info.trial_n([skip_rt1 skip_rt2 skip_rt_outlier]);

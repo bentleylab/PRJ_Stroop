@@ -4,9 +4,16 @@
 proc_vars.plot_psd      = '1by1';         % type of plot for channel PSDs
 proc_vars.resample_freq = 1000;
 proc_vars.demean_yn     = 'yes';
+proc_vars.hp_yn         = 'yes';
 proc_vars.hp_freq       = 0.5;            % [] skips this step
+proc_vars.hp_order      = 4;              % Leaving blank causes instability error, 1 or 2 works
+proc_vars.lp_yn         = 'yes';
 proc_vars.lp_freq       = 300;            % [] skips this step
 proc_vars.notch_type    = 'bandstop';     % method for nothc filtering out line noise
+
+% cleanline   = 'yes';                % Use Tim Mullen's cleanline function
+% dft_yn      = 'no';
+% bs_yn       = 'no';                % Parameters for this in SBJ_vars
 
 % Behavioral Processing
 proc_vars.rt_bounds = [0.3 2.0];          % bounds on a reasonable RT to be detected with KLA algorithm

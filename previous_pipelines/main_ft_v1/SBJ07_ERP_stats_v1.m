@@ -4,7 +4,7 @@ function SBJ07_ERP_stats(SBJ,conditions,pipeline_id)
 
 % Data Selection
 % SBJ        = 'IR35';
-% elecs      = {'LAC*'};        % will now pull everything in SBJ_vars.ch_lab.ROI
+% elecs      = {'LAC*'};        % will now pull everything in proc_vars.ch_lab.ROI
 % conditions = 'CI';
 
 % Analysis Parameters
@@ -36,8 +36,9 @@ SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars
 eval(SBJ_vars_cmd);
 
 % Load Data
-load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
-load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'));
+load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_bp.reref.bandstop.mat'));
+load(strcat(SBJ_dir,'/03_events/',SBJ,'_trial_info_final.mat'));
+load(strcat(SBJ_dir,'/02_preproc/',SBJ,'_proc_vars.mat'));
 
 % Select Conditions of Interest
 [cond_lab, cond_colors, cond_style] = fn_condition_label_styles(conditions);
@@ -51,7 +52,7 @@ end
 
 % Select Channel(s)
 cfgs = [];
-cfgs.channel = SBJ_vars.ch_lab.ROI;
+cfgs.channel = proc_vars.ch_lab.ROI;
 roi = ft_selectdata(cfgs,data);
 
 %% Compute ERPs
@@ -147,7 +148,7 @@ cfg_stat.ivar             = 1;  %row of design matrix containing independent var
 
 %% Save Results
 if save_data
-    data_out_filename = strcat(SBJ_vars.dirs.SBJ,'04_proc/',SBJ,'_ERP_stats_',conditions,'_ROI_',event_type,'.mat');
+    data_out_filename = strcat(SBJ_dir,'04_proc/',SBJ,'_ERP_stats_',conditions,'_ROI_',event_type,'.mat');
     fprintf('Saving %s\n',data_out_filename);
     save(data_out_filename,'roi_erp','stat');
 end
@@ -156,17 +157,17 @@ stat_full = stat;
 roi_erp_full = roi_erp;
 
 % Create a figure for each ROI
-for roi_ix = 1:numel(SBJ_vars.ch_lab.ROI)
+for roi_ix = 1:numel(proc_vars.ch_lab.ROI)
     % Select data to plot this ROI
     cfgs = [];
-    cfgs.channel = SBJ_vars.ch_lab.ROI{roi_ix};
+    cfgs.channel = proc_vars.ch_lab.ROI{roi_ix};
     stat = ft_selectdata(cfgs,stat_full);
     for an_ix = 1:numel(cond_lab)
         roi_erp{an_ix} = ft_selectdata(cfgs,roi_erp_full{an_ix});
     end
     
     % Plot parameters
-    roi_name = SBJ_vars.ch_lab.ROI{roi_ix}; if strcmp(roi_name(end),'*');roi_name=roi_name(1:end-1);end
+    roi_name = proc_vars.ch_lab.ROI{roi_ix}; if strcmp(roi_name(end),'*');roi_name=roi_name(1:end-1);end
     fig_name = [SBJ '_ERP_stat_' conditions '_' roi_name '_' event_type];
     [plot_rc,~] = fn_num_subplots(numel(stat.label));
     if plot_rc(1)>1; fig_height=1; else fig_height=0.33; end;

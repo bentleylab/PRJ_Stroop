@@ -9,11 +9,11 @@ addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
 addpath('/home/knight/hoycw/Apps/fieldtrip/');
 ft_defaults
 
-%% Processing Variables
-SBJ = 'IR41';
+%% Step 0 - Processing Variables
+% SBJ = 'IR';
 
 pipeline_id = 'main_ft';
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/' pipeline_id '_proc_vars.m']);
+eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
 
 %% ========================================================================
 %   Step 1- Load SBJ and Processing Variable Structures
@@ -102,6 +102,7 @@ save_plot       = 0;
 save_trial_info = 0;
 SBJ03_RT_manual_adjustments(SBJ,outlier_thresh,save_plot,save_trial_info)
 % Check any big discrepancies between auto and manual RTs
+% Fix any RTs manually if necessary
 
 % Run again after verifying accuracy of manual RTs, saving this time
 save_plot       = 1;
@@ -111,7 +112,7 @@ SBJ03_RT_manual_adjustments(SBJ,outlier_thresh,save_plot,save_trial_info)
 %% ========================================================================
 %   Step 7- Preprocess Neural Data
 %  ========================================================================
-SBJ04_preproc(SBJ,pipeline_id,proc_vars.demean_yn,proc_vars.hp_freq,proc_vars.lp_freq,proc_vars.notch_type)
+SBJ04_preproc(SBJ,pipeline_id)
 
 %% ========================================================================
 %   Step 8- Reject Bad Trials Based on Behavior and Bob
@@ -121,8 +122,7 @@ clear data trial_info
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_manual.mat'));
 
 % Toss trials based on behavior and cleaning with Bob
-trial_info_clean = SBJ05_reject_behavior(SBJ,trial_info,pipeline_id,proc_vars.event_type,...
-                                proc_vars.trial_lim_sec,proc_vars.RT_std_thresh);
+trial_info_clean = SBJ05_reject_behavior(SBJ,trial_info,pipeline_id);
 
 %% ========================================================================
 %   Step 9a- Prepare Variance Estimates for Variance-Based Trial Rejection
@@ -199,14 +199,14 @@ ft_rejectvisual(cfg_reject,trials_dif);
 
 % % Choose thresholds based on plots above
 % artifact_params.std_limit_raw = 7;
-% artifact_params.hard_threshold_raw = 300; % trials go up to ~300, then outlier start
+% artifact_params.hard_threshold_raw = 300; % based on maxabs()
 % 
 % artifact_params.std_limit_diff = 7;
-% artifact_params.hard_threshold_diff = 100; % only one trial above 100 (I think)
+% artifact_params.hard_threshold_diff = 100; % based on maxabs() for trials_dif
 
 
 %% ========================================================================
-%   Step 10- Reject Bad Trials Based on Variance
+%   Step 10a- Automatically Reject Bad Trials Based on Variance
 %  ========================================================================
 % Re-load SBJ_vars after updating artifact field
 clear SBJ_vars
@@ -214,20 +214,26 @@ eval(SBJ_vars_cmd);
 
 % Run KLA artifact rejection based on robust variance estimates
 % If too many/few trials are rejected, adjust artifact_params and rerun
+
+% plot_chans is a cell array of channels to be plotted
+%   {} - empty array indicates skip plotting
+%   'worst' - says plot channels that had > 5 bad trials
+%   full array - list of channel names to plot
+% report [struct] - list of 0/1/2 flags for plotting and reporting options,
+%   0 = no report; 1 = concise report; 2 = verbose report
+%   .hard_thresh: 1=number of trials; 2=print rejected trial_n
+%   .std_thresh: 1=number of trials; 2=print rejected trial_n
+%   .std_plot: 1=plot std distribution with cut off
 plot_ch = {'worst',5};%ft_channelselection({'LPC*','LAC*','RIN*'},data.label);
 report.hard_thresh = 2; % print total rejected and trial numbers
 report.std_thresh  = 1; % print only total rejected
 report.std_plot    = 1; % plot the std distribution and threshold
-trial_info_final = SBJ06_reject_artifacts_KLA_report(trials,trial_info_clean,artifact_params,plot_ch,report);
+trial_info_auto_clean = SBJ06_reject_artifacts_KLA_report(trials,trial_info_clean,...
+                                        SBJ_vars.artifact_params,plot_ch,report);
 
-% KLA Notes:
-%   LIN5-6, 6-7, and 7-8 and RIN7-8 all end up with a lot of rejected trials
-%   LAC1-2 has a few, but they might be interesting!
-%   trial 202 has BIG fluctuations, good catch; 46 also not great
-
-bad_samples = NaN([size(trial_info_final.bad_trials.var,1) 2]);
+bad_samples = NaN([size(trial_info_auto_clean.bad_trials.var,1) 2]);
 for t_ix = 1:size(bad_samples,1)
-    bad_samples(t_ix,:) = trials.sampleinfo(find(trial_info_clean.trial_n==trial_info_final.bad_trials.var(t_ix)),:);
+    bad_samples(t_ix,:) = trials.sampleinfo(find(trial_info_clean.trial_n==trial_info_auto_clean.bad_trials.var(t_ix)),:);
 end
 cfg = [];
 cfg.continuous = 'no';
@@ -236,9 +242,32 @@ cfg.artfctdef.visual.artifact = bad_samples;
 ft_databrowser(cfg, trials);
 
 %% ========================================================================
-%   Step 10- Save the final trial_info
+%   Step 11- Compile Variance-Based Trial Rejection and Save Results
 %  ========================================================================
+% Re-load SBJ_vars after updating artifact field
+clear SBJ_vars
+eval(SBJ_vars_cmd);
+
 clear trial_info
-trial_info = trial_info_final;
+trial_info = trial_info_clean;
+% Document bad trials
+trial_info.bad_trials.variance = trial_info.trial_n(SBJ_vars.trial_reject_ix);
+trial_info.bad_trials.all = sort([trial_info.bad_trials.all; trial_info.bad_trials.variance]);
+
+% Remove bad trials
+trial_info.block_n(SBJ_vars.trial_reject_ix) = [];
+trial_info.trial_n(SBJ_vars.trial_reject_ix) = [];
+trial_info.word(SBJ_vars.trial_reject_ix) = [];
+trial_info.color(SBJ_vars.trial_reject_ix) = [];
+trial_info.trialtype(SBJ_vars.trial_reject_ix) = [];
+trial_info.blocktype(SBJ_vars.trial_reject_ix) = [];
+trial_info.response_time(SBJ_vars.trial_reject_ix) = [];
+trial_info.marker_time(SBJ_vars.trial_reject_ix) = [];
+trial_info.onset_time(SBJ_vars.trial_reject_ix) = [];
+trial_info.word_onset(SBJ_vars.trial_reject_ix) = [];
+trial_info.resp_onset(SBJ_vars.trial_reject_ix) = [];
+trial_info.condition_n(SBJ_vars.trial_reject_ix) = [];
+trial_info.error(SBJ_vars.trial_reject_ix) = [];
+
 save(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
 
