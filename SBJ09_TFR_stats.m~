@@ -53,7 +53,6 @@ roi_trl = fn_ft_cut_trials_equal_len(roi,events,trial_info.condition_n',trial_li
 
 %% Compute TFRs
 % all cfg_tfr options are specified in the an_vars
-% n_trials = zeros([1 numel(cond_lab)]);
 tfr = {};
 for cond_ix = numel(cond_lab)
     fprintf('===================================================\n');
@@ -61,15 +60,18 @@ for cond_ix = numel(cond_lab)
     fprintf('===================================================\n');
     cfg_tfr.trials = find(cond_idx(cond_ix,:)==1);
     tfr{cond_ix}   = ft_freqanalysis(cfg_tfr, roi_trl);
+    
+    % Baseline correction
+    
 end
 
 %     % Grab n_trials for design matrix
 %     n_trials(cond_ix) = size(tfr{cond_ix}.trial,1);
-% %% Baseline Correction
-% cfg = [];
-% cfg.demean         = demean_yn;
-% cfg.baselinewindow = bsln_lim;
-% roi_trl = ft_preprocessing(cfg,roi_trl);
+%% Baseline Correction
+cfg = [];
+cfg.demean         = demean_yn;
+cfg.baselinewindow = bsln_lim;
+roi_trl = ft_preprocessing(cfg,roi_trl);
 
 % %% Run Statistics
 % % Create design matrix
@@ -157,17 +159,18 @@ for cond_ix = 1:length(cond_lab)
 %         'outerposition',[0 0 1 fig_height],'Visible',vis_fig);
     cfg = [];
     cfg.trials = 'all';%logical(fn_condition_index(cond_lab{cond_ix}, cond_n));
+    cfg.latency = [-0.5 2];
     cfg.baseline = bsln_lim; %should be in sec
     cfg.baselinetype = 'db';
     cfg.channel = 'all';
     cfg.colorbar = 'yes';
     cfg.zlim = 'maxabs'; %[-3 3];%
     cfg.parameter = 'powspctrm';
-    cfg.layout = layout;
+%     cfg.layout = layout;
     % cfg.maskparameter = 'trial';
     % cfg.maskstyle = 'outline';
     cfg.showlabels   = 'yes';
-    ft_multiplotTFR(cfg, tfr_plot);
+    ft_singleplotTFR(cfg, tfr_plot);
 end
 
 %% cfg_s = [];

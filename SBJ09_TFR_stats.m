@@ -1,4 +1,4 @@
-function SBJ09_TFR_stats(SBJ,conditions,pipeline_id,an_id,save_data,plot_vis,save_plot)
+function SBJ09_TFR_stats(SBJ,conditions,pipeline_id,an_id,save_data,n_boots,save_stats,plot_vis,save_plot)
 % Calculates time frequency representation, computes cluster-based statistics, and plots the results
 % INPUTS:
 %   SBJ [str] - dataset to be processed
@@ -6,6 +6,8 @@ function SBJ09_TFR_stats(SBJ,conditions,pipeline_id,an_id,save_data,plot_vis,sav
 %   pipeline_id [str] - which processed data pipeline to get the data
 %   an_id [str] - which analysis variabels to use
 %   save_data [0/1] - flag to save TFR or not
+%   n_boots [int] - iterations of stats permutations
+%   save_stats [0/1] - flag to save stats or not
 %   plot_vis ['on'/'off'] - make the plot visible or not
 %   save_plot [0/1] - save the plots or not
 
@@ -53,87 +55,92 @@ roi_trl = fn_ft_cut_trials_equal_len(roi,events,trial_info.condition_n',trial_li
 
 %% Compute TFRs
 % all cfg_tfr options are specified in the an_vars
-% n_trials = zeros([1 numel(cond_lab)]);
 tfr = {};
+n_trials = zeros([1 numel(cond_lab)]);
 for cond_ix = numel(cond_lab)
     fprintf('===================================================\n');
     fprintf('------------- TFR Calculations for %s ----------\n',cond_lab{cond_ix});
     fprintf('===================================================\n');
     cfg_tfr.trials = find(cond_idx(cond_ix,:)==1);
     tfr{cond_ix}   = ft_freqanalysis(cfg_tfr, roi_trl);
+    
+    % Grab n_trials for design matrix
+    n_trials(cond_ix) = size(tfr{cond_ix}.trialinfo,1);
 end
 
-%     % Grab n_trials for design matrix
-%     n_trials(cond_ix) = size(tfr{cond_ix}.trial,1);
-% %% Baseline Correction
+% %% Baseline Correction --> not doing this since I'm comparing conditions directly, not to baseline
 % cfg = [];
 % cfg.demean         = demean_yn;
 % cfg.baselinewindow = bsln_lim;
 % roi_trl = ft_preprocessing(cfg,roi_trl);
 
-% %% Run Statistics
-% % Create design matrix
-% % design = zeros(2,size(roi_erp_con.trial,1) + size(roi_erp_inc.trial,1));
-% % % Conditions (Independent Variable)
-% % design(1,1:size(roi_erp_con.trial,1)) = 1;
-% % design(1,(size(roi_erp_con.trial,1)+1):(size(roi_erp_con.trial,1) + size(roi_erp_inc.trial,1)))= 2;
-% % % Trial Numbers
-% % design(2,1:size(roi_erp_con.trial,1)) = 1;
-% % design(2,(size(roi_erp_con.trial,1)+1):(size(roi_erp_con.trial,1) + size(roi_erp_inc.trial,1)))= 2;
-% design = zeros(2,sum(n_trials));
-% for an_ix = 1:numel(cond_lab)
-%     if an_ix==1
-%         design(1,1:n_trials(an_ix)) = an_ix;                                % Conditions (Independent Variable)
-%         design(2,1:n_trials(an_ix)) = 1:n_trials(an_ix);                    % Trial Numbers
-%     else
-%         design(1,sum(n_trials(1:an_ix-1))+1:sum(n_trials(1:an_ix)))= an_ix; % Conditions (Independent Variable)
-%         design(2,sum(n_trials(1:an_ix-1))+1:sum(n_trials(1:an_ix)))= 1:n_trials(an_ix);
-%     end
-% end
-% 
-% % Prepare neighbors layout
-% % cfgn = [];
-% % cfgn.method  = 'distance';
-% % cfgn.layout  = 'ordered';
-% % cfgn.channel = elecs;
-% % neighbors    = ft_prepare_neighbours(cfgn,roi_erp_allch{1});
-% % for ch_ix = 1:numel(roi_erp{1}.label)
-% %     neighbors(ch_ix).label = roi_erp{1}.label{ch_ix};
-% %     neighbors(ch_ix).neighblabel = {};
-% % end
-% 
-% % Calculate statistics
-% cfg_stat = [];
-% cfg_stat.latency          = stat_lim;
-% cfg_stat.channel          = 'all';
-% cfg_stat.parameter        = 'trial';
-% cfg_stat.method           = 'montecarlo';
-% cfg_stat.statistic        = 'ft_statfun_indepsamplesT';
-% cfg_stat.correctm         = 'cluster';
-% cfg_stat.clusteralpha     = 0.05;   %threshold for a single comparison (time point) to be included in the clust
-% cfg_stat.clusterstatistic = 'maxsum';
-% cfg_stat.clustertail      = 0;
-% cfg_stat.tail             = 0; %two sided
-% cfg_stat.correcttail      = 'alpha'; %correct the .alpha for two-tailed test (/2)
-% cfg_stat.alpha            = 0.05;
-% cfg_stat.numrandomization = n_boots;
-% cfg_stat.design           = design;
-% cfg_stat.neighbours       = [];%neighbors;
-% % cfg_stat.minnbchan        = 0;
-% cfg_stat.ivar             = 1;  %row of design matrix containing independent variable
-% % cfg_stat.uvar             = 2;  %row of design matrix containing dependent variable, not needed for indepsamp
-% [stat] = ft_timelockstatistics(cfg_stat, roi_hfa{:});
+%% Run Statistics
+% Create design matrix
+design = zeros(2,sum(n_trials));
+for an_ix = 1:numel(cond_lab)
+    if an_ix==1
+        design(1,1:n_trials(an_ix)) = an_ix;                                % Conditions (Independent Variable)
+        design(2,1:n_trials(an_ix)) = 1:n_trials(an_ix);                    % Trial Numbers
+    else
+        design(1,sum(n_trials(1:an_ix-1))+1:sum(n_trials(1:an_ix)))= an_ix; % Conditions (Independent Variable)
+        design(2,sum(n_trials(1:an_ix-1))+1:sum(n_trials(1:an_ix)))= 1:n_trials(an_ix);
+    end
+end
+
+% Calculate statistics
+cfg_stat = [];
+cfg_stat.latency          = stat_lim;
+cfg_stat.channel          = {'RSM*','LSM*'};%'all';
+cfg_stat.parameter        = 'powspctrm';    %for now, assume power
+cfg_stat.method           = 'montecarlo';
+cfg_stat.statistic        = 'ft_statfun_indepsamplesT';
+cfg_stat.correctm         = 'cluster';
+cfg_stat.clusteralpha     = 0.05;   %threshold for a single comparison (time point) to be included in the clust
+cfg_stat.clusterstatistic = 'maxsum';
+cfg_stat.clustertail      = 0;
+cfg_stat.tail             = 0; %two sided
+cfg_stat.correcttail      = 'alpha'; %correct the .alpha for two-tailed test (/2)
+cfg_stat.alpha            = 0.05;
+cfg_stat.numrandomization = n_boots;
+cfg_stat.design           = design;
+cfg_stat.neighbours       = [];%neighbors;
+% cfg_stat.minnbchan        = 0;
+cfg_stat.ivar             = 1;  %row of design matrix containing independent variable
+% cfg_stat.uvar             = 2;  %row of design matrix containing dependent variable, not needed for indepsamp
+[stat] = ft_freqstatistics(cfg_stat, tfr{:});
 
 % Save Results
 if save_data
     data_out_filename = strcat(SBJ_vars.dirs.proc,SBJ,'_TFR_stats_',conditions,...
                                 '_ROI_',pipeline_id,'_',an_id,'.mat');
     fprintf('Saving %s\n',data_out_filename);
-    save(data_out_filename, '-v7.3','tfr');
+    save(data_out_filename, '-v7.3','stat');
 end
 %% Plot Results
 % stat_full = stat;
 % roi_hfa_full = roi_hfa;
+% Obtain the descriptive stats
+tfr_avg = {};
+cfg_avg = [];
+cfg_avg.channel = {'RSM*','LSM*'};
+for cond_ix = 1:numel(cond_lab)
+    tfr_avg{cond_ix} = ft_freqdescriptive(cfg_avg,tfr{cond_ix});
+end
+
+% Take the difference
+tfr_diff = {};
+for cond_ix = 2:numel(cond_lab)
+    tfr_diff{cond_ix-1} = tfr_avg{cond_ix}.powspctrm - tfr_avg{cond_ix-1}.powspctrm;
+end
+stat.raweffect = tfr_diff{1};
+
+%% Cluster plots
+cfg_clust = [];
+cfg_clust.alpha  = 0.025;
+cfg_clust.parameter = 'raweffect';
+cfg_clust.zlim   = [-1e-27 1e-27];
+cfg_clust.layout = layout;
+ft_clusterplot(cfg_clust, stat);
 
 %% Single Plots
 cfg_s = [];

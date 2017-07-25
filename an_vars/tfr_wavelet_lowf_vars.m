@@ -24,11 +24,7 @@ cfg_tfr.method       = 'wavelet';
 cfg_tfr.width        = 4;
 cfg_tfr.pad          = 'maxperlen'; %add time on either side of window
 cfg_tfr.padtype      = 'zero';
-cfg_tfr.foi          = foi_center;%2:5:150;                         % analysis 2 to 30 Hz in steps of 2 Hz 
-%cfg_tfr.t_ftimwin    = ones(length(cfg_tfr.foi),1).*0.5;   % length of time window = 0.5 sec
+cfg_tfr.foi          = foi_center;  % analysis 2 to 30 Hz in steps of 2 Hz 
 cfg_tfr.toi          = 'all';%-buff_lim(1):0.1:1.5;                  % time window "slides" from -0.5 to 1.5 sec in steps of 0.05 sec (50 ms)
-cfg_tfr.keeptrials   = 'yes';
-% cfg.t_ftimwin    = ones(1,length(cfg.tapsmofrq))*delta_time;
-% cfg.width        = 7;
-% cfg.gwidth       = 3;
+cfg_tfr.keeptrials   = 'yes';       %must be 'yes' for stats
 

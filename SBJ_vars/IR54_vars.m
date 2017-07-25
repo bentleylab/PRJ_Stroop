@@ -1,12 +1,12 @@
-%% IR39 Processing Variables
+%% IR54 Processing Variables
 addpath('/home/knight/hoycw/Apps/fieldtrip/');
 ft_defaults
 
 %--------------------------------------
 % Basics
 %--------------------------------------
-SBJ_vars.SBJ = 'IR39';
-SBJ_vars.raw_file = '2016042320_0029.besa';
+SBJ_vars.SBJ = 'IR54';
+SBJ_vars.raw_file = '2017012411_0008.besa';
 SBJ_vars.block_prefix = '';
 
 SBJ_vars.dirs.SBJ     = ['/home/knight/hoycw/PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
@@ -39,45 +39,47 @@ SBJ_vars.orig_n_samples = hdr.nSamples;
 SBJ_vars.orig_srate = hdr.Fs;
 clear hdr;
 
-SBJ_vars.ch_lab.probes = {'ROF','RAC','RIN','RAM','RHH','RTH','LOF','LIN','LHH','LTH','LAM'};
-SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
-SBJ_vars.ch_lab.ROI    = {'RAC*','ROF*','RIN*','LOF*','LIN*'};
+SBJ_vars.ch_lab.probes = {'RAM','RHH','RTH','RAC','ROF','LAM','LHH','LTH','LAC','LOF'};
+SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
+SBJ_vars.ch_lab.ROI    = {'RAC*','ROF*','LAC*','LOF*'};
 
 SBJ_vars.ch_lab.bad = {...
-    '-LAM*','-LHH1','-LHH2','-LHH3','-LTH1','-LTH2','-LTH3','-LTH10',...%Epileptic
-    '-RHH1','-RHH2','-RHH3','-RTH2','-RTH3','-RTH4','-RAM1','-RAM2','-RAM3','-RAM6',...% Epileptic
-    '-RIN9','-RIN10','-ROF10','-LIN3','-LOF1','-LOF10','-LIN10','-ROF10','-LHH10',...%noisy or out of brain
-    '-PMF*','-AMF*','-OF*','-AT*','-PT*','-LT*','-AD*','-HD*','-DC03','-DC04'....% Not real data
-    '-E','-LSH','-LLE','-RSH','-V1',...% Not real data
-    '-EKG*',...
+    'RAM1','RAM2','RAM8','RAM9','RAM10','RHH1','RHH2','RHH3','RHH4',...% epileptic
+    'ROF1','LAM10',...% bad- both are loose
+    'ROF10','LTH10','LAC10','LOF1',...% out of brain
+    'RSMA*','RBT*','RAIN*','RPIN*',...% Not real data (left overs from previous SBJ?)
+    'DC01','DC04'....% Not real data
+    'REF','LLE','LUE','RLE','RUE',...% Not real data
+    'EKG'...
     };
-SBJ_vars.ch_lab.eeg = {'C3','CZ','C4','FZ','OZ'};
-%                           not sure about 'Z' but PSD looks ok
-SBJ_vars.ch_lab.photod = {'DC01'};
-SBJ_vars.ch_lab.mic    = {'DC02'};
+% watch out for prominent slowing in LAC5+ and LOF5+, sometimes upper ROF,RAC too
+SBJ_vars.ch_lab.ref_exclude = {};
+
+SBJ_vars.ch_lab.eeg = {'FZ' 'CZ' 'OZ' 'C3' 'C4'};
+SBJ_vars.ch_lab.photod = {'DC02'};
+SBJ_vars.ch_lab.mic    = {'DC03'};
 
 %--------------------------------------
 % Line Noise Parameters
 %--------------------------------------
 % most have only regular harmonics with normal width, and 120 and 240 are weak
-% RBT, RPIN, RSMA,LAC have an extra peak at 200
 % RHH6 has really bad at all harmonics, like LUE and other nonsense chan
-SBJ_vars.notch_freqs = [60 120 180 240 300]; %200 shoudl come out in re-referencing
+SBJ_vars.notch_freqs = [60 120 180 240 300];
 SBJ_vars.bs_width    = 2;
 
 %--------------------------------------
 % Time Parameters
 %--------------------------------------
-% events start ~155 or 160s to ~384; ~580 to end (~1360?)
-SBJ_vars.analysis_time = {[135 380], [535 1370]};
+% Data starts ~107s, ends ~1101s; end of recording is ~1114s 
+preproc_vars.analysis_time = {[90 1114]};
 
 %--------------------------------------
 % Artifact Rejection Parameters
 %--------------------------------------
-% SBJ_vars.artifact_params.std_limit_raw = 7;
-% SBJ_vars.artifact_params.hard_threshold_raw = 1000;
+% SBJ_vars.artifact_params.std_limit_raw = 8;
+% SBJ_vars.artifact_params.hard_threshold_raw = 1000; % ~1000 and below is the main cloud of points
 
-% SBJ_vars.artifact_params.std_limit_diff = 7;
+% SBJ_vars.artifact_params.std_limit_diff = 8;
 % SBJ_vars.artifact_params.hard_threshold_diff = 100;
 
 %--------------------------------------

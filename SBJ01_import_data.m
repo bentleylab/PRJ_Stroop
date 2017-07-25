@@ -20,6 +20,26 @@ SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars
 eval(SBJ_vars_cmd);
 
 % Process channel labels
+if isfield(SBJ_vars.ch_lab,'prefix')
+    for bad_ix = 1:numel(SBJ_vars.ch_lab.bad)
+        SBJ_vars.ch_lab.bad{bad_ix} = [SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.bad{bad_ix}];
+    end
+    for eeg_ix = 1:numel(SBJ_vars.ch_lab.eeg)
+        SBJ_vars.ch_lab.eeg{eeg_ix} = [SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.eeg{eeg_ix}];
+    end
+    SBJ_vars.ch_lab.photod = [SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.photod];
+    SBJ_vars.ch_lab.mic    = [SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.mic];
+end
+if isfield(SBJ_vars.ch_lab,'suffix')
+    for bad_ix = 1:numel(SBJ_vars.ch_lab.bad)
+        SBJ_vars.ch_lab.bad{bad_ix} = [SBJ_vars.ch_lab.bad{bad_ix} SBJ_vars.ch_lab.suffix];
+    end
+    for eeg_ix = 1:numel(SBJ_vars.ch_lab.eeg)
+        SBJ_vars.ch_lab.eeg{eeg_ix} = [SBJ_vars.ch_lab.eeg{eeg_ix} SBJ_vars.ch_lab.suffix];
+    end
+    SBJ_vars.ch_lab.photod = [SBJ_vars.ch_lab.photod SBJ_vars.ch_lab.suffix];
+    SBJ_vars.ch_lab.mic    = [SBJ_vars.ch_lab.mic SBJ_vars.ch_lab.suffix];
+end
 bad_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.bad);
 eeg_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.eeg);
 photod_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.photod);
@@ -56,6 +76,12 @@ else
     % Load event data
     cfg.channel = {SBJ_vars.ch_lab.photod{:},SBJ_vars.ch_lab.mic{:}};
     evnt = ft_preprocessing(cfg);
+end
+% Toss 'EDF Annotations' Channel (if it exists)
+if any(strcmp(data.label,'EDF Annotations'))
+    cfg_s = [];
+    cfg_s.channel = {'all','-EDF Annotations'};
+    data = ft_selectdata(cfg_s,data);
 end
 
 %% Cut to analysis_time
@@ -115,6 +141,40 @@ if strcmp(resamp_yn,'yes') && (data.fsample ~= resamp_freq)
     data = ft_resampledata(cfg, data);
     if ~isempty(SBJ_vars.ch_lab.eeg)
         eeg = ft_resampledata(cfg, eeg);
+    end
+end
+
+%% Final Channel Label Corrections
+% Strip Pre/Suffix if Necessary
+for ch_ix = 1:numel(data.label)
+    if isfield(SBJ_vars.ch_lab,'prefix')
+        data.label{ch_ix} = strrep(data.label{ch_ix},SBJ_vars.ch_lab.prefix,'');
+    end
+    if isfield(SBJ_vars.ch_lab,'suffix')
+        data.label{ch_ix} = strrep(data.label{ch_ix},SBJ_vars.ch_lab.suffix,'');
+    end
+end
+for eeg_ix = 1:numel(eeg.label)
+    if isfield(SBJ_vars.ch_lab,'prefix')
+        eeg.label{ch_ix} = strrep(eeg.label{ch_ix},SBJ_vars.ch_lab.prefix,'');
+    end
+    if isfield(SBJ_vars.ch_lab,'suffix')
+        eeg.label{ch_ix} = strrep(eeg.label{ch_ix},SBJ_vars.ch_lab.suffix,'');
+    end
+end
+if isfield(SBJ_vars.ch_lab,'prefix')
+    evnt.label{1} = strrep(evnt.label{1},SBJ_vars.ch_lab.prefix,'');
+    evnt.label{2} = strrep(evnt.label{2},SBJ_vars.ch_lab.prefix,'');
+end
+if isfield(SBJ_vars.ch_lab,'suffix')
+    evnt.label{1} = strrep(evnt.label{1},SBJ_vars.ch_lab.suffix,'');
+    evnt.label{2} = strrep(evnt.label{2},SBJ_vars.ch_lab.suffix,'');
+end
+
+% Fix any mislabeled channels
+if isfield(SBJ_vars.ch_lab,'mislabel')
+    for ch_ix = 1:numel(SBJ_vars.ch_lab.mislabel)
+        data.label{strcmp(data.label,SBJ_vars.ch_lab.mislabel{ch_ix}(1))} = SBJ_vars.ch_lab.mislabel{ch_ix}(2);
     end
 end
 

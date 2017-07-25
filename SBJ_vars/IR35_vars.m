@@ -72,9 +72,17 @@ SBJ_vars.bs_width    = 2;
 %--------------------------------------
 SBJ_vars.analysis_time = {[105 1140]};
 
-% %--------------------------------------
-% % Save SBJ_vars
-% %--------------------------------------
-% out_filename = [SBJ_vars.dirs.SBJ SBJ '_vars.mat'];
-% save(out_filename,'SBJ_vars');
+%--------------------------------------
+% Artifact Rejection Parameters
+%--------------------------------------
+% SBJ_vars.artifact_params.std_limit_raw = 7;
+% SBJ_vars.artifact_params.hard_threshold_raw = 1000;
 
+% SBJ_vars.artifact_params.std_limit_diff = 7;
+% SBJ_vars.artifact_params.hard_threshold_diff = 100;
+
+%--------------------------------------
+% Trials to Reject
+%--------------------------------------
+% These should be indices AFTER SBJ05 has run!
+% SBJ_vars.trial_reject_ix = [];
