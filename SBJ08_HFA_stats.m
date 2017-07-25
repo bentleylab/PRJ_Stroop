@@ -26,9 +26,11 @@ addpath('/home/knight/hoycw/PRJ_Stroop/scripts/');
 addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
 addpath('/home/knight/hoycw/Apps/fieldtrip/');
 ft_defaults
-SBJ_dir = ['/home/knight/hoycw/PRJ_Stroop/data/' SBJ '/'];
 
 % Load Data
+eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
+eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
+
 load(strcat(SBJ_dir,'/02_preproc/',SBJ,'_preproc_bp.reref.bandstop.mat'));
 load(strcat(SBJ_dir,'/03_events/',SBJ,'_trial_info_final.mat'));
 load(strcat(SBJ_dir,'/02_preproc/',SBJ,'_proc_vars.mat'));

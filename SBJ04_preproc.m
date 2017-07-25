@@ -88,7 +88,7 @@ end
 % SBJ_vars.ch_lab.left_out = [left_out_ch{:}];
 
 %% Filter out line noise
-fprintf('============== Filtering Line Noise %s via %s ==============\n',SBJ,line_filt);
+fprintf('============== Filtering Line Noise %s via %s ==============\n',SBJ,proc_vars.notch_type);
 
 if strcmp(proc_vars.notch_type,'dft')
     cfg           = [];

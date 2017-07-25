@@ -40,9 +40,9 @@ SBJ_vars.orig_srate = hdr.Fs;
 clear hdr;
 
 SBJ_vars.ch_lab.probes = {'RSM','RAC','ROF','RIN','RTI','RAM','RHH','RTH',...
-                         'LSMA','LAC','LOF','LIN','LTI','LAM','LHH','LTH'};
+                         'LSMA','LAC','LOF','LIN','LTI','LAM','LTH'};%'LHH' doesn't count because all elecs are bad
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP',...
-                          'BP','BP','BP','BP','BP','BP','BP','BP'};
+                          'BP','BP','BP','BP','BP','BP','BP'};
 SBJ_vars.ch_lab.ROI    = {'RSM*','RAC*','ROF*','RIN*','RTI*',...
                               'LAM4-5','LAC*','LOF*'}; %LAM4 is inferior anterior insula
 
@@ -81,3 +81,18 @@ SBJ_vars.analysis_time = {[70 1040]};
 % out_filename = [SBJ_vars.dirs.SBJ SBJ '_vars.mat'];
 % save(out_filename,'SBJ_vars');
 
+%--------------------------------------
+% Artifact Rejection Parameters
+%--------------------------------------
+% Add rejection of LOF1-2, maybe RTI2-3, RIN4-5
+SBJ_vars.artifact_params.std_limit_raw = 7;
+SBJ_vars.artifact_params.hard_threshold_raw = 1000; % ~1000 and below is the main cloud of points
+
+SBJ_vars.artifact_params.std_limit_diff = 7;
+SBJ_vars.artifact_params.hard_threshold_diff = 100; % everything was really low on diff here
+
+%--------------------------------------
+% Trials to Reject
+%--------------------------------------
+% These should be indices AFTER SBJ05 has run!
+SBJ_vars.trial_reject_ix = [22, 95, 174, 176, 180, 245, 254];

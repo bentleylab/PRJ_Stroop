@@ -26,13 +26,13 @@ eval(SBJ_vars_cmd);
 %% Load data
 eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
 load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
-load(strcat(SBJ_vars.dirs.events,SBJ,'_bob_bad_epochs.mat'));
+load(strcat(SBJ_vars.dirs.events,SBJ,'_bob_bad_epochs_preclean.mat'));
 
 % Parameters
-if ~isfield(proc_vars.RT_std_thresh)
+if ~isfield(proc_vars,'RT_std_thresh')
     proc_vars.RT_std_thresh = 3;
 end
-if ~isfield(proc_vars.trial_lim_s)
+if ~isfield(proc_vars,'trial_lim_s')
     proc_vars.trial_lim_s = [-0.500 2.5];
 end
 
@@ -49,23 +49,19 @@ end
 trial_lim = proc_vars.trial_lim_s*data.fsample;
 
 %% Reject known artifacts
-skip_rt1 = find(trial_info.resp_onset==-1); % this may be unnecessary, not sure if I make any -1 at some point...
-skip_rt2 = find(isnan(trial_info.resp_onset));
-skip_err = find(trial_info.error==1);
-skip_bad = find(trial_info.error==-1);
+skip_rt1 = find(trial_info.resp_onset==-1);     % couldn't determine RT
+skip_rt2 = find(isnan(trial_info.resp_onset));  % no response
+skip_err = find(trial_info.error==1);           % error
+skip_bad = find(trial_info.error==-1);          % bad trial
 
+% Convert visually bad epochs from full time to analysis_time
+%   NOTE: 1 keeps epochs that are only partially overlaping real data
+%   (i.e., will be trimmed to edges of analysis_time)
+bad_epochs = fn_convert_epochs_full2at(bad_epochs,SBJ_vars.analysis_time,...
+                                    strcat(SBJ_vars.dirs.preproc,SBJ,'_preclean.mat'),1);
+                                
 % Toss epochs that overlap with bad_epochs from Bob
-bob_bad_samples = [];
-for bad_epoch_ix = 1:size(bad_epochs,1)
-    bob_bad_samples = [bob_bad_samples bad_epochs(bad_epoch_ix,1):bad_epochs(bad_epoch_ix,2)];
-end
-trials_sample_idx = fn_epoch_cuts_datapad(1:size(data.trial{1},2),events,events,trial_lim);
-skip_bob = [];
-for epoch_ix = 1:size(trials_sample_idx,1)
-    if ~isempty(intersect(trials_sample_idx(epoch_ix,:),bob_bad_samples))
-        skip_bob = [skip_bob; epoch_ix];
-    end
-end
+skip_bob = fn_find_trials_overlap_epochs(bad_epochs,1:size(data.trial{1},2),events,trial_lim);
 
 % Find RT outliers
 RT_mean = nanmean(trial_info.response_time);
