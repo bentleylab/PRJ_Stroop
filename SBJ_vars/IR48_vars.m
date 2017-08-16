@@ -54,7 +54,6 @@ SBJ_vars.ch_lab.bad = {...
 %     'FG12',...% slow rhythm like FG43 but lower amplitude
 %     'FG25',...% lots of drift, can maybe be saved with preprocessing?
 SBJ_vars.ch_lab.ref_exclude = {'FG44'}; % sometimes reflects artifact in FG45/46
-
 SBJ_vars.ch_lab.eeg = {'FPZ','FP1','FP2','OZ','T5','T6'};
 SBJ_vars.ch_lab.photod = {'DC02'};
 SBJ_vars.ch_lab.mic    = {'DC04'};%burried in noise, so can't visually see responses in plot (can hear just barely)

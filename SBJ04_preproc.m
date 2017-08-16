@@ -50,13 +50,28 @@ clear data_orig
 
 %% Rerefrence
 fprintf('============== Re-Referencing %s ==============\n',SBJ);
+if numel(SBJ_vars.ref_types)~=numel(SBJ_vars.ch_lab.probes)
+    error('ERROR: Mismatched number of probes and reference types in SBJ_vars');
+end
+left_out_ch = {};
 for d = 1:numel(SBJ_vars.ch_lab.probes)
     cfg = [];
     cfg.channel = ft_channelselection(strcat(SBJ_vars.ch_lab.probes{d},'*'), data.label);
     probe_data = ft_selectdata(cfg,data);   % Grab data from this probe to plot in PSD comparison
     
-    cfg.montage.labelold = cfg.channel;
-    [cfg.montage.labelnew, cfg.montage.tra, left_out_ch{d}] = fn_create_ref_scheme_bipolar(cfg.channel);
+    % Create referencing scheme
+    if strcmp(SBJ_vars.ref_types{d},'BP')
+        cfg.montage.labelold = cfg.channel;
+        [cfg.montage.labelnew, cfg.montage.tra, left_out_ch{d}] = fn_create_ref_scheme_bipolar(cfg.channel);
+    elseif strcmp(SBJ_vars.ref_types{d},'CAR')
+        cfg.reref      = 'yes';
+        cfg.refchannel = setdiff(probe_data.label,SBJ_vars.ref_exclude);
+        cfg.refmethod  = 'avg';
+        left_out_ch{d} = {};    % CAR is applied to all channels
+    else
+        error(strcat('ERROR: Unrecognized reference type ',SBJ_vars.ref_types{d},...
+            ' for probe ',SBJ_vars.ch_lab.probes{d}));
+    end
     data_reref{d} = ft_preprocessing(cfg, data);
     
     if strcmp(psd_reref,'yes')
@@ -75,13 +90,15 @@ clear data_bp probe_data
 cfg = [];
 % cfg.appendsens = 'yes';
 data = ft_appenddata(cfg,data_reref{:});
+% Somehow, data.fsample is lost in certain cases here (new ft version I think):
+data.fsample = data_reref{1}.fsample;
 data_reref = data;
 
 % Print left out channels, add to SBJ_vars
-if ~isempty(left_out_ch)
+if ~isempty([left_out_ch{:}])
     fprintf('=============================================================\n');
-    fprintf('WARNING: %i channels left out!\n',numel(left_out_ch));
-    left_out_ch
+    fprintf('WARNING: %i channels left out!\n',numel([left_out_ch{:}]));
+    left_out_ch{:}
     fprintf('Consider adding these to SBJ_vars!\n');
     fprintf('=============================================================\n');
 end

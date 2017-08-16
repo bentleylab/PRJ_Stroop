@@ -53,6 +53,7 @@ SBJ_vars.ch_lab.bad = {...
     'E','LSh ','LLE','RSh','V1','V2','V3','V4','V5','V6','REF',...% Not real data
     'EKG','C16','EDF Annotations'...
     };
+% SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.eeg = {};
 SBJ_vars.ch_lab.photod = {'DC01'};
 SBJ_vars.ch_lab.mic    = {'DC04'};
@@ -68,6 +69,9 @@ SBJ_vars.bs_width    = 2;
 %--------------------------------------
 % Time Parameters
 %--------------------------------------
+%   12 blocks, if you count the one split by the screen freeze as two blocks
+%   events start 75, screen freezes ~168, kicks back in ~213, over !1365
+%   not sure about excluding the freeze, which is ~45s
 SBJ_vars.analysis_time = {[65 1375]};
 
 %--------------------------------------

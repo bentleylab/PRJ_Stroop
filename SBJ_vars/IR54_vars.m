@@ -53,8 +53,7 @@ SBJ_vars.ch_lab.bad = {...
     'EKG'...
     };
 % watch out for prominent slowing in LAC5+ and LOF5+, sometimes upper ROF,RAC too
-SBJ_vars.ch_lab.ref_exclude = {};
-
+% SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.eeg = {'FZ' 'CZ' 'OZ' 'C3' 'C4'};
 SBJ_vars.ch_lab.photod = {'DC02'};
 SBJ_vars.ch_lab.mic    = {'DC03'};

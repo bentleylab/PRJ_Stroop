@@ -1,0 +1,43 @@
+%% Photodiode Trace Cleaning Parameters: IR31
+% Mark trials to ignore e.g., interruptions
+%   B1 trials is in different besa file due to seizure interruptions
+ignore_trials = [1:36];
+
+% Set zero/baseline during a block
+bsln_val = 6500;
+
+% Record epochs (in sec) with fluctuations that should be set to baseline
+% photodiode looks good, but KLA script finds some extra events (e.g., extra red line at ending?)
+% 2x red: B1T22, B2T34, B4T28, B6T2, B8T7, 26, and 30
+% 2x green: B5T18 and 22, B7T1 and 5
+yval_bsln = 1000; %this is the zero/baseline during a block
+bsln_times = {...
+[897.0 910.0]...% this is just hte end of the data
+    };
+% Record epochs (in sec) when baseline has shifted
+bsln_shift_times = {};
+% Record amount of shift in baseline for each epoch 
+bsln_shift_val = [];
+if length(bsln_shift_times)~=length(bsln_shift_val)
+    error('Number of epochs and values for baseline shift periods do not match.');
+end
+
+% Record within trial corrections
+stim_times = {...
+    [64.5 66.1],...
+    [203.8 205.2],...
+    [424.1 425.6],...
+    [522.4 523.7],...
+    [533.3 534.7],...
+    [585.6 587.2],...
+    [691.8 693.2],...
+    [702.6 704.0],...
+    [815.8 817.4],...
+    [868.0 869.5],...
+    [879.1 880.6]...
+    };
+stim_yval = repmat(4350,[numel(stim_times) 1]);
+if length(stim_times)~=length(stim_yval)
+    error('Number of epochs and values for stimulus correction periods do not match.');
+end
+

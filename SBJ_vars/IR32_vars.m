@@ -45,11 +45,11 @@ SBJ_vars.ch_lab.ROI    = {'FPG*','IHL*','IHR*','AG*'};
 
 SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
 SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
-SBJ_vars.ch_lab.mislabel = {['RLT12','FPG12'],['IH;L8','IHL8']};
+SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
 
 SBJ_vars.ch_lab.bad = {...
-    'FTG27','FTG28','FTG29','FTG35','FTG36','FTG37','FTG34',...%epileptic
-    'FTG7','FTG25','FTG40',...%bad/noisy
+    'FPG27','FPG28','FPG29','FPG35','FPG36','FPG37','FPG34',...%epileptic
+    'FPG7','FPG25','FPG40',...%bad/noisy
     'IHR20','IHR21','IHR30','IHR31',...% noisy
     'DC03','DC04'....% Not real data
     'E','LSh ','LLE','RSh','V1','V2','V3','V4','V5','V6','REF',...% Not real data

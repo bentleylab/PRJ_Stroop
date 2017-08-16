@@ -43,6 +43,7 @@ SBJ_vars.ch_lab.probes = {};
 SBJ_vars.ref_types     = {};
 SBJ_vars.ch_lab.ROI    = {};
 
+% SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     };
 SBJ_vars.ch_lab.eeg = {};

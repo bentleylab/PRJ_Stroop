@@ -27,8 +27,8 @@ if isfield(SBJ_vars.ch_lab,'prefix')
     for eeg_ix = 1:numel(SBJ_vars.ch_lab.eeg)
         SBJ_vars.ch_lab.eeg{eeg_ix} = [SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.eeg{eeg_ix}];
     end
-    SBJ_vars.ch_lab.photod = [SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.photod];
-    SBJ_vars.ch_lab.mic    = [SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.mic];
+    SBJ_vars.ch_lab.photod = {[SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.photod{1}]};
+    SBJ_vars.ch_lab.mic    = {[SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.mic{1}]};
 end
 if isfield(SBJ_vars.ch_lab,'suffix')
     for bad_ix = 1:numel(SBJ_vars.ch_lab.bad)
@@ -37,8 +37,8 @@ if isfield(SBJ_vars.ch_lab,'suffix')
     for eeg_ix = 1:numel(SBJ_vars.ch_lab.eeg)
         SBJ_vars.ch_lab.eeg{eeg_ix} = [SBJ_vars.ch_lab.eeg{eeg_ix} SBJ_vars.ch_lab.suffix];
     end
-    SBJ_vars.ch_lab.photod = [SBJ_vars.ch_lab.photod SBJ_vars.ch_lab.suffix];
-    SBJ_vars.ch_lab.mic    = [SBJ_vars.ch_lab.mic SBJ_vars.ch_lab.suffix];
+    SBJ_vars.ch_lab.photod = {[SBJ_vars.ch_lab.photod{1} SBJ_vars.ch_lab.suffix]};
+    SBJ_vars.ch_lab.mic    = {[SBJ_vars.ch_lab.mic{1} SBJ_vars.ch_lab.suffix]};
 end
 bad_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.bad);
 eeg_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.eeg);
@@ -154,12 +154,14 @@ for ch_ix = 1:numel(data.label)
         data.label{ch_ix} = strrep(data.label{ch_ix},SBJ_vars.ch_lab.suffix,'');
     end
 end
-for eeg_ix = 1:numel(eeg.label)
-    if isfield(SBJ_vars.ch_lab,'prefix')
-        eeg.label{ch_ix} = strrep(eeg.label{ch_ix},SBJ_vars.ch_lab.prefix,'');
-    end
-    if isfield(SBJ_vars.ch_lab,'suffix')
-        eeg.label{ch_ix} = strrep(eeg.label{ch_ix},SBJ_vars.ch_lab.suffix,'');
+if ~isempty(SBJ_vars.ch_lab.eeg)
+    for eeg_ix = 1:numel(eeg.label)
+        if isfield(SBJ_vars.ch_lab,'prefix')
+            eeg.label{ch_ix} = strrep(eeg.label{ch_ix},SBJ_vars.ch_lab.prefix,'');
+        end
+        if isfield(SBJ_vars.ch_lab,'suffix')
+            eeg.label{ch_ix} = strrep(eeg.label{ch_ix},SBJ_vars.ch_lab.suffix,'');
+        end
     end
 end
 if isfield(SBJ_vars.ch_lab,'prefix')
@@ -174,7 +176,8 @@ end
 % Fix any mislabeled channels
 if isfield(SBJ_vars.ch_lab,'mislabel')
     for ch_ix = 1:numel(SBJ_vars.ch_lab.mislabel)
-        data.label{strcmp(data.label,SBJ_vars.ch_lab.mislabel{ch_ix}(1))} = SBJ_vars.ch_lab.mislabel{ch_ix}(2);
+        % Future edit: search for the bad label across data, eeg, evnt
+        data.label(strcmp(data.label,SBJ_vars.ch_lab.mislabel{ch_ix}(1))) = SBJ_vars.ch_lab.mislabel{ch_ix}(2);
     end
 end
 
