@@ -41,7 +41,7 @@ clear hdr;
 
 SBJ_vars.ch_lab.probes = {'FPG','IHL','IHR','AG'};
 SBJ_vars.ref_types     = {'CAR','CAR','CAR','CAR'};
-SBJ_vars.ch_lab.ROI    = {'FPG*','IHL*','IHR*','AG*'};
+SBJ_vars.ch_lab.ROI    = {'IHL*','IHR*','AG*'};%'FPG*' taken out because so many channels are dominated by rhythmic activity
 
 SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
 SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
@@ -75,14 +75,14 @@ SBJ_vars.analysis_time = {[62 1170]};
 %--------------------------------------
 % Artifact Rejection Parameters
 %--------------------------------------
-% SBJ_vars.artifact_params.std_limit_raw = 7;
-% SBJ_vars.artifact_params.hard_threshold_raw = 1000;
+SBJ_vars.artifact_params.std_limit_raw = 9;
+SBJ_vars.artifact_params.hard_threshold_raw = 1000;
 
-% SBJ_vars.artifact_params.std_limit_diff = 7;
-% SBJ_vars.artifact_params.hard_threshold_diff = 100;
+SBJ_vars.artifact_params.std_limit_diff = 9;
+SBJ_vars.artifact_params.hard_threshold_diff = 150;
 
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
 % These should be indices AFTER SBJ05 has run!
-% SBJ_vars.trial_reject_ix = [];
+SBJ_vars.trial_reject_ix = [146, 175, 181, 207, 209, 228, 232, 237, 242];

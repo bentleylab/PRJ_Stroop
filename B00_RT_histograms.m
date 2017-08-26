@@ -4,8 +4,7 @@ addpath(genpath('/home/knight/hoycw/PRJ_Stroop/scripts/'));
 addpath(genpath('/home/knight/hoycw/Apps/export_fig-master/'));
 
 % Analysis Parameters
-SBJ       = 'IR32';
-data_id   = strcat(SBJ,'_IH_CA');
+SBJ       = 'IR57';
 late_RT_cut = 600;      %ms window before next stim to eliminate
 %!!! implement!!! stat      = 'mean';         % do stats on 'mean' or 'median'
 
@@ -24,17 +23,13 @@ fig_type      = 'eps';
 
 % Process parameters
 SBJ_dir = strcat('/home/knight/hoycw/PRJ_Stroop/data/',SBJ,'/');
-fig_dir  = strcat('/home/knight/hoycw/PRJ_Stroop/results/RTs/',SBJ,'/auto_RTs/');
+fig_dir  = strcat('/home/knight/hoycw/PRJ_Stroop/results/RTs/',SBJ,'/');
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
 
 %% Load data
-%!!! Taking the manual RTs that are correct, but will need to edit these
-%plots to toss trials excluded for neural reasons
-load(strcat(SBJ_dir,'03_events/',data_id,'_trial_info.mat'),'trial_info');
-% load(strcat(SBJ_dir,'06_epochs/',data_id,'_clean.mat'),'trial_info');
-% load(strcat(SBJ_dir,'03_events/',data_id,'_trial_info.mat'));
+load(strcat(SBJ_dir,'03_events/',SBJ,'_trial_info_final.mat'),'trial_info');
 
 % con = 1-3, neu = 4-6, inc = 7-9
 % within those: same, mic, mcon
@@ -66,7 +61,7 @@ fprintf('%i late trials detected\n',length(late_RT_idx));
 
 %% Histograms per condition
 % Trial Type
-fig_name = strcat(data_id,'_RT_hist_trial_type');
+fig_name = strcat(SBJ,'_RT_hist_trial_type');
 figure('Name',fig_name,'units','normalized','outerposition',[0 0 1 1],'Visible',vis);hold on;
 trial_RTs{1} = RTs(fn_condition_index([trial_lab{1}], trial_info.condition_n)==1);
 trial_RTs{2} = RTs(fn_condition_index([trial_lab{2}], trial_info.condition_n)==1);
@@ -94,7 +89,7 @@ if save_fig ==1
 end
 
 %% Compare trial types within each block type
-fig_name = strcat(data_id,'_RT_hist_trial_type_by_block');
+fig_name = strcat(SBJ,'_RT_hist_trial_type_by_block');
 figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.6 1],'Visible',vis);
 ylimits = {};
 pval = {};
@@ -129,7 +124,7 @@ if save_fig ==1
 end
 
 %% Compare block effects within trial type
-fig_name = strcat(data_id,'_RT_hist_trial_type_prop_con');
+fig_name = strcat(SBJ,'_RT_hist_trial_type_prop_con');
 figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.6 1],'Visible',vis);
 for t_ix = 1:length(trial_lab)
     subplot(3,1,t_ix);hold on;

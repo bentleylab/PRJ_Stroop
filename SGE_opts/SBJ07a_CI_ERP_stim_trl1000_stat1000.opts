@@ -1,0 +1,5 @@
+-o /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
+-e /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
+-v conditions="CI",pipeline_id="main_ft",an_id="ERP_stim_trl1000_stat1000"
+-l mem_free=8G
+-N ERPstat

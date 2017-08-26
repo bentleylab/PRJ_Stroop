@@ -44,8 +44,11 @@ end
 % ylim(ylims);
 
 % Plot Extra Features (events, significance)
-event_line = line([event.time event.time],ylim,...
-    'LineWidth',event.width,'Color',event.color,'LineStyle',event.style);
+for evnt_ix = 1:numel(event.name)
+    event_line = line([event.time(evnt_ix) event.time(evnt_ix)],ylim,...
+        'LineWidth',event.width(evnt_ix),'Color',event.color{evnt_ix},'LineStyle',event.style{evnt_ix});
+    main_lines = [main_lines event_line];
+end
 % Significance marker
 ylims = ylim;
 for sig_ix = 1:size(sig,1)
@@ -60,10 +63,9 @@ end
 plot_info.ax.XLim = [0,size(data,2)];
 plot_info.ax.XTick = 0:plot_info.x_step:size(data,2);
 plot_info.ax.XTickLabel = plot_info.x_lab;
-main_lines = [main_lines event_line];
 title(plot_info.title);
 if plot_info.legend==1
-    legend(main_lines,cond.name{:},event.name,'Location',plot_info.legend_loc);
+    legend(main_lines,cond.name{:},event.name{:},'Location',plot_info.legend_loc);
 end
 
 %         % Plot Single Trials Per Condition

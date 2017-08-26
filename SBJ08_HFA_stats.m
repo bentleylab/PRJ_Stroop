@@ -1,24 +1,6 @@
-function SBJ08_HFA_stats(SBJ,conditions,HFA_type)
+function SBJ08_HFA_stats(SBJ,conditions,pipeline_id,an_id)
 % Calculates high frequency activity, computes cluster-based statistics, and plots the results
 % clear all; %close all;
-
-% Analysis Parameters
-save_data   = 1;                % 0/1
-event_type  = 'stim';           % event around which to cut trials
-trial_lim_s = [-0.5 2.5];       % window in SEC for cutting trials
-demean_yn   = 'yes';
-bsln_lim    = [-0.25 -0.05];    % window in SEC for baseline correction
-stat_lim    = [0 2];            % window in SEC for stats
-n_boots     = 1000;             % Repetitions for non-parametric stats
-% lp_yn       = 'yes';
-% lp_freq     = 30;
-% hp_yn       = 'yes';
-% hp_freq     = 0.5;
-
-% Plotting Parameters
-save_fig     = 1;               % 0/1
-vis_fig      = 'on';            % 'on'/'off'
-fig_filetype = 'png';
 
 %% Data Preparation
 % Set up paths
@@ -27,13 +9,18 @@ addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
 addpath('/home/knight/hoycw/Apps/fieldtrip/');
 ft_defaults
 
+SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+eval(SBJ_vars_cmd);
+an_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/an_vars/' an_id '_vars.m'];
+eval(an_vars_cmd);
+% eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
+
 % Load Data
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
+load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
+load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'));
 
 load(strcat(SBJ_dir,'/02_preproc/',SBJ,'_preproc_bp.reref.bandstop.mat'));
 load(strcat(SBJ_dir,'/03_events/',SBJ,'_trial_info_final.mat'));
-load(strcat(SBJ_dir,'/02_preproc/',SBJ,'_proc_vars.mat'));
 
 % Select Conditions of Interest
 [cond_lab, cond_colors, cond_style] = fn_condition_label_styles(conditions);
@@ -47,7 +34,7 @@ end
 
 % Select Channel(s)
 cfgs = [];
-cfgs.channel = proc_vars.ch_lab.ROI;
+cfgs.channel = SBJ_vars.ch_lab.ROI;
 roi = ft_selectdata(cfgs,data);
 
 %% Compute ERPs

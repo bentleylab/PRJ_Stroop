@@ -39,7 +39,7 @@ else
         plot_struct.plot_chan_names = plot_chans;
     end
     for ch_ix = 1:numel(plot_struct.plot_chan_names)
-        plot_struct.plot_chans = [plot_struct.plot_chans strmatch(plot_struct.plot_chan_names{ch_ix},trials.label)];
+        plot_struct.plot_chans = [plot_struct.plot_chans strmatch(plot_struct.plot_chan_names{ch_ix},trials.label,'exact')];
     end
 end
 

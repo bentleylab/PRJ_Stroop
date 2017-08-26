@@ -1,23 +1,16 @@
 %% SBJ01_import_data.m
 % Extract data with fieldtrip and save out by data type
-function SBJ01_import_data(SBJ,resamp_freq)
+function SBJ01_import_data(SBJ,pipeline_id)
 
 addpath(genpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/'));
 addpath('/home/knight/hoycw/Apps/fieldtrip/');
 ft_defaults
 
-if isempty(resamp_freq)
-    resamp_yn = 'no';
-else
-    if ischar(resamp_freq)  % for SGE input
-        resamp_freq = str2num(resamp_freq);
-    end
-    resamp_yn   = 'yes';
-end
-
 %% Load and preprocess the data
 SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
+proc_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_vars.m'];
+eval(proc_vars_cmd);
 
 % Process channel labels
 if isfield(SBJ_vars.ch_lab,'prefix')
@@ -134,9 +127,9 @@ mic_data = mic_data.trial{1};
 mic_data_rescale = mic_data./(max(abs(mic_data))+0.05);
 
 %% Resample data
-if strcmp(resamp_yn,'yes') && (data.fsample ~= resamp_freq)
+if strcmp(proc_vars.resample_yn,'yes') && (data.fsample ~= proc_vars.resample_freq)
     cfg = [];
-    cfg.resamplefs = resamp_freq;
+    cfg.resamplefs = proc_vars.resample_freq;
     cfg.detrend = 'no';
     data = ft_resampledata(cfg, data);
     if ~isempty(SBJ_vars.ch_lab.eeg)
@@ -182,11 +175,11 @@ if isfield(SBJ_vars.ch_lab,'mislabel')
 end
 
 %% Save data
-nrl_out_filename = strcat(SBJ_vars.dirs.import,SBJ,'_',num2str(resamp_freq),'hz.mat');
+nrl_out_filename = strcat(SBJ_vars.dirs.import,SBJ,'_',num2str(proc_vars.resample_freq),'hz.mat');
 save(nrl_out_filename, '-v7.3', 'data');
 
 if ~isempty(SBJ_vars.ch_lab.eeg)
-    eeg_out_filename = strcat(SBJ_vars.dirs.import,SBJ,'_eeg_',num2str(resamp_freq),'hz.mat');
+    eeg_out_filename = strcat(SBJ_vars.dirs.import,SBJ,'_eeg_',num2str(proc_vars.resample_freq),'hz.mat');
     save(eeg_out_filename, '-v7.3', 'eeg');
 end
 

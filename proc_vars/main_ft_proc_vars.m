@@ -2,6 +2,7 @@
 
 % Data Preprocessing
 proc_vars.plot_psd      = '1by1';         % type of plot for channel PSDs
+proc_vars.resample_yn   = 'yes';
 proc_vars.resample_freq = 1000;
 proc_vars.demean_yn     = 'yes';
 proc_vars.hp_yn         = 'yes';

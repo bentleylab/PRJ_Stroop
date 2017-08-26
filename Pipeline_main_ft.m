@@ -210,6 +210,8 @@ ft_rejectvisual(cfg_reject,trials_dif);
 %  ========================================================================
 % Re-load SBJ_vars after updating artifact field
 clear SBJ_vars
+clear_cmd = ['clear /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+eval(clear_cmd); %needed to delete cached version
 eval(SBJ_vars_cmd);
 
 % Run KLA artifact rejection based on robust variance estimates
@@ -241,11 +243,14 @@ cfg.viewmode = 'vertical';
 cfg.artfctdef.visual.artifact = bad_samples;
 ft_databrowser(cfg, trials);
 
+ft_databrowser(cfg, trials_dif);
+
 %% ========================================================================
 %   Step 11- Compile Variance-Based Trial Rejection and Save Results
 %  ========================================================================
 % Re-load SBJ_vars after updating artifact field
 clear SBJ_vars
+eval(clear_cmd); %needed to delete cached version
 eval(SBJ_vars_cmd);
 
 clear trial_info

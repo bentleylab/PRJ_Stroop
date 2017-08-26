@@ -20,6 +20,7 @@ func_call="${FUNCTION}('${DATASET}', '${plot_psd}')"
 # define commands to execute via SGE
 echo ${DATASET}
 echo ${func_call}
+echo $$
 echo ${func_call} > NotBackedUp/tmpSGE/SBJ00_cleaning_prep_${DATASET}.m
 time matlab -nodesktop -nosplash -nodisplay < NotBackedUp/tmpSGE/SBJ00_cleaning_prep_${DATASET}.m
 rm NotBackedUp/tmpSGE/SBJ00_cleaning_prep_${DATASET}.m

@@ -20,6 +20,7 @@ func_call="${FUNCTION}('${DATASET}', '${resamp_freq}')"
 # define commands to execute via SGE
 echo ${DATASET}
 echo ${func_call}
+echo $$
 echo ${func_call} > NotBackedUp/tmpSGE/${FUNCTION}_${DATASET}.m
 time matlab -nodesktop -nosplash -nodisplay < NotBackedUp/tmpSGE/${FUNCTION}_${DATASET}.m
 rm NotBackedUp/tmpSGE/${FUNCTION}_${DATASET}.m

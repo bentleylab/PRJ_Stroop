@@ -70,19 +70,19 @@ SBJ_vars.bs_width    = 2;
 % Time Parameters
 %--------------------------------------
 % Data starts ~107s, ends ~1101s; end of recording is ~1114s 
-preproc_vars.analysis_time = {[90 1114]};
+SBJ_vars.analysis_time = {[90 1114]};
 
 %--------------------------------------
 % Artifact Rejection Parameters
 %--------------------------------------
-% SBJ_vars.artifact_params.std_limit_raw = 8;
-% SBJ_vars.artifact_params.hard_threshold_raw = 1000; % ~1000 and below is the main cloud of points
+SBJ_vars.artifact_params.std_limit_raw = 8;
+SBJ_vars.artifact_params.hard_threshold_raw = 800; % 800 and below is the main cloud of points
 
-% SBJ_vars.artifact_params.std_limit_diff = 8;
-% SBJ_vars.artifact_params.hard_threshold_diff = 100;
+SBJ_vars.artifact_params.std_limit_diff = 8;
+SBJ_vars.artifact_params.hard_threshold_diff = 70;
 
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
 % These should be indices AFTER SBJ05 has run!
-% SBJ_vars.trial_reject_ix = [];
+SBJ_vars.trial_reject_ix = [135, 136, 166, 185, 186, 187, 188, 189, 191, 192, 263, 306, 307];

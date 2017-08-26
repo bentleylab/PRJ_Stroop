@@ -4,7 +4,9 @@ function [new_labels, weights, left_out_ch] = fn_create_ref_scheme_bipolar(label
 %   Pairs made only from contiguous numbers
 %
 % new_labels = cell array of strings with combined labels
+%   can be used with ft_preprocessing as cfg_rereference.montage.labelnew
 % weights = [length(new_labels),length(labels)] matrix of weights to combine elecs
+%   can be used with ft_preprocessing as cfg_rereference.montage.tra
 % left_out_ch = labels of channels that aren't included (don't have contiguous pair)
 
 % Find name of the probe

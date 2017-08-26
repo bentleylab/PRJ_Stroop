@@ -49,6 +49,7 @@ SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotation
 SBJ_vars.ch_lab.bad = {...
     'RAH6','RAH7',...%epileptic
     'RC13','RC14','RC15','RC16',...%out of brain
+    'LIN16',...% strongest HF nois bursts; causes excessive variance rejection in derivative data
     'DC02','DC03'....% Not real data
     'E','LSh ','LLE','RSh','V1','V2','V3','V4','V5','V6','REF',...% Not real data
     'EKG','C16','EDF Annotations'...
@@ -77,14 +78,14 @@ SBJ_vars.analysis_time = {[65 1375]};
 %--------------------------------------
 % Artifact Rejection Parameters
 %--------------------------------------
-% SBJ_vars.artifact_params.std_limit_raw = 7;
-% SBJ_vars.artifact_params.hard_threshold_raw = 1000;
+SBJ_vars.artifact_params.std_limit_raw = 5;
+SBJ_vars.artifact_params.hard_threshold_raw = 200;
 
-% SBJ_vars.artifact_params.std_limit_diff = 7;
-% SBJ_vars.artifact_params.hard_threshold_diff = 100;
+SBJ_vars.artifact_params.std_limit_diff = 5;
+SBJ_vars.artifact_params.hard_threshold_diff = 20;
 
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
 % These should be indices AFTER SBJ05 has run!
-% SBJ_vars.trial_reject_ix = [];
+SBJ_vars.trial_reject_ix = [];

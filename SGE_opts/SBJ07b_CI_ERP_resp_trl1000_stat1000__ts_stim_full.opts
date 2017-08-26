@@ -1,0 +1,5 @@
+-o /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
+-e /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
+-v conditions="CI",an_id="ERP_resp_trl1000_stat1000",plt_id="ts_stim_full",save_fig="1"
+-l mem_free=4G
+-N ERPplot

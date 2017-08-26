@@ -20,6 +20,7 @@ func_call="${FUNCTION}('${SBJ}', '${pipeline_id}')"
 # define commands to execute via SGE
 echo ${SBJ}
 echo ${func_call}
+echo $$
 echo ${func_call} > NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}.m
 time matlab -nodesktop -nosplash -nodisplay < NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}.m
 rm NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}.m

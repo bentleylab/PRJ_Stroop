@@ -1,28 +1,10 @@
-function SBJ07_ERP_stats(SBJ,conditions,pipeline_id)
+function SBJ07_ERP_stats(SBJ,conditions,pipeline_id,an_id,save_fig,fig_vis)
 % Calculates ERPs, computes cluster-based statistics, and plots the results
 % clear all; %close all;
 
-% Data Selection
-% SBJ        = 'IR35';
-% elecs      = {'LAC*'};        % will now pull everything in SBJ_vars.ch_lab.ROI
-% conditions = 'CI';
-
 % Analysis Parameters
-save_data   = 1;                % 0/1
-event_type  = 'stim';           % event around which to cut trials
-trial_lim_s = [-0.5 2.5];       % window in SEC for cutting trials
-demean_yn   = 'yes';
-bsln_lim    = [-0.25 -0.05];    % window in SEC for baseline correction
-stat_lim    = [0 2];            % window in SEC for stats
-n_boots     = 1000;             % Repetitions for non-parametric stats
-lp_yn       = 'yes';
-lp_freq     = 30;
-hp_yn       = 'yes';
-hp_freq     = 0.5;
-
-% Plotting Parameters
-save_fig     = 1;               % 0/1
-vis_fig      = 'off';            % 'on'/'off'
+% save_fig     = 1;               % 0/1
+% fig_vis      = 'off';            % 'on'/'off'
 fig_filetype = 'png';
 
 %% Data Preparation
@@ -34,6 +16,8 @@ ft_defaults
 
 SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
+an_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/an_vars/' an_id '_vars.m'];
+eval(an_vars_cmd);
 
 % Load Data
 load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
@@ -124,33 +108,13 @@ end
 % end
 
 % Calculate statistics
-cfg_stat = [];
-cfg_stat.latency          = stat_lim;
-cfg_stat.channel          = 'all';
-cfg_stat.parameter        = 'trial';
-cfg_stat.method           = 'montecarlo';
-cfg_stat.statistic        = 'ft_statfun_indepsamplesT';
-cfg_stat.correctm         = 'cluster';
-cfg_stat.clusteralpha     = 0.05;   %threshold for a single comparison (time point) to be included in the clust
-cfg_stat.clusterstatistic = 'maxsum';
-cfg_stat.clustertail      = 0;
-cfg_stat.tail             = 0; %two sided
-cfg_stat.correcttail      = 'alpha'; %correct the .alpha for two-tailed test (/2)
-cfg_stat.alpha            = 0.05;
-cfg_stat.numrandomization = n_boots;
 cfg_stat.design           = design;
-cfg_stat.neighbours       = [];%neighbors;
-% cfg_stat.minnbchan        = 0;
-cfg_stat.ivar             = 1;  %row of design matrix containing independent variable
-% cfg_stat.uvar             = 2;  %row of design matrix containing dependent variable, not needed for indepsamp
 [stat] = ft_timelockstatistics(cfg_stat, roi_erp{:});
 
 %% Save Results
-if save_data
-    data_out_filename = strcat(SBJ_vars.dirs.SBJ,'04_proc/',SBJ,'_ERP_stats_',conditions,'_ROI_',event_type,'.mat');
-    fprintf('Saving %s\n',data_out_filename);
-    save(data_out_filename,'roi_erp','stat');
-end
+data_out_filename = strcat(SBJ_vars.dirs.SBJ,'04_proc/',SBJ,'_',conditions,'_ROI_',an_id,'.mat');
+fprintf('Saving %s\n',data_out_filename);
+save(data_out_filename,'roi_erp','stat');
 %% Plot Results
 stat_full = stat;
 roi_erp_full = roi_erp;
@@ -172,7 +136,7 @@ for roi_ix = 1:numel(SBJ_vars.ch_lab.ROI)
     if plot_rc(1)>1; fig_height=1; else fig_height=0.33; end;
     
     figure('Name',fig_name,'units','normalized',...
-        'outerposition',[0 0 1 fig_height],'Visible',vis_fig);
+        'outerposition',[0 0 1 fig_height],'Visible',fig_vis);
     plot_info.fig        = gcf;
     plot_info.x_step     = 0.25*roi.fsample;
     plot_info.x_lab      = trial_lim_s(1):0.25:trial_lim_s(2);
