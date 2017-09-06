@@ -52,6 +52,11 @@ if s_rate > 1000
   decimate_v = floor(s_rate/1000);
   data_photo_d = data_photo(1:decimate_v:end);
   min_event_length = floor(min_event_length/decimate_v);
+else
+    fprintf('================================================\n');
+    fprintf('WARNING: evnt sample rate is 1000 or less!!\n');
+    data_photo_d = data_photo;
+    decimate_v = 1;
 end
 [~, ~, data_shades] = read_photodiode(data_photo_d, min_event_length, 4);  %4 different shades (con, inc, neu, bsln)
 clear data_photo;

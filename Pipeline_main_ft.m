@@ -274,5 +274,8 @@ trial_info.resp_onset(SBJ_vars.trial_reject_ix) = [];
 trial_info.condition_n(SBJ_vars.trial_reject_ix) = [];
 trial_info.error(SBJ_vars.trial_reject_ix) = [];
 
+% Make sure no response times are in weird float format
+trial_info.resp_onset = round(trial_info.resp_onset);
+
 save(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
 

@@ -9,7 +9,7 @@ ft_defaults
 %% Load and preprocess the data
 SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
-proc_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_vars.m'];
+proc_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m'];
 eval(proc_vars_cmd);
 
 % Process channel labels

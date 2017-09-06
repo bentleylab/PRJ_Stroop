@@ -39,17 +39,18 @@ SBJ_vars.orig_n_samples = hdr.nSamples;
 SBJ_vars.orig_srate = hdr.Fs;
 clear hdr;
 
-SBJ_vars.ch_lab.probes = {'ROF','RAC','RIN','RAM','RHH','RTH','LOF','LIN','LHH','LTH','LAM'};
-SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
+SBJ_vars.ch_lab.probes = {'ROF','RAC','RIN','RAM','RHH','RTH','LOF','LIN','LHH','LTH'};%'LAM' is all bad
+SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};%'BP'
 SBJ_vars.ch_lab.ROI    = {'RAC*','ROF*','RIN*','LOF*','LIN*'};
 
 SBJ_vars.ch_lab.bad = {...
-    '-LAM*','-LHH1','-LHH2','-LHH3','-LTH1','-LTH2','-LTH3','-LTH10',...%Epileptic
-    '-RHH1','-RHH2','-RHH3','-RTH2','-RTH3','-RTH4','-RAM1','-RAM2','-RAM3','-RAM6',...% Epileptic
-    '-RIN9','-RIN10','-ROF10','-LIN3','-LOF1','-LOF10','-LIN10','-ROF10','-LHH10',...%noisy or out of brain
-    '-PMF*','-AMF*','-OF*','-AT*','-PT*','-LT*','-AD*','-HD*','-DC03','-DC04'....% Not real data
-    '-E','-LSH','-LLE','-RSH','-V1',...% Not real data
-    '-EKG*',...
+    'LAM*','LHH1','LHH2','LHH3','LTH1','LTH2','LTH3','LTH10',...%Epileptic
+    'RHH1','RHH2','RHH3','RTH2','RTH3','RTH4','RAM1','RAM2','RAM3','RAM6',...% Epileptic
+    'RIN9','RIN10','ROF10','LIN3','LOF1','LOF10','LIN10','ROF10','LHH10',...%noisy or out of brain
+    'PMF*','AMF*','OF*','AT*','PT*','AD*','HD*','DC03','DC04',....% Not real data
+    'LT1','LT2','LT3','LT4','LT5','LT6',...% Not real data, using 'LT*' tosses LTH elecs too
+    'E','LSH','LLE','RSH','V1',...% Not real data
+    'EKG*'...
     };
 % SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.eeg = {'C3','CZ','C4','FZ','OZ'};
@@ -75,14 +76,14 @@ SBJ_vars.analysis_time = {[135 380], [535 1370]};
 %--------------------------------------
 % Artifact Rejection Parameters
 %--------------------------------------
-% SBJ_vars.artifact_params.std_limit_raw = 7;
-% SBJ_vars.artifact_params.hard_threshold_raw = 1000;
+SBJ_vars.artifact_params.std_limit_raw = 7;
+SBJ_vars.artifact_params.hard_threshold_raw = 400;
 
-% SBJ_vars.artifact_params.std_limit_diff = 7;
-% SBJ_vars.artifact_params.hard_threshold_diff = 100;
+SBJ_vars.artifact_params.std_limit_diff = 7;
+SBJ_vars.artifact_params.hard_threshold_diff = 40;
 
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
 % These should be indices AFTER SBJ05 has run!
-% SBJ_vars.trial_reject_ix = [];
+SBJ_vars.trial_reject_ix = [125, 168];

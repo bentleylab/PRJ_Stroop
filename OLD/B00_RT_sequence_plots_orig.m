@@ -1,11 +1,12 @@
 %% RT Behavioral analysis
-% clear all; close all
+clear all; close all
 addpath('/home/knight/hoycw/PRJ_Stroop/scripts/');
 addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
 addpath(genpath('/home/knight/hoycw/Apps/export_fig-master/'));
 
 % Analysis Parameters
-SBJ       = 'IR57';
+SBJ       = 'IR35';
+data_id   = strcat(SBJ,'_LAC_WM');
 late_RT_cut = 600;      %ms window before next stim to eliminate
 
 % Plotting parameters
@@ -19,17 +20,17 @@ trial_colors   = {'b', 'k', 'r'};    % colors for cond_lab plotting
 block_colors  = {repmat(0.8,3,1), repmat(0.5,3,1), repmat(0.2,3,1)};    % colors for [mcon, same, minc]
 prop_con_lab  = {'con_mcon', 'con_same', 'con_minc', 'neu_mcon', 'neu_same',...
     'neu_minc', 'inc_mcon', 'inc_same', 'inc_minc'};
-fig_type      = 'png';
+fig_type      = 'eps';
 
 % Process parameters
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/',SBJ,'_vars.m']);
+SBJ_dir = strcat('/home/knight/hoycw/PRJ_Stroop/data/',SBJ,'/');
 fig_dir  = strcat('/home/knight/hoycw/PRJ_Stroop/results/RTs/',SBJ,'/');
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
 
 %% Load data
-load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'));
+load(strcat(SBJ_dir,'06_epochs/',data_id,'_clean.mat'),'trial_info');
 
 % con = 1-3, neu = 4-6, inc = 7-9
 % within those: same, mic, mcon
@@ -71,7 +72,7 @@ iI_lab = ['iI (n=' num2str(sum(iI_idx)) ')'];
 % end
 
 % Plot Boxplots
-fig_name = strcat(SBJ,'_RT_con_seq');
+fig_name = strcat(data_id,'_RT_con_seq');
 figure('Name',fig_name,'units','normalized','outerposition',[0 0 1 1],'Visible',vis);hold on;
 subplot(1,2,1);hold on;
 max_trl_num = max([sum(cC_idx) sum(iC_idx)]);
@@ -98,21 +99,17 @@ if save_fig ==1
 end
 
 %% Gratton Effects: Within Trial Type Across Blocks
-fig_name = strcat(SBJ,'_RT_con_seq_by_block');
+fig_name = strcat(data_id,'_RT_con_seq_by_block');
 figure('Name',fig_name,'units','normalized','outerposition',[0 0 1 1],'Visible',vis);
 for b_ix = 1:length(block_lab)
-    cC_idx = fn_sequence_index(['con_' block_lab{b_ix}], ['con_' block_lab{b_ix}],...
-                                            trial_info.condition_n, trial_info.block_n);
-    iC_idx = fn_sequence_index(['inc_' block_lab{b_ix}], ['con_' block_lab{b_ix}],...
-                                            trial_info.condition_n, trial_info.block_n);
+    cC_idx = fn_sequence_index(['con_' block_lab{b_ix}], ['con_' block_lab{b_ix}], trial_info.condition_n, trial_info.block_n);
+    iC_idx = fn_sequence_index(['inc_' block_lab{b_ix}], ['con_' block_lab{b_ix}], trial_info.condition_n, trial_info.block_n);
     [~,C_pval] = ttest2(RTs(cC_idx==1), RTs(iC_idx==1));
     cC_lab = ['cC (n=' num2str(sum(cC_idx)) ')'];
     iC_lab = ['iC (n=' num2str(sum(iC_idx)) ')'];
 
-    cI_idx = fn_sequence_index(['con_' block_lab{b_ix}], ['inc_' block_lab{b_ix}],...
-                                            trial_info.condition_n, trial_info.block_n);
-    iI_idx = fn_sequence_index(['inc_' block_lab{b_ix}], ['inc_' block_lab{b_ix}],...
-                                            trial_info.condition_n, trial_info.block_n);
+    cI_idx = fn_sequence_index(['con_' block_lab{b_ix}], ['inc_' block_lab{b_ix}], trial_info.condition_n, trial_info.block_n);
+    iI_idx = fn_sequence_index(['inc_' block_lab{b_ix}], ['inc_' block_lab{b_ix}], trial_info.condition_n, trial_info.block_n);
     [~,I_pval] = ttest2(RTs(cI_idx==1), RTs(iI_idx==1));
     cI_lab = ['cI (n=' num2str(sum(cI_idx)) ')'];
     iI_lab = ['iI (n=' num2str(sum(iI_idx)) ')'];

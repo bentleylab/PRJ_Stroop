@@ -9,18 +9,18 @@ cd /home/knight/hoycw/PRJ_Stroop/scripts/
 
 # don't change this variable
 # used by the submit script to define which data sets to analyze
-DATASET="${SGE_TASK}"
+SBJ="${SGE_TASK}"
 
 # define function
-FUNCTION='SBJ01_import_data'
+FUNCTION='SBJ08b_HFA_plot_SR_but_stats'
 
 # set up matlab function call
-func_call="${FUNCTION}('${DATASET}', '${pipeline_id}')"
+func_call="${FUNCTION}('${SBJ}', '${conditions}', '${an_id_s}', '${an_id_r}', '${plt_id}', '${save_fig}', 'off')"
 
 # define commands to execute via SGE
-echo ${DATASET}
+echo ${SBJ}
 echo ${func_call}
 echo $$
-echo ${func_call} > NotBackedUp/tmpSGE/${FUNCTION}_${DATASET}.m
-time matlab -nodesktop -nosplash -nodisplay < NotBackedUp/tmpSGE/${FUNCTION}_${DATASET}.m
-rm NotBackedUp/tmpSGE/${FUNCTION}_${DATASET}.m
+echo ${func_call} > NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}.m
+time matlab -nodesktop -nosplash -nodisplay < NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}.m
+rm NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}.m

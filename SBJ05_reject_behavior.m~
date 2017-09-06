@@ -112,14 +112,5 @@ fprintf('TRIALS REMAINING: %i/%i\n',length(trial_info_clean.trial_n),length(tria
 fprintf('==============================================================================================\n');
 
 % Save results
-results_filename = [SBJ_vars.dirs.events SBJ '_behav_rejection_results.txt'];
-r_file = fopen(results_filename,'w');
-fprintf(r_file,'Num trials excluded for bad RT: %i\n',length(skip_rt1)+length(skip_rt2)+length(skip_rt_outlier));
-fprintf(r_file,'Num trials excluded for errors: %i\n',length(skip_err));
-fprintf(r_file,'Num trials excluded by Bob vis: %i\n',length(skip_bob));
-fprintf(r_file,'Num trials excluded for other : %i\n',length(skip_bad));
-fprintf(r_file,'TOTAL TRIALS EXCLUDED A PRIORI: %i\n',length(skip_trial_ix));
-fprintf(r_file,'TRIALS REMAINING: %i/%i\n',length(trial_info_clean.trial_n),length(trial_info.response_time));
-fclose(r_file);
 
 end

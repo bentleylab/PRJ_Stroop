@@ -1,5 +1,5 @@
 -o /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
 -e /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
--v conditions="CI",an_id_s="HGm_stim_trl1500_sm0_stat1500",an_id_r="HGm_resp_zstim_trl1000_sm0_stat2to1",plt_id="S15R1_ts_errbr_evnt",save_fig="1"
+-v conditions="CI",an_id_s="HGm_stim_trl1500_sm0_stat1500",an_id_r="HGm_resp_zstim_trl1000_sm0_stat2to1",plt_id="ts_S15R1_errbr_evnt",save_fig="1"
 -l mem_free=4G
 -N HFAplot
