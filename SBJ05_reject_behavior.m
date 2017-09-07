@@ -71,6 +71,17 @@ RT_mean = nanmean(trial_info.response_time);
 RT_std  = nanstd(trial_info.response_time);
 skip_rt_outlier = find(abs(trial_info.response_time-RT_mean)>proc_vars.RT_std_thresh*RT_std);
 
+% Check against RT bounds, toss late but only warn for early
+RT_late = find(trial_info.response_time>proc_vars.rt_bounds(2));
+if ~isempty(RT_late)
+    fprintf('WARNING! %i RTs > %f sec detected!\n',numel(RT_late),proc_vars.rt_bounds(2));
+end
+skip_rt_outlier = [skip_rt_outlier RT_late];
+RT_early = find(trial_info.response_time>proc_vars.rt_bounds(1));
+if ~isempty(RT_early)
+    fprintf('WARNING! %i RTs < %f sec detected!\n',numel(RT_early),proc_vars.rt_bounds(1));
+end
+
 % Compile all a priori bad trials
 skip_trial_ix = unique([skip_bad; skip_rt1; skip_rt2; skip_err; skip_bob; skip_rt_outlier]);
 ok_trial_ix = setdiff(1:length(trial_info.resp_onset),skip_trial_ix);
@@ -127,6 +138,12 @@ end
 r_file = fopen(results_filename,'a');
 if print_date
     fprintf(r_file,'%s\n',datestr(datetime));
+end
+if ~isempty(RT_late)
+    fprintf(r_file,'WARNING! %i RTs > %f sec excluded!\n',length(RT_late),proc_vars.rt_bounds(2));
+end
+if ~isempty(RT_early)
+    fprintf(r_file,'WARNING! %i RTs < %f sec detected!\n',numel(RT_early),proc_vars.rt_bounds(1));
 end
 fprintf(r_file,'Num trials excluded for bad RT    : %i\n',length(skip_rt1)+length(skip_rt2));
 fprintf(r_file,'Num trials excluded for outlier RT: %i\n',length(skip_rt_outlier));

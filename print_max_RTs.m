@@ -4,15 +4,18 @@ SBJs = {'IR21','IR31','IR32','IR35','IR39','IR41','IR54','IR57'};
 str = 'not yet';
 for s = 1:numel(SBJs)
     tmp = load(['/home/knight/hoycw/PRJ_Stroop/data/' SBJs{s} '/03_events/' SBJs{s} '_trial_info_manual.mat']);
-%     ITI = diff(trial_info.word_onset)/1000;
 %     max_RTs(s) = min(ITI);
 % %     max_RTs(s) = max(trial_info.response_time);
-    if ~isempty(find(tmp.trial_info.response_time<0))
-        str = 'yes!';
-    else
-        str = 'no';
+    rt_over2 = find(tmp.trial_info.response_time<0.3);
+    fprintf('%s = %i\n',SBJs{s},numel(rt_over2));
+    if ~isempty(rt_over2)
+        tmp.trial_info.response_time(rt_over2)
     end
-    fprintf('%s = %s\n',SBJs{s},str);
+%     if ~isempty(find(tmp.trial_info.response_time<0))
+%         str = 'yes!';
+%     else
+%         str = 'no';
+%     end
 %     histogram(trial_info.response_time);
 % %     set(gca,'xlim',[0 4]);
 %     title(SBJs{s});
