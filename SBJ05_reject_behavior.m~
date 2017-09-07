@@ -51,6 +51,7 @@ trial_lim = proc_vars.trial_lim_s*data.fsample;
 %% Reject known artifacts
 skip_rt1 = find(trial_info.resp_onset<0);     % couldn't determine RT
 skip_rt2 = find(isnan(trial_info.resp_onset));  % no response
+fprintf('WARNING! Found a NaN in trial_info.resp_onset... will be tossed, but shouldnt that be a -1?\n');
 skip_err = find(trial_info.error==1);           % error
 skip_bad = find(trial_info.error<0);          % bad trial
 
@@ -101,6 +102,10 @@ trial_info_clean.resp_onset(skip_trial_ix) = [];
 trial_info_clean.condition_n(skip_trial_ix) = [];
 trial_info_clean.error(skip_trial_ix) = [];
 
+%prevent formatting errors
+trial_info_clean.resp_onset = roun;
+
+
 % Print results
 fprintf('==============================================================================================\n');
 fprintf('Num trials excluded for bad RT: %i\n',length(skip_rt1)+length(skip_rt2)+length(skip_rt_outlier));
@@ -112,5 +117,14 @@ fprintf('TRIALS REMAINING: %i/%i\n',length(trial_info_clean.trial_n),length(tria
 fprintf('==============================================================================================\n');
 
 % Save results
+results_filename = [SBJ_vars.dirs.events SBJ '_behav_rejection_results.txt'];
+r_file = fopen(results_filename,'w');
+fprintf(r_file,'Num trials excluded for bad RT: %i\n',length(skip_rt1)+length(skip_rt2)+length(skip_rt_outlier));
+fprintf(r_file,'Num trials excluded for errors: %i\n',length(skip_err));
+fprintf(r_file,'Num trials excluded by Bob vis: %i\n',length(skip_bob));
+fprintf(r_file,'Num trials excluded for other : %i\n',length(skip_bad));
+fprintf(r_file,'TOTAL TRIALS EXCLUDED A PRIORI: %i\n',length(skip_trial_ix));
+fprintf(r_file,'TRIALS REMAINING: %i/%i\n',length(trial_info_clean.trial_n),length(trial_info.response_time));
+fclose(r_file);
 
 end

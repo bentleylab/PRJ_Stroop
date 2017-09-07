@@ -40,8 +40,8 @@ resp_onset_man = man_data(:,4);
 resp_onset_man(skip_trial_ix) = NaN;
 fprintf('Skipping %i trials for artifacts\n',length(skip_bad));
 fprintf('Skipping %i trials for errors\n',length(skip_err));
-fprintf('Skipping %i trials for RTs\n',length(skip_rt));
-fprintf('Trials remaining = %i\n\n',sum(~isnan(resp_onset_man)));
+fprintf('Skipping %i trials for no RTs\n',length(skip_rt));
+fprintf('Trials remaining = %i (tossed %i)\n\n',sum(~isnan(resp_onset_man)),length(skip_trial_ix));
 
 % Compute the difference in seconds
 rt_auto     = trial_info.response_time;
@@ -98,9 +98,13 @@ end
 
 %% Update trial_info, save results
 % Add all manual data to trial_info (without NaNs to keep all info for later)
-trial_info.resp_onset = man_data(:,4).*1000;
+trial_info.resp_onset    = man_data(:,4).*1000;
 trial_info.response_time = man_data(:,4)-trial_info.word_onset./1000;
-trial_info.error = man_data(:,3);
+trial_info.error         = man_data(:,3);
+
+% Keep -1 RT info
+trial_info.resp_onset(skip_rt)    = -1;
+trial_info.response_time(skip_rt) = -1;
 
 if save_it
     save(trial_info_man_filename, 'trial_info');

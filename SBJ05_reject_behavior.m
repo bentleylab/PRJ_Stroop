@@ -51,6 +51,9 @@ trial_lim = proc_vars.trial_lim_s*data.fsample;
 %% Reject known artifacts
 skip_rt1 = find(trial_info.resp_onset<0);     % couldn't determine RT
 skip_rt2 = find(isnan(trial_info.resp_onset));  % no response
+if ~isempty(skip_rt2)
+    fprintf('WARNING! Found a NaN in trial_info.resp_onset... will be tossed, but shouldnt that be a -1?\n');
+end
 skip_err = find(trial_info.error==1);           % error
 skip_bad = find(trial_info.error<0);          % bad trial
 
@@ -80,45 +83,57 @@ trial_info_clean.trial_lim_s = proc_vars.trial_lim_s;
 trial_info_clean.RT_std_thresh = proc_vars.RT_std_thresh;
 
 % Document bad trials
-trial_info_clean.bad_trials.RT = trial_info.trial_n([skip_rt1 skip_rt2 skip_rt_outlier]);
-trial_info_clean.bad_trials.bob = trial_info.trial_n(skip_bob);
-trial_info_clean.bad_trials.error = trial_info.trial_n(skip_err);
-trial_info_clean.bad_trials.bad = trial_info.trial_n(skip_bad);
-trial_info_clean.bad_trials.all = trial_info.trial_n(skip_trial_ix);
+trial_info_clean.bad_trials.RT_bad = trial_info.trial_n([skip_rt1 skip_rt2]);
+trial_info_clean.bad_trials.RT_out = trial_info.trial_n(skip_rt_outlier);
+trial_info_clean.bad_trials.bob    = trial_info.trial_n(skip_bob);
+trial_info_clean.bad_trials.error  = trial_info.trial_n(skip_err);
+trial_info_clean.bad_trials.bad    = trial_info.trial_n(skip_bad);
+trial_info_clean.bad_trials.all    = trial_info.trial_n(skip_trial_ix);
 
 % Remove bad trials
-trial_info_clean.block_n(skip_trial_ix) = [];
-trial_info_clean.trial_n(skip_trial_ix) = [];
-trial_info_clean.word(skip_trial_ix) = [];
-trial_info_clean.color(skip_trial_ix) = [];
-trial_info_clean.trialtype(skip_trial_ix) = [];
-trial_info_clean.blocktype(skip_trial_ix) = [];
+trial_info_clean.block_n(skip_trial_ix)       = [];
+trial_info_clean.trial_n(skip_trial_ix)       = [];
+trial_info_clean.word(skip_trial_ix)          = [];
+trial_info_clean.color(skip_trial_ix)         = [];
+trial_info_clean.trialtype(skip_trial_ix)     = [];
+trial_info_clean.blocktype(skip_trial_ix)     = [];
 trial_info_clean.response_time(skip_trial_ix) = [];
-trial_info_clean.marker_time(skip_trial_ix) = [];
-trial_info_clean.onset_time(skip_trial_ix) = [];
-trial_info_clean.word_onset(skip_trial_ix) = [];
-trial_info_clean.resp_onset(skip_trial_ix) = [];
-trial_info_clean.condition_n(skip_trial_ix) = [];
-trial_info_clean.error(skip_trial_ix) = [];
+trial_info_clean.marker_time(skip_trial_ix)   = [];
+trial_info_clean.onset_time(skip_trial_ix)    = [];
+trial_info_clean.word_onset(skip_trial_ix)    = [];
+trial_info_clean.resp_onset(skip_trial_ix)    = [];
+trial_info_clean.condition_n(skip_trial_ix)   = [];
+trial_info_clean.error(skip_trial_ix)         = [];
+
+%prevent formatting errors
+trial_info_clean.resp_onset = round(trial_info_clean.resp_onset);
 
 % Print results
 fprintf('==============================================================================================\n');
-fprintf('Num trials excluded for bad RT: %i\n',length(skip_rt1)+length(skip_rt2)+length(skip_rt_outlier));
-fprintf('Num trials excluded for errors: %i\n',length(skip_err));
-fprintf('Num trials excluded by Bob vis: %i\n',length(skip_bob));
-fprintf('Num trials excluded for other : %i\n',length(skip_bad));
-fprintf('TOTAL TRIALS EXCLUDED A PRIORI: %i\n',length(skip_trial_ix));
+fprintf('Num trials excluded for bad RT    : %i\n',length(skip_rt1)+length(skip_rt2));
+fprintf('Num trials excluded for outlier RT: %i\n',length(skip_rt_outlier));
+fprintf('Num trials excluded for errors    : %i\n',length(skip_err));
+fprintf('Num trials excluded by Bob vis    : %i\n',length(skip_bob));
+fprintf('Num trials excluded for other     : %i\n',length(skip_bad));
+fprintf('TOTAL TRIALS EXCLUDED A PRIORI    : %i\n',length(skip_trial_ix));
 fprintf('TRIALS REMAINING: %i/%i\n',length(trial_info_clean.trial_n),length(trial_info.response_time));
 fprintf('==============================================================================================\n');
 
 % Save results
-results_filename = [SBJ_vars.dirs.events SBJ '_behav_rejection_results.txt'];
-r_file = fopen(results_filename,'w');
-fprintf(r_file,'Num trials excluded for bad RT: %i\n',length(skip_rt1)+length(skip_rt2)+length(skip_rt_outlier));
-fprintf(r_file,'Num trials excluded for errors: %i\n',length(skip_err));
-fprintf(r_file,'Num trials excluded by Bob vis: %i\n',length(skip_bob));
-fprintf(r_file,'Num trials excluded for other : %i\n',length(skip_bad));
-fprintf(r_file,'TOTAL TRIALS EXCLUDED A PRIORI: %i\n',length(skip_trial_ix));
+results_filename = [SBJ_vars.dirs.events SBJ '_behavior_rejection_results.txt'];
+if exist(results_filename, 'file')
+    print_date = 1;
+end
+r_file = fopen(results_filename,'a');
+if print_date
+    fprintf(r_file,'%s\n',datestr(datetime));
+end
+fprintf(r_file,'Num trials excluded for bad RT    : %i\n',length(skip_rt1)+length(skip_rt2));
+fprintf(r_file,'Num trials excluded for outlier RT: %i\n',length(skip_rt_outlier));
+fprintf(r_file,'Num trials excluded for errors    : %i\n',length(skip_err));
+fprintf(r_file,'Num trials excluded by Bob vis    : %i\n',length(skip_bob));
+fprintf(r_file,'Num trials excluded for other     : %i\n',length(skip_bad));
+fprintf(r_file,'TOTAL TRIALS EXCLUDED A PRIORI    : %i\n',length(skip_trial_ix));
 fprintf(r_file,'TRIALS REMAINING: %i/%i\n',length(trial_info_clean.trial_n),length(trial_info.response_time));
 fclose(r_file);
 
