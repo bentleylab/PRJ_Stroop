@@ -170,18 +170,30 @@ trial_var_mean_dif = mean(var_mat_dif,1);
 trial_var_dif_thresh = mean(trial_var_mean_dif)+std(trial_var_mean_dif)*proc_vars.var_std_warning_thresh;
 
 % Report on potentially bad channels
+bad_var_ch      = trials.label(abs(ch_var_mean) > ch_var_thresh);
+bad_var_dif_ch  = trials.label(abs(ch_var_mean_dif) > ch_var_dif_thresh);
+bad_var_trl     = trial_info_clean.trial_n(abs(trial_var_mean) > trial_var_thresh);
+bad_var_dif_trl = trial_info_clean.trial_n(abs(trial_var_mean_dif) > trial_var_dif_thresh);
 fprintf('==============================================================================================\n');
-fprintf('WARNING! Check channels over thresholds:\n');
-fprintf('\tChannel Variance Names:');
-disp(trials.label(abs(ch_var_mean) > ch_var_thresh));
-fprintf('\n\tChannel Diff Variance Names:');
-disp(trials.label(abs(ch_var_mean_dif) > ch_var_dif_thresh));
-fprintf('\n\tTrial Variance Ix:');
-disp(find(abs(trial_var_mean) > trial_var_thresh));
-fprintf('\n\tTrial Diff Variance Ix:');
-disp(find(abs(trial_var_mean_dif) > trial_var_dif_thresh));
-fprintf('\n');
+fprintf('Simple Variance Rejection:\n');
+fprintf('\tChannel Variance Names: %s\n',bad_var_ch{:});
+fprintf('\tChannel Diff Variance Names: %s\n',bad_var_dif_ch{:});
+fprintf('\tTrial Variance Ix: %i\n',bad_var_trl);
+fprintf('\tTrial Diff Variance Ix: %i\n',bad_var_dif_trl);
 fprintf('==============================================================================================\n');
+
+% Save results
+var_rej_filename = [SBJ_vars.dirs.events SBJ '_variance_rejection_results.txt'];
+r_file = fopen(var_rej_filename,'a');
+fprintf(r_file,'==============================================================================================\n');
+fprintf(r_file,'Simple Variance Rejection:\n');
+fprintf(r_file,'Run Time: %s\n',datestr(datetime));
+fprintf(r_file,'\tChannel Variance Names: %s\n',bad_var_ch{:});
+fprintf(r_file,'\tChannel Diff Variance Names: %s\n',bad_var_dif_ch{:});
+fprintf(r_file,'\tTrial Variance Ix: %i\n',bad_var_trl);
+fprintf(r_file,'\tTrial Diff Variance Ix: %i\n',bad_var_dif_trl);
+fprintf(r_file,'==============================================================================================\n');
+fclose(r_file);
 
 %% ========================================================================
 %   Step 9b- Choose Thresholds for Variance-Based Trial Rejection
@@ -230,12 +242,12 @@ plot_ch = {'worst',5};%ft_channelselection({'LPC*','LAC*','RIN*'},data.label);
 report.hard_thresh = 2; % print total rejected and trial numbers
 report.std_thresh  = 1; % print only total rejected
 report.std_plot    = 1; % plot the std distribution and threshold
-trial_info_auto_clean = SBJ06_reject_artifacts_KLA_report(trials,trial_info_clean,...
+trial_info_KLA_clean = SBJ06_reject_artifacts_KLA_report(trials,trial_info_clean,...
                                         SBJ_vars.artifact_params,plot_ch,report);
 
-bad_samples = NaN([size(trial_info_auto_clean.bad_trials.var,1) 2]);
+bad_samples = NaN([size(trial_info_KLA_clean.bad_trials.var,1) 2]);
 for t_ix = 1:size(bad_samples,1)
-    bad_samples(t_ix,:) = trials.sampleinfo(find(trial_info_clean.trial_n==trial_info_auto_clean.bad_trials.var(t_ix)),:);
+    bad_samples(t_ix,:) = trials.sampleinfo(trial_info_clean.trial_n==trial_info_KLA_clean.bad_trials.var(t_ix),:);
 end
 cfg = [];
 cfg.continuous = 'no';
@@ -256,23 +268,25 @@ eval(SBJ_vars_cmd);
 clear trial_info
 trial_info = trial_info_clean;
 % Document bad trials
-trial_info.bad_trials.variance = trial_info.trial_n(SBJ_vars.trial_reject_ix);
+trial_info.bad_trials.variance = SBJ_vars.trial_reject_n';
 trial_info.bad_trials.all = sort([trial_info.bad_trials.all; trial_info.bad_trials.variance]);
 
 % Remove bad trials
-trial_info.block_n(SBJ_vars.trial_reject_ix) = [];
-trial_info.trial_n(SBJ_vars.trial_reject_ix) = [];
-trial_info.word(SBJ_vars.trial_reject_ix) = [];
-trial_info.color(SBJ_vars.trial_reject_ix) = [];
-trial_info.trialtype(SBJ_vars.trial_reject_ix) = [];
-trial_info.blocktype(SBJ_vars.trial_reject_ix) = [];
-trial_info.response_time(SBJ_vars.trial_reject_ix) = [];
-trial_info.marker_time(SBJ_vars.trial_reject_ix) = [];
-trial_info.onset_time(SBJ_vars.trial_reject_ix) = [];
-trial_info.word_onset(SBJ_vars.trial_reject_ix) = [];
-trial_info.resp_onset(SBJ_vars.trial_reject_ix) = [];
-trial_info.condition_n(SBJ_vars.trial_reject_ix) = [];
-trial_info.error(SBJ_vars.trial_reject_ix) = [];
+trial_rejected = ismember(trial_info.trial_n,SBJ_vars.trial_reject_n);
+trial_reject_ix = find(trial_rejected);
+trial_info.block_n(trial_reject_ix) = [];
+trial_info.trial_n(trial_reject_ix) = [];
+trial_info.word(trial_reject_ix) = [];
+trial_info.color(trial_reject_ix) = [];
+trial_info.trialtype(trial_reject_ix) = [];
+trial_info.blocktype(trial_reject_ix) = [];
+trial_info.response_time(trial_reject_ix) = [];
+trial_info.marker_time(trial_reject_ix) = [];
+trial_info.onset_time(trial_reject_ix) = [];
+trial_info.word_onset(trial_reject_ix) = [];
+trial_info.resp_onset(trial_reject_ix) = [];
+trial_info.condition_n(trial_reject_ix) = [];
+trial_info.error(trial_reject_ix) = [];
 
 % Make sure no response times are in weird float format
 trial_info.resp_onset = round(trial_info.resp_onset);

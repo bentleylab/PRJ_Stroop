@@ -81,14 +81,15 @@ SBJ_vars.analysis_time = {[140 400], [560 1360]};
 %--------------------------------------
 % Artifact Rejection Parameters
 %--------------------------------------
-SBJ_vars.artifact_params.std_limit_raw = 8;
+SBJ_vars.artifact_params.std_limit_raw = 7;
 SBJ_vars.artifact_params.hard_threshold_raw = 1000; % ~1000 and below is the main cloud of points
 
-SBJ_vars.artifact_params.std_limit_diff = 8;
-SBJ_vars.artifact_params.hard_threshold_diff = 100;
+SBJ_vars.artifact_params.std_limit_diff = 7;
+SBJ_vars.artifact_params.hard_threshold_diff = 60;
 
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
 % These should be indices AFTER SBJ05 has run!
-SBJ_vars.trial_reject_ix = [27 51 63 67 129 148 151 193 195];
+SBJ_vars.trial_reject_n = [15 130 186 197 221 260 268 284];
+% BADBADBAD!!! Keeping for posterity- SBJ_vars.trial_reject_ix = [27 51 63 67 129 148 151 193 195];

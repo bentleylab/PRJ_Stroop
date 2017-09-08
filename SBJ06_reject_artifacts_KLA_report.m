@@ -53,13 +53,13 @@ fprintf('=======================================================================
 fprintf('=================================== PHASE 1: ORIGINAL DATA ===================================\n');
 fprintf('==============================================================================================\n');
 ok_epochs1 = artifact_reject(trial_mat, artifact_struct.std_limit_raw,...
-    artifact_struct.hard_threshold_raw, s_rate, plot_struct, report);
+    artifact_struct.hard_threshold_raw, s_rate, plot_struct, report, trial_info);
 % Reject artifacts from diff data (looking for fast changes)
 fprintf('==============================================================================================\n');
 fprintf('================================== PHASE 2: DERIVATIVE DATA ==================================\n');
 fprintf('==============================================================================================\n');
 ok_epochs2 = artifact_reject(diff(trial_mat,1,3), artifact_struct.std_limit_diff,...
-    artifact_struct.hard_threshold_diff, s_rate, plot_struct, report);
+    artifact_struct.hard_threshold_diff, s_rate, plot_struct, report, trial_info);
 % Get intersection of the two arrays
 ok_epochs = intersect(ok_epochs1,ok_epochs2);
 
@@ -91,7 +91,7 @@ trial_info_clean.error(var_reject_ix) = [];
 fprintf('\tTOTAL %d OUT OF %d EPOCHS RETAINED\n', length(ok_epochs), n_epochs);
 
 %% Artifact rejection function
-function [ok_epochs] = artifact_reject(current_data, std_limit, hard_threshold, s_rate, plot_struct, report)
+function [ok_epochs] = artifact_reject(current_data, std_limit, hard_threshold, s_rate, plot_struct, report, trial_info)
 
 n_channels = size(current_data,1);
 n_epochs = size(current_data,2);
@@ -102,7 +102,7 @@ threshold_epochs = squeeze(max(max(abs(current_data),[],3),[],1)) > hard_thresho
 if report.hard_thresh > 0
     fprintf('\t----> Hard Threshold rejected %i trials:\n',sum(threshold_epochs));
     if report.hard_thresh > 1
-        disp(ok_epochs(threshold_epochs));
+        disp(trial_info.trial_n(ok_epochs(threshold_epochs)));
     end
 end
 ok_epochs(threshold_epochs) = [];
@@ -151,7 +151,7 @@ fprintf('\tOK: %3.0f\tREJECTED: %3.0f\tPCT REJ: %3.0f\n',...
 if report.std_thresh > 0
     fprintf('\t----> StD Threshold rejected %i trials:\n',numel(bad_epochs));
     if report.std_thresh > 1
-        disp(bad_epochs);
+        disp(trial_info.trial_n(bad_epochs));
     end
 end
  
