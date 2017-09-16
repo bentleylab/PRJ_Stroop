@@ -2,7 +2,7 @@ plt_vars.plt_lim_S  = [-0.2 1.5];
 plt_vars.plt_lim_R  = [-0.5 1];
 plt_vars.x_step_sz  = 0.2;
 plt_vars.legend     = 1;
-plt_vars.legend_loc = 'southeast';
+plt_vars.legend_loc = 'northeast';
 
 plt_vars.but_width  = 1;
 plt_vars.but_color  = [0 0 0];

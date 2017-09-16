@@ -41,10 +41,12 @@ clear hdr;
 
 SBJ_vars.ch_lab.probes = {'LAM','LHH','LTH','LOF','LAC','RAM','RHH','RTH','ROF','RAC'};
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
-SBJ_vars.ch_lab.ROI    = {'LOF','LAC','ROF','RAC'};
+SBJ_vars.ch_lab.ROI    = {'LOF*','LAC*','ROF*','RAC*'};
 
 % SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
+    'LAM1','LAM2','LHH1','LHH2','LHH3','LTH1','LTH2','RHH3','RHH4','RAM2','RTH2','RTH3',...%epileptic
+    'LAM3','LHH7',...%loose
     'Z','---(13)','---(14)','---(17)','---(18)',...% not real?
     'REF','EKG','DC01','DC04'...%non-neural
     };

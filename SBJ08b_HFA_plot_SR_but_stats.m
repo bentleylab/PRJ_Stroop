@@ -27,8 +27,8 @@ stats_filename1 = strcat(SBJ_vars.dirs.proc,SBJ,'_',conditions,'_ROI_',an_id_s,'
 stats_filename2 = strcat(SBJ_vars.dirs.proc,SBJ,'_',conditions,'_ROI_',an_id_r,'.mat');
 tmp = load(stats_filename1,'stat'); stat{1} = tmp.stat;
 tmp = load(stats_filename2,'stat'); stat{2} = tmp.stat;
-tmp = load(stats_filename1,'roi_hfa'); hfa{1,1} = tmp.roi_hfa{1}; hfa{1,2} = tmp.roi_hfa{2};
-tmp = load(stats_filename2,'roi_hfa'); hfa{2,1} = tmp.roi_hfa{1}; hfa{2,2} = tmp.roi_hfa{2};
+tmp = load(stats_filename1,'hfa'); hfa{1,1} = tmp.hfa{1}; hfa{1,2} = tmp.hfa{2};
+tmp = load(stats_filename2,'hfa'); hfa{2,1} = tmp.hfa{1}; hfa{2,2} = tmp.hfa{2};
 clear tmp
 
 %!!! is this the best way to do this??? Maybe not...

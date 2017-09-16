@@ -178,8 +178,8 @@ fprintf('=======================================================================
 fprintf('Simple Variance Rejection:\n');
 fprintf('\tChannel Variance Names: %s\n',bad_var_ch{:});
 fprintf('\tChannel Diff Variance Names: %s\n',bad_var_dif_ch{:});
-fprintf('\tTrial Variance Ix: %i\n',bad_var_trl);
-fprintf('\tTrial Diff Variance Ix: %i\n',bad_var_dif_trl);
+fprintf('\tTrial Variance: %i\n',bad_var_trl);
+fprintf('\tTrial Diff Variance: %i\n',bad_var_dif_trl);
 fprintf('==============================================================================================\n');
 
 % Save results
@@ -190,8 +190,8 @@ fprintf(r_file,'Simple Variance Rejection:\n');
 fprintf(r_file,'Run Time: %s\n',datestr(datetime));
 fprintf(r_file,'\tChannel Variance Names: %s\n',bad_var_ch{:});
 fprintf(r_file,'\tChannel Diff Variance Names: %s\n',bad_var_dif_ch{:});
-fprintf(r_file,'\tTrial Variance Ix: %i\n',bad_var_trl);
-fprintf(r_file,'\tTrial Diff Variance Ix: %i\n',bad_var_dif_trl);
+fprintf(r_file,'\tTrial Variance: %i\n',bad_var_trl);
+fprintf(r_file,'\tTrial Diff Variance: %i\n',bad_var_dif_trl);
 fprintf(r_file,'==============================================================================================\n');
 fclose(r_file);
 

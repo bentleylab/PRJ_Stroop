@@ -87,13 +87,14 @@ SBJ_vars.analysis_time = {[70 1040]};
 %--------------------------------------
 % Add rejection of LOF1-2, maybe RTI2-3, RIN4-5
 SBJ_vars.artifact_params.std_limit_raw = 7;
-SBJ_vars.artifact_params.hard_threshold_raw = 1000; % ~1000 and below is the main cloud of points
+SBJ_vars.artifact_params.hard_threshold_raw = 700;
 
 SBJ_vars.artifact_params.std_limit_diff = 7;
-SBJ_vars.artifact_params.hard_threshold_diff = 100; % everything was really low on diff here
+SBJ_vars.artifact_params.hard_threshold_diff = 35;
 
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
 % These should be indices AFTER SBJ05 has run!
-SBJ_vars.trial_reject_ix = [22, 95, 174, 176, 180, 245, 254];
+SBJ_vars.trial_reject_n = [50 125 131 134 213 214 306 311];
+% BADBADBAD SBJ_vars.trial_reject_ix = [22, 95, 174, 176, 180, 245, 254];

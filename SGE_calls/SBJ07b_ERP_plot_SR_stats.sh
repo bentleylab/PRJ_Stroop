@@ -12,7 +12,7 @@ cd /home/knight/hoycw/PRJ_Stroop/scripts/
 SBJ="${SGE_TASK}"
 
 # define function
-FUNCTION='SBJ08b_HFA_plot_SR_but_stats'
+FUNCTION='SBJ07b_ERP_plot_SR_stats'
 
 # set up matlab function call
 func_call="${FUNCTION}('${SBJ}', '${conditions}', '${an_id_s}', '${an_id_r}', '${plt_id}', '${save_fig}', 'off')"
@@ -21,6 +21,6 @@ func_call="${FUNCTION}('${SBJ}', '${conditions}', '${an_id_s}', '${an_id_r}', '$
 echo ${SBJ}
 echo ${func_call}
 echo $$
-echo ${func_call} > NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}_${an_id_s}_${an_id_r}.m
-time matlab -nodesktop -nosplash -nodisplay < NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}_${an_id_s}_${an_id_r}.m
-rm NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}_${an_id_s}_${an_id_r}.m
+echo ${func_call} > NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}.m
+time matlab -nodesktop -nosplash -nodisplay < NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}.m
+rm NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}.m

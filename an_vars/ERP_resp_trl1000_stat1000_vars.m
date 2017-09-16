@@ -1,6 +1,6 @@
 event_type  = 'resp';           % event around which to cut trials
 trial_lim_s = [-0.5 1];       % window in SEC for cutting trials
-plt_lim     = [-0.5 1];         % window for plotting these results
+%plt_lim     = [-0.5 1];         % window for plotting these results
 demean_yn   = 'yes';
 bsln_lim    = [-0.25 -0.05];    % window in SEC for baseline correction
 stat_lim    = [0 1];            % window in SEC for stats

@@ -1,5 +1,5 @@
-function SBJ08a_HFA_save(SBJ,conditions,pipeline_id,an_id)
-% Calculates high frequency activity and save out results
+function SBJ08a_HFA_stats_bad_bsln(SBJ,conditions,pipeline_id,an_id)
+% Calculates high frequency activity, computes cluster-based statistics, and plots the results
 % clear all; %close all;
 
 %% Data Preparation
@@ -19,14 +19,14 @@ eval(an_vars_cmd);
 load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'));
 
-% % Select Conditions of Interest
-% [cond_lab, ~, ~] = fn_condition_label_styles(conditions);
-% cond_idx = false([length(cond_lab) length(trial_info.trial_n)]);
-% for cond_ix = 1:length(cond_lab)
-%     % Get binary condition index
-%     cond_idx(cond_ix,:) = logical(fn_condition_index(cond_lab{cond_ix},...
-%         trial_info.condition_n));
-% end
+% Select Conditions of Interest
+[cond_lab, ~, ~] = fn_condition_label_styles(conditions);
+cond_idx = false([length(cond_lab) length(trial_info.trial_n)]);
+for cond_ix = 1:length(cond_lab)
+    % Get binary condition index
+    cond_idx(cond_ix,:) = logical(fn_condition_index(cond_lab{cond_ix},...
+        trial_info.condition_n));
+end
 
 %% Select Channel(s)
 cfgs = [];
@@ -54,7 +54,7 @@ if ~strcmp(event_type,bsln_evnt)
         error(strcat('ERROR: unknown bsln_evnt ',bsln_evnt));
     end
     % Account for the loss of 1/2 TFR window
-    bsln_lim = [bsln_lim(1)-cfg_hfa.t_ftimwin(1)/2 bsln_lim(2)+cfg_hfa.t_ftimwin(1)/2];
+    bsln_lim = [bsln_lim(1)-cfg_hfa.t_ftimwin(1)/2 bsln_lim(2)-cfg_hfa.t_ftimwin(1)/2];
     bsln_trl = fn_ft_cut_trials_equal_len(roi,bsln_evnts,trial_info.condition_n',bsln_lim*roi.fsample);
 end
 

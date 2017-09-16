@@ -1,0 +1,5 @@
+-o /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
+-e /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
+-v conditions="CI",an_id_s="HGm_S_zbootS_trl2to15_sm0_stat15",an_id_r="HGm_R_zbootS_trl5to1_sm0_stat5to1",plt_id="ts_S15R1_errbr_evnt",save_fig="1"
+-l mem_free=4G
+-N HFAplot

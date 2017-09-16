@@ -45,6 +45,8 @@ SBJ_vars.ch_lab.ROI    = {};
 
 % SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
+    'LTH2','LTH3','LHH1','LHH2','RHH1','RTH1','RTH2',...%epileptic
+    'RAM7','RAM8',...%HF noise
     'GND','---(1)','---(2)',...%not real data
     'REF','EKG','E','DC01','DC04'...%not real data
     };

@@ -1,10 +1,10 @@
 event_type  = 'stim';           % event around which to cut trials
 % trial_lim_s will NOT be full of data! the first and last t_ftimwin/2 epochs will be NaNs
-trial_lim_s = [-0.5 1.75];      % window in SEC for cutting trials
-plt_lim     = [-0.2 1.5];         % window to plot this data
+trial_lim_s = [-0.25 1.5];      % window in SEC for cutting trials
+%plt_lim     = [-0.2 1.5];         % window to plot this data
 demean_yn   = 'no';             % z-score for HFA instead
 bsln_evnt   = 'stim';
-bsln_type   = 'relchange';
+bsln_type   = 'zscore';
 bsln_lim    = [-0.25 -0.05];    % window in SEC for baseline correction
 
 % HFA Calculations
@@ -39,8 +39,8 @@ cfg_hfa.keeptrials   = 'yes';                               % must be 'yes' for 
 % Cleaning up power time series for plotting
 smooth_pow_ts = 0;
 lp_yn       = 'yes';
-lp_freq     = 20;
-hp_yn       = 'yes';
+lp_freq     = 10;
+hp_yn       = 'no';
 hp_freq     = 0.5;
 
 % Stats parameters

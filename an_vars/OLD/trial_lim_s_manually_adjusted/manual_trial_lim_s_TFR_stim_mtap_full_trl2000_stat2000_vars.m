@@ -1,7 +1,7 @@
 event_type  = 'stim';           % event around which to cut trials
-% trial_lim_s will be expanded in SBJ09a by t_ftimwin/2 on front and back to avoid NaNs within real trial_lim_s
-trial_lim_s = [-0.5 2];         % window in SEC for cutting trials
-%plt_lim     = [-0.5 2];         % window to plot this data
+% trial_lim_s will NOT be full of data! the first and last t_ftimwin/2 epochs will be NaNs
+trial_lim_s = [-0.75 2.25];       % window in SEC for cutting trials
+plt_lim     = [-0.5 2];         % window to plot this data
 demean_yn   = 'no';
 bsln_evnt   = 'stim';
 bsln_type   = 'relchange';
