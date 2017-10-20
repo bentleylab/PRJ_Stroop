@@ -93,11 +93,11 @@ for ch_ix = 1:numel(stat.label)
         var(cond_ix,:) = squeeze(std(hfa{cond_ix}.powspctrm(:,ch_ix,:,:),[],1)./sqrt(size(hfa{cond_ix}.powspctrm,1)))';
     end
     % Find significant time periods
-    if sum(stat.mask(ch_ix,:))>0
+    if sum(squeeze(stat.mask(ch_ix,1,:)))>0
         sig_ch = {sig_ch{:} stat.label{ch_ix}};
-        mask_chunks = fn_find_chunks(stat.mask(ch_ix,:));
+        mask_chunks = fn_find_chunks(squeeze(stat.mask(ch_ix,1,:)));
         sig_chunks = mask_chunks;
-        sig_chunks(stat.mask(ch_ix,sig_chunks(:,1))==0,:) = [];
+        sig_chunks(squeeze(stat.mask(ch_ix,1,sig_chunks(:,1)))==0,:) = [];
         % If stat and hfa aren't on same time axis, adjust sig_chunk indices
         if (size(stat.time,2)~=size(hfa{1}.time,2)) || (sum(stat.time==hfa{1}.time)~=numel(stat.time))
             for chunk_ix = 1:size(sig_chunks,1)

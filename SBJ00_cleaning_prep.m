@@ -95,7 +95,7 @@ end
 % Save preclean data
 out_filename = strcat(SBJ_vars.dirs.preproc,SBJ,'_preclean',SBJ_vars.block_prefix,'.mat');
 fprintf('============== Saving %s, %s ==============\n',out_filename,SBJ_vars.raw_file);
-save(out_filename, 'data');
+save(out_filename, '-v7.3', 'data');
 
 % Save data labels
 raw_labels = data.label;

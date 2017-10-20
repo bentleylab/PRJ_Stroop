@@ -242,9 +242,17 @@ plot_ch = {'worst',5};%ft_channelselection({'LPC*','LAC*','RIN*'},data.label);
 report.hard_thresh = 2; % print total rejected and trial numbers
 report.std_thresh  = 1; % print only total rejected
 report.std_plot    = 1; % plot the std distribution and threshold
-
-trial_info_KLA_clean = SBJ06_reject_artifacts_KLA_report(trials,trial_info_clean,...
-                                        SBJ_vars.artifact_params,plot_ch,report);
+roi_info = {};
+for roi = 1:numel(SBJ_vars.ch_lab.ROI)
+    fprintf('==========================================================h====================================\n');
+    fprintf('KLA Variance Rejection: %s\n',SBJ_vars.ch_lab.ROI{roi});
+    cfgs = [];
+    cfgs.channel = {SBJ_vars.ch_lab.ROI{roi}};
+    roi_trials = ft_selectdata(cfgs,trials);
+    roi_info{roi} = SBJ06_reject_artifacts_KLA_report(roi_trials,trial_info_clean,...
+                                            SBJ_vars.artifact_params,plot_ch,report);
+end
+error('now need to recombine those to get unique answers');
 
 bad_samples = NaN([size(trial_info_KLA_clean.bad_trials.var,1) 2]);
 for t_ix = 1:size(bad_samples,1)

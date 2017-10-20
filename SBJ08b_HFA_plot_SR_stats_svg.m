@@ -1,8 +1,8 @@
-function SBJ08b_HFA_plot_SR_stats_(SBJ,conditions,an_id_s,an_id_r,plt_id,save_fig,fig_vis)
+function SBJ08b_HFA_plot_SR_stats_svg(SBJ,elec,conditions,pipeline_id,an_id_s,an_id_r,plt_id,save_fig,fig_vis)
 % Plots ERPs computed in SBJ07a_ERP_stats
 % clear all; %close all;
 
-fig_filetype = 'png';
+fig_filetype = 'svg';
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Data Preparation
@@ -23,6 +23,19 @@ event_lab = {'stim', 'resp'};
 % Load RTs
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
 
+einfo_filename = [SBJ_vars.dirs.preproc SBJ '_einfo_' pipeline_id '.mat'];
+load(einfo_filename);
+% Electrode Info Table:
+%   label- name of electrode
+%   ROI- specific region
+%   gROI- general region (LPFC, MPFC, OFC, FWM=frontal white matter)
+%   ROI2- specific region of second electrode
+%   tissue- primary tissue type
+%   GM weight- percentage of electrode pair in GM
+%   Out- 0/1 flag for whether this is partially out of the brain
+einfo_ix = strmatch(elec,einfo(:,1),'exact');
+roi = einfo{einfo_ix,2};
+
 stats_filename1 = strcat(SBJ_vars.dirs.proc,SBJ,'_',conditions,'_ROI_',an_id_s,'.mat');
 stats_filename2 = strcat(SBJ_vars.dirs.proc,SBJ,'_',conditions,'_ROI_',an_id_r,'.mat');
 tmp = load(stats_filename1,'stat'); stat{1} = tmp.stat;
@@ -40,6 +53,9 @@ end
 %% Prep Data
 % Trim data to plotting epoch
 cfg_trim = [];
+cfg_trim.channel = elec;
+stat{1} = ft_selectdata(cfg_trim,stat{1});
+stat{2} = ft_selectdata(cfg_trim,stat{2});
 cfg_trim.latency = plt_vars.plt_lim_S;
 hfa{1,1} = ft_selectdata(cfg_trim,hfa{1,1});
 hfa{1,2} = ft_selectdata(cfg_trim,hfa{1,2});
@@ -56,49 +72,37 @@ for cond_ix = 1:numel(cond_lab)
 end
 
 %% Plot Results
-% NO! I will plot whatever channels I ran the stats on (why else did I run them?)
-% % Select data to plot only ROI channels
-% cfgs = [];
-% cfgs.channel = SBJ_vars.ch_lab.ROI;
-% stat = ft_selectdata(cfgs,stat);
-% for an_ix = 1:numel(cond_lab)
-%     hfa{an_ix} = ft_selectdata(cfgs,hfa{an_ix});
-% end
-
 fig_dir = ['/home/knight/hoycw/PRJ_Stroop/results/HFA/' SBJ '/' conditions '/SR/' an_id_s '-' an_id_r '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
 
 % Create a figure for each channel
-sig_ch = {};
-for ch_ix = 1:numel(stat{1}.label)
-    % Plot parameters
-%     probe_name = stat.label{ch_ix}(regexp(stat.label{ch_ix},'\D'));
-%     probe_name(strfind(probe_name,'-')) = [];
-    
-    fig_name = [SBJ '_' conditions '_SR_' stat{1}.label{ch_ix}];
-%     [plot_rc,~] = fn_num_subplots(numel(stat.label));
-%     if plot_rc(1)>1; fig_height=1; else fig_height=0.33; end;
-    
-    figure('Name',fig_name,'units','normalized',...
-        'outerposition',[0 0 1 0.5],'Visible',fig_vis); %twice as wide for the double plot
-    plot_info.fig        = gcf;
-    plot_info.x_step     = plt_vars.x_step_sz*sample_rate;
-    plot_info.legend_loc = plt_vars.legend_loc;
-    plot_info.sig_alpha  = plt_vars.sig_alpha;
-    plot_info.sig_color  = plt_vars.sig_color;
-    % Condition plotting params
-    cond_info.name       = cond_lab;
-    cond_info.style      = cond_style;
-    cond_info.color      = cond_colors;
-    cond_info.alpha      = repmat(plt_vars.errbar_alpha,[1 numel(cond_lab)]);
-    
-    for set_ix = 1:2
-        subplot(1,2,set_ix);
-        plot_info.ax     = gca;
-        plot_info.title  = [stat{set_ix}.label{ch_ix} ':' event_lab{set_ix}];
-        plot_info.legend = plt_vars.legend;
+% Plot parameters
+fig_name = strcat(SBJ,'_',conditions,'_SR_',roi,'_',elec);
+figure('Name',fig_name,'units','normalized',...
+    'outerposition',[0 0 0.4 0.5],'Visible',fig_vis); %twice as wide for the double plot
+plot_info.fig        = gcf;
+plot_info.x_step     = plt_vars.x_step_sz*sample_rate;
+plot_info.legend_loc = plt_vars.legend_loc;
+plot_info.sig_alpha  = plt_vars.sig_alpha;
+plot_info.sig_color  = plt_vars.sig_color;
+% Condition plotting params
+cond_info.name       = cond_lab;
+cond_info.style      = cond_style;
+cond_info.color      = cond_colors;
+cond_info.alpha      = repmat(plt_vars.errbar_alpha,[1 numel(cond_lab)]);
+
+for set_ix = 1:2
+    subplot(1,2,set_ix);
+    plot_info.ax     = gca;
+    plot_info.title  = [event_lab{set_ix} '-Locked'];
+    plot_info.title(1) = upper(plot_info.title(1));
+        if set_ix==2
+            plot_info.legend = 1;
+        else
+            plot_info.legend = 2;
+        end
         if strcmp(event_lab{set_ix},'stim')
             plot_info.x_lab = plt_vars.plt_lim_S(1):plt_vars.x_step_sz:plt_vars.plt_lim_S(2);
             % Stimulus plotting params
@@ -106,6 +110,7 @@ for ch_ix = 1:numel(stat{1}.label)
             event_info.color = {[0 0 0], cond_colors{:}};
             event_info.width = repmat(plt_vars.evnt_width,[1 numel(event_info.name)]);
             event_info.style = repmat({plt_vars.evnt_style},[1 numel(event_info.name)]);
+            event_info.style{1} = '-';
             event_info.time  = [-plt_vars.plt_lim_S(1)*sample_rate, RT_means{:}];
         else
             plot_info.x_lab = plt_vars.plt_lim_R(1):plt_vars.x_step_sz:plt_vars.plt_lim_R(2);
@@ -121,47 +126,39 @@ for ch_ix = 1:numel(stat{1}.label)
         means = NaN([numel(cond_lab) size(hfa{set_ix,1}.powspctrm,4)]);
         var = NaN([numel(cond_lab) size(hfa{set_ix,1}.powspctrm,4)]);
         for cond_ix = 1:numel(cond_lab)
-            means(cond_ix,:) = squeeze(mean(hfa{set_ix,cond_ix}.powspctrm(:,ch_ix,:,:),1));
-            var(cond_ix,:) = squeeze(std(hfa{set_ix,cond_ix}.powspctrm(:,ch_ix,:,:),[],1)./...
-                                                    sqrt(size(hfa{set_ix,cond_ix}.powspctrm,1)))';
+            means(cond_ix,:) = squeeze(mean(hfa{set_ix,cond_ix}.powspctrm(:,1,:,:),1));
+            var(cond_ix,:) = squeeze(std(hfa{set_ix,cond_ix}.powspctrm(:,1,:,:),[],1)./...
+                sqrt(size(hfa{set_ix,cond_ix}.powspctrm,1)))';
         end
         % Find significant time periods
-        if sum(stat{set_ix}.mask(ch_ix,:))>0
-            sig_ch = {sig_ch{:} stat{set_ix}.label{ch_ix}};
-            mask_chunks = fn_find_chunks(stat{set_ix}.mask(ch_ix,:));
+        if sum(stat{set_ix}.mask(1,:))>0
+            mask_chunks = fn_find_chunks(stat{set_ix}.mask(1,:));
             sig_chunks = mask_chunks;
-            sig_chunks(stat{set_ix}.mask(ch_ix,sig_chunks(:,1))==0,:) = [];
+            sig_chunks(stat{set_ix}.mask(1,sig_chunks(:,1))==0,:) = [];
             % If stat and hfa aren't on same time axis, adjust sig_chunk indices
             if (size(stat{set_ix}.time,2)~=size(hfa{set_ix,1}.time,2)) || ...
-                                (sum(stat{set_ix}.time==hfa{set_ix,1}.time)~=numel(stat{set_ix}.time))
+                    (sum(stat{set_ix}.time==hfa{set_ix,1}.time)~=numel(stat{set_ix}.time))
                 for chunk_ix = 1:size(sig_chunks,1)
                     sig_chunks(chunk_ix,1) = find(hfa{set_ix,1}.time==stat{set_ix}.time(sig_chunks(chunk_ix,1)));
                     sig_chunks(chunk_ix,2) = find(hfa{set_ix,1}.time==stat{set_ix}.time(sig_chunks(chunk_ix,2)));
                 end
             end
             fprintf('%s -- %i SIGNIFICANT CLUSTERS FOUND, plotting with significance shading...\n',...
-                stat{set_ix}.label{ch_ix},size(sig_chunks,1));
+                elec,size(sig_chunks,1));
             fn_plot_ts_error_bar_sig(plot_info,means,var,sig_chunks,event_info,cond_info);
         else
-            fprintf('%s -- NO SIGNIFICANT CLUSTERS FOUND, plotting without significance shading...\n',stat{set_ix}.label{ch_ix});
+            fprintf('%s -- NO SIGNIFICANT CLUSTERS FOUND, plotting without significance shading...\n',elec);
             fn_plot_ts_error_bar(plot_info,means,var,event_info,cond_info);
         end
-    end
-    
-    % Save figure
-    if save_fig
-        fig_filename = [fig_dir fig_name '.' fig_filetype];
-        fprintf('Saving %s\n',fig_filename);
-        saveas(gcf,fig_filename);
-        %eval(['export_fig ' fig_filename]);
-    end
 end
 
-% Save out list of channels with significant differences
-sig_report_filename = [fig_dir 'sig_ch_list.txt'];
-sig_report = fopen(sig_report_filename,'a');
-fprintf(sig_report,'%s - %s\n',an_id_s,an_id_r);
-fprintf(sig_report,'%s\n',sig_ch{:});
-fclose(sig_report);
+%% Save figure
+if save_fig
+    fig_filename = [fig_dir fig_name '.' fig_filetype];
+    fprintf('Saving %s\n',fig_filename,'svg');
+    saveas(gcf,fig_filename);
+    %eval(['export_fig ' fig_filename]);
+end
+
 
 end

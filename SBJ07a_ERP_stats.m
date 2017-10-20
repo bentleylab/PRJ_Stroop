@@ -108,7 +108,7 @@ cfg_stat.design           = design;
 %% Save Results
 data_out_filename = strcat(SBJ_vars.dirs.SBJ,'04_proc/',SBJ,'_',conditions,'_ROI_',an_id,'.mat');
 fprintf('Saving %s\n',data_out_filename);
-save(data_out_filename,'roi_erp','stat');
+save(data_out_filename,'-v7.3','roi_erp','stat');
 
 % %% Plot Results
 % stat_full = stat;

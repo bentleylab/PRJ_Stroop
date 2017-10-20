@@ -204,7 +204,7 @@ data_out_filename = strcat(SBJ_vars.dirs.proc,SBJ,'_',conditions,'_ROI_',an_id,'
 fprintf('===================================================\n');
 fprintf('--- Saving %s ------------------\n',data_out_filename);
 fprintf('===================================================\n');
-save(data_out_filename,'hfa','stat');
+save(data_out_filename,'-v7.3','hfa','stat');
 
 % %% Plot Results
 % stat_full = stat;

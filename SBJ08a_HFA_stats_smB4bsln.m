@@ -34,7 +34,9 @@ roi = ft_selectdata(cfgs,data);
 
 %% Cut into Trials
 % Pad trial_lim_s by cfg_hfa.t_ftimwin/2 to avoid NaNs in epoch of interest
-trial_lim_s_pad = [trial_lim_s(1)-max(cfg_hfa.t_ftimwin)/2 trial_lim_s(2)+max(cfg_hfa.t_ftimwin)/2+0.0];
+% Add 10 ms just because trimming back down to trial_lim_s exactly leave
+% one NaN on the end, so smoothing will NaN out everything
+trial_lim_s_pad = [trial_lim_s(1)-max(cfg_hfa.t_ftimwin)/2 trial_lim_s(2)+max(cfg_hfa.t_ftimwin)/2+0.01];
 
 % Always normalize to pre-stimulus baseline for HFA
 bsln_events = trial_info.word_onset;
@@ -96,25 +98,6 @@ for cond_ix = 1:numel(cond_lab)
     end
 end
 
-%% Baseline Correction
-for cond_ix = 1:numel(cond_lab)
-    fprintf('===================================================\n');
-    fprintf('------------- Baseline Correction for %s ----------\n',cond_lab{cond_ix});
-    fprintf('===================================================\n');
-    switch bsln_type
-        case {'zboot', 'zscore', 'demean', 'my_relchange'}
-            hfa{cond_ix} = fn_bsln_ft_tfr(hfa{cond_ix},bsln_lim,bsln_type,n_boots);
-        case 'relchange'
-            cfgbsln = [];
-            cfgbsln.baseline     = bsln_lim;
-            cfgbsln.baselinetype = bsln_type;
-            cfgbsln.parameter    = 'powspctrm';
-            hfa{cond_ix} = ft_freqbaseline(cfgbsln,hfa{cond_ix});
-        otherwise
-            error(['No baseline implemented for bsln_type: ' bsln_type]);
-    end
-end
-
 %% Smooth Power Time Series
 if smooth_pow_ts
     fprintf('===================================================\n');
@@ -136,6 +119,25 @@ if smooth_pow_ts
                 end
             end
         end
+    end
+end
+
+%% Baseline Correction
+for cond_ix = 1:numel(cond_lab)
+    fprintf('===================================================\n');
+    fprintf('------------- Baseline Correction for %s ----------\n',cond_lab{cond_ix});
+    fprintf('===================================================\n');
+    switch bsln_type
+        case {'zboot', 'zscore', 'demean', 'my_relchange'}
+            hfa{cond_ix} = fn_bsln_ft_tfr(hfa{cond_ix},bsln_lim,bsln_type,n_boots);
+        case 'relchange'
+            cfgbsln = [];
+            cfgbsln.baseline     = bsln_lim;
+            cfgbsln.baselinetype = bsln_type;
+            cfgbsln.parameter    = 'powspctrm';
+            hfa{cond_ix} = ft_freqbaseline(cfgbsln,hfa{cond_ix});
+        otherwise
+            error(['No baseline implemented for bsln_type: ' bsln_type]);
     end
 end
 
@@ -198,7 +200,7 @@ cfg_stat.design           = design;
 [stat] = ft_freqstatistics(cfg_stat, hfa{:});
 
 %% Save Results
-data_out_filename = strcat(SBJ_vars.dirs.proc,SBJ,'_',conditions,'_ROI_',an_id,'.mat');
+data_out_filename = strcat(SBJ_vars.dirs.proc,SBJ,'_',conditions,'_ROI_',an_id,'_smB4bsln.mat');
 fprintf('===================================================\n');
 fprintf('--- Saving %s ------------------\n',data_out_filename);
 fprintf('===================================================\n');

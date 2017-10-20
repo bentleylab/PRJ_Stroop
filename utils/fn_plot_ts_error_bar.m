@@ -42,10 +42,11 @@ for cond_ix = 1:length(cond.name)
     main_lines = [main_lines ebars{cond_ix}.mainLine];
 end
 % ylim(ylims);
+ylims = ylim;
 
 % Plot Extra Features (events, significance)
 for evnt_ix = 1:numel(event.name)
-    event_line = line([event.time(evnt_ix) event.time(evnt_ix)],ylim,...
+    event_line = line([event.time(evnt_ix) event.time(evnt_ix)],ylims,...
         'LineWidth',event.width(evnt_ix),'Color',event.color{evnt_ix},'LineStyle',event.style{evnt_ix});
     main_lines = [main_lines event_line];
 end
@@ -55,9 +56,12 @@ end
 
 
 % Axes and Labels
-plot_info.ax.XLim = [0,size(data,2)];
-plot_info.ax.XTick = 0:plot_info.x_step:size(data,2);
-plot_info.ax.XTickLabel = plot_info.x_lab;
+plot_info.ax.YLim          = ylims;
+plot_info.ax.YLabel.String = 'HFA (z-score)';
+plot_info.ax.XLim          = [0,size(data,2)];
+plot_info.ax.XTick         = 0:plot_info.x_step:size(data,2);
+plot_info.ax.XTickLabel    = plot_info.x_lab;
+plot_info.ax.XLabel.String = 'Time (s)';
 title(plot_info.title);
 if plot_info.legend==1
     legend(main_lines,cond.name{:},event.name{:},'Location',plot_info.legend_loc);

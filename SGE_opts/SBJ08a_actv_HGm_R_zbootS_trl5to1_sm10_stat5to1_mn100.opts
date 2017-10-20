@@ -1,0 +1,5 @@
+-o /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
+-e /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
+-v pipeline_id="main_ft",an_id="HGm_R_zbootS_trl5to1_sm10_stat5to1",actv_win="100"
+-l mem_free=8G
+-N HFAactv

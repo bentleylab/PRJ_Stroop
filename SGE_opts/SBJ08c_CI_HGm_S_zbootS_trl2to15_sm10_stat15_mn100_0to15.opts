@@ -1,0 +1,5 @@
+-o /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
+-e /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
+-v conditions="CI",an_id="HGm_S_zbootS_trl2to15_sm10_stat15",actv_win="100",plt_id="summary_trl0to15_evnt",save_fig="1"
+-l mem_free=4G
+-N HFAsumm

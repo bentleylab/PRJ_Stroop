@@ -98,7 +98,7 @@ for ch_ix = 1:numel(stat.label)
     ax.YTickLabel = round(freqs(1:tick_step:end));
     title([cond_lab{2} '-' cond_lab{1}]);
     
-    if sum(stat.mask(ch_ix,:))>0
+    if sum(squeeze(stat.mask(ch_ix,!!!,:)))>0
         sig_ch = {sig_ch{:} stat.label{ch_ix}};
     end
     
