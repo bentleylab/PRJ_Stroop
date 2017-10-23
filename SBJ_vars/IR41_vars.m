@@ -53,7 +53,7 @@ SBJ_vars.ch_lab.bad = {...
     'ROF11','ROF12','ROF13','ROF14','ROF15','LAC8','LAC9','LAC10',...%out of brain
     'RAC8','RAC9','RAC10','RAC11','RAC12','RMT9','RMT10',...%out of brain
     'LPC12','LPC13','LPC14','LPC15','LES8','LES9','LES10',...%out of brain
-    'LIN13','LIN14','LIN15','LSM10','RSM9','RSM10','RIN12',...%out of brain
+    'LIN13','LIN14','LIN15','LSM10','RSM9','RSM10','RIN12','RIN13','RIN14',...%out of brain
     'DC03','DC04','EYE1','EYE2','EYE3','EYE4',....% Not real data
     'E','LSH','LLE','RSH','V1','V2','V3','V4','V5','V6',...% Not real data
     'EKG*'...

@@ -46,7 +46,7 @@ SBJ_vars.ch_lab.ROI    = {'RAC*','ROF*','RIN*','LOF*','LIN*'};
 SBJ_vars.ch_lab.bad = {...
     'LAM*','LHH1','LHH2','LHH3','LTH1','LTH2','LTH3','LTH10',...%Epileptic
     'RHH1','RHH2','RHH3','RTH2','RTH3','RTH4','RAM1','RAM2','RAM3','RAM6',...% Epileptic
-    'RIN9','RIN10','ROF10','LIN3','LOF1','LOF10','LIN10','ROF10','LHH10',...%noisy or out of brain
+    'RIN10','ROF10','LIN3','LOF1','LOF10','LIN10','ROF10','LHH10',...%noisy or out of brain
     'PMF*','AMF*','OF*','AT*','PT*','AD*','HD*','DC03','DC04',....% Not real data
     'LT1','LT2','LT3','LT4','LT5','LT6',...% Not real data, using 'LT*' tosses LTH elecs too
     'E','LSH','LLE','RSH','V1',...% Not real data

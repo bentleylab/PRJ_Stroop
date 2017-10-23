@@ -221,6 +221,9 @@ ft_rejectvisual(cfg_reject,trials_dif);
 % artifact_params.std_limit_diff = 7;
 % artifact_params.hard_threshold_diff = 100; % based on maxabs() for trials_dif
 
+% Capture original ROI channels
+orig_ROI_ch = data.label;
+
 % Re-load SBJ_vars after updating artifact field
 clear SBJ_vars
 clear_cmd = ['clear /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];

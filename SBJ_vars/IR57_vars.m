@@ -44,14 +44,15 @@ SBJ_vars.ch_lab.probes = {'RSM','RAC','ROF','RIN','RTI','RAM','RHH','RTH',...
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP',...
                           'BP','BP','BP','BP','BP','BP','BP'};
 SBJ_vars.ch_lab.ROI    = {'RSM*','RAC*','ROF*','RIN*','RTI*',...
-                              'LAM4-5','LAC*','LOF*'}; %LAM4 is inferior anterior insula
+                              'LAM4-5','LAM5-6','LAC*','LOF*',...%LAM4,5 are inferior anterior insula
+                              '-LOF1-2','-RTI2-3','-RIN4-5'}; %these are rejected based on variance
 
 SBJ_vars.ch_lab.bad = {...
     'RHH1','RHH2','RHH3','RHH4','ROF1','RAM1','RTH1','RTH2',...%epileptic
     'LHH1','LHH2','LHH3','LHH4','LHH5','LHH6','LHH7','LHH8','LHH9','LHH10',...%epileptic
     'LTH1','LTH2','LTH3','LAM1','LAM2','LAM3',...%epileptic
     'RSM2','RSM3','RIN9','RIN10','LTI2','LTI3','RHH6','LHH1','LHH2','LHH4','LHH6',...%bad line noise
-    'RSM8','RSM9','RAC10','RAM10','RTH9','RTH10','LOF10','LAM10',...%out of brain
+    'RSM9','RSM10','RAC10','RAM10','RTH9','RTH10','LOF10','LAM10',...%out of brain
     'RHH7',...%marked as bad in visual for some reason?
     'DC01','DC03',...% not real data
     'LUC','LLC','RUC','RLC','XREF','E',...% not real data

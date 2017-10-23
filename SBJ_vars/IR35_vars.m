@@ -41,14 +41,14 @@ clear hdr;
 
 SBJ_vars.ch_lab.probes = {'RAM','RHH','RTH','RIN','ROF','LAM','LHH','LTH','LAC','LOF','LIN','LPC'};
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
-SBJ_vars.ch_lab.ROI    = {'RIN*','ROF*','LAC*','LOF*','LIN*','LPC*'};
+SBJ_vars.ch_lab.ROI    = {'RIN*','ROF*','LAC*','LOF*','LIN*','LPC*','-LPC6-7'};
 
 SBJ_vars.ch_lab.bad = {...
     'LHH1','LHH2','LHH3','RHH1','RHH2','RHH3','LTH3','LTH4',...%epileptic
     'LAC4',...%crazy strong noise
     'RIN10','LAM8','LAM9','LAM10','LPC9','LPC10','LHH9','LHH10',...%out of brain
     'LTH1','LTH10','ROF8','ROF9','ROF10','RTH8','RTH9','RTH10',...%out of brain
-    'RHH7','RHH8','RHH9','RHH10','RAM9','RAM10','LIN9','LIN10',...%out of brain
+    'RHH7','RHH8','RHH9','RHH10','RAM9','RAM10','LIN10',...%out of brain
     'LOF1','LOF8','LOF9','LOF10','LAC11','LAC12',...%out of brain
     'NULL','NULL-1','NILL','NULL-2','DC03','DC04'....% Not real data
     'E','LSH','LLE','RSH','V1','V2','V3','V4','V5','V6','xREF',...% Not real data
@@ -86,4 +86,5 @@ SBJ_vars.artifact_params.hard_threshold_diff = 40;
 % Trials to Reject
 %--------------------------------------
 % These should be indices AFTER SBJ05 has run!
-SBJ_vars.trial_reject_ix = [42];
+SBJ_vars.trial_reject_n = [42];
+% old index version: SBJ_vars.trial_reject_ix = [42];

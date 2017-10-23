@@ -272,113 +272,129 @@ if save_fig
 end
 
 %% Plot ROI Results
-% Create and format the plot
-fig_name = ['GRP_HFA_cond_onsets_ROI_' event '_meanRTout'];
-figure('Name',fig_name,'units','normalized',...
-        'outerposition',[0 0 0.9 1],'Visible',fig_vis);
-
-% Plot Condition Difference Onsets per SBJ
-ax = subplot(2,1,1);
-hold on;
-roi_y_offset = linspace(-marker_offset,marker_offset,numel(roi_list));
-for sbj_ix = 1:numel(SBJs)
-    s = [];
-    for roi_ix = 1:numel(roi_list)
-        s(roi_ix) = scatter(cond_onsets{sbj_ix,roi_ix},...
-            repmat(SBJ_ys(sbj_ix)+roi_y_offset(roi_ix),[1 numel(cond_onsets{sbj_ix,roi_ix})]),...
-            onset_marker_size,'o','filled');
-        set(s(roi_ix),'MarkerFaceColor',roi_colors{roi_ix},'MarkerEdgeColor','k');
-    end
-    r = [];
-    for cond_ix = 1:numel(cond_lab)
-        r(cond_ix) = scatter(mean_RTs(cond_ix,sbj_ix),SBJ_ys(sbj_ix),rt_marker_size,'+');
-        set(r(cond_ix),'MarkerEdgeColor',cond_colors{cond_ix},'LineWidth',rt_marker_width);
-    end
-    for roi_ix = 1:numel(roi_list)
-        line([median_onsets(sbj_ix,roi_ix) median_onsets(sbj_ix,roi_ix)],...
-            [SBJ_ys(sbj_ix)-median_line_height/2 SBJ_ys(sbj_ix)+median_line_height/2],...
-            'Color',roi_colors{roi_ix},'LineStyle','-','LineWidth',3);
-    end
-    line([plt_vars.plt_lim(1) plt_vars.plt_lim(2)],[SBJ_ys(sbj_ix) SBJ_ys(sbj_ix)],...
-        'Color',[0.2 0.2 0.2],'LineStyle',':');
-end
-scat_obj = findobj(gca,'Type','Scatter');
-roi_scat_idx = logical([1 numel(scat_obj)]);
-roi_scat_lgd = zeros([1 numel(scat_obj)]);
-roi_rt_lab = {roi_list{:} ['Mean RT: ' cond_lab{1}],['Mean RT: ' cond_lab{2}]};
-for scat_ix = 1:numel(scat_obj)
-    if ~isempty(scat_obj(scat_ix).DisplayName)
-        roi_scat_idx(scat_ix) = 1;
-        roi_scat_lgd(scat_ix) = strmatch(scat_obj(scat_ix).DisplayName,roi_rt_lab);
-    end
-end
-legend(scat_obj(roi_scat_idx),roi_rt_lab{roi_scat_lgd(roi_scat_idx)},'Location','northeast');
-
-% ax = gca;
-% Plot labels
-% ax.XLabel.String   = 'Time (s)';
-% ax.XLabel.FontSize = 14;
-ax.XLim    = plt_vars.plt_lim;
-ax.XTick   = plt_vars.plt_lim(1):plt_vars.x_step_sz:plt_vars.plt_lim(2);
-ax.XColor  = 'k';
-
-ax.YLabel.String   = 'Subject';
-ax.YLabel.FontSize = 14;
-ax.YLim            = [0 max(SBJ_ys)+median_line_height/2];
-ax.YTick           = SBJ_ys;        % Ticks anywhere non-zero in plot_idx
-ax.YTickLabel      = SBJs;
-% ax.YTickLabelRotation = 45;
-ax.YColor  = 'k';
-
-ax.Title.String = 'Condition Difference Onsets by ROI in Individuals';
-ax.Title.FontSize = 16;
-
-% Plot histogram of the median onsets by ROI across subjects
-ax2 = subplot(2,1,2);
-hold on;
-% ax2 = gca;
-b = [];
-l = [];
-% hist_alpha = 0.6;
-hist_data = zeros([numel(roi_list) numel(plt_vars.x_data)-1]);
-for roi_ix = 1:numel(roi_list)
-    hist_data(roi_ix,:)  = histcounts(median_onsets(:,roi_ix),plt_vars.x_data);
-end
-b = bar(plt_vars.x_data(1:end-1)+(diff(plt_vars.x_data(1:2))/2),hist_data',1,'stacked');
-for roi_ix = numel(roi_list):-1:1 %backwards so OFC doesn't overwrite LPFC mean onset
-    set(b(roi_ix),'FaceColor',roi_colors{roi_ix},'EdgeColor','k');
-%     l(roi_ix) = line([nanmean(median_onsets(:,roi_ix)) nanmean(median_onsets(:,roi_ix))],...
-%         ax2.YLim,'Color',roi_colors{roi_ix},'LineStyle','--','LineWidth',3);
-end
-legend(b,roi_list{:},'Location','northeast');
-% Plot labels
-ax2.XLabel.String   = 'Time (s)';
-ax2.XLabel.FontSize = 14;
-ax2.XLim    = plt_vars.plt_lim;
-ax2.XTick   = plt_vars.plt_lim(1):plt_vars.x_step_sz:plt_vars.plt_lim(2);
-ax2.XColor  = 'k';
-
-ax2.YLabel.String   = '# Median Onsets';
-ax2.YLabel.FontSize = 14;
-% ax2.YLim            = [0 numel(SBJs)+1];
-ax2.YTick           = 1:1:ax2.YLim(2);        % Ticks anywhere non-zero in plot_idx
-% ax2.YTickLabel      = SBJs;
-% ax2.YTickLabelRotation = 45;
-ax2.YColor  = 'k';
-
-ax2.Title.String = 'Group-Level Median Condition Difference Onsets by ROI';
-ax2.Title.FontSize = 16;
-
-% Reposition axes
-set(ax, 'Position',[0.05 0.33 0.9 0.63]);    %[left bottom width height]
-set(ax2,'Position',[0.05 0.05 0.9 0.21]);    %[left bottom width height]
-
-%% Save figure
-if save_fig
-    fig_filename = [fig_dir fig_name '.' fig_filetype];
-    fprintf('Saving %s\n',fig_filename);
-    saveas(gcf,fig_filename);
-    %eval(['export_fig ' fig_filename]);
-end
+% % Create and format the plot
+% fig_name = ['GRP_HFA_cond_onsets_ROI_' event '_meanRTout'];
+% figure('Name',fig_name,'units','normalized',...
+%         'outerposition',[0 0 0.9 1],'Visible',fig_vis);
+% 
+% % Plot Condition Difference Onsets per SBJ
+% ax = subplot(2,1,1);
+% hold on;
+% roi_y_offset = linspace(-marker_offset,marker_offset,numel(roi_list));
+% for sbj_ix = 1:numel(SBJs)
+%     % ROI scatter
+%     s = [];
+%     for roi_ix = 1:numel(roi_list)
+%         s(roi_ix) = scatter(cond_onsets{sbj_ix,roi_ix},...
+%             repmat(SBJ_ys(sbj_ix)+roi_y_offset(roi_ix),[1 numel(cond_onsets{sbj_ix,roi_ix})]),...
+%             onset_marker_size,'o','filled','DisplayName',roi_list{roi_ix});
+%         set(s(roi_ix),'MarkerFaceColor',roi_colors{roi_ix},'MarkerEdgeColor','k');
+%     end
+%     % RT scatter
+%     r = [];
+%     for cond_ix = 1:numel(cond_lab)
+%         r(cond_ix) = scatter(mean_RTs(cond_ix,sbj_ix),SBJ_ys(sbj_ix),rt_marker_size,'+',...
+%             'DisplayName',['Mean RT: ' cond_lab{cond_ix}]);
+%         set(r(cond_ix),'MarkerEdgeColor',cond_colors{cond_ix},'LineWidth',rt_marker_width);
+%     end
+%     % Median Lines
+%     for roi_ix = 1:numel(roi_list)
+%         line([median_onsets(sbj_ix,roi_ix) median_onsets(sbj_ix,roi_ix)],...
+%             [SBJ_ys(sbj_ix)-median_line_height/2 SBJ_ys(sbj_ix)+median_line_height/2],...
+%             'Color',roi_colors{roi_ix},'LineStyle','-','LineWidth',3);
+%     end
+%     % SBJ Line
+%     line([plt_vars.plt_lim(1) plt_vars.plt_lim(2)],[SBJ_ys(sbj_ix) SBJ_ys(sbj_ix)],...
+%         'Color',[0.2 0.2 0.2],'LineStyle',':');
+% end
+% scat_obj = findobj(gca,'Type','Scatter');
+% lgd_ix = zeros([1 numel(roi_list)+2]);
+% for roi_ix = 1:numel(roi_list)
+%     match_ix = strmatch(roi_list(roi_ix),{scat_obj.DisplayName});
+%     lgd_ix(roi_ix) = match_ix(1);
+% end
+% for cond_ix = 1:numel(cond_lab)
+%     match_ix = strmatch(['Mean RT: ' cond_lab{cond_ix}],{scat_obj.DisplayName});
+%     lgd_ix(roi_ix+cond_ix) = match_ix(1);
+% end
+% % [names,lgd_ix] = unique({scat_obj.DisplayName});
+% % for name_ix = 1:numel(names)
+% % roi_scat_idx = zeros([1 numel(scat_obj)]);
+% % roi_scat_lgd = zeros([1 numel(scat_obj)]);
+% % roi_rt_lab = {roi_list{:} ['Mean RT: ' cond_lab{1}],['Mean RT: ' cond_lab{2}]};
+% % for scat_ix = 1:numel(scat_obj)
+% %     if ~isempty(scat_obj(scat_ix).DisplayName)
+% %         roi_scat_idx(scat_ix) = 1;
+% %         roi_scat_lgd(scat_ix) = strmatch(scat_obj(scat_ix).DisplayName,roi_rt_lab);
+% %     end
+% % end
+% legend(scat_obj(lgd_ix),'Location','northeast');%names
+% 
+% % ax = gca;
+% % Plot labels
+% % ax.XLabel.String   = 'Time (s)';
+% % ax.XLabel.FontSize = 14;
+% ax.XLim    = plt_vars.plt_lim;
+% ax.XTick   = plt_vars.plt_lim(1):plt_vars.x_step_sz:plt_vars.plt_lim(2);
+% ax.XColor  = 'k';
+% 
+% ax.YLabel.String   = 'Subject';
+% ax.YLabel.FontSize = 14;
+% ax.YLim            = [0 max(SBJ_ys)+median_line_height/2];
+% ax.YTick           = SBJ_ys;        % Ticks anywhere non-zero in plot_idx
+% ax.YTickLabel      = SBJs;
+% % ax.YTickLabelRotation = 45;
+% ax.YColor  = 'k';
+% 
+% ax.Title.String = 'Condition Difference Onsets by ROI in Individuals';
+% ax.Title.FontSize = 16;
+% 
+% % Plot histogram of the median onsets by ROI across subjects
+% ax2 = subplot(2,1,2);
+% hold on;
+% % ax2 = gca;
+% b = [];
+% l = [];
+% % hist_alpha = 0.6;
+% hist_data = zeros([numel(roi_list) numel(plt_vars.x_data)-1]);
+% for roi_ix = 1:numel(roi_list)
+%     hist_data(roi_ix,:)  = histcounts(median_onsets(:,roi_ix),plt_vars.x_data);
+% end
+% b = bar(plt_vars.x_data(1:end-1)+(diff(plt_vars.x_data(1:2))/2),hist_data',1,'stacked');
+% for roi_ix = numel(roi_list):-1:1 %backwards so OFC doesn't overwrite LPFC mean onset
+%     set(b(roi_ix),'FaceColor',roi_colors{roi_ix},'EdgeColor','k');
+% %     l(roi_ix) = line([nanmean(median_onsets(:,roi_ix)) nanmean(median_onsets(:,roi_ix))],...
+% %         ax2.YLim,'Color',roi_colors{roi_ix},'LineStyle','--','LineWidth',3);
+% end
+% legend(b,roi_list{:},'Location','northeast');
+% % Plot labels
+% ax2.XLabel.String   = 'Time (s)';
+% ax2.XLabel.FontSize = 14;
+% ax2.XLim    = plt_vars.plt_lim;
+% ax2.XTick   = plt_vars.plt_lim(1):plt_vars.x_step_sz:plt_vars.plt_lim(2);
+% ax2.XColor  = 'k';
+% 
+% ax2.YLabel.String   = '# Median Onsets';
+% ax2.YLabel.FontSize = 14;
+% % ax2.YLim            = [0 numel(SBJs)+1];
+% ax2.YTick           = 1:1:ax2.YLim(2);        % Ticks anywhere non-zero in plot_idx
+% % ax2.YTickLabel      = SBJs;
+% % ax2.YTickLabelRotation = 45;
+% ax2.YColor  = 'k';
+% 
+% ax2.Title.String = 'Group-Level Median Condition Difference Onsets by ROI';
+% ax2.Title.FontSize = 16;
+% 
+% % Reposition axes
+% set(ax, 'Position',[0.05 0.33 0.9 0.63]);    %[left bottom width height]
+% set(ax2,'Position',[0.05 0.05 0.9 0.21]);    %[left bottom width height]
+% 
+% %% Save figure
+% if save_fig
+%     fig_filename = [fig_dir fig_name '.' fig_filetype];
+%     fprintf('Saving %s\n',fig_filename);
+%     saveas(gcf,fig_filename);
+%     %eval(['export_fig ' fig_filename]);
+% end
 
 end

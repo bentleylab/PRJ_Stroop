@@ -46,6 +46,7 @@ SBJ_vars.ch_lab.ROI    = {'RAC*','ROF*','LAC*','LOF*','LIN*'};
 SBJ_vars.ch_lab.bad = {...
     'RHH7','RTH5','RTH6','RTH7',...%epileptic
     'RAC3',...% Noisy
+    'RAC8','RAC9','RAC10',...%out of brain;  'RAC7' is half out, but keeping it because RAC6-7 PSD looks good
     'RAM10','RHH1','RHH9','RHH10','RTH8','RTH9','RTH10','ROF7','ROF8','ROF9','ROF10',...%out of brain
     'LIN8','LIN9','LIN10','LIN11','LIN12','LHH7','LHH8','LHH9','LHH10',...%out of brain
     'LAC6','LAC7','LAC8','LAC9','LAC10','LOF8','LOF9','LOF10','LAM7','LAM8','LAM9','LAM10',...%out of brain
@@ -84,4 +85,5 @@ SBJ_vars.artifact_params.hard_threshold_diff = 25;
 % Trials to Reject
 %--------------------------------------
 % These should be indices AFTER SBJ05 has run!
-SBJ_vars.trial_reject_ix = [71, 192, 198, 225, 251, 252];
+SBJ_vars.trial_reject_n = [112, 247, 275, 302, 303];
+% OLD ix SBJ_vars.trial_reject_ix = [71, 198, 225, 251, 252];
