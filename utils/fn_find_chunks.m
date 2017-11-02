@@ -4,7 +4,7 @@ function [chunk_lim] = fn_find_chunks(data)
 %   chunk_lim [Nx2 array] - (start_ix,stop_ix) pairs for each chunk of consecutive data
 
 % Catch non time series data
-if ~numel(size(data))==2
+if ~(numel(size(data))==2)
     error('ERROR: Input data should be 2 dimensions!');
 end
 % If column vector, flip to row vector

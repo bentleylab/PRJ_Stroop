@@ -36,6 +36,9 @@ cfg_hfa.keeptrials   = 'yes';                               % must be 'yes' for 
 % cfg.t_ftimwin    = ones(1,length(cfg.tapsmofrq))*delta_time;
 
 
+% Outlier Rejection
+outlier_std_lim = 6;
+
 % Cleaning up power time series for plotting
 smooth_pow_ts = 1;
 lp_yn       = 'yes';

@@ -1,4 +1,4 @@
-function SBJ08a_HFA_stats(SBJ,conditions,pipeline_id,an_id)
+function SBJ08a_HFA_stats_regressRT(SBJ,conditions,pipeline_id,an_id)
 % Calculates high frequency activity, computes cluster-based statistics, and plots the results
 % clear all; %close all;
 % Set up paths
@@ -141,9 +141,6 @@ if smooth_pow_ts
     end
 end
 
-%% Reject Outlier Trials
-
-
 %% Merge multiple bands
 if strcmp(HFA_type,'multiband')
     cfg_avg = [];
@@ -162,6 +159,15 @@ if strcmp(event_type,'resp')
     end
 elseif ~strcmp(event_type,'stim')
     error(['ERROR: unknown event_type ' event_type]);
+end
+
+%% Regress RT
+cfg_rt = [];
+cfg_rt.statistics = 'yes';
+cfg_rt.model      = 'yes';
+for cond_ix = 1:numel(cond_lab)
+    cfg_rt.confound   = trial_info.response_time(cond_idx(cond_ix,:));
+    hfa{cond_ix} = ft_regressconfound(cfg_rt, hfa{cond_ix});
 end
 
 %% Run Statistics

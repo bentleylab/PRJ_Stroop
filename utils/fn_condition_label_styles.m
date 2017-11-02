@@ -1,14 +1,10 @@
-function [labels, colors, line_styles] = fn_condition_label_styles(condition_name)
+function [labels, colors, line_styles] = fn_factor_label_styles(factor_name)
 %% Converts the name of a set of conditions into labels, plotting colors/styles
 % condition_name: [str] 'CNI', 'CI', 'pcon'
 % colors from http://colorbrewer2.org/#type=qualitative&scheme=Set1&n=3
 
 % if length(cond_lab) == 1
-switch condition_name
-    case 'pcon'
-        labels = {'con_mcon', 'con_minc', 'inc_mcon', 'inc_minc'};
-        colors = {[0 0 0], [0 0 0], [228,26,28]./256, [228,26,28]./256};    % colors for cond_lab plotting
-        line_styles = {'-', '--', '-','--'};    % colors for cond_lab plotting
+switch factor_name
     case 'CNI'
         labels = {'con', 'neu', 'inc'};
         colors = {[55,126,184]./256, [0 0 0], [228,26,28]./256};
@@ -17,6 +13,14 @@ switch condition_name
         labels = {'con', 'inc'};
         colors = {[55,126,184]./256, [228,26,28]./256};
         line_styles = {'-', '-'};    % colors for cond_lab plotting
+    case 'pcon'
+        labels = {'mcon', 'same', 'minc'};
+        colors = {[55,126,184]./256, [0 0 0], [228,26,28]./256};
+        line_styles = {'-', '-', '-'};    % colors for cond_lab plotting
+    case 'pcon_CI'
+        labels = {'con_mcon', 'con_minc', 'inc_mcon', 'inc_minc'};
+        colors = {[0 0 0], [0 0 0], [228,26,28]./256, [228,26,28]./256};    % colors for cond_lab plotting
+        line_styles = {'-', '--', '-','--'};    % colors for cond_lab plotting
 %     case 'conseq'
 %         cond_id = 'conseq';
     otherwise
