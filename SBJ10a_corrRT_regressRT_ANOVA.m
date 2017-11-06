@@ -125,7 +125,7 @@ for ch_ix = 1:length(hfa.label)
 end
 
 %% Save Results
-f_name = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' model_lab '_' an_id '.mat'];
+f_name = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id '.mat'];
 if rt_correlation
     save(f_name,'-v7.3','hfa','w2','stat');
 else

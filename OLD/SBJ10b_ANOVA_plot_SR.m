@@ -23,8 +23,8 @@ event_lab = {'stim', 'resp'};
 % Load RTs
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
 
-f_name_s = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' model_lab '_' an_id_s '.mat'];
-f_name_r = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' model_lab '_' an_id_r '.mat'];
+f_name_s = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id_s '.mat'];
+f_name_r = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id_r '.mat'];
 tmp = load(f_name_s,'w2'); w2{1} = tmp.w2;
 tmp = load(f_name_r,'w2'); w2{2} = tmp.w2;
 tmp = load(f_name_s,'hfa'); hfa{1} = tmp.hfa;
@@ -54,7 +54,7 @@ win_center = round(mean(win_lim,2));
 % end
 
 %% Plot Results
-fig_dir = ['/home/knight/hoycw/PRJ_Stroop/results/HFA/' SBJ '/' model_lab '/SR/' an_id_s '-' an_id_r '/'];
+fig_dir = ['/home/knight/hoycw/PRJ_Stroop/results/HFA/' SBJ '/' stat_id '/SR/' an_id_s '-' an_id_r '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
@@ -73,7 +73,7 @@ end
 % Create a figure for each channel
 sig_ch = cell(size(grp_lab));
 for ch_ix = 1:numel(hfa{1}.label)    
-    fig_name = [SBJ '_ANOVA_' model_lab '_SR_' hfa{1}.label{ch_ix}];    
+    fig_name = [SBJ '_ANOVA_' stat_id '_SR_' hfa{1}.label{ch_ix}];    
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 1 0.5],'Visible',fig_vis); %twice as wide for the double plot
     

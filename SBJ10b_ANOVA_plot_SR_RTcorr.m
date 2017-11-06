@@ -1,4 +1,4 @@
-function SBJ10b_ANOVA_plot_SR_RTcorr(SBJ,stat_id,an_id_s,an_id_r,plt_id,save_fig,fig_vis)
+function SBJ10b_ANOVAfdr_plot_SR_RTcorr(SBJ,stat_id,an_id_s,an_id_r,plt_id,save_fig,fig_vis)
 % Plots ANOVA results
 % clear all; %close all;
 
@@ -24,8 +24,8 @@ event_lab = {'stim', 'resp'};
 % Load RTs
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
 
-f_name_s = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' model_lab '_' an_id_s '.mat'];
-f_name_r = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' model_lab '_' an_id_r '.mat'];
+f_name_s = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id_s '.mat'];
+f_name_r = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id_r '.mat'];
 tmp = load(f_name_s,'w2'); w2{1} = tmp.w2;
 tmp = load(f_name_r,'w2'); w2{2} = tmp.w2;
 % tmp = load(f_name_s,'hfa'); hfa{1} = tmp.hfa;
@@ -47,9 +47,18 @@ cfg_trim.latency = plt_vars.plt_lim_R;
 % hfa{2}  = ft_selectdata(cfg_trim,hfa{2});
 stat{2} = ft_selectdata(cfg_trim,stat{2});
 
-% Convert % explained variance to 0-100 scale
-w2{1}.trial = w2{1}.trial*100;
-w2{2}.trial = w2{2}.trial*100;
+% FDR correct pvalues for ANOVA
+qvals = {NaN(size(w2{1}.pval)) NaN(size(w2{1}.pval))};
+for set_ix = 1:2
+    for ch_ix = 1:numel(stat{1}.label)
+        pvals = squeeze(w2{set_ix}.pval(:,ch_ix,:));
+        [~, ~, ~, qvals{set_ix}(:,ch_ix,:)] = fdr_bh(pvals);%,0.05,'pdep','yes');
+    end
+    
+    % Convert % explained variance to 0-100 scale
+    w2{set_ix}.trial = w2{set_ix}.trial*100;
+end
+
 
 % Get Sliding Window Parameters
 win_lim    = fn_sliding_window_lim(stat{1}.time,win_len,win_step);
@@ -64,7 +73,7 @@ win_center = round(mean(win_lim,2));
 % end
 
 %% Plot Results
-fig_dir = ['/home/knight/hoycw/PRJ_Stroop/results/HFA/' SBJ '/' model_lab '/SR/' an_id_s '-' an_id_r '/'];
+fig_dir = ['/home/knight/hoycw/PRJ_Stroop/results/HFA/' SBJ '/' stat_id '/SR/' an_id_s '-' an_id_r '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
@@ -87,10 +96,9 @@ for grp_ix = 2:numel(grp_lab)+2
 end
 
 % Create a figure for each channel
-sig_ch = cell(size(grp_lab));
-ch = strmatch('AG20',stat{1}.label);
-for ch_ix = ch%1:numel(stat{1}.label)
-    fig_name = [SBJ '_ANOVA_' model_lab '_SR_' stat{1}.label{ch_ix}];
+sig_ch = cell([1+numel(grp_lab) 2]);
+for ch_ix = 1:numel(stat{1}.label)
+    fig_name = [SBJ '_ANOVA_' stat_id '_SR_' stat{1}.label{ch_ix}];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 1 0.5],'Visible',fig_vis); %twice as wide for the double plot
     
@@ -126,31 +134,31 @@ for ch_ix = ch%1:numel(stat{1}.label)
         % Plot significant time periods
         for grp_ix = 1:numel(grp_lab)+1
             if grp_ix <= numel(grp_lab)
-                if any(w2{set_ix}.pval(grp_ix,ch_ix,:)<0.05)
+                if any(squeeze(qvals{set_ix}(grp_ix,ch_ix,:))<0.05)
                     % Track channels with significant var_exp
-                    if ~iscell(sig_ch{grp_ix})
-                        sig_ch{grp_ix} = {};
+                    if ~iscell(sig_ch{grp_ix,set_ix})
+                        sig_ch{grp_ix,set_ix} = {};
                     end
-                    sig_ch{grp_ix} = {sig_ch{grp_ix}{:} stat{set_ix}.label{ch_ix}};
+                    sig_ch{grp_ix,set_ix} = {sig_ch{grp_ix,set_ix}{:} stat{set_ix}.label{ch_ix}};
                     
                     % Find significant periods
                     if strcmp(plt_vars.sig_type,'bold')
-                        sig_chunks = fn_find_chunks(squeeze(w2{set_ix}.pval(grp_ix,ch_ix,:))<0.05);
-                        sig_chunks(w2{set_ix}.pval(grp_ix,ch_ix,sig_chunks(:,1))>0.05,:) = [];
-                        axes(axs(1));
-                        for sig_ix = 1:numel(sig_chunks)
+                        sig_chunks = fn_find_chunks(squeeze(qvals{set_ix}(grp_ix,ch_ix,:))<0.05);
+                        sig_chunks(squeeze(qvals{set_ix}(grp_ix,ch_ix,sig_chunks(:,1)))>0.05,:) = [];
+                        set(gcf,'CurrentAxes',axs(1));
+                        for sig_ix = 1:size(sig_chunks,1)
                             line(win_center(sig_chunks(sig_ix,1):sig_chunks(sig_ix,2)),...
                                 squeeze(w2{set_ix}.trial(grp_ix,ch_ix,sig_chunks(sig_ix,1):sig_chunks(sig_ix,2))),...
                                 'Color',[grp_colors{grp_ix}],'LineStyle',plt_vars.sig_style,...
                                 'LineWidth',plt_vars.sig_width);
                         end
                     elseif strcmp(plt_vars.sig_type,'scatter')
-                        sig_times = win_center(squeeze(w2{set_ix}.pval(grp_ix,ch_ix,:))<0.05);
+                        sig_times = win_center(squeeze(qvals{set_ix}(grp_ix,ch_ix,:))<0.05);
                         scatter(sig_times,repmat(y_sig(grp_ix),size(sig_times)),...
                             plt_vars.sig_scat_size,grp_colors{grp_ix},plt_vars.sig_scat_mrkr);
                     elseif strcmp(plt_vars.sig_type,'patch')
-                        sig_chunks = fn_find_chunks(squeeze(w2{set_ix}.pval(grp_ix,ch_ix,:))<0.05);
-                        sig_chunks(w2{set_ix}.pval(grp_ix,ch_ix,sig_chunks(:,1))>0.05,:) = [];
+                        sig_chunks = fn_find_chunks(squeeze(qvals{set_ix}(grp_ix,ch_ix,:))<0.05);
+                        sig_chunks(squeeze(qvals{set_ix}(grp_ix,ch_ix,sig_chunks(:,1)))>0.05,:) = [];
                         error('sig_type = patch needs sig_times variable!');
                         % Plot Significance Shading
                         fprintf('%s %s (%s) -- %i SIGNIFICANT CLUSTERS FOUND...\n',...
@@ -169,12 +177,23 @@ for ch_ix = ch%1:numel(stat{1}.label)
             else
                 % RT correlation significant time periods
                 if sum(stat{set_ix}.mask(ch_ix,:))>0
+                    % Track channels with significant var_exp
+                    if ~iscell(sig_ch{grp_ix,set_ix})
+                        sig_ch{grp_ix,set_ix} = {};
+                    end
+                    sig_ch{grp_ix,set_ix} = {sig_ch{grp_ix,set_ix}{:} stat{set_ix}.label{ch_ix}};
+                    
+                    sig_chunks = fn_find_chunks(squeeze(stat{set_ix}.mask(ch_ix,:,:)));
+                    sig_chunks(squeeze(stat{set_ix}.mask(ch_ix,:,sig_chunks(:,1)))==0,:) = [];
                     sig_times = find(squeeze(stat{set_ix}.mask(ch_ix,:,:)==1));
-                    axes(axs(2));
+                    set(gcf,'CurrentAxes',axs(2));
                     if strcmp(plt_vars.sig_type,'bold')
-                        line(sig_times,squeeze(stat{set_ix}.rho(ch_ix,:,sig_times)),...
-                            'Color',rt_color{1},'LineStyle',plt_vars.sig_style,...
-                            'LineWidth',plt_vars.sig_width);
+                        for sig_ix = 1:size(sig_chunks,1)
+                            sig_times = sig_chunks(sig_ix,1):sig_chunks(sig_ix,2);
+                            line(sig_times,squeeze(stat{set_ix}.rho(ch_ix,:,sig_times)),...
+                                'Color',rt_color{1},'LineStyle',plt_vars.sig_style,...
+                                'LineWidth',plt_vars.sig_width);
+                        end
                     elseif strcmp(plt_vars.sig_type,'scatter')
                         scatter(sig_times,repmat(y_sig(grp_ix),size(sig_times)),...
                             plt_vars.sig_scat_size2,rt_color{1},plt_vars.sig_scat_mrkr2);
@@ -214,11 +233,20 @@ for ch_ix = ch%1:numel(stat{1}.label)
     end
 end
 
-% % Save out list of channels with significant differences
-% sig_report_filename = [fig_dir 'sig_ch_list.txt'];
-% sig_report = fopen(sig_report_filename,'a');
-% fprintf(sig_report,'%s - %s\n',an_id_s,an_id_r);
-% fprintf(sig_report,'%s\n',[sig_ch{:}]);
-% fclose(sig_report);
+%% Save out list of channels with significant differences
+sig_report_filename = [fig_dir 'sig_ch_list.txt'];
+sig_report = fopen(sig_report_filename,'a');
+fprintf(sig_report,'%s: %s for %s - %s\n',SBJ,stat_id,an_id_s,an_id_r);
+for grp_ix = 1:numel(grp_lab)+1
+    for set_ix = 1:numel(event_lab)
+        fprintf(sig_report,'%s, %s :\n',lgd_lab{grp_ix},event_lab{set_ix});
+        if ~isempty(sig_ch{grp_ix,set_ix})
+            fprintf(sig_report,'\t%s\n',strjoin(sig_ch{grp_ix,set_ix},','));
+        else
+            fprintf(sig_report,'\n');
+        end
+    end
+end
+fclose(sig_report);
 
 end

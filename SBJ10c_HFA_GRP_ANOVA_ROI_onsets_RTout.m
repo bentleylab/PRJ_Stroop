@@ -25,7 +25,7 @@ eval(stat_vars_cmd);
 
 % Get condition info
 [grp_lab, grp_colors, grp_style] = fn_group_label_styles(model_lab);
-cond_lab = {'RT', grp_lab{:}};
+cond_lab = {'corr(RT)', grp_lab{:}};
 
 % Get event timing
 mean_RTs = zeros(size(SBJs));
@@ -65,7 +65,7 @@ for sbj_ix = 1:numel(SBJs)
     end
     
     % Get Sliding Window Parameters
-    win_lim    = fn_sliding_window_lim(stat{1}.time,win_len,win_step);
+    win_lim    = fn_sliding_window_lim(stat.time,win_len,win_step);
     win_center = round(mean(win_lim,2));
     
     %% Load ROI and GM/WM info
@@ -82,26 +82,10 @@ for sbj_ix = 1:numel(SBJs)
     
     % Sort by gROI, then ROI
     einfo = sortrows(einfo,[3,2]);
-    if ~isempty(setdiff(hfa{1}.label,einfo(:,1)))
-        error('ERROR: Electrodes do not match between hfa and einfo!');
+    if ~isempty(setdiff(stat.label,einfo(:,1)))
+        error('ERROR: Electrodes do not match between stat and einfo!');
     end
-    
-    %% Process parameters
-    %!!! is this the best way to do this??? Maybe not...
-    sample_rate = (numel(hfa{1}.time)-1)/(hfa{1}.time(end)-hfa{1}.time(1));
-    
-    % Confirm channels and time axis are the same
-    %   All the rounding and such is because some stupid rounding errors...
-%     same_start = round(hfa_actv.time(1)*uint8(sample_rate))==round(hfa{1}.time(1)*uint8(sample_rate));
-%     same_end   = round(hfa_actv.time(end)*uint8(sample_rate))==round(hfa{1}.time(end)*uint8(sample_rate));
-%     same_numel = size(hfa_actv.time,2)==size(hfa{1}.time,2);
-%     if ~same_start || ~same_end || ~same_numel
-%         error('time axes are not the same across hfa analyses!');
-%     end
-%     if ~isempty(setdiff(hfa{1}.label,hfa_actv.label));
-%         error('Different electrodes across hfa analyses!');
-%     end
-    
+        
     %% Aggregate results per ROI
     for ch_ix = 1:numel(stat.label)
         roi_ix = [];
@@ -119,7 +103,7 @@ for sbj_ix = 1:numel(SBJs)
                 % Exclude differences after the mean RT for this SBJ
                 if strcmp(event_lab,'resp')
                     all_onsets{sbj_ix,roi_ix,1} = [all_onsets{sbj_ix,roi_ix,1} onset_time];
-                elseif strcmp(event_lab,'stim') && (min(mask_chunks(:,1))<mean_RTs(sbj_ix))
+                elseif strcmp(event_lab,'stim') && (onset_time<mean_RTs(sbj_ix))
                     all_onsets{sbj_ix,roi_ix,1} = [all_onsets{sbj_ix,roi_ix,1} onset_time];
                 end
             end
@@ -127,22 +111,22 @@ for sbj_ix = 1:numel(SBJs)
             % Get ANOVA group onsets
             for grp_ix = 1:numel(grp_lab)
                 if any(squeeze(qvals(grp_ix,ch_ix,:))<0.05)
-                    sig_onsets = win_lim(squeeze(qvals(grp_ix,ch_ix,:))<0.05,1);
+                    sig_onsets = stat.time(win_lim(squeeze(qvals(grp_ix,ch_ix,:))<0.05,1));
                     all_onsets{sbj_ix,roi_ix,grp_ix+1} = [all_onsets{sbj_ix,roi_ix,grp_ix+1} sig_onsets(1)];
                 end
             end
         end
     end
     
-    clear SBJ SBJ_vars hfa hfa_actv stat einfo w2
+    clear SBJ SBJ_vars hfa stat einfo w2
 end
 %% Compute medians per gROI
 median_onsets = NaN([numel(SBJs) numel(roi_list) numel(grp_lab)+1]);
 for sbj_ix = 1:numel(SBJs)
     for roi_ix = 1:numel(roi_list)
-        median_onsets(sbj_ix,roi_ix,1) = median(all_onsets{sbj_ix,roi_ix,1});
+        median_onsets(sbj_ix,roi_ix,1) = nanmedian(all_onsets{sbj_ix,roi_ix,1});
         for grp_ix = 1:numel(grp_lab)
-            median_onsets(sbj_ix,roi_ix,grp_ix+1) = median(all_onsets{sbj_ix,roi_ix,grp_ix+1});
+            median_onsets(sbj_ix,roi_ix,grp_ix+1) = nanmedian(all_onsets{sbj_ix,roi_ix,grp_ix+1});
         end
 %         fprintf('%s , %s: %f (N=%i)\n',SBJs{sbj_ix},groi_list{groi_ix},...
 %             median_onsets(sbj_ix,groi_ix),numel(cond_g_onsets{sbj_ix,groi_ix}));
@@ -154,7 +138,7 @@ end
 %% Plot GROI Results
 for cond_ix = 1:numel(cond_lab)
     % Create and format the plot
-    fig_name = ['GRP_HFA_onsets_' stat_id '_' roi_id '_' event_lab '_meanRTout'];
+    fig_name = ['GRP_HFA_onsets_' cond_lab{cond_ix} '_' roi_id '_' event_lab '_meanRTout'];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.9 1],'Visible',fig_vis);
     
@@ -168,31 +152,28 @@ for cond_ix = 1:numel(cond_lab)
     rt_marker_size     = 250;
     onset_marker_size  = 150;
     marker_offset      = 0.08;
-    groi_y_offset      = linspace(-marker_offset,marker_offset,numel(roi_list));
+    roi_y_offset       = linspace(-marker_offset,marker_offset,numel(roi_list));
+    s = [];
     for sbj_ix = 1:numel(SBJs)
-        s = [];
         for roi_ix = 1:numel(roi_list)
-            s(roi_ix) = scatter(all_onsets{sbj_ix,roi_ix},...
-                repmat(SBJ_ys(sbj_ix)+groi_y_offset(roi_ix),[1 numel(all_onsets{sbj_ix,roi_ix})]),...
-                onset_marker_size,'o','filled');
-            set(s(roi_ix),'MarkerFaceColor',roi_colors{roi_ix},'MarkerEdgeColor','k');
+            if ~isempty(all_onsets{sbj_ix,roi_ix,cond_ix})
+                s(roi_ix) = scatter(all_onsets{sbj_ix,roi_ix,cond_ix},...
+                    repmat(SBJ_ys(sbj_ix)+roi_y_offset(roi_ix),[1 numel(all_onsets{sbj_ix,roi_ix,cond_ix})]),...
+                    onset_marker_size,'o','filled');
+                set(s(roi_ix),'MarkerFaceColor',roi_colors{roi_ix},'MarkerEdgeColor','k');
+            end
         end
-        r = [];
-        for cond_ix = 1:numel(grp_lab)
-            r(cond_ix) = scatter(mean_RTs(cond_ix,sbj_ix)-plt_vars.plt_lim(1),SBJ_ys(sbj_ix),rt_marker_size,'+');
-            set(r(cond_ix),'MarkerEdgeColor',cond_colors{cond_ix},'LineWidth',rt_marker_width);
-        end
+        r = scatter(mean_RTs(sbj_ix)-plt_vars.plt_lim(1),SBJ_ys(sbj_ix),rt_marker_size,'+');
+        set(r,'MarkerEdgeColor','k','LineWidth',rt_marker_width);
         for roi_ix = 1:numel(roi_list)
-            line([median_onsets(sbj_ix,roi_ix) median_onsets(sbj_ix,roi_ix)],...
+            line([median_onsets(sbj_ix,roi_ix,cond_ix) median_onsets(sbj_ix,roi_ix,cond_ix)],...
                 [SBJ_ys(sbj_ix)-median_line_height/2 SBJ_ys(sbj_ix)+median_line_height/2],...
                 'Color',roi_colors{roi_ix},'LineStyle','-','LineWidth',3);
-        end
-        if sbj_ix==4    % IR35 has all 4 main gROIs
-            legend([s r],roi_list{:},['Mean RT: ' grp_lab{1}],['Mean RT: ' grp_lab{2}],'Location','northeast');
         end
         line([plt_vars.plt_lim(1) plt_vars.plt_lim(2)],[SBJ_ys(sbj_ix) SBJ_ys(sbj_ix)],...
             'Color',[0.2 0.2 0.2],'LineStyle',':');
     end
+    legend([s r],roi_list{:},'Mean RT','Location','northeast');
     
     % ax = gca;
     % Plot labels
@@ -210,7 +191,7 @@ for cond_ix = 1:numel(cond_lab)
     % ax.YTickLabelRotation = 45;
     ax.YColor  = 'k';
     
-    ax.Title.String = 'Condition Difference Onsets by gROI in Individuals';
+    ax.Title.String = [cond_lab{cond_ix} ' Onsets by ' roi_id ' in Individuals'];
     ax.Title.FontSize = 16;
     
     % Plot histogram of the median onsets by ROI across subjects
@@ -222,7 +203,7 @@ for cond_ix = 1:numel(cond_lab)
     % hist_alpha = 0.6;
     hist_data = zeros([numel(roi_list) numel(plt_vars.x_data)-1]);
     for roi_ix = 1:numel(roi_list)
-        hist_data(roi_ix,:)  = histcounts(median_onsets(:,roi_ix),plt_vars.x_data);
+        hist_data(roi_ix,:)  = histcounts(median_onsets(:,roi_ix,cond_ix),plt_vars.x_data);
     end
     b = bar(plt_vars.x_data(1:end-1)+(diff(plt_vars.x_data(1:2))/2),hist_data',1,'stacked');
     for roi_ix = numel(roi_list):-1:1 %backwards so OFC doesn't overwrite LPFC mean onset
@@ -246,7 +227,7 @@ for cond_ix = 1:numel(cond_lab)
     % ax2.YTickLabelRotation = 45;
     ax2.YColor  = 'k';
     
-    ax2.Title.String = 'Group-Level Median Condition Difference Onsets by gROI';
+    ax2.Title.String = ['Group-Level Median ' cond_lab{cond_ix} ' Onsets by ' roi_id];
     ax2.Title.FontSize = 16;
     
     % Reposition axes
@@ -255,8 +236,8 @@ for cond_ix = 1:numel(cond_lab)
     
     %% Save figure
     if save_fig
-        fig_dir = ['/home/knight/hoycw/PRJ_Stroop/results/HFA/GRP_' conditions '_onsets_ROI/'...
-            an_id '/'];
+        fig_dir = ['/home/knight/hoycw/PRJ_Stroop/results/HFA/GRP_onsets_ROI/'...
+            stat_id '_' roi_id '_' an_id '/'];
         if ~exist(fig_dir,'dir')
             mkdir(fig_dir);
         end
