@@ -1,4 +1,4 @@
-function [labels, colors, line_styles] = fn_factor_label_styles(factor_name)
+function [labels, colors, line_styles] = fn_condition_label_styles(factor_name)
 %% Converts the name of a set of conditions into labels, plotting colors/styles
 % condition_name: [str] 'CNI', 'CI', 'pcon'
 % colors from http://colorbrewer2.org/#type=qualitative&scheme=Set1&n=3
@@ -24,7 +24,7 @@ switch factor_name
 %     case 'conseq'
 %         cond_id = 'conseq';
     otherwise
-        error(strcat('Only one, unrecognized condition offered: ',labels{:}));
+        error(strcat('Only one, unrecognized condition offered: ',factor_name));
 end
 % else
 %     cond_id = 'cst';

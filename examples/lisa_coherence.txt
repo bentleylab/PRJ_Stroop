@@ -1,0 +1,43 @@
+Hey,
+
+Here is the procedure for quantifying coherence (per Cohen, 2014, ch. 26):
+
+1. Compute spectral decomposition using method of choice, outputting complex values (for illustrative purposes, assuming TFR matrix "data" with dimensions channel x frequency x time)
+
+2. Compute power:
+
+pow = abs(data).^2;
+
+3. Compute cross-spectral power (channel x channel x frequency x time):
+
+cspow = zeros(size(data,1), size(data));
+for c = 1:size(cspow,1)
+    cspow(c,:,:,:) = abs(mean(data(c,:,:).*conj(data)).^2;
+    end
+
+    4. Compute coherence (channel x channel x frequency x time):
+
+    coh = zeros(size(cspow));
+    for c1 = 1:size(coh,1)
+        for c2 = 1:size(coh,2)
+                coh(c1,c2,:,:) = squeeze(cspow(c1,c2,:,:))./(squeeze(pow(c1,:,:)).*squeeze(pow(c2,:,:)));
+                    end
+                    end
+
+                    You could also create surrogate "chance" coherence distributions for significance testing by randomly shifting select input data (e.g., 1 pow input) on the time dimension, holding the inputs true. I haven't tried this, but something like the circshift.m function at a randomly chosen time point should work. Then, repeat it 1000 times to create a distribution, and test the real coh against the chance coh distribution to denote "true" coh at whatever alpha level you choose.
+
+                    Hope that helps! L
+**holding the other inputs true
+
+=============
+Next email:
+Wait, no need to take the mean in step 3 (this code is simplified and I forgot to remove that step). So,
+
+3. Compute cross-spectral power (channel x channel x frequency x time):
+
+cspow = zeros(size(data,1), size(data));
+for c = 1:size(cspow,1)
+    cspow(c,:,:,:) = abs(data(c,:,:).*conj(data)).^2;
+    end
+
+    spazz.

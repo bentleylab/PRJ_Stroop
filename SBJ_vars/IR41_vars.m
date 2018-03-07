@@ -60,7 +60,7 @@ SBJ_vars.ch_lab.bad = {...
     };
 % edge of cortex: LOF1,ROF1,RMT8,LIN12,RSM8
 %     'LHH4',...%noisy in Kata's data
-% SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.eeg = {'F3','FZ','F4','T3','T4','CZ','O1','O2','OZ','C3','C4'};
 SBJ_vars.ch_lab.photod = {'DC01'};
 SBJ_vars.ch_lab.mic    = {'DC02'};

@@ -32,7 +32,7 @@ for ch = 1:size(tfr.powspctrm,2)
             sample_means = NaN([1 n_boots]);
             sample_stds  = NaN([1 n_boots]);
             for boot_ix = 1:n_boots
-                % Select a random set of trials
+                % Select a random set of trials (sampling WITH REPLACEMENT!)
                 shuffle_ix = randi(size(tfr.powspctrm,1),[1 size(tfr.powspctrm,1)]);
                 % Select baseline data and compute stats
                 bsln_data = bsln_tfr.powspctrm(shuffle_ix,ch,f,:);

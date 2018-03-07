@@ -41,7 +41,7 @@ for sbj_ix = 1:numel(SBJs)
     eval(SBJ_vars_cmd);
     
     % Load data
-    load(strcat(SBJ_vars.dirs.proc,SBJ,'_ANOVA_ROI_',model_lab,'_',an_id,'.mat'),'stat','w2');
+    load(strcat(SBJ_vars.dirs.proc,SBJ,'_ANOVA_ROI_',stat_id,'_',an_id,'.mat'),'stat','w2');
     
     %% FDR correct pvalues for ANOVA
     qvals = NaN(size(w2.pval));
@@ -104,6 +104,12 @@ for sbj_ix = 1:numel(SBJs)
     fprintf(print_line,'RT',squeeze(grp_cnt(sbj_ix,:,numel(grp_lab)+1)));
     fprintf(print_line,'Total',squeeze(elec_cnt(sbj_ix,:)));
     fprintf('\n\n');
+end
+
+%% Print elec counts per ROI across all patients
+fprintf('============== GRP ROI counts ==============\n');
+for roi_ix = 1:numel(roi_list)
+    fprintf('%s = %i\n',roi_list{roi_ix},sum(elec_cnt(:,roi_ix)));
 end
 
 %% Save output

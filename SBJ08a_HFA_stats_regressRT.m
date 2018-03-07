@@ -209,7 +209,7 @@ cfg_stat.design           = design;
 [stat] = ft_freqstatistics(cfg_stat, hfa{:});
 
 %% Save Results
-data_out_filename = strcat(SBJ_vars.dirs.proc,SBJ,'_',conditions,'_ROI_',an_id,'.mat');
+data_out_filename = strcat(SBJ_vars.dirs.proc,SBJ,'_',conditions,'_ROI_',an_id,'_rRT.mat');
 fprintf('===================================================\n');
 fprintf('--- Saving %s ------------------\n',data_out_filename);
 fprintf('===================================================\n');

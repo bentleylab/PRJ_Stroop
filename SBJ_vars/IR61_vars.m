@@ -41,15 +41,18 @@ clear hdr;
 
 SBJ_vars.ch_lab.probes = {'LAM','LHH','LTH','LOF','LAC','RAM','RHH','RTH','ROF','RAC'};
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
-SBJ_vars.ch_lab.ROI    = {'LOF*','LAC*','ROF*','RAC*'};
+SBJ_vars.ch_lab.ROI    = {'LOF*','LAC*','ROF*','RAC*','RAM4','RAM5','RAM6',... % RAM5,6 inf. ant. Insula, RAM4 is WM nearby
+                            'RHH5','RHH6','RHH7'}; % RHH5,6 in inf. post. Insula, RHH7 WM nearby
 
-% SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'LAM1','LAM2','LHH1','LHH2','LHH3','LTH1','LTH2','RHH3','RHH4','RAM2','RTH2','RTH3',...%epileptic
+    'LOF10','LAC10','RAM10','RHH1','RAC10','ROF10',...%out of brain
     'LAM3','LHH7',...%loose
     'Z','---(13)','---(14)','---(17)','---(18)',...% not real?
     'REF','EKG','DC01','DC04'...%non-neural
     };
+    % BEWARE: LTH4 (ventricle), LHH1+RAM9 (border)
 SBJ_vars.ch_lab.eeg = {'FZ','FPZ','CZ','OZ','C3','C4'};
 SBJ_vars.ch_lab.eog = {'LLE','LUE','RLE','RUE'};
 SBJ_vars.ch_lab.photod = {'DC02'};

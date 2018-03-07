@@ -58,8 +58,9 @@ SBJ_vars.ch_lab.bad = {...
     'LUC','LLC','RUC','RLC','XREF','E',...% not real data
     'EKG'...
     };
-% SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.eeg = {'FPZ' 'CZ' 'OZ' 'C3' 'C4' 'Z' 'FP1' 'FP2' 'T3' 'T4' 'O1' 'O2'};
+SBJ_vars.ch_lab.eeg_bad = {'Z','T4','O2','T3'}; %take these out of the above .eeg field!
 SBJ_vars.ch_lab.photod = {'DC02'};
 SBJ_vars.ch_lab.mic    = {'DC04'};
 

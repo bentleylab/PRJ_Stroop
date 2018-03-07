@@ -52,7 +52,7 @@ SBJ_vars.ch_lab.bad = {...
     'E','LSH','LLE','RSH','V1',...% Not real data
     'EKG*'...
     };
-% SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.eeg = {'C3','CZ','C4','FZ','OZ'};
 %                           not sure about 'Z' but PSD looks ok
 SBJ_vars.ch_lab.photod = {'DC01'};

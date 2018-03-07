@@ -43,7 +43,7 @@ SBJ_vars.ch_lab.probes = {'LAM','LHH','LTH','LOF','LAC','LPC','LLES','RAM','RHH'
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
 SBJ_vars.ch_lab.ROI    = {};
 
-% SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'LTH2','LTH3','LHH1','LHH2','RHH1','RTH1','RTH2',...%epileptic
     'RAM7','RAM8',...%HF noise

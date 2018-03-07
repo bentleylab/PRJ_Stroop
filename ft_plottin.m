@@ -1,4 +1,19 @@
-%% Practice fieldtrip plotting
+%% Viewing Recons
+% Read in MRI:
+%   mri = ft_read_mri(<SBJ>_fsMR_<pre or post>tal.nii);
+% Grids only: read in the surface mesh ending in .pial
+%   cortex = ft_read_headshape('<SBJ>_xh.pial'); % x = l or r
+% Load elec file: '_elec_tal_r.mat'
+%     load(<SBJ>_elec_tal_r.mat);
+%     NOTE: if no grids, '<SBJ>_elec_tal_r,mat' will not exist; use '...tal_f.mat', or'..._tal.mat'
+% Depth view (3 orthogonal slices):
+%     cfg = [];
+%     cfg.elec = elec_struct;
+%     ft_electrodeplacement(cfg, mri)
+% Surface view:
+%     ft_plot_mesh(cortex, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none');
+%     view([-90 10]); lighting gouraud; camlight;
+%     hs = ft_plot_sens(elec_struct, 'shape', 'sphere');
 
 %% Interactive 2D plot
 
@@ -15,7 +30,8 @@ cfg.avgoverrpt = 'yes';
 tfr_sel = ft_selectdata(cfg,tfr);
 
 % Load mesh
-mesh = ft_read_headshape('/home/knight/ecog/DATA_FOLDER/Irvine/IR57/3D_Images/freesurfer_pre-op/freesurfer/surf/lh.pial');
+mesh = ft_read_headshape(...
+    '/home/knight/ecog/DATA_FOLDER/Irvine/IR57/3D_Images/freesurfer_pre-op/freesurfer/surf/lh.pial');
 mesh.coorsys = 'acpc';
 
 % create layout
@@ -37,7 +53,8 @@ ft_multiplotTFR(cfg,tfr);
 
 %% 3D Mesh Plotting (for depths)
 %Create meask
-atlas = ft_read_atlas('/home/knight/ecog/DATA_FOLDER/Irvine/IR57/3D_Images/freesurfer_pre-op/freesurfer/mri/aparc+aseg.mgz');
+atlas = ft_read_atlas(...
+    '/home/knight/ecog/DATA_FOLDER/Irvine/IR57/3D_Images/freesurfer_pre-op/freesurfer/mri/aparc+aseg.mgz');
 atlas.coordsys = 'acpc';
 cfg = [];
 cfg.inputcoord = 'acpc';

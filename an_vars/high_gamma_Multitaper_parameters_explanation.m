@@ -24,7 +24,7 @@ cfg_hfa.keeptapers   = 'no';
 cfg_hfa.pad          = 'maxperlen';                         %add time on either side of window
 cfg_hfa.padtype      = 'zero';
 cfg_hfa.foi          = foi_center;                          % analysis 2 to 30 Hz in steps of 2 Hz 
-cfg_hfa.t_ftimwin    = ones(length(cfg_hfa.foi),1).*0.5;    % length of time window; 0.5 sec, could be n_cycles./foi for n_cylces per win
+cfg_hfa.t_ftimwin    = ones(length(cfg_hfa.foi),1).*delta_time;    % length of time window; 0.5 sec, could be n_cycles./foi for n_cylces per win
 cfg_hfa.toi          = 'all';%-buff_lim(1):0.1:1.5;         % time window centers
 cfg_hfa.keeptrials   = 'yes';                               % must be 'yes' for stats
 

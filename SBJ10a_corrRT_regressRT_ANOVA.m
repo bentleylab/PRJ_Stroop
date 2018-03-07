@@ -44,14 +44,18 @@ end
 %% Regress off Reaction Time
 if regress_rt
     cfg_conf = [];
-    cfg_conf.model    = 'yes';
+    cfg_conf.output = 'residual';
     cfg_conf.confound = zscore(trial_info.response_time);
     hfa = ft_regressconfound(cfg_conf, hfa);
 end
 % OUTPUT:
-%   .beta  = weights
-%   .model = confounds * weights = X * X\Y
-%   .powspctrm = Yclean = Y - X * X\Y (i.e., the residuals after subtracting the model off
+%   As of August 2017, can no longer get residuals, model, and beta; now choose via .output argument
+%   'beta'  = weights
+%       .beta = 4D double
+%   'model' = confounds * weights = X * X\Y
+%       output is a .model struct that contains .powspctrm, .time, .trialinfo, etc.
+%   'residual' = Yclean = Y - X * X\Y (i.e., the residuals after subtracting the model off
+%       output is .powspctrm as normal
 % NOTE: .stat and .prob output if .statistics = 'yes', but DO NOT TRUST THEM!!! (e.g., p values of 2...)
 
 %% Run ANOVA

@@ -1,4 +1,5 @@
-function SBJ10c_HFA_GRP_summary_boxcmp_perc_actv_RT_ANOVA(SBJs,stat_id,pipeline_id,an_id,actv_win,roi_id,plt_id,save_fig,fig_vis)
+function SBJ10c_HFA_GRP_summary_bar_perc_actv_RT_ANOVA_ROI(SBJs,stat_id,pipeline_id,an_id,actv_win,roi_id,...
+                                                            plt_id,save_fig,fig_vis,fig_filetype)
 % Load HFA analysis results for active, RT correlation, and ANOVA epochs
 %   Active- must be significant, and for S-locked, before mean(RT)
 %   RT correlation: any significance in stat_lim
@@ -6,7 +7,7 @@ function SBJ10c_HFA_GRP_summary_boxcmp_perc_actv_RT_ANOVA(SBJs,stat_id,pipeline_
 % OUTPUTS:
 %   Bar chart with % active, % deactivated, % RT correlations, % ANOVA factors
 % clear all; %close all;
-fig_filetype = 'png';
+% fig_filetype = 'png';
 label_spacer = 0;
 groi_label_spacer = '      ';
 if ischar(save_fig); save_fig = str2num(save_fig); end
@@ -67,7 +68,7 @@ for sbj_ix = 1:numel(SBJs)
         mean_RTs(sbj_ix) = mean(trial_info.response_time); % converts sec to ms
     end
     % Load data
-    load(strcat(SBJ_vars.dirs.proc,SBJ,'_ANOVA_ROI_',model_lab,'_',an_id,'.mat'));
+    load(strcat(SBJ_vars.dirs.proc,SBJ,'_ANOVA_ROI_',stat_id,'_',an_id,'.mat'));
     actv_filename = strcat(SBJ_vars.dirs.proc,SBJ,'_actv_ROI_',an_id,'_mn',actv_win,'.mat');
     load(actv_filename,'actv_ch','actv_ch_epochs');
     tmp = load(actv_filename,'hfa'); hfa_actv = tmp.hfa;
@@ -96,8 +97,10 @@ for sbj_ix = 1:numel(SBJs)
     
     % Restrict hfa_actv to stat_lim (should obviate some of below comparisons)
     cfg_lim = [];
-    cfg_lim.latency = [stat_lim(1) stat_lim(2)+0.001]; %add a data point to get a full window over the tail end
+    cfg_lim.latency = stat_lim;
     hfa_actv = ft_selectdata(cfg_lim,hfa_actv);
+    hfa      = ft_selectdata(cfg_lim,hfa);
+    stat     = ft_selectdata(cfg_lim,stat);
     
     % FDR correct pvalues for ANOVA
     qvals = NaN(size(w2.pval));

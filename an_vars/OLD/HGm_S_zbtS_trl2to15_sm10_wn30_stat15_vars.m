@@ -1,3 +1,4 @@
+error('This an_id has 500ms smoothing and is mislabeled!!!');
 event_type  = 'stim';           % event around which to cut trials
 % trial_lim_s will NOT be full of data! the first and last t_ftimwin/2 epochs will be NaNs
 trial_lim_s = [-0.25 1.5];      % window in SEC for cutting trials
@@ -30,7 +31,7 @@ cfg_hfa.keeptapers   = 'no';
 cfg_hfa.pad          = 'maxperlen';                         %add time on either side of window
 cfg_hfa.padtype      = 'zero';
 cfg_hfa.foi          = foi_center;                          % analysis 2 to 30 Hz in steps of 2 Hz 
-cfg_hfa.t_ftimwin    = ones(length(cfg_hfa.foi),1).*0.5;    % length of time window; 0.5 sec, could be n_cycles./foi for n_cylces per win
+cfg_hfa.t_ftimwin    = ones(length(cfg_hfa.foi),1).*delta_time;    % length of time window; 0.5 sec, could be n_cycles./foi for n_cylces per win
 cfg_hfa.toi          = 'all';%-buff_lim(1):0.1:1.5;         % time window centers
 cfg_hfa.keeptrials   = 'yes';                               % must be 'yes' for stats
 % cfg.t_ftimwin    = ones(1,length(cfg.tapsmofrq))*delta_time;

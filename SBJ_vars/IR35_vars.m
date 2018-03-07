@@ -54,7 +54,7 @@ SBJ_vars.ch_lab.bad = {...
     'E','LSH','LLE','RSH','V1','V2','V3','V4','V5','V6','xREF',...% Not real data
     'EKG*'...
     };
-% SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.eeg = {};
 SBJ_vars.ch_lab.photod = {'DC01'};
 SBJ_vars.ch_lab.mic    = {'DC02'};

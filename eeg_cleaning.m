@@ -8,7 +8,7 @@ SBJ = 'IR57';
 eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
 
 cfg = [];
-cfg.dataset = SBJ_vars.dirs.raw_filename;
+cfg.dataset = [SBJ_vars.dirs.preproc SBJ '_preclean.mat'];
 cfg.continuous = 'yes';
 cfg.channel = 'all';
 data = ft_preprocessing(cfg);

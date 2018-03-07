@@ -145,7 +145,7 @@ else
     error(stract('ERROR: unknown event_type ',proc_vars.event_type));
 end
 trials = fn_ft_cut_trials_equal_len(data,events,...
-    trial_info_clean.condition_n',proc_vars.trial_lim_sec*data.fsample);
+    trial_info_clean.condition_n',proc_vars.trial_lim_s*data.fsample);
 
 % Compute Derivative
 cfg = [];
@@ -235,7 +235,7 @@ cfg.channel = SBJ_vars.ch_lab.ROI;
 data = ft_selectdata(cfg,data);
 
 trials = fn_ft_cut_trials_equal_len(data,events,...
-    trial_info_clean.condition_n',proc_vars.trial_lim_sec*data.fsample);
+    trial_info_clean.condition_n',proc_vars.trial_lim_s*data.fsample);
 
 
 %% ========================================================================

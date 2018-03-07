@@ -1,8 +1,9 @@
-function SBJ10c_HFA_GRP_ANOVA_ROI_onsets_RTout(SBJs,stat_id,pipeline_id,an_id,roi_id,plt_id,save_fig,fig_vis)
+function SBJ10c_HFA_GRP_onsets_ROI_RTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_id,roi_id,...
+                                                    plt_id,save_fig,fig_vis,fig_filetype)
 % Load HFA analysis results for active and condition-differentiating
 %   epochs, plot a summary of those time period per electrode
 % clear all; %close all;
-fig_filetype = 'png';
+% fig_filetype = 'png';
 label_spacer = 0;
 groi_label_spacer = '      ';
 if ischar(save_fig); save_fig = str2num(save_fig); end
@@ -56,7 +57,7 @@ for sbj_ix = 1:numel(SBJs)
         mean_RTs(sbj_ix) = mean(trial_info.response_time);
     end
     % Load data
-    load(strcat(SBJ_vars.dirs.proc,SBJ,'_ANOVA_ROI_',model_lab,'_',an_id,'.mat'));
+    load(strcat(SBJ_vars.dirs.proc,SBJ,'_ANOVA_ROI_',stat_id,'_',an_id,'.mat'));
     
     % FDR correct pvalues for ANOVA
     qvals = NaN(size(w2.pval));
@@ -112,7 +113,11 @@ for sbj_ix = 1:numel(SBJs)
             for grp_ix = 1:numel(grp_lab)
                 if any(squeeze(qvals(grp_ix,ch_ix,:))<0.05)
                     sig_onsets = stat.time(win_lim(squeeze(qvals(grp_ix,ch_ix,:))<0.05,1));
-                    all_onsets{sbj_ix,roi_ix,grp_ix+1} = [all_onsets{sbj_ix,roi_ix,grp_ix+1} sig_onsets(1)];
+                    if strcmp(event_lab,'resp')
+                        all_onsets{sbj_ix,roi_ix,grp_ix+1} = [all_onsets{sbj_ix,roi_ix,grp_ix+1} sig_onsets(1)];
+                    elseif strcmp(event_lab,'stim') && (sig_onsets(1)<mean_RTs(sbj_ix))
+                        all_onsets{sbj_ix,roi_ix,grp_ix+1} = [all_onsets{sbj_ix,roi_ix,grp_ix+1} sig_onsets(1)];
+                    end
                 end
             end
         end
@@ -153,17 +158,32 @@ for cond_ix = 1:numel(cond_lab)
     onset_marker_size  = 150;
     marker_offset      = 0.08;
     roi_y_offset       = linspace(-marker_offset,marker_offset,numel(roi_list));
-    s = [];
+    s        = cell(size(roi_list));
+    lgd_lab  = cell(size(roi_list));
+    roi_flag = ones(size(roi_list));
     for sbj_ix = 1:numel(SBJs)
         for roi_ix = 1:numel(roi_list)
             if ~isempty(all_onsets{sbj_ix,roi_ix,cond_ix})
-                s(roi_ix) = scatter(all_onsets{sbj_ix,roi_ix,cond_ix},...
+                tmp_s = scatter(all_onsets{sbj_ix,roi_ix,cond_ix},...
                     repmat(SBJ_ys(sbj_ix)+roi_y_offset(roi_ix),[1 numel(all_onsets{sbj_ix,roi_ix,cond_ix})]),...
                     onset_marker_size,'o','filled');
-                set(s(roi_ix),'MarkerFaceColor',roi_colors{roi_ix},'MarkerEdgeColor','k');
+                set(tmp_s,'MarkerFaceColor',roi_colors{roi_ix},'MarkerEdgeColor','k');
+                
+                s{roi_ix} = tmp_s(1);
+                lgd_lab{roi_ix} = roi_list{roi_ix};
             end
         end
-        r = scatter(mean_RTs(sbj_ix)-plt_vars.plt_lim(1),SBJ_ys(sbj_ix),rt_marker_size,'+');
+        if strcmp(event_lab,'stim')
+            r = scatter(mean_RTs(sbj_ix)-plt_vars.plt_lim(1),SBJ_ys(sbj_ix),rt_marker_size,'+');
+            if sbj_ix==1
+                s        = {s{:} r};
+                roi_flag = [roi_flag 1];
+                lgd_lab  = {lgd_lab{:} 'Mean RT'};
+            end
+        else
+%             error('plotting RT markers for resp-locked looks wrong...');
+            r = scatter(mean_RTs(sbj_ix),SBJ_ys(sbj_ix),rt_marker_size,'+');
+        end
         set(r,'MarkerEdgeColor','k','LineWidth',rt_marker_width);
         for roi_ix = 1:numel(roi_list)
             line([median_onsets(sbj_ix,roi_ix,cond_ix) median_onsets(sbj_ix,roi_ix,cond_ix)],...
@@ -173,7 +193,13 @@ for cond_ix = 1:numel(cond_lab)
         line([plt_vars.plt_lim(1) plt_vars.plt_lim(2)],[SBJ_ys(sbj_ix) SBJ_ys(sbj_ix)],...
             'Color',[0.2 0.2 0.2],'LineStyle',':');
     end
-    legend([s r],roi_list{:},'Mean RT','Location','northeast');
+    for roi_ix = 1:numel(roi_list)
+        if isempty(lgd_lab{roi_ix})
+            lgd_lab{roi_ix} = [];
+            roi_flag(roi_ix) = 0;
+        end
+    end
+    legend([s{logical(roi_flag)}],lgd_lab{logical(roi_flag)},'Location','northeast');
     
     % ax = gca;
     % Plot labels
@@ -208,8 +234,10 @@ for cond_ix = 1:numel(cond_lab)
     b = bar(plt_vars.x_data(1:end-1)+(diff(plt_vars.x_data(1:2))/2),hist_data',1,'stacked');
     for roi_ix = numel(roi_list):-1:1 %backwards so OFC doesn't overwrite LPFC mean onset
         set(b(roi_ix),'FaceColor',roi_colors{roi_ix},'EdgeColor','k');
-        %     l(groi_ix) = line([nanmean(median_g_onsets(:,groi_ix)) nanmean(median_g_onsets(:,groi_ix))],...
-        %         ax2.YLim,'Color',groi_colors{groi_ix},'LineStyle','--','LineWidth',3);
+        l(roi_ix) = line([nanmean(median_onsets(:,roi_ix,cond_ix)) nanmean(median_onsets(:,roi_ix,cond_ix))],...
+            ax2.YLim,'Color',roi_colors{roi_ix},'LineStyle','-','LineWidth',3);
+        fprintf('%s mean(RT) for %s:\t%f\n',cond_lab{cond_ix},roi_list{roi_ix},...
+            nanmean(median_onsets(:,roi_ix,cond_ix)));
     end
     legend(b,roi_list{:},'Location','northeast');
     % Plot labels
