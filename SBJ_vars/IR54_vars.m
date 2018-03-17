@@ -42,6 +42,7 @@ clear hdr;
 SBJ_vars.ch_lab.probes = {'RAM','RHH','RTH','RAC','ROF','LAM','LHH','LTH','LAC','LOF'};
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
 SBJ_vars.ch_lab.ROI    = {'RAC*','ROF*','LAC*','LOF*'};
+SBJ_vars.ch_lab.eeg_ROI = {'CZ'};
 
 SBJ_vars.ch_lab.bad = {...
     'RAM1','RAM2','RAM8','RAM9','RAM10','RHH1','RHH2','RHH3','RHH4',...% epileptic
@@ -49,12 +50,15 @@ SBJ_vars.ch_lab.bad = {...
     'ROF10','LTH10','LAC10','LOF1',...% out of brain
     'RSMA*','RBT*','RAIN*','RPIN*',...% Not real data (left overs from previous SBJ?)
     'DC01','DC04'....% Not real data
-    'REF','LLE','LUE','RLE','RUE',...% Not real data
+    'REF',...% Not real data
     'EKG'...
     };
 % watch out for prominent slowing in LAC5+ and LOF5+, sometimes upper ROF,RAC too
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.eeg = {'FZ' 'CZ' 'OZ' 'C3' 'C4'};
+SBJ_vars.ch_lab.CZ_lap_ref = {'C3','C4'};
+% SBJ_vars.ch_lab.eeg_bad = {};
+SBJ_vars.ch_lab.eog = {'LUE','LLE','RUE','RLE'};
 SBJ_vars.ch_lab.photod = {'DC02'};
 SBJ_vars.ch_lab.mic    = {'DC03'};
 

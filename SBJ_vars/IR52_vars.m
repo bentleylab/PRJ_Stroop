@@ -42,6 +42,7 @@ clear hdr;
 SBJ_vars.ch_lab.probes = {'RAM','RHH','RTH','RAC','ROF','RSMA','RAIN','RPIN','RBT','LAM','LHH','LTH','LAC','LOF'};
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
 SBJ_vars.ch_lab.ROI    = {'RAC*','ROF*','RSMA*','RAIN*','RPIN*','RAM5','RAM6','RAM7','RAM8'};%RAM elecs in vaINS
+SBJ_var.ch_lab.eeg_ROI = {'CZ','FZ'};
 
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
@@ -50,6 +51,9 @@ SBJ_vars.ch_lab.bad = {...
     'RAM1','RHH10','RTH1','RTH2','RAC10','LAM10','RAIN10'...%out of brain
     };
 SBJ_vars.ch_lab.eeg = {'FZ','CZ','OZ','C3','C4','O1','O2','T3','T4','F3','F4'};
+SBJ_vars.ch_lab.CZ_lap_ref = {'C3','C4'};
+SBJ_vars.ch_lab.FZ_lap_ref = {'F3','F4'};
+% SBJ_vars.ch_lab.eeg_bad = {};
 SBJ_vars.ch_lab.eog = {'LUE','LLE','RUE','RLE'};
 SBJ_vars.ch_lab.photod = {'DC02'};
 SBJ_vars.ch_lab.mic    = {'DC03'};

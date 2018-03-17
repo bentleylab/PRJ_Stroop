@@ -44,6 +44,7 @@ SBJ_vars.ch_lab.probes = {'LHH','LAC','LES','LOF','LSM','LPC','LIN',...
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
 SBJ_vars.ch_lab.ROI    = {'LAC*','LES*','LOF*','LSM*','LPC*','LIN*',...
                           'RAC*','ROF*','RIN*','RMT*','RSM*'};
+SBJ_vars.ch_lab.eeg_ROI = {'CZ','FZ'};
 
 SBJ_vars.ch_lab.bad = {...
     'RAM1','RAM2','RAM3','LHH1','LHH2','LHH3',...%epileptic
@@ -55,13 +56,17 @@ SBJ_vars.ch_lab.bad = {...
     'LPC12','LPC13','LPC14','LPC15','LES8','LES9','LES10',...%out of brain
     'LIN13','LIN14','LIN15','LSM10','RSM9','RSM10','RIN12','RIN13','RIN14',...%out of brain
     'DC03','DC04','EYE1','EYE2','EYE3','EYE4',....% Not real data
-    'E','LSH','LLE','RSH','V1','V2','V3','V4','V5','V6',...% Not real data
+    'E','V1','V2','V3','V4','V5','V6',...% Not real data
     'EKG*'...
     };
 % edge of cortex: LOF1,ROF1,RMT8,LIN12,RSM8
 %     'LHH4',...%noisy in Kata's data
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.eeg = {'F3','FZ','F4','T3','T4','CZ','O1','O2','OZ','C3','C4'};
+SBJ_vars.ch_lab.CZ_lap_ref = {'C3','C4'};
+SBJ_vars.ch_lab.FZ_lap_ref = {'F3','F4'};
+% SBJ_vars.ch_lab.eeg_bad = {};
+SBJ_vars.ch_lab.eog = {'LSH','LLE','RSH'};
 SBJ_vars.ch_lab.photod = {'DC01'};
 SBJ_vars.ch_lab.mic    = {'DC02'};
 

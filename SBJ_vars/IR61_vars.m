@@ -43,6 +43,7 @@ SBJ_vars.ch_lab.probes = {'LAM','LHH','LTH','LOF','LAC','RAM','RHH','RTH','ROF',
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
 SBJ_vars.ch_lab.ROI    = {'LOF*','LAC*','ROF*','RAC*','RAM4','RAM5','RAM6',... % RAM5,6 inf. ant. Insula, RAM4 is WM nearby
                             'RHH5','RHH6','RHH7'}; % RHH5,6 in inf. post. Insula, RHH7 WM nearby
+SBJ_vars.ch_lab.eeg_ROI = {'CZ','FZ','FPZ'};
 
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
@@ -54,6 +55,10 @@ SBJ_vars.ch_lab.bad = {...
     };
     % BEWARE: LTH4 (ventricle), LHH1+RAM9 (border)
 SBJ_vars.ch_lab.eeg = {'FZ','FPZ','CZ','OZ','C3','C4'};
+SBJ_vars.ch_lab.CZ_lap_ref = {'C3','C4'};
+SBJ_vars.ch_lab.FZ_lap_ref = {'C3','C4'};
+SBJ_vars.ch_lab.FPZ_lap_ref = {'C3','C4'};
+% SBJ_vars.ch_lab.eeg_bad = {'FZ'};
 SBJ_vars.ch_lab.eog = {'LLE','LUE','RLE','RUE'};
 SBJ_vars.ch_lab.photod = {'DC02'};
 SBJ_vars.ch_lab.mic    = {'DC03'};

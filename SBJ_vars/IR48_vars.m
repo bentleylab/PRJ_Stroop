@@ -42,19 +42,23 @@ clear hdr;
 SBJ_vars.ch_lab.probes = {'FG','AF','MF'};
 SBJ_vars.ref_types     = {'CAR','CAR','CAR'};
 SBJ_vars.ch_lab.ROI    = {'MF*','FG*','AF*'};
+SBJ_vars.ch_lab.eeg_ROI = {'FPZ'};
 
 SBJ_vars.ch_lab.bad = {...
     'FG27','FG28','FG29','FG37','FG38','FG45','FG46','FG47','FG48',...%epileptic, Jack (via Jie) said FG47+48
     'FG43',...%slow ~1 Hz rhythm...
     'AF12',...%noisy
     'E','REF','V1','V2','V3','V4','V5','V6','C10','OFG*','PST*','LAM*','LHH*', ...% Not real data
-    'RSH','LSH','LLE',...% EOG?
     'EKG'...
     };
+%     'RSH','LSH','LLE',...% EOG?
 %     'FG12',...% slow rhythm like FG43 but lower amplitude
 %     'FG25',...% lots of drift, can maybe be saved with preprocessing?
 SBJ_vars.ref_exclude = {'FG44'}; % sometimes reflects artifact in FG45/46
 SBJ_vars.ch_lab.eeg = {'FPZ','FP1','FP2','OZ','T5','T6'};
+SBJ_vars.ch_lab.FPZ_lap_ref = {'FP1','FP2'};
+% SBJ_vars.ch_lab.eeg_bad = {};
+SBJ_vars.ch_lab.eog = {'RSH','LSH','LLE'}; % Janna says these channels are empty?
 SBJ_vars.ch_lab.photod = {'DC02'};
 SBJ_vars.ch_lab.mic    = {'DC04'};%burried in noise, so can't visually see responses in plot (can hear just barely)
 

@@ -142,7 +142,7 @@ if strcmp(proc_vars.event_type,'stim')
 elseif strcmp(proc_vars.event_type,'resp')
     events = trial_info_clean.resp_onset;
 else
-    error(stract('ERROR: unknown event_type ',proc_vars.event_type));
+    error(strcat('ERROR: unknown event_type ',proc_vars.event_type));
 end
 trials = fn_ft_cut_trials_equal_len(data,events,...
     trial_info_clean.condition_n',proc_vars.trial_lim_s*data.fsample);

@@ -42,6 +42,7 @@ clear hdr;
 SBJ_vars.ch_lab.probes = {'ROF','RAC','RIN','RAM','RHH','RTH','LOF','LIN','LHH','LTH'};%'LAM' is all bad
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};%'BP'
 SBJ_vars.ch_lab.ROI    = {'RAC*','ROF*','RIN*','LOF*','LIN*'};
+SBJ_vars.ch_lab.eeg_ROI = {'CZ'};
 
 SBJ_vars.ch_lab.bad = {...
     'LAM*','LHH1','LHH2','LHH3','LTH1','LTH2','LTH3','LTH10',...%Epileptic
@@ -49,12 +50,15 @@ SBJ_vars.ch_lab.bad = {...
     'RIN10','ROF10','LIN3','LOF1','LOF10','LIN10','ROF10','LHH10',...%noisy or out of brain
     'PMF*','AMF*','OF*','AT*','PT*','AD*','HD*','DC03','DC04',....% Not real data
     'LT1','LT2','LT3','LT4','LT5','LT6',...% Not real data, using 'LT*' tosses LTH elecs too
-    'E','LSH','LLE','RSH','V1',...% Not real data
+    'E','V1',...% Not real data
     'EKG*'...
     };
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.eeg = {'C3','CZ','C4','FZ','OZ'};
+SBJ_vars.ch_lab.CZ_lap_ref = {'C3','C4'};
 %                           not sure about 'Z' but PSD looks ok
+% SBJ_vars.ch_lab.eeg_bad = {};
+SBJ_vars.ch_lab.eog = {'LSH','LLE','RSH'}; % lower left, upper right, ???
 SBJ_vars.ch_lab.photod = {'DC01'};
 SBJ_vars.ch_lab.mic    = {'DC02'};
 

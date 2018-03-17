@@ -55,7 +55,7 @@ SBJ_vars.ch_lab.bad = {...
     'EKG','C16','EDF Annotations'...
     };
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
-SBJ_vars.ch_lab.eeg = {};
+% SBJ_vars.ch_lab.eeg = {};
 SBJ_vars.ch_lab.photod = {'DC01'};
 SBJ_vars.ch_lab.mic    = {'DC04'};
 

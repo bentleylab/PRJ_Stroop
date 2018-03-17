@@ -52,8 +52,8 @@ SBJ_vars.ch_lab.bad = {...
     'CD1','CD2','CD3','CD4','CD5','CD6',...%crazy line noise, but trying to save becuase aMCC!
     'C4','EKG','E','NULL','NULL-1','NULL-2','NULL-3','NULL-4','XREF','DC03','DC04'...%junk
     };
-SBJ_vars.ch_lab.eeg = {};
-SBJ_vars.ch_lab.eog = {};
+% SBJ_vars.ch_lab.eeg = {};
+% SBJ_vars.ch_lab.eog = {};
 SBJ_vars.ch_lab.photod = {'DC01'};
 SBJ_vars.ch_lab.mic    = {'DC02'};
 

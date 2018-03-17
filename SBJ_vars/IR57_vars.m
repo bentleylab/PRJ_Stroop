@@ -46,7 +46,7 @@ SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP',...
 SBJ_vars.ch_lab.ROI    = {'RSM*','RAC*','ROF*','RIN*','RTI*',...
                               'LAM4-5','LAM5-6','LAC*','LOF*',...%LAM4,5 are inferior anterior insula
                               '-LOF1-2','-RTI2-3','-RIN4-5'}; %these are rejected based on variance
-
+SBJ_vars.ch_lab.eeg_ROI = {'CZ','FPZ'};
 SBJ_vars.ch_lab.bad = {...
     'RHH1','RHH2','RHH3','RHH4','ROF1','RAM1','RTH1','RTH2',...%epileptic
     'LHH1','LHH2','LHH3','LHH4','LHH5','LHH6','LHH7','LHH8','LHH9','LHH10',...%epileptic
@@ -54,13 +54,15 @@ SBJ_vars.ch_lab.bad = {...
     'RSM2','RSM3','RIN9','RIN10','LTI2','LTI3','RHH6','LHH1','LHH2','LHH4','LHH6',...%bad line noise
     'RSM9','RSM10','RAC10','RAM10','RTH9','RTH10','LOF10','LAM10',...%out of brain
     'RHH7',...%marked as bad in visual for some reason?
-    'DC01','DC03',...% not real data
-    'LUC','LLC','RUC','RLC','XREF','E',...% not real data
+    'DC01','DC03','XREF','E',...% not real data
     'EKG'...
     };
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.eeg = {'FPZ' 'CZ' 'OZ' 'C3' 'C4' 'Z' 'FP1' 'FP2' 'T3' 'T4' 'O1' 'O2'};
+SBJ_vars.ch_lab.CZ_lap_ref = {'C3','C4'};
+SBJ_vars.ch_lab.FPZ_lap_ref = {'FP1','FP2'};
 SBJ_vars.ch_lab.eeg_bad = {'Z','T4','O2','T3'}; %take these out of the above .eeg field!
+SBJ_vars.ch_lab.eog = {'LUC','LLC','RUC','RLC'};
 SBJ_vars.ch_lab.photod = {'DC02'};
 SBJ_vars.ch_lab.mic    = {'DC04'};
 

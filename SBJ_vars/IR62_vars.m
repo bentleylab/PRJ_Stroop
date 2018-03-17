@@ -42,6 +42,7 @@ clear hdr;
 SBJ_vars.ch_lab.probes = {'LAM','LHH','LTH','LOF','LAC','LPC','LLES','RAM','RHH','RTH','ROF','RAC','RPC'};
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
 SBJ_vars.ch_lab.ROI    = {};
+SBJ_vars.ch_lab.eeg_ROI = {'CZ'};
 
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
@@ -51,6 +52,8 @@ SBJ_vars.ch_lab.bad = {...
     'REF','EKG','E','DC01','DC04'...%not real data
     };
 SBJ_vars.ch_lab.eeg = {'FPZ','CZ','OZ','C3','C4'};
+SBJ_vars.ch_lab.CZ_lap_ref = {'C3','C4'};
+% SBJ_vars.ch_lab.eeg_bad = {};
 SBJ_vars.ch_lab.eog = {'LLE','LUE','RLE','RUE'};
 SBJ_vars.ch_lab.photod = {'DC03'};
 SBJ_vars.ch_lab.mic    = {'DC02'};

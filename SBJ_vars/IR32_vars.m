@@ -57,7 +57,8 @@ SBJ_vars.ch_lab.bad = {...
     'EKG*',...
     };
 SBJ_vars.ref_exclude = {'IHR27','IHR28','IHR18'}; %exclude from the CAR
-SBJ_vars.ch_lab.eeg = {};
+% SBJ_vars.ch_lab.eeg = {};
+% SBJ_vars.ch_lab.eog = {};
 SBJ_vars.ch_lab.photod = {'DC01'};
 SBJ_vars.ch_lab.mic    = {'DC02'};
 
