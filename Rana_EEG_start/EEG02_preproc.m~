@@ -20,7 +20,7 @@ eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_
 eeg_filename = strcat(SBJ_vars.dirs.import,SBJ,'_eeg_',num2str(proc_vars.resample_freq),'hz.mat');
 load(eeg_filename);
 eog_filename = strcat(SBJ_vars.dirs.import,SBJ,'_eog_',num2str(proc_vars.resample_freq),'hz.mat');
-load(eog_filename);%data = ft_preprocessing(cfg);
+load(eog_filename);data = ft_preprocessing(cfg);
 
 bad_filename = [SBJ_vars.dirs.events SBJ '_eeg_bad_epochs_preclean.mat'];
 load(bad_filename);
@@ -72,36 +72,27 @@ end
 % end
 
 %% CZ laplacian
-% if isempty(strmatch('C3',eeg_filt.label)) || isempty(strmatch('C4',eeg_filt.label))
-%     error('ERROR: No C3 or C4 detected! You need a different refrencing strategy...');
-% end
+if isempty(strmatch('C3',eeg_filt.label)) || isempty(strmatch('C4',eeg_filt.label))
+    error('ERROR: No C3 or C4 detected! Y
 cfgs = [];
-cfgs.channel = SBJ_vars.ch_lab.CZ_lap_ref;
+cfgs.channel = {'C3','C4'};
 cz_neigh = ft_selectdata(cfgs,eeg_filt);
 cz_neigh_car = mean(cz_neigh.trial{1},1);
-% cfgm = [];
-% cfgm.parameter = 'trial';
-% cfgm.operation = '(x1+x2)/2';
-% cz_neigh_car = ft_math(cfgm,cz_neigh);
-% 
+
 cfgs.channel = 'CZ';
-cz_lap = ft_selectdata(cfgs,eeg_filt);
-% cfg = [];
-% cfg.operation = 'x1';
-% cz_lap = ft_math(cfg,cz,;
+cz = ft_selectdata(cfgs,eeg_filt);
+cz_lap = cz;
 cz_lap.trial{1} = cz_lap.trial{1}-cz_neigh_car;
 
-%% Plot Comparisons
-sec = 60;
-
+% Plot Comparisons
 figure;
 title('CZ, Neighbor CAR, CZ LaPlacian (all after filtering)');
 hold on;
-plot(cz_lap.time{1}(1:sec*cz_lap.fsample),cz_lap.trial{1}(1:sec*cz_lap.fsample)+400,'k');
-plot(cz.time{1}(1:sec*cz_lap.fsample),cz.trial{1}(1:sec*cz_lap.fsample)+200,'b');
-plot(cz_lap.time{1}(1:sec*cz_lap.fsample),cz_neigh_car(1:sec*cz_lap.fsample),'r');
+plot(cz_lap.time{1}(1:sec*data.fsample),cz_lap.trial{1}(1:sec*data.fsample)+400,'k');
+plot(cz.time{1}(1:sec*data.fsample),cz.trial{1}(1:sec*data.fsample)+200,'b');
+plot(cz_lap.time{1}(1:sec*data.fsample),cz_neigh_car(1:sec*data.fsample),'r');
 for ch_ix = 1:numel(cz_neigh.label)
-    plot(cz_lap.time{1}(1:sec*cz_lap.fsample),cz_neigh.trial{1}(ch_ix,1:sec*cz_lap.fsample)-200*ch_ix,'g');
+    plot(cz_lap.time{1}(1:sec*data.fsample),cz_neigh.trial{1}(ch_ix,1:sec*data.fsample)-200*ch_ix,'g');
 end
 legend('CZ-LP','CZ','CZ-neigh-CAR');
 
@@ -164,6 +155,6 @@ eog = ft_preprocessing(cfg,eog);
 
 %% Save the data
 eeg_out_filename = strcat(SBJ_vars.dirs.preproc,SBJ,'_cz_lap.mat');
-save(eeg_out_filename, '-v7.3', 'cz');
+save(eeg_out_filename, '-v7.3', 'cz_lap');
 eog_out_filename = strcat(SBJ_vars.dirs.preproc,SBJ,'_eog_filt.mat');
 save(eog_out_filename, '-v7.3', 'eog');

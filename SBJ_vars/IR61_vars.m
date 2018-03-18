@@ -54,11 +54,11 @@ SBJ_vars.ch_lab.bad = {...
     'REF','EKG','DC01','DC04'...%non-neural
     };
     % BEWARE: LTH4 (ventricle), LHH1+RAM9 (border)
+    % watch out for FZ, Janna said it was bad
 SBJ_vars.ch_lab.eeg = {'FZ','FPZ','CZ','OZ','C3','C4'};
 SBJ_vars.ch_lab.CZ_lap_ref = {'C3','C4'};
 SBJ_vars.ch_lab.FZ_lap_ref = {'C3','C4'};
 SBJ_vars.ch_lab.FPZ_lap_ref = {'C3','C4'};
-% SBJ_vars.ch_lab.eeg_bad = {'FZ'};
 SBJ_vars.ch_lab.eog = {'LLE','LUE','RLE','RUE'};
 SBJ_vars.ch_lab.photod = {'DC02'};
 SBJ_vars.ch_lab.mic    = {'DC03'};

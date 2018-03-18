@@ -53,7 +53,6 @@ SBJ_vars.ch_lab.bad = {...
     };
 SBJ_vars.ch_lab.eeg = {'FPZ','CZ','OZ','C3','C4'};
 SBJ_vars.ch_lab.CZ_lap_ref = {'C3','C4'};
-% SBJ_vars.ch_lab.eeg_bad = {};
 SBJ_vars.ch_lab.eog = {'LLE','LUE','RLE','RUE'};
 SBJ_vars.ch_lab.photod = {'DC03'};
 SBJ_vars.ch_lab.mic    = {'DC02'};

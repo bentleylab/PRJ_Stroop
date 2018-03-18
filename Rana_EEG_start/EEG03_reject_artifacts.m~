@@ -61,7 +61,7 @@ eog_trials = fn_ft_cut_trials_equal_len(eog,events,...
 %% Visual Rejection Summary
 % Run for CZ
 cfg_reject = [];
-cfg_reject.method = 'summary';mkdir Rana
+cfg_reject.method = 'summary';
 cz_clean = ft_rejectvisual(cfg_reject,cz_trials);
 
 % Run for EOG

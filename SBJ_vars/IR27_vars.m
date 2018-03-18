@@ -58,8 +58,8 @@ SBJ_vars.ch_lab.bad = {...
     'REF','EKG','RSH','LSH','LLE','E',...%junk channels
     'V1','V2','V3','V4','V5','V6','EDF Annotation'...%garbage
     };
-% SBJ_vars.ch_lab.eeg = {};
-% SBJ_vars.ch_lab.eog = {};
+SBJ_vars.ch_lab.eeg = {};
+SBJ_vars.ch_lab.eog = {};
 SBJ_vars.ch_lab.photod = {'DC01'};
 SBJ_vars.ch_lab.mic    = {'DC02'};
 

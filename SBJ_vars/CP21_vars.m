@@ -57,6 +57,7 @@ SBJ_vars.ch_lab.bad = {...
 SBJ_vars.ch_lab.ref_exclude = {'FG44'}; % sometimes reflects artifact in FG45/46
 
 SBJ_vars.ch_lab.eeg = {'FPZ','FP1','FP2','OZ','T5','T6'};
+SBJ_vars.ch_lab.eog = {};
 SBJ_vars.ch_lab.photod = {'DC02'};
 SBJ_vars.ch_lab.mic    = {'DC04'};
 

@@ -53,7 +53,6 @@ SBJ_vars.ch_lab.bad = {...
     };
 SBJ_vars.ch_lab.eeg = {};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};
-SBJ_vars.ch_lab.eeg_bad = {};
 SBJ_vars.ch_lab.eog = {};
 SBJ_vars.ch_lab.photod = {};
 SBJ_vars.ch_lab.mic    = {};

@@ -20,6 +20,9 @@ if isfield(SBJ_vars.ch_lab,'prefix')
     for eeg_ix = 1:numel(SBJ_vars.ch_lab.eeg)
         SBJ_vars.ch_lab.eeg{eeg_ix} = [SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.eeg{eeg_ix}];
     end
+    for eog_ix = 1:numel(SBJ_vars.ch_lab.eog)
+        SBJ_vars.ch_lab.eog{eog_ix} = [SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.eog{eog_ix}];
+    end
     SBJ_vars.ch_lab.photod = {[SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.photod{1}]};
     SBJ_vars.ch_lab.mic    = {[SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.mic{1}]};
 end
@@ -30,11 +33,15 @@ if isfield(SBJ_vars.ch_lab,'suffix')
     for eeg_ix = 1:numel(SBJ_vars.ch_lab.eeg)
         SBJ_vars.ch_lab.eeg{eeg_ix} = [SBJ_vars.ch_lab.eeg{eeg_ix} SBJ_vars.ch_lab.suffix];
     end
+    for eog_ix = 1:numel(SBJ_vars.ch_lab.eog)
+        SBJ_vars.ch_lab.eog{eog_ix} = [SBJ_vars.ch_lab.eog{eog_ix} SBJ_vars.ch_lab.suffix];
+    end
     SBJ_vars.ch_lab.photod = {[SBJ_vars.ch_lab.photod{1} SBJ_vars.ch_lab.suffix]};
     SBJ_vars.ch_lab.mic    = {[SBJ_vars.ch_lab.mic{1} SBJ_vars.ch_lab.suffix]};
 end
 bad_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.bad);
 eeg_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.eeg);
+eog_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.eog);
 photod_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.photod);
 mic_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.mic);
 
@@ -42,12 +49,17 @@ if strcmp(SBJ_vars.raw_file(end-2:end),'mat')
     orig = load(SBJ_vars.dirs.raw_filename);
     % Load Neural Data
     cfg = [];
-    cfg.channel = {'all',bad_ch_neg{:},eeg_ch_neg{:},photod_ch_neg{:},mic_ch_neg{:}};
+    cfg.channel = {'all',bad_ch_neg{:},eeg_ch_neg{:},eog_ch_neg{:},photod_ch_neg{:},mic_ch_neg{:}};
     data = ft_selectdata(cfg,orig.data);
     % EEG data
     if ~isempty(SBJ_vars.ch_lab.eeg)
         cfg.channel = SBJ_vars.ch_lab.eeg;
         eeg = ft_selectdata(cfg,orig.data);
+    end
+    % EOG data
+    if ~isempty(SBJ_vars.ch_lab.eog)
+        cfg.channel = SBJ_vars.ch_lab.eog;
+        eog = ft_selectdata(cfg,orig.data);
     end
     % Load event data
     cfg.channel = {SBJ_vars.ch_lab.photod{:},SBJ_vars.ch_lab.mic{:}};
@@ -57,13 +69,18 @@ else
     cfg            = [];
     cfg.dataset    = SBJ_vars.dirs.raw_filename;
     cfg.continuous = 'yes';
-    cfg.channel    = {'all',bad_ch_neg{:},eeg_ch_neg{:},photod_ch_neg{:},mic_ch_neg{:}};
+    cfg.channel    = {'all',bad_ch_neg{:},eeg_ch_neg{:},eog_ch_neg{:},photod_ch_neg{:},mic_ch_neg{:}};
     data = ft_preprocessing(cfg);
     
     % Load EEG data
     if ~isempty(SBJ_vars.ch_lab.eeg)
         cfg.channel = SBJ_vars.ch_lab.eeg;
         eeg = ft_preprocessing(cfg);
+    end
+    % Load EOG data
+    if ~isempty(SBJ_vars.ch_lab.eog)
+        cfg.channel = SBJ_vars.ch_lab.eog;
+        eog = ft_preprocessing(cfg);
     end
     
     % Load event data
@@ -89,6 +106,9 @@ if ~isempty(SBJ_vars.analysis_time)
         if ~isempty(SBJ_vars.ch_lab.eeg)
             eeg_pieces{epoch_ix}  = ft_selectdata(cfg_trim, eeg);
         end
+        if ~isempty(SBJ_vars.ch_lab.eog)
+            eog_pieces{epoch_ix}  = ft_selectdata(cfg_trim, eog);
+        end
     end
     % Stitch them back together
     data = data_pieces{1};
@@ -98,6 +118,10 @@ if ~isempty(SBJ_vars.analysis_time)
     if ~isempty(SBJ_vars.ch_lab.eeg)
         eeg = eeg_pieces{1};
         eeg.time{1} = eeg.time{1}-SBJ_vars.analysis_time{1}(1);
+    end
+    if ~isempty(SBJ_vars.ch_lab.eog)
+        eog = eog_pieces{1};
+        eog.time{1} = eog.time{1}-SBJ_vars.analysis_time{1}(1);
     end
     if length(SBJ_vars.analysis_time)>1
         for epoch_ix = 2:length(SBJ_vars.analysis_time)
@@ -113,6 +137,11 @@ if ~isempty(SBJ_vars.analysis_time)
                 eeg.trial{1} = horzcat(eeg.trial{1},eeg_pieces{epoch_ix}.trial{1});
                 eeg.time{1} = horzcat(eeg.time{1},eeg_pieces{epoch_ix}.time{1}-...
                     SBJ_vars.analysis_time{epoch_ix}(1)+eeg.time{1}(end)+eeg.time{1}(2));
+            end
+            if ~isempty(SBJ_vars.ch_lab.eog)
+                eog.trial{1} = horzcat(eog.trial{1},eog_pieces{epoch_ix}.trial{1});
+                eog.time{1} = horzcat(eog.time{1},eog_pieces{epoch_ix}.time{1}-...
+                    SBJ_vars.analysis_time{epoch_ix}(1)+eog.time{1}(end)+eog.time{1}(2));
             end
         end
     end
@@ -135,6 +164,9 @@ if strcmp(proc_vars.resample_yn,'yes') && (data.fsample ~= proc_vars.resample_fr
     if ~isempty(SBJ_vars.ch_lab.eeg)
         eeg = ft_resampledata(cfg, eeg);
     end
+    if ~isempty(SBJ_vars.ch_lab.eog)
+        eog = ft_resampledata(cfg, eog);
+    end
 end
 
 %% Final Channel Label Corrections
@@ -150,10 +182,20 @@ end
 if ~isempty(SBJ_vars.ch_lab.eeg)
     for eeg_ix = 1:numel(eeg.label)
         if isfield(SBJ_vars.ch_lab,'prefix')
-            eeg.label{ch_ix} = strrep(eeg.label{ch_ix},SBJ_vars.ch_lab.prefix,'');
+            eeg.label{eeg_ix} = strrep(eeg.label{eeg_ix},SBJ_vars.ch_lab.prefix,'');
         end
         if isfield(SBJ_vars.ch_lab,'suffix')
-            eeg.label{ch_ix} = strrep(eeg.label{ch_ix},SBJ_vars.ch_lab.suffix,'');
+            eeg.label{eeg_ix} = strrep(eeg.label{eeg_ix},SBJ_vars.ch_lab.suffix,'');
+        end
+    end
+end
+if ~isempty(SBJ_vars.ch_lab.eog)
+    for eog_ix = 1:numel(eog.label)
+        if isfield(SBJ_vars.ch_lab,'prefix')
+            eog.label{eog_ix} = strrep(eog.label{eog_ix},SBJ_vars.ch_lab.prefix,'');
+        end
+        if isfield(SBJ_vars.ch_lab,'suffix')
+            eog.label{eog_ix} = strrep(eog.label{eog_ix},SBJ_vars.ch_lab.suffix,'');
         end
     end
 end
@@ -181,6 +223,10 @@ save(nrl_out_filename, '-v7.3', 'data');
 if ~isempty(SBJ_vars.ch_lab.eeg)
     eeg_out_filename = strcat(SBJ_vars.dirs.import,SBJ,'_eeg_',num2str(proc_vars.resample_freq),'hz.mat');
     save(eeg_out_filename, '-v7.3', 'eeg');
+end
+if ~isempty(SBJ_vars.ch_lab.eog)
+    eog_out_filename = strcat(SBJ_vars.dirs.import,SBJ,'_eog_',num2str(proc_vars.resample_freq),'hz.mat');
+    save(eog_out_filename, '-v7.3', 'eog');
 end
 
 evnt_out_filename = strcat(SBJ_vars.dirs.import,SBJ,'_evnt.mat');

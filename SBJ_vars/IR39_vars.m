@@ -56,8 +56,6 @@ SBJ_vars.ch_lab.bad = {...
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.eeg = {'C3','CZ','C4','FZ','OZ'};
 SBJ_vars.ch_lab.CZ_lap_ref = {'C3','C4'};
-%                           not sure about 'Z' but PSD looks ok
-% SBJ_vars.ch_lab.eeg_bad = {};
 SBJ_vars.ch_lab.eog = {'LSH','LLE','RSH'}; % lower left, upper right, ???
 SBJ_vars.ch_lab.photod = {'DC01'};
 SBJ_vars.ch_lab.mic    = {'DC02'};
