@@ -74,5 +74,4 @@ SBJ_vars.analysis_time = {};
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
-% These should be indices AFTER SBJ05 has run!
-% SBJ_vars.trial_reject_ix = [];
+% SBJ_vars.trial_reject_n = [];

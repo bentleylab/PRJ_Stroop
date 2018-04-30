@@ -36,33 +36,43 @@ cfgs.channel = SBJ_vars.ch_lab.ROI;
 roi = ft_selectdata(cfgs,data);
 
 %% Cut into Trials
-if strcmp(event_type,'stim')
-    events = trial_info.word_onset;
-elseif strcmp(event_type,'resp')
-    events = trial_info.resp_onset;
-else
-    error(stract('ERROR: unknown event_type ',event_type));
-end
-roi_trl = fn_ft_cut_trials_equal_len(roi,events,trial_info.condition_n',trial_lim_s*roi.fsample);
+% Pad trial_lim_s by 1/2 lowest frequency window length to avoid NaNs in epoch of interest
+% Add 10 ms just because trimming back down to trial_lim_s exactly leaves
+% one NaN on the end, so smoothing will NaN out everything
 
-% Extract Baseline if it is timelocked to a different event
-if ~strcmp(event_type,bsln_evnt)
-    if strcmp(bsln_evnt,'stim')
-        bsln_evnts = trial_info.word_onset;
-    elseif strcmp(bsln_evnt,'resp')
-        bsln_evnts = trial_info.resp_onset;
-    else
-        error(strcat('ERROR: unknown bsln_evnt ',bsln_evnt));
+%!!! BEWARE: This is suboptimal for R-locked because trial_lim_s(1)=-0.5,
+%which adds 250ms to the time series that isn't necessary; the realign_tfr
+%function should still cut to the desired data, but it'll take longer.
+if strcmp(cfg_tfr.method,'mtmconvol')
+    trial_lim_s_pad = [trial_lim_s(1)-max(cfg_tfr.t_ftimwin)/2 trial_lim_s(2)+max(cfg_tfr.t_ftimwin)/2+0.01];
+elseif strcmp(cfg_tfr.method,'wavelet')
+    trial_lim_s_pad = [trial_lim_s(1)-cfg_tfr.width/min(foi_center)*2 trial_lim_s(2)+cfg_tfr.width/min(foi_center)*2+0.01];
+else
+    error(['Cannot adjust baseline time window, unknown TFR filtering method: ' cfg_tfr.method]);
+end
+
+% Always normalize to pre-stimulus baseline for HFA
+bsln_events = trial_info.word_onset;
+if strcmp(event_type,'stim')
+    % Cut to desired trial_lim_s
+    roi_trl = fn_ft_cut_trials_equal_len(roi,bsln_events,trial_info.condition_n',...
+        round(trial_lim_s_pad*roi.fsample));
+elseif strcmp(event_type,'resp')
+    % Check that baseline will be included in trial_lim_s
+    if trial_lim_s(1)>bsln_lim(1)
+        error(['ERROR: trial_lim_s does not include bsln_lim for an_id = ' an_id]);
     end
-    % Account for the loss of 1/2 TFR window
-    bsln_lim = [bsln_lim(1)-cfg_tfr.t_ftimwin(1)/2 bsln_lim(2)+cfg_tfr.t_ftimwin(1)/2];
-    bsln_trl = fn_ft_cut_trials_equal_len(roi,bsln_evnts,trial_info.condition_n',bsln_lim*roi.fsample);
+    % Cut out to max_RT+trial_lim_s(2)+max(cfg_hfa.t_ftimwin)
+    max_RT  = max(trial_info.response_time);
+    roi_trl = fn_ft_cut_trials_equal_len(roi,bsln_events,trial_info.condition_n',...
+        round([trial_lim_s_pad(1) max_RT+trial_lim_s_pad(2)]*roi.fsample));
+else
+    error(['Unknown event_type: ' event_type]);
 end
 
 %% Compute TFRs
 % all cfg_tfr options are specified in the an_vars
 tfr      = {};
-bsln_tfr = {};
 n_trials = zeros([1 numel(cond_lab)]);
 for cond_ix = 1:numel(cond_lab)
     fprintf('===================================================\n');
@@ -70,8 +80,18 @@ for cond_ix = 1:numel(cond_lab)
     fprintf('===================================================\n');
     cfg_tfr.trials = find(cond_idx(cond_ix,:)==1);
     tfr{cond_ix}   = ft_freqanalysis(cfg_tfr, roi_trl);
-    if ~strcmp(event_type,bsln_evnt)
-        bsln_tfr{cond_ix}   = ft_freqanalysis(cfg_tfr, bsln_trl);
+    
+    % Trim back down to original trial_lim_s to exclude NaNs
+    if strcmp(event_type,'stim')
+        cfg_trim = [];
+        cfg_trim.latency = trial_lim_s;
+        tfr{cond_ix} = ft_selectdata(cfg_trim,tfr{cond_ix});
+    elseif strcmp(event_type,'resp')
+        cfg_trim = [];
+        cfg_trim.latency = [trial_lim_s(1) max_RT+trial_lim_s(2)];
+        tfr{cond_ix} = ft_selectdata(cfg_trim,tfr{cond_ix});
+    else
+        error(['Unknown event_type: ' event_type]);
     end
     
     % Grab n_trials for design matrix
@@ -85,7 +105,7 @@ fprintf('===================================================\n');
 for cond_ix = 1:numel(cond_lab)
     switch bsln_type
         case {'zscore', 'demean', 'my_relchange'}
-            tfr{cond_ix} = fn_bsln_ft_tfr(tfr{cond_ix},bsln_tfr{cond_ix},bsln_type);
+            tfr{cond_ix} = fn_bsln_ft_tfr(tfr{cond_ix},bsln_lim,bsln_type,n_boots);
         case 'relchange'
             cfgbsln = [];
             cfgbsln.baseline     = bsln_lim;
@@ -95,6 +115,15 @@ for cond_ix = 1:numel(cond_lab)
         otherwise
             error(['No baseline implemented for bsln_type: ' bsln_type]);
     end
+end
+
+%% Re-align to event of interest if necessary (e.g., response)
+if strcmp(event_type,'resp')
+    for cond_ix = 1:numel(cond_lab)
+        tfr{cond_ix} = fn_realign_tfr_s2r(tfr{cond_ix},trial_info.response_time,trial_lim_s);
+    end
+elseif ~strcmp(event_type,'stim')
+    error(['ERROR: unknown event_type ' event_type]);
 end
 
 %% Run Statistics

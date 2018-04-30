@@ -1,0 +1,5 @@
+-o /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
+-e /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
+-v conditions="CI",pipeline_id="main_ft",an_id="TFR_R_wvlt_f4to60_zsc3to1_trl5to101_stat5to1"
+-l mem_free=50G
+-N TFRstat

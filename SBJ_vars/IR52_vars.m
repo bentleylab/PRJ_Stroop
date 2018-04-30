@@ -41,7 +41,9 @@ clear hdr;
 
 SBJ_vars.ch_lab.probes = {'RAM','RHH','RTH','RAC','ROF','RSMA','RAIN','RPIN','RBT','LAM','LHH','LTH','LAC','LOF'};
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
-SBJ_vars.ch_lab.ROI    = {'RAC*','ROF*','RSMA*','RAIN*','RPIN*','RAM5','RAM6','RAM7','RAM8'};%RAM elecs in vaINS
+SBJ_vars.ch_lab.ROI    = {'RAC*','ROF*','RSMA*','RAIN*','RPIN*','RAM5-6','RAM6-7','RAM7-8',...%RAM5,6,7,8 in vaINS
+                            'LAC*','LOF*',...
+                            '-LAC9-10'};% tossed after var_rejection
 SBJ_var.ch_lab.eeg_ROI = {'CZ','FZ'};
 
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
@@ -73,14 +75,13 @@ SBJ_vars.analysis_time = {[0.001 505]};
 %--------------------------------------
 % Artifact Rejection Parameters
 %--------------------------------------
-% SBJ_vars.artifact_params.std_limit_raw = 7;
-% SBJ_vars.artifact_params.hard_threshold_raw = 1000;
+SBJ_vars.artifact_params.std_limit_raw = 6;
+SBJ_vars.artifact_params.hard_threshold_raw = 500;
 
-% SBJ_vars.artifact_params.std_limit_diff = 7;
-% SBJ_vars.artifact_params.hard_threshold_diff = 100;
+SBJ_vars.artifact_params.std_limit_diff = 7;
+SBJ_vars.artifact_params.hard_threshold_diff = 40;
 
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
-% These should be indices AFTER SBJ05 has run!
-% SBJ_vars.trial_reject_ix = [];
+SBJ_vars.trial_reject_n = [43 76 93 104 123 135];

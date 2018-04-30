@@ -41,7 +41,7 @@ clear hdr;
 
 SBJ_vars.ch_lab.probes = {'ROF','RAC','RIN','RAM','RHH','RTH','LOF','LIN','LHH','LTH'};%'LAM' is all bad
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};%'BP'
-SBJ_vars.ch_lab.ROI    = {'RAC*','ROF*','RIN*','LOF*','LIN*'};
+SBJ_vars.ch_lab.ROI    = {'RAC*','ROF*','RIN*','LOF*','LIN*','-RIN6-7'};%RIN6-7 tossed in variance rejection
 SBJ_vars.ch_lab.eeg_ROI = {'CZ'};
 
 SBJ_vars.ch_lab.bad = {...
@@ -87,5 +87,6 @@ SBJ_vars.artifact_params.hard_threshold_diff = 40;
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
-% These should be indices AFTER SBJ05 has run!
-SBJ_vars.trial_reject_ix = [125, 168];
+SBJ_vars.trial_reject_n = [131, 158, 275];
+% These old/bad trial_reject_ix should be indices AFTER SBJ05 has run, but on a re-run I got 126 and 169, so redoing it...
+% BAD: SBJ_vars.trial_reject_ix = [125, 168];   % was this off by 1? see above line...

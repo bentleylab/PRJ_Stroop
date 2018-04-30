@@ -100,7 +100,7 @@ n_epochs = size(current_data,2);
 ok_epochs = 1:n_epochs;
 threshold_epochs = squeeze(max(max(abs(current_data),[],3),[],1)) > hard_threshold;
 if report.hard_thresh > 0
-    fprintf('\t----> Hard Threshold rejected %i trials:\n',sum(threshold_epochs));
+    fprintf('\t----> Hard Threshold rejected %i trials, trial_n=:\n',sum(threshold_epochs));
     if report.hard_thresh > 1
         disp(trial_info.trial_n(ok_epochs(threshold_epochs)));
     end
@@ -149,7 +149,7 @@ end
 fprintf('\tOK: %3.0f\tREJECTED: %3.0f\tPCT REJ: %3.0f\n',...
     numel(ok_epochs), numel(bad_epochs), (n_bad_epochs/n_epochs)*100);
 if report.std_thresh > 0
-    fprintf('\t----> StD Threshold rejected %i trials:\n',numel(bad_epochs));
+    fprintf('\t----> StD Threshold rejected %i trials, trial_n:\n',numel(bad_epochs));
     if report.std_thresh > 1
         disp(trial_info.trial_n(bad_epochs));
     end

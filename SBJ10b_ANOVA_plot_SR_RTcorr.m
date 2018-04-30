@@ -1,4 +1,4 @@
-function SBJ10b_ANOVA_plot_SR_RTcorr(SBJ,stat_id,an_id_s,an_id_r,plt_id,save_fig,fig_vis,fig_filetype)
+function SBJ10b_ANOVA_plot_SR_RTcorr(SBJ,pipeline_id,stat_id,an_id_s,an_id_r,plt_id,save_fig,fig_vis,fig_filetype)
 % Plots ANOVA results
 % clear all; %close all;
 % fig_filetype = 'png';
@@ -35,6 +35,18 @@ clear tmp
 
 %!!! is this the best way to do this??? Maybe not...
 sample_rate = (numel(stat{1}.time)-1)/(stat{1}.time(end)-stat{1}.time(1));
+
+% Load ROI and GM/WM info
+einfo_filename = [SBJ_vars.dirs.preproc SBJ '_einfo_' pipeline_id '.mat'];
+load(einfo_filename);
+% Electrode Info Table:
+%   label- name of electrode
+%   ROI- specific region
+%   gROI- general region (LPFC, MPFC, OFC, FWM=frontal white matter)
+%   ROI2- specific region of second electrode
+%   tissue- primary tissue type
+%   GM weight- percentage of electrode pair in GM
+%   Out- 0/1 flag for whether this is partially out of the brain
 
 %% Prep Data
 % FDR correct pvalues for ANOVA
@@ -209,7 +221,7 @@ for ch_ix = 1:numel(stat{1}.label)
         end
         
         % Plotting parameters
-        axs(1).Title.String  = [stat{sr_ix}.label{ch_ix} ':' event_lab{sr_ix}];
+        axs(1).Title.String  = [stat{sr_ix}.label{ch_ix} ' (' einfo{ch_ix,2} ') :' event_lab{sr_ix}];
         axs(1).Box           = 'off';
         axs(1).YLim          = ylims1;
         axs(1).YTick         = yticks1;

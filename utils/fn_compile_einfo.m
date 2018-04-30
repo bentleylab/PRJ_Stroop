@@ -59,15 +59,15 @@ for e_ix = 1:numel(new_lab)
     % CAR Reference
     if isempty(strfind(new_lab{e_ix},'-'))
         orig_e_ix = find(strcmp(roi_info{1},new_lab{e_ix}));
-        einfo{e_ix,2} = roi_info{5}{orig_e_ix};     % ROI
-        einfo{e_ix,3} = roi_info{4}{orig_e_ix};     % gROI
-        einfo{e_ix,4} = '';                         % ROI2
-        einfo{e_ix,5} = roi_info{2}{orig_e_ix};     % tissue
+        einfo{e_ix,2} = roi_info{6}{orig_e_ix};     % ROI
+        einfo{e_ix,3} = roi_info{5}{orig_e_ix};     % gROI
+        einfo{e_ix,4} = '';                         % ROI2, assumed to be nothing because not bipolar
+        einfo{e_ix,5} = roi_info{3}{orig_e_ix};     % primary tissue
         if ~strcmp(einfo{e_ix,5},'GM')
             error(['ERROR: CAR referenced electrode (assumed to be grid) is not in GM! Check out: '...
                 SBJ '_' new_lab{e_ix}]);
         end
-        einfo{e_ix,6} = 1;                          % gm_weight
+        einfo{e_ix,6} = 1;                          % gm_weight, assumed 1 (for grid)
         einfo{e_ix,7} = 0;                          % out
     % Bipolar reference
     else

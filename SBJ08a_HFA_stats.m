@@ -1,4 +1,5 @@
 function SBJ08a_HFA_stats(SBJ,conditions,pipeline_id,an_id)
+error('why arent you running _save_ to prep for SBJ10a_ANOVA?');
 % Calculates high frequency activity, computes cluster-based statistics, and plots the results
 % clear all; %close all;
 % Set up paths

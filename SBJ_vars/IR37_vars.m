@@ -41,7 +41,7 @@ clear hdr;
 
 SBJ_vars.ch_lab.probes = {'FG','OF','PT','AT','ID'};    %'CD' all bad
 SBJ_vars.ref_types     = {'CAR','CAR','CAR','CAR','BP'};
-SBJ_vars.ch_lab.ROI    = {'FG','OF','ID'};
+SBJ_vars.ch_lab.ROI    = {'FG*','OF*','ID*'};
 
 SBJ_vars.ch_lab.mislabel = {{'FG17-1','FG27'}};
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
@@ -83,5 +83,4 @@ SBJ_vars.analysis_time = {[180 1194]};
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
-% These should be indices AFTER SBJ05 has run!
-% SBJ_vars.trial_reject_ix = [];
+% SBJ_vars.trial_reject_n = [];

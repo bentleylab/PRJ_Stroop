@@ -41,8 +41,8 @@ clear hdr;
 
 SBJ_vars.ch_lab.probes = {'LAM','LHH','LTH','LOF','LAC','RAM','RHH','RTH','ROF','RAC'};
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
-SBJ_vars.ch_lab.ROI    = {'LOF*','LAC*','ROF*','RAC*','RAM4','RAM5','RAM6',... % RAM5,6 inf. ant. Insula, RAM4 is WM nearby
-                            'RHH5','RHH6','RHH7'}; % RHH5,6 in inf. post. Insula, RHH7 WM nearby
+SBJ_vars.ch_lab.ROI    = {'LOF*','LAC*','ROF*','RAC*','RAM4-5','RAM5-6',... % RAM5,6 inf. ant. Insula, RAM4 is WM nearby
+                            'RHH5-6','RHH6-7'}; % RHH5,6 in inf. post. Insula, RHH7 WM nearby
 SBJ_vars.ch_lab.eeg_ROI = {'CZ','FZ','FPZ'};
 
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
@@ -77,14 +77,13 @@ SBJ_vars.analysis_time = {[138 872], [1230 1720]};
 %--------------------------------------
 % Artifact Rejection Parameters
 %--------------------------------------
-% SBJ_vars.artifact_params.std_limit_raw = 7;
-% SBJ_vars.artifact_params.hard_threshold_raw = 1000;
+SBJ_vars.artifact_params.std_limit_raw = 7;
+SBJ_vars.artifact_params.hard_threshold_raw = 500;
 
-% SBJ_vars.artifact_params.std_limit_diff = 7;
-% SBJ_vars.artifact_params.hard_threshold_diff = 100;
+SBJ_vars.artifact_params.std_limit_diff = 7;
+SBJ_vars.artifact_params.hard_threshold_diff = 30;
 
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
-% These should be indices AFTER SBJ05 has run!
-% SBJ_vars.trial_reject_ix = [];
+SBJ_vars.trial_reject_n = [201 233];

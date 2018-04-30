@@ -20,6 +20,18 @@ eval(SBJ_vars_cmd);
 plt_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 
+% Load einfo
+einfo_filename = [SBJ_vars.dirs.preproc SBJ '_einfo_' pipeline_id '.mat'];
+load(einfo_filename);
+% Electrode Info Table:
+%   label- name of electrode
+%   ROI- specific region
+%   gROI- general region (LPFC, MPFC, OFC, FWM=frontal white matter)
+%   ROI2- specific region of second electrode
+%   tissue- primary tissue type
+%   GM weight- percentage of electrode pair in GM
+%   Out- 0/1 flag for whether this is partially out of the brain
+
 % Load RTs
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
 
@@ -38,6 +50,10 @@ clear tmp
 sample_rate = (numel(hfa{1}.time)-1)/(hfa{1}.time(end)-hfa{1}.time(1));
 if ~isempty(setdiff(hfa{1}.label,hfa{2}.label))
     error('ERROR: channels do not match between the two analyses!');
+end
+
+if ~isempty(setdiff(hfa{1}.label,einfo(:,1)))
+    error('ERROR: Electrodes do not match between stat and einfo!');
 end
 
 %% Prep Data
@@ -115,7 +131,7 @@ for ch_ix = 1:numel(hfa{1}.label)
         % Plotting parameters
         ax = gca;
 %         ax.legend = plt_vars.legend;
-        ax.Title.String  = [hfa{sr_ix}.label{ch_ix} ': ' event_lab{sr_ix} ' trials'];
+        ax.Title.String  = [hfa{sr_ix}.label{ch_ix} ' (' einfo{ch_ix,2} '): ' event_lab{sr_ix} ' trials'];
         ax.XLim          = [0,numel(hfa{sr_ix}.time)];
         ax.XTick         = 0:plt_vars.x_step_sz*sample_rate:numel(hfa{sr_ix}.time);
         ax.XTickLabel    = x_tick_lab;

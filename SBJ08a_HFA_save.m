@@ -27,6 +27,10 @@ roi = ft_selectdata(cfgs,data);
 % Pad trial_lim_s by cfg_hfa.t_ftimwin/2 to avoid NaNs in epoch of interest
 % Add 10 ms just because trimming back down to trial_lim_s exactly leave
 % one NaN on the end, so smoothing will NaN out everything
+
+%!!! BEWARE: This is suboptimal for R-locked because trial_lim_s(1)=-0.5,
+%which adds 250ms to the time series that isn't necessary; the realign_tfr
+%function should still cut to the desired data, but it'll take longer.
 trial_lim_s_pad = [trial_lim_s(1)-max(cfg_hfa.t_ftimwin)/2 trial_lim_s(2)+max(cfg_hfa.t_ftimwin)/2+0.01];
 
 % Always normalize to pre-stimulus baseline for HFA

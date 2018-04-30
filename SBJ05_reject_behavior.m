@@ -60,11 +60,14 @@ skip_bad = find(trial_info.error<0);          % bad trial
 % Convert visually bad epochs from full time to analysis_time
 %   NOTE: 1 keeps epochs that are only partially overlaping real data
 %   (i.e., will be trimmed to edges of analysis_time)
-bad_epochs = fn_convert_epochs_full2at(bad_epochs,SBJ_vars.analysis_time,...
-                                    strcat(SBJ_vars.dirs.preproc,SBJ,'_preclean.mat'),1);
-                                
-% Toss epochs that overlap with bad_epochs from Bob
-skip_bob = fn_find_trials_overlap_epochs(bad_epochs,1:size(data.trial{1},2),events,trial_lim);
+if sum(sum(bad_epochs)) > 0
+    bad_epochs = fn_convert_epochs_full2at(bad_epochs,SBJ_vars.analysis_time,...
+                                             strcat(SBJ_vars.dirs.preproc,SBJ,'_preclean.mat'),1);
+    % Toss epochs that overlap with bad_epochs from Bob
+    skip_bob = fn_find_trials_overlap_epochs(bad_epochs,1:size(data.trial{1},2),events,trial_lim);
+else
+    skip_bob = [];
+end
 
 % Find RT outliers
 RT_mean = nanmean(trial_info.response_time);
@@ -73,7 +76,7 @@ skip_rt_outlier = find(abs(trial_info.response_time-RT_mean)>proc_vars.RT_std_th
 
 % Check against RT bounds, toss late but only warn for early
 RT_late = find(trial_info.response_time>proc_vars.rt_bounds(2));
-skip_rt_outlier = [skip_rt_outlier RT_late];
+skip_rt_outlier = vertcat(skip_rt_outlier, RT_late);
 RT_early = find(trial_info.response_time(trial_info.response_time>0)<proc_vars.rt_bounds(1));
 
 % Compile all a priori bad trials

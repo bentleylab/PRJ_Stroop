@@ -85,6 +85,5 @@ SBJ_vars.artifact_params.hard_threshold_diff = 25;
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
-% These should be indices AFTER SBJ05 has run!
 SBJ_vars.trial_reject_n = [112, 247, 275, 302, 303];
 % OLD ix SBJ_vars.trial_reject_ix = [71, 198, 225, 251, 252];

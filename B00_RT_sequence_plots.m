@@ -5,7 +5,7 @@ addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
 addpath(genpath('/home/knight/hoycw/Apps/export_fig-master/'));
 
 % Analysis Parameters
-SBJ       = 'IR57';
+SBJ       = 'IR61';
 late_RT_cut = 600;      %ms window before next stim to eliminate
 
 % Plotting parameters

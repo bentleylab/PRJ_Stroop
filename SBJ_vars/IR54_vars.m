@@ -87,5 +87,5 @@ SBJ_vars.artifact_params.hard_threshold_diff = 70;
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
-% These should be indices AFTER SBJ05 has run!
-SBJ_vars.trial_reject_ix = [135, 136, 166, 185, 186, 187, 188, 189, 191, 192, 263, 306, 307];
+SBJ_vars.trial_reject_n = [140 141 171 190 191 192 193 194 196 197 268 311 312];
+% BAD: SBJ_vars.trial_reject_ix = [135, 136, 166, 185, 186, 187, 188, 189, 191, 192, 263, 306, 307];

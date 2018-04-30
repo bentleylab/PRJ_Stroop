@@ -4,7 +4,7 @@ addpath(genpath('/home/knight/hoycw/PRJ_Stroop/scripts/'));
 addpath(genpath('/home/knight/hoycw/Apps/export_fig-master/'));
 
 % Analysis Parameters
-SBJ       = 'IR57';
+SBJ       = 'IR61';
 late_RT_cut = 600;      %ms window before next stim to eliminate
 %!!! implement!!! stat      = 'mean';         % do stats on 'mean' or 'median'
 

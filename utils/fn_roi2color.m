@@ -18,6 +18,8 @@ switch roi
         RGB = [127 201 127]./256;
     case 'OFC'          % Dark Blue
         RGB = [56 108 176]./256;
+    case 'PAR'          % Maroon
+        RGB = [128 0 0]./256;
 
     % LPFC Subregions - reds
     case 'FPC'
@@ -30,8 +32,8 @@ switch roi
         RGB = [253 187 132]./256;
     case 'M1'
         RGB = [253 212 158]./256;
-    case 'S1'
-        RGB = [254 240 217]./256;
+%    case 'S1'
+%        RGB = [254 240 217]./256;
     
     % MPFC Subregions - blues
     case 'ACC'
@@ -58,12 +60,22 @@ switch roi
         RGB = [161 217 155]./256;
     case 'pINS'
         RGB = [199 233 192]./256;
+    case 'STS'
+        RGB = [0.3 0.3 0.3];
 
     % OFC Subregions - yellows
     case 'mOFC'
         RGB = [255 215 0]./256;
     case 'lOFC'
         RGB = [255 255 0]./256;
+
+    % Parietal - purples
+    case 'IPL'
+        RGB = [129 15 124]./256;
+    case 'SPL'
+        RGB = [136 86 167]./256;
+    case 'S1'
+        RGB = [140 150 198]./256;
 
     % Weird Cases
     case 'FWM'          % Gray

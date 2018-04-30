@@ -1,5 +1,5 @@
 %% EEG03_reject_artifacts
-SBJ = 'IR57';
+SBJ = 'IR39';
 pipeline_id = 'eeg_ft';
 ecog_pipeline_id = 'main_ft';
 

@@ -33,11 +33,11 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw,SBJ_vars.raw_file);
 %--------------------------------------
 % Channel Selection
 %--------------------------------------
-hdr = ft_read_header(SBJ_vars.dirs.raw_filename);
-SBJ_vars.orig_n_ch = length(hdr.label);
-SBJ_vars.orig_n_samples = hdr.nSamples;
-SBJ_vars.orig_srate = hdr.Fs;
-clear hdr;
+%hdr = ft_read_header(SBJ_vars.dirs.raw_filename);
+%SBJ_vars.orig_n_ch = length(hdr.label);
+%SBJ_vars.orig_n_samples = hdr.nSamples;
+%SBJ_vars.orig_srate = hdr.Fs;
+%clear hdr;
 
 SBJ_vars.ch_lab.probes = {'ROF','RAH','RC','LIN','LAH'};
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP'};
@@ -89,4 +89,4 @@ SBJ_vars.artifact_params.hard_threshold_diff = 20;
 % Trials to Reject
 %--------------------------------------
 % These should be indices AFTER SBJ05 has run!
-SBJ_vars.trial_reject_ix = [];
+SBJ_vars.trial_reject_n = [];

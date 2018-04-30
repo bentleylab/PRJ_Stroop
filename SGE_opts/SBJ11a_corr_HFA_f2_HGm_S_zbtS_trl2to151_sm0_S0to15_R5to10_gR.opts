@@ -1,0 +1,5 @@
+-o /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
+-e /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
+-v pipeline_id="main_ft",an_id="HGm_S_zbtS_trl2to151_sm0_wn100_stat15",stat_id="corr_HFA_ts_filt0to2_S0to1_R5to1_nb1k",plt_id="corr_mat_ts_S0to15_R5to10_gR"
+-l mem_free=4G
+-N CORRhfa

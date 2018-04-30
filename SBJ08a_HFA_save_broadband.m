@@ -1,4 +1,5 @@
 function SBJ08a_HFA_save_broadband(SBJ,pipeline_id,an_id)
+error('boradband code isnt working');
 % Calculates high frequency activity, computes cluster-based statistics, and plots the results
 % clear all; %close all;
 % Set up paths

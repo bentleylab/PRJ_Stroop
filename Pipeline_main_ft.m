@@ -93,8 +93,18 @@ SBJ02_behav_parse(SBJ,proc_vars.rt_bounds,ignore_trials,1,1)
 %   i.e., SBJ_photodiode_segmentation.fig & SBJ_events.fig
 
 %% ========================================================================
-%   Step 6- Manually Correct Reaction Times
+%   Step 6- Create einfo based on ROIs
 %  ========================================================================
+% look at recon and create spreadsheet of general ROI, WM/GM, etc.
+%   save that as tsv
+fn_compile_einfo(SBJ,pipeline_id)
+
+%% ========================================================================
+%   Step 7- Manually Correct Reaction Times
+%  ========================================================================
+% Send to Rana, get her to create the basic excel sheet
+% double check it!
+
 % Before running this function, open SBJ_events.fig
 % run with default parameters (outlier_thresh=0.1s), not saving plot or trial_info
 outlier_thresh  = 0.15;
@@ -110,12 +120,12 @@ save_trial_info = 1;
 SBJ03_RT_manual_adjustments(SBJ,outlier_thresh,save_plot,save_trial_info)
 
 %% ========================================================================
-%   Step 7- Preprocess Neural Data
+%   Step 8- Preprocess Neural Data
 %  ========================================================================
 SBJ04_preproc(SBJ,pipeline_id)
 
 %% ========================================================================
-%   Step 8- Reject Bad Trials Based on Behavior and Bob
+%   Step 9- Reject Bad Trials Based on Behavior and Bob
 %  ========================================================================
 % Load manually corrected trial_info
 clear data trial_info
@@ -125,7 +135,7 @@ load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_manual.mat'));
 trial_info_clean = SBJ05_reject_behavior(SBJ,trial_info,pipeline_id);
 
 %% ========================================================================
-%   Step 9a- Prepare Variance Estimates for Variance-Based Trial Rejection
+%   Step 10a- Prepare Variance Estimates for Variance-Based Trial Rejection
 %  ========================================================================
 % Load data for visualization
 % load(strcat(preproc_dir,SBJ,'_proc_vars.mat'));
@@ -185,7 +195,7 @@ fprintf('=======================================================================
 % Save results
 var_rej_filename = [SBJ_vars.dirs.events SBJ '_variance_rejection_results.txt'];
 r_file = fopen(var_rej_filename,'a');
-fprintf(r_file,'==========================================================h====================================\n');
+fprintf(r_file,'===============================================================================================\n');
 fprintf(r_file,'Simple Variance Rejection:\n');
 fprintf(r_file,'Run Time: %s\n',datestr(datetime));
 fprintf(r_file,'\tChannel Variance Names: %s\n',bad_var_ch{:});
@@ -196,7 +206,7 @@ fprintf(r_file,'================================================================
 fclose(r_file);
 
 %% ========================================================================
-%   Step 9b- Choose Thresholds for Variance-Based Trial Rejection
+%   Step 10b- Choose Thresholds for Variance-Based Trial Rejection
 %  ========================================================================
 % Visualize data to set limits for variance-based rejection
 cfg_reject = [];
@@ -207,7 +217,7 @@ ft_rejectvisual(cfg_reject,trials);
 ft_rejectvisual(cfg_reject,trials_dif);
 
 %% ========================================================================
-%   Step 10a- Update Rejection parameters and electrodes based on variance
+%   Step 11a- Update Rejection parameters and electrodes based on variance
 %  ========================================================================
 % Comment in evernote note on bad trials and channels!
 % Then the following variables should be written into SBJ_vars:
@@ -233,13 +243,17 @@ load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
 cfg = [];
 cfg.channel = SBJ_vars.ch_lab.ROI;
 data = ft_selectdata(cfg,data);
-
 trials = fn_ft_cut_trials_equal_len(data,events,...
     trial_info_clean.condition_n',proc_vars.trial_lim_s*data.fsample);
 
+% Compute Derivative
+cfg = [];
+cfg.derivative = 'yes';
+trials_dif = ft_preprocessing(cfg,trials);
+
 
 %% ========================================================================
-%   Step 10b- Automatically Reject Bad Trials Based on Variance
+%   Step 11b- Automatically Reject Bad Trials Based on Variance
 %  ========================================================================
 % Run KLA artifact rejection based on robust variance estimates
 % If too many/few trials are rejected, adjust artifact_params and rerun
@@ -274,7 +288,7 @@ ft_databrowser(cfg, trials);
 ft_databrowser(cfg, trials_dif);
 
 %% ========================================================================
-%   Step 11- Compile Variance-Based Trial Rejection and Save Results
+%   Step 12- Compile Variance-Based Trial Rejection and Save Results
 %  ========================================================================
 % Re-load SBJ_vars after updating artifact field
 clear SBJ_vars

@@ -41,7 +41,7 @@ clear hdr;
 
 SBJ_vars.ch_lab.probes = {'RAM','RHH','RTH','ROF','RCI','LAM','LHH','LTH','LOF','LCI'};
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
-SBJ_vars.ch_lab.ROI    = {'ROF','RCI','LOF','LCI'};
+SBJ_vars.ch_lab.ROI    = {'ROF*','RCI*','LOF*','LCI*','-LOF1-2'};%LOF1-2 has EKG like spiking in it
 
 SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
 SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
@@ -78,14 +78,13 @@ SBJ_vars.analysis_time = {[31 982]};
 %--------------------------------------
 % Artifact Rejection Parameters
 %--------------------------------------
-% SBJ_vars.artifact_params.std_limit_raw = 7;
-% SBJ_vars.artifact_params.hard_threshold_raw = 1000;
+SBJ_vars.artifact_params.std_limit_raw = 7;
+SBJ_vars.artifact_params.hard_threshold_raw = 500;
 
-% SBJ_vars.artifact_params.std_limit_diff = 7;
-% SBJ_vars.artifact_params.hard_threshold_diff = 100;
+SBJ_vars.artifact_params.std_limit_diff = 7;
+SBJ_vars.artifact_params.hard_threshold_diff = 40;
 
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
-% These should be indices AFTER SBJ05 has run!
-% SBJ_vars.trial_reject_ix = [];
+SBJ_vars.trial_reject_n = [78 109 144 171 207 214];
