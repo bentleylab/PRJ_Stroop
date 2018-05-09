@@ -1,5 +1,10 @@
 % Correlataion Matrix Parameters
-sort_vec = [3, 2];  % gROI, ROI
+plt_vars.sort_vec = [3, 2];  % gROI, ROI
+plt_vars.sig_cut = 0.01;
+plt_vars.corr_cut = 0;
+plt_vars.exclude_FWM = 1;
+plt_vars.exclude_OUT = 1;
+
 plt_vars.double_sig_dot = 1;
 plt_vars.sig_dot_size = 25;
 plt_vars.sig_dot_color = 'w';
@@ -13,7 +18,7 @@ plt_vars.font_sz    = 14;
 plt_vars.plt_min_div = 1;
 plt_vars.subplot_pos = [0 0 0.5 1; 0.5 0 0.5 1];  % [left bottom width height]
 
-plt_vars.fig_dim = [0 0 1 0.8];
+plt_vars.fig_dim = [0 0 0.8 1];
 
 % Histogream parameters
 plt_vars.y_jitter = 0.1;    % proportion of histogram height to jitter scatter

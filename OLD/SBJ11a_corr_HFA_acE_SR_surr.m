@@ -1,6 +1,7 @@
 function SBJ11a_corr_HFA_acE_surr(SBJ,pipeline_id,stat_id,an_id,plt_id)
 % Build connectivity matrix based on HFA correlations
 %   non-parametric stats via circular shift of trial time series
+error('stop running response-locked, it doesnt make sense');
 
 %% Data Preparation
 % Set up paths
@@ -27,7 +28,7 @@ clear tmp
 % Load ROI and GM/WM info
 einfo_filename = [SBJ_vars.dirs.preproc SBJ '_einfo_' pipeline_id '.mat'];
 load(einfo_filename);
-einfo = sortrows(einfo,sort_vec);
+einfo = sortrows(einfo,plt_vars.sort_vec);
 % Electrode Info Table:
 %   label- name of electrode
 %   ROI- specific region

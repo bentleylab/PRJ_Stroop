@@ -1,4 +1,4 @@
-function SBJ11a_corr_HFA_acE_surr(SBJ,pipeline_id,stat_id,an_id_main,plt_id)
+function SBJ11a_corr_HFA_acE_cond_surr(SBJ,pipeline_id,stat_id,an_id_main,plt_id)
 % Build connectivity matrix based on HFA correlations
 %   non-parametric stats via circular shift of trial time series
 
@@ -19,6 +19,20 @@ eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m']);
 % Load data
 hfa_filename1 = strcat(SBJ_vars.dirs.proc,SBJ,'_HFA_ROI_',an_id_main,'.mat');
 load(hfa_filename1,'hfa');
+
+% Load condition info
+load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'));
+% Select Conditions of Interest
+if ~strcmp(stat_vars.conditions,'CI')
+    error('fix the corr_mat difference!');
+end
+[cond_lab, ~, ~] = fn_condition_label_styles(stat_vars.conditions);
+cond_idx = false([length(cond_lab) length(trial_info.trial_n)]);
+for cond_ix = 1:length(cond_lab)
+    % Get binary condition index
+    cond_idx(cond_ix,:) = logical(fn_condition_index(cond_lab{cond_ix},...
+        trial_info.condition_n));
+end
 
 % Load ROI and GM/WM info
 einfo_filename = [SBJ_vars.dirs.preproc SBJ '_einfo_' pipeline_id '.mat'];
@@ -54,19 +68,30 @@ end
 if plt_vars.exclude_OUT
     good_e = intersect(good_e,hfa.label(~strcmp(einfo(:,3),'OUT')));
 end
-
-% Select Channels and Epoch of Interest
 cfgs = [];
 cfgs.channel = good_e;
-cfgs.latency = stat_vars.stat_lim;
 hfa = ft_selectdata(cfgs,hfa);
 
-% Clean up einfo after removing channels
 good_ix = NaN(size(good_e));
 for e_ix = 1:numel(good_e)
     good_ix(e_ix) = find(strcmp(einfo(:,1),good_e{e_ix}));
 end
 einfo = einfo(good_ix,:);
+
+% Select trials that will be permuted later
+cfgs = [];
+cfgs.trials = [];
+for cond_ix = 1:numel(cond_lab)
+    cfgs.trials = union(cfgs.trials, find(cond_idx(cond_ix,:)==1));
+end
+hfa = ft_selectdata(cfgs,hfa);
+% Redo condition index after removing unused trials
+cond_idx = false([length(cond_lab) length(cfgs.trials)]);
+for cond_ix = 1:length(cond_lab)
+    % Get binary condition index
+    cond_idx(cond_ix,:) = logical(fn_condition_index(cond_lab{cond_ix},...
+        trial_info.condition_n(cfgs.trials)));
+end
 
 % Sort by ROI
 einfo = sortrows(einfo,plt_vars.sort_vec);
@@ -92,15 +117,30 @@ for ch_ix = 1:numel(hfa.label)
     end
 end
 
+% Trim data to stats epoch
+cfg_trim = [];
+cfg_trim.latency = stat_vars.stat_lim;
+hfa = ft_selectdata(cfg_trim,hfa);
+
 %% Correlation
 % Compute correlation
-% NOTE: reshape goes down columns, so need to move time to first dimension
-corr_mat = corrcoef(reshape(permute(hfa.powspctrm,[4 1 2 3]),...    % make dim_ord: time, trials, ch, empty
-    size(hfa.powspctrm,1)*size(hfa.powspctrm,4),...                 % n_trials*n_samples
-    size(hfa.powspctrm,2)));                                        % channels
+corr_mat = {};
+hfa_cond = {};
+for cond_ix = 1:numel(cond_lab)
+    % Divide by condition
+    cfgc = [];
+    cfgc.trials = find(cond_idx(cond_ix,:)==1);
+    hfa_cond{cond_ix} = ft_selectdata(cfgc,hfa);
+    % NOTE: reshape goes down columns, so need to move time to first dimension
+    corr_mat{cond_ix} = corrcoef(reshape(permute(hfa_cond{cond_ix}.powspctrm,[4 1 2 3]),...    % make dim_ord: time, trials, ch, empty
+        size(hfa_cond{cond_ix}.powspctrm,1)*size(hfa_cond{cond_ix}.powspctrm,4),...            % n_trials*n_samples
+        size(hfa_cond{cond_ix}.powspctrm,2)));                                                 % channels
+end
+% ok next part is only for CI...
+diff_mat = corr_mat{2}-corr_mat{1}; % inc-con, so greater inc is positive
 
 % Null Distribution
-surr_mat = NaN(stat_vars.n_boots, numel(hfa.label), numel(hfa.label));
+surr_diff = NaN(stat_vars.n_boots, numel(hfa.label), numel(hfa.label));
 fprintf('============================= Bootstrap Correlations: %s =============================\n',stat_vars.event_lab);
 for boot_ix = 1:stat_vars.n_boots
     fprintf('%i..',boot_ix);
@@ -113,9 +153,15 @@ for boot_ix = 1:stat_vars.n_boots
         shuffled_data(:,ch_ix,1,:) = shuffled_data(randi(size(shuffled_data,1),size(shuffled_data,1),1),ch_ix,1,:);
     end
     
-    surr_mat(boot_ix,:,:) = corrcoef(reshape(permute(shuffled_data,[4 1 2 3]),...   % dim_ord: time, trials, ch, empty
-        size(shuffled_data,1)*size(shuffled_data,4),...                             % n_trials*n_samples
-        size(shuffled_data,2)));                                                    % channels
+    surr_mat = {};
+    for cond_ix = 1:numel(cond_lab)
+        % Divide by condition
+        shuffled_cond = shuffled_data(cond_idx(cond_ix,:),:,1,:);
+        surr_mat{cond_ix} = corrcoef(reshape(permute(shuffled_cond,[4 1 2 3]),...   % dim_ord: time, trials, ch, empty
+            size(shuffled_cond,1)*size(shuffled_cond,4),...                             % n_trials*n_samples
+            size(shuffled_cond,2)));                                                    % channels
+    end
+    surr_diff(boot_ix,:,:) = surr_mat{2}-surr_mat{1};
 end
 fprintf('\n');  % for a nice reset of the command line
 
@@ -123,14 +169,15 @@ fprintf('\n');  % for a nice reset of the command line
 pairs = nchoosek(1:numel(hfa.label),2);
 n_pairs = size(pairs,1);
 pvals = NaN([1 n_pairs]);
-corr_vals = NaN([1 n_pairs]);
+diff_vals = NaN([1 n_pairs]);
 for pair_ix = 1:n_pairs
-    null_corr_dist = sort(abs(surr_mat(:,pairs(pair_ix,1),pairs(pair_ix,2))));                   % Sort absolute values
-    corr_logical = logical(abs(corr_mat(pairs(pair_ix,1),pairs(pair_ix,2))) > null_corr_dist);   % Find n_boots less than real value
+    null_corr_dist = sort(abs(surr_diff(:,pairs(pair_ix,1),pairs(pair_ix,2))));                   % Sort absolute values
+    corr_logical = logical(abs(diff_mat(pairs(pair_ix,1),pairs(pair_ix,2))) > null_corr_dist);   % Find n_boots less than real value
     pvals(pair_ix) = (numel(null_corr_dist)-numel(find(corr_logical)))/stat_vars.n_boots;                         % convert to proportion of n_boots
     
-    corr_vals(pair_ix) = corr_mat(pairs(pair_ix,1),pairs(pair_ix,2));    % Grab to set plotting limits
+    diff_vals(pair_ix) = diff_mat(pairs(pair_ix,1),pairs(pair_ix,2));    % Grab to set plotting limits
 end
+
 % Find epochs with significant task activations
 %     [~, qvals] = mafdr(pvals); % Errors on some random ch during SBJ08a_HFA_actv (e.g., ROF8-9 in IR32), so try this:
 %     [h, crit_p, adj_ci_cvrg, adj_p]=fdr_bh(pvals,q,method,report);
@@ -138,6 +185,6 @@ end
 
 %% Save Data
 data_out_filename = [SBJ_vars.dirs.proc SBJ '_' stat_id '_' an_id_main '.mat'];
-save(data_out_filename, '-v7.3', 'hfa','pairs','corr_mat','corr_vals','qvals');
+save(data_out_filename, '-v7.3', 'hfa_cond','pairs','diff_mat','diff_vals','qvals');
 
 end

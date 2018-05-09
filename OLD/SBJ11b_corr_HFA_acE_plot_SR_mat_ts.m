@@ -1,7 +1,7 @@
 function SBJ11b_corr_HFA_acE_plot_SR_mat_ts(SBJ,pipeline_id,stat_id,an_id_s,an_id_r,plt_id,save_fig,fig_vis,fig_filetype)
 % Build connectivity matrix based on HFA correlations, plot as matrix
 %   non-parametric stats via circular shift of trial time series
-
+error('stop running this, it doesnt make sense to do r-locked');
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Data Preparation

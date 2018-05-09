@@ -1,0 +1,1 @@
+It doesn't make sense to do stim and response locked because this trial does single trial correlations that should take the dynamics into account!

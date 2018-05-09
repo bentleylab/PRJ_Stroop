@@ -2,7 +2,7 @@ function SBJ11_corr_HFA_acE_plot_mat_SR_surr(SBJ,pipeline_id,stat_id,an_id_s,an_
 % Plot times series of two effects in same electrode, with significant
 % epochs of correlation highlighted
 %   stats done via generation of a null distribution
-
+error('never wrote this script, would require multiple measures within elec');
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Data Preparation
