@@ -39,23 +39,27 @@ SBJ_vars.orig_n_samples = hdr.nSamples;
 SBJ_vars.orig_srate = hdr.Fs;
 clear hdr;
 
-SBJ_vars.ch_lab.probes = {};
-SBJ_vars.ref_types     = {};
-SBJ_vars.ch_lab.ROI    = {};
-SBJ_vars.ch_lab.eeg_ROI = {};
+SBJ_vars.ch_lab.probes = {'LAM','LHH','LTH','LOF','LASM','LPSM','LAC','LPC','RAM','RHH','RTH','ROF','RAC','RPC','RASM','RPSM','LBT','LPT'};
+SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
+SBJ_vars.ch_lab.ROI    = {'LOF','LASM','LPSM','LAC','LPC','ROF','RAC','RPC','RASM','RPSM'};
+SBJ_vars.ch_lab.eeg_ROI = {'CZ'};
 
-SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
-SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
-SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
+%SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
+%SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
+%SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
 
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
+    'RPSM2','RSPM3',...% epileptic
+    'LTH5','LTH6','LPT1','LHH2','LHH3','RHH2','RHH3','RHH4',...% noisy
+    'LOF10','LASM9','LASM10','LPSM9','LPSM10','RTH10','RAM1',...% out of brain
+    'REF','EKG','E','GRND','DC02','DC04'...% not real data
     };
-SBJ_vars.ch_lab.eeg = {};
+SBJ_vars.ch_lab.eeg = {'FZ','CZ','OZ','C3','C4'};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};
-SBJ_vars.ch_lab.eog = {};
-SBJ_vars.ch_lab.photod = {};
-SBJ_vars.ch_lab.mic    = {};
+SBJ_vars.ch_lab.eog = {'LLC','LUC','RLC','RUC'};
+SBJ_vars.ch_lab.photod = {'DC01'};
+SBJ_vars.ch_lab.mic    = {'DC03'};
 
 %--------------------------------------
 % Line Noise Parameters
@@ -66,7 +70,7 @@ SBJ_vars.bs_width    = 2;
 %--------------------------------------
 % Time Parameters
 %--------------------------------------
-SBJ_vars.analysis_time = {};
+SBJ_vars.analysis_time = {[80 1120]};
 
 %--------------------------------------
 % Artifact Rejection Parameters

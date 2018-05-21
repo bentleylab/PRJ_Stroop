@@ -44,9 +44,9 @@ SBJ_vars.ref_types     = {};
 SBJ_vars.ch_lab.ROI    = {};
 SBJ_vars.ch_lab.eeg_ROI = {};
 
-SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
-SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
-SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
+%SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
+%SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
+%SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
 
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...

@@ -50,6 +50,7 @@ SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
 
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
+    'RHH1','RHH2','RHH3','RTH1','RTH2','RTH3','RTH4','RAM1','RAM2',...% epileptic
     'AST*','PST*','AMG*','HH*','TH*',...% Not real data
     'C3-1','C4-1','CZ-1','OZ-1','FPZ','Z','LUE-1','LLE-1','RUE-1','RLE-1','EKG-1',...% Not real data
     'REF','EKG','GND','XREF'...% note real data
@@ -69,7 +70,7 @@ SBJ_vars.bs_width    = 2;
 %--------------------------------------
 % Time Parameters
 %--------------------------------------
-SBJ_vars.analysis_time = {};
+SBJ_vars.analysis_time = {[145 490], [610 1290]};
 
 %--------------------------------------
 % Artifact Rejection Parameters

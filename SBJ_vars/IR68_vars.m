@@ -39,23 +39,27 @@ SBJ_vars.orig_n_samples = hdr.nSamples;
 SBJ_vars.orig_srate = hdr.Fs;
 clear hdr;
 
-SBJ_vars.ch_lab.probes = {};
-SBJ_vars.ref_types     = {};
-SBJ_vars.ch_lab.ROI    = {};
-SBJ_vars.ch_lab.eeg_ROI = {};
+SBJ_vars.ch_lab.probes = {'LAM','LHH','LTH','AIN','MIN','PIN','LOF','LAC','LPC'};
+SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP'};
+SBJ_vars.ch_lab.ROI    = {'AIN','MIN','PIN','LOF','LAC','LPC'};
+SBJ_vars.ch_lab.eeg_ROI = {'CZ'};
 
-SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
-SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
-SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
+%SBJ_vars.ch_lab.prefix = '';    % before every channel except 'EDF Annotations'
+%SBJ_vars.ch_lab.suffix = '';    % after every channel except 'EDF Annotations'
+%SBJ_vars.ch_lab.mislabel = {};
 
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
+%SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
+    'LHH8','LHH9','LHH10','LTH8','LTH9','LTH10','LAM7','LAM9','LAM10',...% epileptic
+    'AIN5','LPC6','LPC7',...% noisy
+    'AIN8','AIN9','AIN10','LTH9','LTH10','LHH10','LAM10',...% out of brain
+    'GRND','XREF','EKG','DC03','DC04'...% not real data
     };
-SBJ_vars.ch_lab.eeg = {};
+SBJ_vars.ch_lab.eeg = {'FZ','CZ','OZ','C3','C4'};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};
-SBJ_vars.ch_lab.eog = {};
-SBJ_vars.ch_lab.photod = {};
-SBJ_vars.ch_lab.mic    = {};
+SBJ_vars.ch_lab.eog = {'LUE','LLE','RUE','RLE'};
+SBJ_vars.ch_lab.photod = {'DC01'};
+SBJ_vars.ch_lab.mic    = {'DC02'};
 
 %--------------------------------------
 % Line Noise Parameters
@@ -66,7 +70,7 @@ SBJ_vars.bs_width    = 2;
 %--------------------------------------
 % Time Parameters
 %--------------------------------------
-SBJ_vars.analysis_time = {};
+SBJ_vars.analysis_time = {[280 1021], [1115 1463]};
 
 %--------------------------------------
 % Artifact Rejection Parameters
