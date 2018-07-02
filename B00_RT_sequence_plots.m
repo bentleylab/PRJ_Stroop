@@ -1,8 +1,13 @@
 %% RT Behavioral analysis
 % clear all; close all
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/');
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
-addpath(genpath('/home/knight/hoycw/Apps/export_fig-master/'));
+% Check which root directory
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+
+% Set Up Directories
+addpath([root_dir 'PRJ_Stroop/scripts/']);
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+%addpath(genpath('/home/knight/hoycw/Apps/export_fig-master/'));
 
 % Analysis Parameters
 SBJ       = 'IR61';
@@ -22,8 +27,8 @@ prop_con_lab  = {'con_mcon', 'con_same', 'con_minc', 'neu_mcon', 'neu_same',...
 fig_type      = 'png';
 
 % Process parameters
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/',SBJ,'_vars.m']);
-fig_dir  = strcat('/home/knight/hoycw/PRJ_Stroop/results/RTs/',SBJ,'/');
+eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/',SBJ,'_vars.m']);
+fig_dir  = strcat([root_dir 'PRJ_Stroop/results/RTs/GRP/']);
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end

@@ -9,19 +9,21 @@ function SBJ02_behav_parse(SBJ, rt_window, ignore_trials, plot_it, save_it)
 n_hist_bins = 100; % Set this to a higher number for more amplitudes. More bins can mean more errors though.
 
 %% File paths
-SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+
+% Import helper functions to Matlab path
+addpath(genpath(helper_function_dir_name));
+helper_function_dir_name = [root_dir 'PRJ_Stroop/scripts/utils/'];
+SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 
-helper_function_dir_name = '/home/knight/hoycw/PRJ_Stroop/scripts/utils/';
 evnt_filename = [SBJ_vars.dirs.preproc SBJ '_evnt_clean.mat'];
 log_filename = [SBJ_vars.dirs.raw SBJ '_strooptask_log.txt'];
 wav_dir = [SBJ_vars.dirs.raw SBJ '_strooptask_wavfiles/'];
 %   create directory if needed
 output_dir = [SBJ_vars.dirs.events];
 output_filename = [output_dir SBJ '_trial_info_auto.mat'];
-
-% Import helper functions to Matlab path
-addpath(genpath(helper_function_dir_name));
 
 %% Determine event onset sample points
 % Load preprocessing variables to get sampling rate

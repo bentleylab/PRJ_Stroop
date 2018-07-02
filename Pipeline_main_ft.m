@@ -3,22 +3,27 @@
 % prefix can be run automatically, and all other sections should be
 % manually editted for each dataset.
 clear all; close all;
+
+% Check which root directory
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+
 % Set Up Directories
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/');
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
-addpath('/home/knight/hoycw/Apps/fieldtrip/');
+addpath([root_dir 'PRJ_Stroop/scripts/']);
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+addpath(ft_dir);
 ft_defaults
 
 %% Step 0 - Processing Variables
 % SBJ = 'IR';
 
 pipeline_id = 'main_ft';
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
 
 %% ========================================================================
 %   Step 1- Load SBJ and Processing Variable Structures
 %  ========================================================================
-SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 
 %% ======================================================================== 
@@ -50,7 +55,7 @@ plot(linspace(0,hdr.length_in_seconds,hdr.n_samples), evnt);
 %   Step 4b- Manually Clean Photodiode Trace: Mark Sections to Correct
 %  ========================================================================
 % Create correction times and values in a separate file in ~/PRJ_Stroop/scripts/SBJ_evnt_clean/
-SBJ_evnt_clean_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_evnt_clean/' SBJ '_evnt_clean_params.m'];
+SBJ_evnt_clean_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_evnt_clean/' SBJ '_evnt_clean_params.m'];
 eval(SBJ_evnt_clean_cmd);
 
 %% ========================================================================
@@ -88,7 +93,7 @@ save(out_filename, 'evnt', 'hdr', 'ignore_trials', 'photod_ix', 'mic_ix');
 if proc_vars.resample_freq~=1000
     error('ERROR!!! SBJ02_behav_parse assumes 1 kHz neural sampling rate!!!\n');
 end
-SBJ02_behav_parse(SBJ,proc_vars.rt_bounds,ignore_trials,1,1)
+SBJ02_behav_parse_colinhoy(SBJ,proc_vars.rt_bounds,ignore_trials,1,1)
 % Be sure to save the two figures coming from this function!
 %   i.e., SBJ_photodiode_segmentation.fig & SBJ_events.fig
 
@@ -233,7 +238,7 @@ ft_rejectvisual(cfg_reject,trials_dif);
 
 % Re-load SBJ_vars after updating artifact field
 clear SBJ_vars
-clear_cmd = ['clear /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+clear_cmd = ['clear ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(clear_cmd); %needed to delete cached version
 eval(SBJ_vars_cmd);
 

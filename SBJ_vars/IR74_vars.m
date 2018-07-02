@@ -1,6 +1,9 @@
-%% ${SBJ} Processing Variables
-addpath('/home/knight/hoycw/Apps/fieldtrip/');
-ft_defaults
+%% IR74 Processing Variables
+[root_dir, ft_dir] = fn_get_root_dir();
+if isempty(strfind(path,'fieldtrip'))
+    addpath(ft_dir);
+    ft_defaults
+end
 
 %--------------------------------------
 % Basics
@@ -9,7 +12,7 @@ SBJ_vars.SBJ = 'IR74';
 SBJ_vars.raw_file = '2018032811_0002.besa';
 SBJ_vars.block_prefix = '';
 
-SBJ_vars.dirs.SBJ     = ['/home/knight/hoycw/PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
+SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
 SBJ_vars.dirs.import  = [SBJ_vars.dirs.SBJ '01_import/'];
 SBJ_vars.dirs.preproc = [SBJ_vars.dirs.SBJ '02_preproc/'];
@@ -33,11 +36,11 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw,SBJ_vars.raw_file);
 %--------------------------------------
 % Channel Selection
 %--------------------------------------
-hdr = ft_read_header(SBJ_vars.dirs.raw_filename);
-SBJ_vars.orig_n_ch = length(hdr.label);
-SBJ_vars.orig_n_samples = hdr.nSamples;
-SBJ_vars.orig_srate = hdr.Fs;
-clear hdr;
+%hdr = ft_read_header(SBJ_vars.dirs.raw_filename);
+%SBJ_vars.orig_n_ch = length(hdr.label);
+%SBJ_vars.orig_n_samples = hdr.nSamples;
+%SBJ_vars.orig_srate = hdr.Fs;
+%clear hdr;
 
 SBJ_vars.ch_lab.probes = {'LAM','LHH','LTH','LIN','LOF','LAC','LPRE','RAM','RHH','RTH','ROF','RIN','RAC','RPRE'};
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
@@ -52,6 +55,7 @@ SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'LTH1','LTH2','LHH1','LHH2','LHH3','LHH4','LAM1','LAM2','LAM3','LHH5',...% epileptic
     'RTH2','RTH3','RHH2','RHH3','RHH4','RHH5','RAM1','RAM2','RAM3',...% epileptic
+    'RTH7','RTH8',...% spiking artifact
     'G','EKG','REF','E'...% not real data
     };
 SBJ_vars.ch_lab.eeg = {'FPZ','CZ','OZ','C3','C4'};

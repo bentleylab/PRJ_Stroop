@@ -1,8 +1,13 @@
 %% RT Behavioral analysis- draw box plots per SBJ and for Group
 clear all; close all
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/');
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
-addpath(genpath('/home/knight/hoycw/Apps/export_fig-master/'));
+% Check which root directory
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+
+% Set Up Directories
+addpath([root_dir 'PRJ_Stroop/scripts/']);
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+%addpath(genpath('/home/knight/hoycw/Apps/export_fig-master/'));
 
 % Analysis Parameters
 conditions = 'CNI';
@@ -23,7 +28,7 @@ line_w        = 2;
 fig_type      = 'png';
 
 % Process parameters
-fig_dir  = strcat('/home/knight/hoycw/PRJ_Stroop/results/RTs/GRP/');
+fig_dir  = strcat([root_dir 'PRJ_Stroop/results/RTs/GRP/']);
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
@@ -34,7 +39,7 @@ RT_means  = NaN([numel(SBJs) numel(cond_lab)]);
 RT_vars   = NaN([numel(SBJs) numel(cond_lab)]);
 for sbj_ix = 1:numel(SBJs)
     SBJ = SBJs{sbj_ix};
-    eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
+    eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
     load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
     
     % con = 1-3, neu = 4-6, inc = 7-9

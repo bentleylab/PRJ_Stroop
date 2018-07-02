@@ -1,6 +1,9 @@
 %% IR48 Processing Variables
-addpath('/home/knight/hoycw/Apps/fieldtrip/');
-ft_defaults
+[root_dir, ft_dir] = fn_get_root_dir();
+if isempty(strfind(path,'fieldtrip'))
+    addpath(ft_dir);
+    ft_defaults
+end
 
 %--------------------------------------
 % Basics
@@ -9,7 +12,7 @@ SBJ_vars.SBJ = 'IR48';
 SBJ_vars.raw_file = '2016092915_0028.besa';
 SBJ_vars.block_prefix = '';
 
-SBJ_vars.dirs.SBJ     = ['/home/knight/hoycw/PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
+SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
 SBJ_vars.dirs.import  = [SBJ_vars.dirs.SBJ '01_import/'];
 SBJ_vars.dirs.preproc = [SBJ_vars.dirs.SBJ '02_preproc/'];
@@ -33,11 +36,11 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw,SBJ_vars.raw_file);
 %--------------------------------------
 % Channel Selection
 %--------------------------------------
-hdr = ft_read_header(SBJ_vars.dirs.raw_filename);
-SBJ_vars.orig_n_ch = length(hdr.label);
-SBJ_vars.orig_n_samples = hdr.nSamples;
-SBJ_vars.orig_srate = hdr.Fs;
-clear hdr;
+%hdr = ft_read_header(SBJ_vars.dirs.raw_filename);
+%SBJ_vars.orig_n_ch = length(hdr.label);
+%SBJ_vars.orig_n_samples = hdr.nSamples;
+%SBJ_vars.orig_srate = hdr.Fs;
+%clear hdr;
 
 SBJ_vars.ch_lab.probes = {'FG','AF','MF'};
 SBJ_vars.ref_types     = {'CAR','CAR','CAR'};
@@ -45,8 +48,7 @@ SBJ_vars.ch_lab.ROI    = {'MF*','FG*','AF*'};
 SBJ_vars.ch_lab.eeg_ROI = {'FPZ'};
 
 SBJ_vars.ch_lab.bad = {...
-    'FG27','FG28','FG29','FG37','FG38','FG45','FG46','FG47','FG48',...%epileptic, Jack (via Jie) said FG47+48
-    'FG43',...%slow ~1 Hz rhythm...
+    'FG39','FG40','FG47','FG48','FG55','FG56','FG63','FG64',...%epileptic, Jack (via Jie) said FG47+48
     'AF12',...%noisy
     'E','REF','V1','V2','V3','V4','V5','V6','C10','OFG*','PST*','LAM*','LHH*', ...% Not real data
     'EKG'...
@@ -54,7 +56,10 @@ SBJ_vars.ch_lab.bad = {...
 %     'RSH','LSH','LLE',...% EOG?
 %     'FG12',...% slow rhythm like FG43 but lower amplitude
 %     'FG25',...% lots of drift, can maybe be saved with preprocessing?
-SBJ_vars.ref_exclude = {'FG44'}; % sometimes reflects artifact in FG45/46
+SBJ_vars.ref_exclude = {...
+    'FG27','FG28','FG29','FG37','FG38','FG45','FG46',...% strong mu rhythm that shouldn't be injected into other channels
+    'FG12','FG43'...% large slow (~1 Hz) rhythms??? maybe artifact, so watch carefully!
+    };
 SBJ_vars.ch_lab.eeg = {'FPZ','FP1','FP2','OZ','T5','T6'};
 SBJ_vars.ch_lab.FPZ_lap_ref = {'FP1','FP2'};
 SBJ_vars.ch_lab.eog = {'RSH','LSH','LLE'}; % Janna says these channels are empty?

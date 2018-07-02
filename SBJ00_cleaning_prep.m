@@ -13,8 +13,10 @@ function SBJ00_cleaning_prep(SBJ,plot_psd)
 %   SBJ_raw_labels.mat- the raw labels for all channels, to inform channel selection
 %   raw_psds/- PSDs of channels as determined by plot_psd
 
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
-addpath('/home/knight/hoycw/Apps/fieldtrip/');
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+addpath(ft_dir);
 ft_defaults
 
 % plot_psd      = '1by1';         % 'all','1by1','none'

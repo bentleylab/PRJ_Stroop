@@ -11,7 +11,10 @@ if isempty(outlier_thresh)
 %     outlier_sd_thresh = 10;             % in standard deviations
 end
 
-event_dir = strcat('/home/knight/hoycw/PRJ_Stroop/data/',SBJ,'/03_events/');
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+
+event_dir = strcat(root_dir,'PRJ_Stroop/data/',SBJ,'/03_events/');
 csv_filename = strcat(event_dir,SBJ,'_RT_manual.csv');
 trial_info_man_filename = strcat(event_dir,SBJ,'_trial_info_manual.mat');
 trial_info_auto_filename = strcat(event_dir,SBJ,'_trial_info_auto.mat');

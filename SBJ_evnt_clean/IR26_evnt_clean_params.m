@@ -1,14 +1,15 @@
 %% Photodiode Trace Cleaning Parameters: IR54
 % Mark trials to ignore e.g., interruptions
-ignore_trials = [];
+ignore_trials = [253 254];
 
 % Set zero/baseline during a block
-bsln_val = 7278.5;
+bsln_val = 10692;
 
 % Record epochs (in sec) with fluctuations that should be set to baseline
 bsln_times = {...
     [0.0 10.0],...% initial offset (attaching to screen?)
-    [108.0 112.0]...% extra blip of a trial at the end of B1
+    [111.0 113.0],...% extra blip of a trial at the end of B1
+    [765.0 790.0]...% zero out B8T1-2 due to 2 trials then long pause, so toss those 2 and start back at B8T3
     };
 % Record epochs (in sec) when baseline has shifted
 %   continous, linear drift upwards, slope fit on 500:582s = 0.006421 using cftools

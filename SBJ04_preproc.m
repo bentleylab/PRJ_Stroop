@@ -11,14 +11,16 @@ psd_line     = 'yes';          % plot psds after filtering out line noise?
 psd_fig_type = 'jpg';
 
 % Directories
-addpath(genpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/'));
-addpath('/home/knight/hoycw/Apps/fieldtrip/');
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+addpath(genpath([root_dir 'PRJ_Stroop/scripts/utils/']));
+addpath(ft_dir);
 ft_defaults
 
 %% Load data
 fprintf('============== Loading Data %s ==============\n',SBJ);
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
 
 import_filename = [SBJ_vars.dirs.import SBJ '_1000hz.mat'];
 load(import_filename);

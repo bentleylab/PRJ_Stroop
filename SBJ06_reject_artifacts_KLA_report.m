@@ -16,7 +16,9 @@ function [trial_info_clean] = SBJ06_reject_artifacts_KLA_report(trials, trial_in
 % end
 
 %% File paths
-helper_function_dir_name = '/home/knight/hoycw/PRJ_Stroop/scripts/_TOOLBOXES/';
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+helper_function_dir_name = [root_dir 'PRJ_Stroop/scripts/_TOOLBOXES/'];
 if(~exist(fullfile(helper_function_dir_name)))
   fprintf('\nERROR: Helper function directory does not exist.\n');
   return;

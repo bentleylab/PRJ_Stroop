@@ -18,16 +18,20 @@ function trial_info_clean = SBJ05_reject_behavior(SBJ,trial_info,pipeline_id)
 %   trial_info_clean_behav [struct]- saves out final version after tossing all bad trials
 
 % Directories
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/');
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
-SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+addpath([root_dir 'PRJ_Stroop/scripts/']);
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 
 %% Load data
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
 load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
-load(strcat(SBJ_vars.dirs.events,SBJ,'_bob_bad_epochs_preclean.mat'));
+bob = load(strcat(SBJ_vars.dirs.events,SBJ,'_bob_bad_epochs_preclean.mat'));
+colin = load(strcat(SBJ_vars.dirs.events,SBJ,'_colin_bad_epochs_preproc.mat'));
 
+%vis_bad_epochs = 
 % Parameters
 if ~isfield(proc_vars,'RT_std_thresh')
     proc_vars.RT_std_thresh = 3;
@@ -60,13 +64,21 @@ skip_bad = find(trial_info.error<0);          % bad trial
 % Convert visually bad epochs from full time to analysis_time
 %   NOTE: 1 keeps epochs that are only partially overlaping real data
 %   (i.e., will be trimmed to edges of analysis_time)
-if sum(sum(bad_epochs)) > 0
-    bad_epochs = fn_convert_epochs_full2at(bad_epochs,SBJ_vars.analysis_time,...
+if sum(sum(bob.bad_epochs)) > 0
+    bob.bad_epochs = fn_convert_epochs_full2at(bob.bad_epochs,SBJ_vars.analysis_time,...
                                              strcat(SBJ_vars.dirs.preproc,SBJ,'_preclean.mat'),1);
     % Toss epochs that overlap with bad_epochs from Bob
-    skip_bob = fn_find_trials_overlap_epochs(bad_epochs,1:size(data.trial{1},2),events,trial_lim);
+    skip_bob = fn_find_trials_overlap_epochs(bob.bad_epochs,1:size(data.trial{1},2),events,trial_lim);
 else
     skip_bob = [];
+end
+if sum(sum(colin.bad_epochs)) > 0
+    colin.bad_epochs = fn_convert_epochs_full2at(colin.bad_epochs,SBJ_vars.analysis_time,...
+                                             strcat(SBJ_vars.dirs.preproc,SBJ,'_preclean.mat'),1);
+    % Toss epochs that overlap with bad_epochs from Bob
+    skip_colin = fn_find_trials_overlap_epochs(colin.bad_epochs,1:size(data.trial{1},2),events,trial_lim);
+else
+    skip_colin = [];
 end
 
 % Find RT outliers
@@ -80,7 +92,7 @@ skip_rt_outlier = vertcat(skip_rt_outlier, RT_late);
 RT_early = find(trial_info.response_time(trial_info.response_time>0)<proc_vars.rt_bounds(1));
 
 % Compile all a priori bad trials
-skip_trial_ix = unique([skip_bad; skip_rt1; skip_rt2; skip_err; skip_bob; skip_rt_outlier]);
+skip_trial_ix = unique([skip_bad; skip_rt1; skip_rt2; skip_err; skip_bob; skip_colin; skip_rt_outlier]);
 ok_trial_ix = setdiff(1:length(trial_info.resp_onset),skip_trial_ix);
 
 %% Compile Bad Trials
@@ -94,6 +106,7 @@ trial_info_clean.RT_std_thresh = proc_vars.RT_std_thresh;
 trial_info_clean.bad_trials.RT_bad = trial_info.trial_n([skip_rt1 skip_rt2]);
 trial_info_clean.bad_trials.RT_out = trial_info.trial_n(skip_rt_outlier);
 trial_info_clean.bad_trials.bob    = trial_info.trial_n(skip_bob);
+trial_info_clean.bad_trials.colin  = trial_info.trial_n(skip_colin);
 trial_info_clean.bad_trials.error  = trial_info.trial_n(skip_err);
 trial_info_clean.bad_trials.bad    = trial_info.trial_n(skip_bad);
 trial_info_clean.bad_trials.all    = trial_info.trial_n(skip_trial_ix);
@@ -124,12 +137,13 @@ end
 if ~isempty(RT_early)
     fprintf('WARNING! %i RTs < %f sec detected (not excluded)!\n',numel(RT_early),proc_vars.rt_bounds(1));
 end
-fprintf('Num trials excluded for bad RT    : %i\n',length(skip_rt1)+length(skip_rt2));
-fprintf('Num trials excluded for outlier RT: %i\n',length(skip_rt_outlier));
-fprintf('Num trials excluded for errors    : %i\n',length(skip_err));
-fprintf('Num trials excluded by Bob vis    : %i\n',length(skip_bob));
-fprintf('Num trials excluded for other     : %i\n',length(skip_bad));
-fprintf('TOTAL TRIALS EXCLUDED A PRIORI    : %i\n',length(skip_trial_ix));
+fprintf('Num trials excluded for bad RT     : %i\n',length(skip_rt1)+length(skip_rt2));
+fprintf('Num trials excluded for outlier RT : %i\n',length(skip_rt_outlier));
+fprintf('Num trials excluded for errors     : %i\n',length(skip_err));
+fprintf('Num trials excluded by PRECLEAN vis: %i\n',length(skip_bob));
+fprintf('Num trials excluded by PREPROC vis : %i\n',length(skip_colin));
+fprintf('Num trials excluded for other      : %i\n',length(skip_bad));
+fprintf('TOTAL TRIALS EXCLUDED A PRIORI     : %i\n',length(skip_trial_ix));
 fprintf('TRIALS REMAINING: %i/%i\n',length(trial_info_clean.trial_n),length(trial_info.response_time));
 fprintf('==============================================================================================\n');
 

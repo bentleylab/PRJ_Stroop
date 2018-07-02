@@ -1,6 +1,9 @@
 %% IR21 Processing Variables
-addpath('/home/knight/hoycw/Apps/fieldtrip/');
-ft_defaults
+[root_dir, ft_dir] = fn_get_root_dir();
+if isempty(strfind(path,'fieldtrip'))
+    addpath(ft_dir);
+    ft_defaults
+end
 
 %--------------------------------------
 % Basics
@@ -9,7 +12,7 @@ SBJ_vars.SBJ = 'IR21';
 SBJ_vars.raw_file = '2015063014_0002.edf';
 SBJ_vars.block_prefix = '';
 
-SBJ_vars.dirs.SBJ     = ['/home/knight/hoycw/PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
+SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
 SBJ_vars.dirs.import  = [SBJ_vars.dirs.SBJ '01_import/'];
 SBJ_vars.dirs.preproc = [SBJ_vars.dirs.SBJ '02_preproc/'];
