@@ -10,8 +10,8 @@ function overlap_trial_ix = fn_find_trials_overlap_epochs(epochs,sample_idx,even
 %   trial_lim [Nx2 int array] - # data points to include [before, after] the event
 % OUTPUTS:
 %   overlap_trials [Nx1 int array] - column vector of trial indices that overlap with any epochs
-
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
+[root_dir,~] = fn_get_root_dir();
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
 
 % Compile list of samples covered by epochs
 epoch_samples = [];

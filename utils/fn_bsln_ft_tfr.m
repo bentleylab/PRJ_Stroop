@@ -11,7 +11,8 @@ function bslnd_tfr = fn_bsln_ft_tfr(tfr, bsln_lim, bsln_type, n_boots)
 %       'my_relchange' = subtract mean, divide by mean (results in % change)
 % OUTPUTS:
 %   bslnd_tfr [ft dataset] - same tfr but baseline corrected
-addpath('/home/knight/hoycw/Apps/fieldtrip/');
+[~, ft_dir] = fn_get_root_dir();
+addpath(ft_dir);
 ft_defaults
 rng('shuffle'); % seed randi with time
 

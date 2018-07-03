@@ -4,7 +4,7 @@
 % manually editted for each dataset.
 clear all; close all;
 
-% Check which root directory
+%% Check which root directory
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 

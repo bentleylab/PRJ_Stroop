@@ -85,6 +85,7 @@ end
 RT_mean = nanmean(trial_info.response_time);
 RT_std  = nanstd(trial_info.response_time);
 skip_rt_outlier = find(abs(trial_info.response_time-RT_mean)>proc_vars.RT_std_thresh*RT_std);
+skip_rt_outlier = setdiff(skip_rt_outlier,skip_rt1);    %don't include RT=-1
 
 % Check against RT bounds, toss late but only warn for early
 RT_late = find(trial_info.response_time>proc_vars.rt_bounds(2));

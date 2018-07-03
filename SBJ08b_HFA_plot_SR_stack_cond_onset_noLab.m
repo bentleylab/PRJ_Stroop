@@ -1,4 +1,4 @@
-function SBJ08b_HFA_plot_SR_stack_cond_onset(SBJ,conditions,an_id_s,an_id_r,pipeline_id,actv_win,...
+function SBJ08b_HFA_plot_SR_stack_cond_onset_noLab(SBJ,conditions,an_id_s,an_id_r,pipeline_id,actv_win,...
                                         plt_id,save_fig,fig_vis,fig_filetype)
 % Plots single trial stack for both stimulus- and response-locked HFA computed in SBJ08a_HFA_actv
 %   sorts by condition, then by RT; scatter for RTs in stim-locked
@@ -22,8 +22,8 @@ plt_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/plt_vars/' plt_id '_v
 eval(plt_vars_cmd);
 
 % Load einfo
-einfo_filename = [SBJ_vars.dirs.preproc SBJ '_einfo_' pipeline_id '.mat'];
-load(einfo_filename);
+% einfo_filename = [SBJ_vars.dirs.preproc SBJ '_einfo_' pipeline_id '.mat'];
+% load(einfo_filename);
 % Electrode Info Table:
 %   label- name of electrode
 %   ROI- specific region
@@ -53,9 +53,9 @@ if ~isempty(setdiff(hfa{1}.label,hfa{2}.label))
     error('ERROR: channels do not match between the two analyses!');
 end
 
-if ~isempty(setdiff(hfa{1}.label,einfo(:,1)))
-    error('ERROR: Electrodes do not match between stat and einfo!');
-end
+% if ~isempty(setdiff(hfa{1}.label,einfo(:,1)))
+%     error('ERROR: Electrodes do not match between stat and einfo!');
+% end
 
 %% Prep Data
 % Trim data to plotting epoch
@@ -147,7 +147,7 @@ for ch_ix = 1:numel(hfa{1}.label)
         % Plotting parameters
         ax = gca;
 %         ax.legend = plt_vars.legend;
-        ax.Title.String  = [hfa{sr_ix}.label{ch_ix} ' (' einfo{ch_ix,2} '): ' event_lab{sr_ix} ' trials'];
+        ax.Title.String  = [hfa{sr_ix}.label{ch_ix} ': ' event_lab{sr_ix} ' trials'];
         ax.XLim          = [0,numel(hfa{sr_ix}.time)];
         ax.XTick         = 0:plt_vars.x_step_sz*sample_rate:numel(hfa{sr_ix}.time);
         ax.XTickLabel    = x_tick_lab;

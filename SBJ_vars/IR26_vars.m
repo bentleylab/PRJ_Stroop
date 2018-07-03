@@ -44,7 +44,7 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw,SBJ_vars.raw_file);
 
 SBJ_vars.ch_lab.probes = {'RAM','RHP','ROF','RPC','LAM','LHP','LOF','LPC'};
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP'};
-SBJ_vars.ch_lab.ROI    = {'ROF','RPC','LOF','LPC'};
+SBJ_vars.ch_lab.ROI    = {'ROF*','RPC*','LOF*','LPC*'};
 SBJ_vars.ch_lab.eeg_ROI = {};
 
 SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'

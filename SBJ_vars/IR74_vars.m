@@ -44,7 +44,7 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw,SBJ_vars.raw_file);
 
 SBJ_vars.ch_lab.probes = {'LAM','LHH','LTH','LIN','LOF','LAC','LPRE','RAM','RHH','RTH','ROF','RIN','RAC','RPRE'};
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
-SBJ_vars.ch_lab.ROI    = {'LAC','LIN','LOF','LPRE','RAC','RIN','ROF','RPRE'};
+SBJ_vars.ch_lab.ROI    = {'LAC*','LIN*','LOF*','LPRE*','RAC*','RIN*','ROF*','RPRE*'};
 SBJ_vars.ch_lab.eeg_ROI = {'CZ'};
 
 %SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
@@ -56,6 +56,7 @@ SBJ_vars.ch_lab.bad = {...
     'LTH1','LTH2','LHH1','LHH2','LHH3','LHH4','LAM1','LAM2','LAM3','LHH5',...% epileptic
     'RTH2','RTH3','RHH2','RHH3','RHH4','RHH5','RAM1','RAM2','RAM3',...% epileptic
     'RTH7','RTH8',...% spiking artifact
+    'RTH10','RIN9','RIN10','RPRE10',...% out of brain (based on my eye, maybe add RAC10 and LIN10 since they're edge)
     'G','EKG','REF','E'...% not real data
     };
 SBJ_vars.ch_lab.eeg = {'FPZ','CZ','OZ','C3','C4'};
@@ -78,11 +79,11 @@ SBJ_vars.analysis_time = {[135 1125]};
 %--------------------------------------
 % Artifact Rejection Parameters
 %--------------------------------------
-% SBJ_vars.artifact_params.std_limit_raw = 7;
-% SBJ_vars.artifact_params.hard_threshold_raw = 1000;
+SBJ_vars.artifact_params.std_limit_raw = 7;
+SBJ_vars.artifact_params.hard_threshold_raw = 800;
 
-% SBJ_vars.artifact_params.std_limit_diff = 7;
-% SBJ_vars.artifact_params.hard_threshold_diff = 100;
+SBJ_vars.artifact_params.std_limit_diff = 7;
+SBJ_vars.artifact_params.hard_threshold_diff = 100;
 
 %--------------------------------------
 % Trials to Reject

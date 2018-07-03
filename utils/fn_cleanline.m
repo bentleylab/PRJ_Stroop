@@ -3,8 +3,8 @@ function [data_clean] = fn_cleanline(data,line_noise_freqs)
 % Some important comments from Readme.txt:
 %   -If cleaning continuous, un-epoched data, then you may wish to use sliding
 %       windows of 3-4 seconds with 50% overlap.
-
-addpath(genpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/'));
+[root_dir,~] = fn_get_root_dir();
+addpath(genpath([root_dir 'PRJ_Stroop/scripts/utils/']));
 
 cleaned = cleanline2(data.trial{1}, data.fsample,...
     'LineFrequencies',  line_noise_freqs, ...   % default is 60, 120

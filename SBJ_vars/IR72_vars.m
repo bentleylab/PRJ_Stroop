@@ -44,7 +44,7 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw,SBJ_vars.raw_file);
 
 SBJ_vars.ch_lab.probes = {'LAM','LHH','LTH','LOF','LASM','LPSM','LAC','LPC','RAM','RHH','RTH','ROF','RAC','RPC','RASM','RPSM','LBT','LPT'};
 SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
-SBJ_vars.ch_lab.ROI    = {'LOF','LASM','LPSM','LAC','LPC','ROF','RAC','RPC','RASM','RPSM'};
+SBJ_vars.ch_lab.ROI    = {'LOF*','LASM*','LPSM*','LAC*','LPC*','ROF*','RAC*','RPC*','RASM*','RPSM*'};
 SBJ_vars.ch_lab.eeg_ROI = {'CZ'};
 
 %SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
@@ -78,13 +78,13 @@ SBJ_vars.analysis_time = {[80 1120]};
 %--------------------------------------
 % Artifact Rejection Parameters
 %--------------------------------------
-% SBJ_vars.artifact_params.std_limit_raw = 7;
-% SBJ_vars.artifact_params.hard_threshold_raw = 1000;
+SBJ_vars.artifact_params.std_limit_raw = 7;
+SBJ_vars.artifact_params.hard_threshold_raw = 400;
 
-% SBJ_vars.artifact_params.std_limit_diff = 7;
-% SBJ_vars.artifact_params.hard_threshold_diff = 100;
+SBJ_vars.artifact_params.std_limit_diff = 7;
+SBJ_vars.artifact_params.hard_threshold_diff = 25;
 
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
-% SBJ_vars.trial_reject_n = [];
+SBJ_vars.trial_reject_n = [228];
