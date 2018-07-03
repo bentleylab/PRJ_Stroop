@@ -88,4 +88,4 @@ SBJ_vars.artifact_params.hard_threshold_diff = 100;
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
-% SBJ_vars.trial_reject_n = [];
+SBJ_vars.trial_reject_n = [163 223 232 278 322];
