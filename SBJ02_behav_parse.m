@@ -13,8 +13,8 @@ if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[roo
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 % Import helper functions to Matlab path
-addpath(genpath(helper_function_dir_name));
 helper_function_dir_name = [root_dir 'PRJ_Stroop/scripts/utils/'];
+addpath(genpath(helper_function_dir_name));
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 

@@ -93,7 +93,7 @@ save(out_filename, 'evnt', 'hdr', 'ignore_trials', 'photod_ix', 'mic_ix');
 if proc_vars.resample_freq~=1000
     error('ERROR!!! SBJ02_behav_parse assumes 1 kHz neural sampling rate!!!\n');
 end
-SBJ02_behav_parse_colinhoy(SBJ,proc_vars.rt_bounds,ignore_trials,1,1)
+SBJ02_behav_parse(SBJ,proc_vars.rt_bounds,ignore_trials,1,1)
 % Be sure to save the two figures coming from this function!
 %   i.e., SBJ_photodiode_segmentation.fig & SBJ_events.fig
 
