@@ -8,7 +8,7 @@ clear all; close all;
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
-% Set Up Directories
+%% Set Up Directories
 addpath([root_dir 'PRJ_Stroop/scripts/']);
 addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
 addpath(ft_dir);
@@ -26,7 +26,7 @@ eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m'
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 
-%% ======================================================================== 
+%% ========================================================================
 %   Step 2- Quick Import and Processing for Data Cleaning/Inspection
 %  ========================================================================
 % FILE TOO BIG, RUNNING THIS VIA SGE
@@ -44,58 +44,65 @@ eval(SBJ_vars_cmd);
 %   Step 4a- Manually Clean Photodiode Trace: Load & Plot
 %  ========================================================================
 % Load data
-evnt_filename = strcat(SBJ_vars.dirs.import,SBJ,'_evnt.mat');
-load(evnt_filename);
-[evnt, hdr] = fn_format_data_ft2KLA(evnt);
-
-% Plot event channels
-plot(linspace(0,hdr.length_in_seconds,hdr.n_samples), evnt);
-
-%% ========================================================================
-%   Step 4b- Manually Clean Photodiode Trace: Mark Sections to Correct
-%  ========================================================================
-% Create correction times and values in a separate file in ~/PRJ_Stroop/scripts/SBJ_evnt_clean/
-SBJ_evnt_clean_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_evnt_clean/' SBJ '_evnt_clean_params.m'];
-eval(SBJ_evnt_clean_cmd);
-
-%% ========================================================================
-%   Step 4c- Manually Clean Photodiode Trace: Apply Corrections
-%  ========================================================================
-photod_ix = strmatch(SBJ_vars.ch_lab.photod,hdr.channel_labels);
-mic_ix = strmatch(SBJ_vars.ch_lab.mic,hdr.channel_labels);
-% Correct baseline shift
-for shift_ix = 1:length(bsln_shift_times)
-    epoch_idx = floor(bsln_shift_times{shift_ix}(1)*hdr.sample_rate):floor(bsln_shift_times{shift_ix}(2)*hdr.sample_rate);
-    epoch_idx(epoch_idx<1) = [];
-    evnt(photod_ix,epoch_idx) = evnt(photod_ix,epoch_idx) - bsln_shift_val(shift_ix);
+for b_ix = 1:numel(SBJ_vars.block_name)
+    if numel(SBJ_vars.raw_file)>1
+        block_suffix = strcat('_',SBJ_vars.block_name{b_ix});
+    else
+        block_suffix = SBJ_vars.block_name{b_ix};   % should just be ''
+    end
+    evnt_filename = strcat(SBJ_vars.dirs.import,SBJ,'_evnt',block_suffix,'.mat');
+    load(evnt_filename);
+    [evnt, hdr] = fn_format_data_ft2KLA(evnt);
+    
+    % Plot event channels
+    plot(linspace(0,hdr.length_in_seconds,hdr.n_samples), evnt);
+    
+    %% ========================================================================
+    %   Step 4b- Manually Clean Photodiode Trace: Mark Sections to Correct
+    %  ========================================================================
+    % Create correction times and values in a separate file in ~/PRJ_Stroop/scripts/SBJ_evnt_clean/
+    SBJ_evnt_clean_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_evnt_clean/' SBJ '_evnt_clean_params',block_suffix,'.m'];
+    eval(SBJ_evnt_clean_cmd);
+    
+    %% ========================================================================
+    %   Step 4c- Manually Clean Photodiode Trace: Apply Corrections
+    %  ========================================================================
+    photod_ix = strmatch(SBJ_vars.ch_lab.photod,hdr.channel_labels);
+    mic_ix = strmatch(SBJ_vars.ch_lab.mic,hdr.channel_labels);
+    % Correct baseline shift
+    for shift_ix = 1:length(bsln_shift_times)
+        epoch_idx = floor(bsln_shift_times{shift_ix}(1)*hdr.sample_rate):floor(bsln_shift_times{shift_ix}(2)*hdr.sample_rate);
+        epoch_idx(epoch_idx<1) = [];
+        evnt(photod_ix,epoch_idx) = evnt(photod_ix,epoch_idx) - bsln_shift_val(shift_ix);
+    end
+    % zero out drifts
+    for zero_ix = 1:length(bsln_times)
+        epoch_idx = floor(bsln_times{zero_ix}(1)*hdr.sample_rate):floor(bsln_times{zero_ix}(2)*hdr.sample_rate);
+        epoch_idx(epoch_idx<1) = [];
+        evnt(photod_ix,epoch_idx) = bsln_val;
+    end
+    
+    % level out stimulus periods
+    for stim_ix = 1:length(stim_times)
+        epoch_idx = floor(stim_times{stim_ix}(1)*hdr.sample_rate):floor(stim_times{stim_ix}(2)*hdr.sample_rate);
+        epoch_idx(epoch_idx<1) = [];
+        evnt(photod_ix,epoch_idx) = stim_yval(stim_ix);
+    end
+    
+    % Save corrected data
+    out_filename = [SBJ_vars.dirs.preproc SBJ '_evnt_clean',block_suffix,'.mat'];
+    save(out_filename, 'evnt', 'hdr', 'ignore_trials', 'photod_ix', 'mic_ix');
+    
+    %% ========================================================================
+    %   Step 5- Parse Event Traces into Behavioral Data
+    %  ========================================================================
+    if proc_vars.resample_freq~=1000
+        error('ERROR!!! SBJ02_behav_parse assumes 1 kHz neural sampling rate!!!\n');
+    end
+    SBJ02_behav_parse(SBJ,b_ix,proc_vars.rt_bounds,1,1)
+    % Be sure to save the two figures coming from this function!
+    %   i.e., SBJ_photodiode_segmentation.fig & SBJ_events.fig
 end
-% zero out drifts
-for zero_ix = 1:length(bsln_times)
-    epoch_idx = floor(bsln_times{zero_ix}(1)*hdr.sample_rate):floor(bsln_times{zero_ix}(2)*hdr.sample_rate);
-    epoch_idx(epoch_idx<1) = [];
-    evnt(photod_ix,epoch_idx) = bsln_val;
-end
-
-% level out stimulus periods
-for stim_ix = 1:length(stim_times)
-    epoch_idx = floor(stim_times{stim_ix}(1)*hdr.sample_rate):floor(stim_times{stim_ix}(2)*hdr.sample_rate);
-    epoch_idx(epoch_idx<1) = [];
-    evnt(photod_ix,epoch_idx) = stim_yval(stim_ix);
-end
-
-% Save corrected data
-out_filename = [SBJ_vars.dirs.preproc SBJ '_evnt_clean.mat'];
-save(out_filename, 'evnt', 'hdr', 'ignore_trials', 'photod_ix', 'mic_ix');
-
-%% ========================================================================
-%   Step 5- Parse Event Traces into Behavioral Data
-%  ========================================================================
-if proc_vars.resample_freq~=1000
-    error('ERROR!!! SBJ02_behav_parse assumes 1 kHz neural sampling rate!!!\n');
-end
-SBJ02_behav_parse(SBJ,proc_vars.rt_bounds,ignore_trials,1,1)
-% Be sure to save the two figures coming from this function!
-%   i.e., SBJ_photodiode_segmentation.fig & SBJ_events.fig
 
 %% ========================================================================
 %   Step 6- Create einfo based on ROIs

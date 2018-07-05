@@ -47,12 +47,13 @@ eog_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.eog);
 photod_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.photod);
 mic_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.mic);
 
-data_all = {};
-evnt_all = {};
-eeg_all  = {};
-eog_all  = {};
 for b_ix = 1:numel(SBJ_vars.block_name)
     %% Load Data
+    if numel(SBJ_vars.raw_file)>1
+        block_suffix = strcat('_',SBJ_vars.block_name{b_ix});
+    else
+        block_suffix = SBJ_vars.block_name{b_ix};   % should just be ''
+    end
     if strcmp(SBJ_vars.raw_file{b_ix}(end-2:end),'mat')
         orig = load(SBJ_vars.dirs.raw_filename{b_ix});
         % Load Neural Data
@@ -160,9 +161,6 @@ for b_ix = 1:numel(SBJ_vars.block_name)
         cfg = [];
         cfg.resamplefs = proc_vars.resample_freq;
         cfg.detrend = 'no';
-        if numel(SBJ_vars.block_name)>1
-            cfg.demean = 'yes';
-        end
         data = ft_resampledata(cfg, data);
         if ~isempty(SBJ_vars.ch_lab.eeg)
             eeg = ft_resampledata(cfg, eeg);
@@ -172,100 +170,82 @@ for b_ix = 1:numel(SBJ_vars.block_name)
         end
     end
     
-    data_all{b_ix} = data;
-    evnt_all{b_ix} = evnt;
+    %% Final Channel Label Corrections
+    % Strip Pre/Suffix if Necessary
+    for ch_ix = 1:numel(data.label)
+        if isfield(SBJ_vars.ch_lab,'prefix')
+            data.label{ch_ix} = strrep(data.label{ch_ix},SBJ_vars.ch_lab.prefix,'');
+        end
+        if isfield(SBJ_vars.ch_lab,'suffix')
+            data.label{ch_ix} = strrep(data.label{ch_ix},SBJ_vars.ch_lab.suffix,'');
+        end
+    end
     if ~isempty(SBJ_vars.ch_lab.eeg)
-        eeg_all{b_ix} = eeg;
+        for eeg_ix = 1:numel(eeg.label)
+            if isfield(SBJ_vars.ch_lab,'prefix')
+                eeg.label{eeg_ix} = strrep(eeg.label{eeg_ix},SBJ_vars.ch_lab.prefix,'');
+            end
+            if isfield(SBJ_vars.ch_lab,'suffix')
+                eeg.label{eeg_ix} = strrep(eeg.label{eeg_ix},SBJ_vars.ch_lab.suffix,'');
+            end
+        end
     end
     if ~isempty(SBJ_vars.ch_lab.eog)
-        eog_all{b_ix} = eog;
+        for eog_ix = 1:numel(eog.label)
+            if isfield(SBJ_vars.ch_lab,'prefix')
+                eog.label{eog_ix} = strrep(eog.label{eog_ix},SBJ_vars.ch_lab.prefix,'');
+            end
+            if isfield(SBJ_vars.ch_lab,'suffix')
+                eog.label{eog_ix} = strrep(eog.label{eog_ix},SBJ_vars.ch_lab.suffix,'');
+            end
+        end
     end
-    clear data evnt eeg eog
-end
-
-%% Concatenate blocks
-data = fn_concat_blocks(data_all);
-evnt = fn_concat_blocks(evnt_all);
-if ~isempty(SBJ_vars.ch_lab.eeg)
-    eeg = fn_concat_blocks(eeg_all);
-end
-if ~isempty(SBJ_vars.ch_lab.eog)
-    eog = fn_concat_blocks(eog_all);
-end
-
-%% Final Channel Label Corrections
-% Strip Pre/Suffix if Necessary
-for ch_ix = 1:numel(data.label)
     if isfield(SBJ_vars.ch_lab,'prefix')
-        data.label{ch_ix} = strrep(data.label{ch_ix},SBJ_vars.ch_lab.prefix,'');
+        evnt.label{1} = strrep(evnt.label{1},SBJ_vars.ch_lab.prefix,'');
+        evnt.label{2} = strrep(evnt.label{2},SBJ_vars.ch_lab.prefix,'');
     end
     if isfield(SBJ_vars.ch_lab,'suffix')
-        data.label{ch_ix} = strrep(data.label{ch_ix},SBJ_vars.ch_lab.suffix,'');
+        evnt.label{1} = strrep(evnt.label{1},SBJ_vars.ch_lab.suffix,'');
+        evnt.label{2} = strrep(evnt.label{2},SBJ_vars.ch_lab.suffix,'');
     end
-end
-if ~isempty(SBJ_vars.ch_lab.eeg)
-    for eeg_ix = 1:numel(eeg.label)
-        if isfield(SBJ_vars.ch_lab,'prefix')
-            eeg.label{eeg_ix} = strrep(eeg.label{eeg_ix},SBJ_vars.ch_lab.prefix,'');
-        end
-        if isfield(SBJ_vars.ch_lab,'suffix')
-            eeg.label{eeg_ix} = strrep(eeg.label{eeg_ix},SBJ_vars.ch_lab.suffix,'');
-        end
-    end
-end
-if ~isempty(SBJ_vars.ch_lab.eog)
-    for eog_ix = 1:numel(eog.label)
-        if isfield(SBJ_vars.ch_lab,'prefix')
-            eog.label{eog_ix} = strrep(eog.label{eog_ix},SBJ_vars.ch_lab.prefix,'');
-        end
-        if isfield(SBJ_vars.ch_lab,'suffix')
-            eog.label{eog_ix} = strrep(eog.label{eog_ix},SBJ_vars.ch_lab.suffix,'');
-        end
-    end
-end
-if isfield(SBJ_vars.ch_lab,'prefix')
-    evnt.label{1} = strrep(evnt.label{1},SBJ_vars.ch_lab.prefix,'');
-    evnt.label{2} = strrep(evnt.label{2},SBJ_vars.ch_lab.prefix,'');
-end
-if isfield(SBJ_vars.ch_lab,'suffix')
-    evnt.label{1} = strrep(evnt.label{1},SBJ_vars.ch_lab.suffix,'');
-    evnt.label{2} = strrep(evnt.label{2},SBJ_vars.ch_lab.suffix,'');
-end
-
-% Fix any mislabeled channels
-if isfield(SBJ_vars.ch_lab,'mislabel')
-    for ch_ix = 1:numel(SBJ_vars.ch_lab.mislabel)
-        % Future edit: search for the bad label across data, eeg, evnt
-        data.label(strcmp(data.label,SBJ_vars.ch_lab.mislabel{ch_ix}(1))) = SBJ_vars.ch_lab.mislabel{ch_ix}(2);
-    end
-end
-
-%% Process Microphone data
-cfg = [];
-cfg.channel = SBJ_vars.ch_lab.mic;
-mic_data = ft_selectdata(cfg,evnt);
-mic_data = mic_data.trial{1};
-%rescale to prevent clipping, add 0.05 fudge factor
-mic_data_rescale = mic_data./(max(abs(mic_data))+0.05);
     
-%% Save data
-nrl_out_filename = strcat(SBJ_vars.dirs.import,SBJ,'_',num2str(proc_vars.resample_freq),'hz.mat');
-save(nrl_out_filename, '-v7.3', 'data');
-
-if ~isempty(SBJ_vars.ch_lab.eeg)
-    eeg_out_filename = strcat(SBJ_vars.dirs.import,SBJ,'_eeg_',num2str(proc_vars.resample_freq),'hz.mat');
-    save(eeg_out_filename, '-v7.3', 'eeg');
+    % Fix any mislabeled channels
+    if isfield(SBJ_vars.ch_lab,'mislabel')
+        for ch_ix = 1:numel(SBJ_vars.ch_lab.mislabel)
+            % Future edit: search for the bad label across data, eeg, evnt
+            data.label(strcmp(data.label,SBJ_vars.ch_lab.mislabel{ch_ix}(1))) = SBJ_vars.ch_lab.mislabel{ch_ix}(2);
+        end
+    end
+    
+    %% Process Microphone data
+    cfg = [];
+    cfg.channel = SBJ_vars.ch_lab.mic;
+    mic_data = ft_selectdata(cfg,evnt);
+    mic_data = mic_data.trial{1};
+    %rescale to prevent clipping, add 0.05 fudge factor
+    mic_data_rescale = mic_data./(max(abs(mic_data))+0.05);
+    
+    %% Save data
+    nrl_out_filename = strcat(SBJ_vars.dirs.import,SBJ,'_',num2str(proc_vars.resample_freq),'hz',block_suffix,'.mat');
+    save(nrl_out_filename, '-v7.3', 'data');
+    
+    if ~isempty(SBJ_vars.ch_lab.eeg)
+        eeg_out_filename = strcat(SBJ_vars.dirs.import,SBJ,'_eeg_',num2str(proc_vars.resample_freq),'hz',block_suffix,'.mat');
+        save(eeg_out_filename, '-v7.3', 'eeg');
+    end
+    if ~isempty(SBJ_vars.ch_lab.eog)
+        eog_out_filename = strcat(SBJ_vars.dirs.import,SBJ,'_eog_',num2str(proc_vars.resample_freq),'hz',block_suffix,'.mat');
+        save(eog_out_filename, '-v7.3', 'eog');
+    end
+    
+    evnt_out_filename = strcat(SBJ_vars.dirs.import,SBJ,'_evnt',block_suffix,'.mat');
+    save(evnt_out_filename, '-v7.3', 'evnt');
+    
+    % Save Microphone data separately as .wav for listening
+    mic_data_filename = strcat(SBJ_vars.dirs.import,SBJ,'_mic_recording',block_suffix,'.wav');
+    audiowrite(mic_data_filename,mic_data_rescale,evnt.fsample);
+    
+    clear data evnt eeg eog mic_data mic_data_rescale
 end
-if ~isempty(SBJ_vars.ch_lab.eog)
-    eog_out_filename = strcat(SBJ_vars.dirs.import,SBJ,'_eog_',num2str(proc_vars.resample_freq),'hz.mat');
-    save(eog_out_filename, '-v7.3', 'eog');
-end
-
-evnt_out_filename = strcat(SBJ_vars.dirs.import,SBJ,'_evnt.mat');
-save(evnt_out_filename, '-v7.3', 'evnt');
-
-% Save Microphone data separately as .wav for listening
-mic_data_filename = strcat(SBJ_vars.dirs.import,SBJ,'_mic_recording.wav');
-audiowrite(mic_data_filename,mic_data_rescale,evnt.fsample);
 
 end

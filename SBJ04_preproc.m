@@ -22,6 +22,11 @@ fprintf('============== Loading Data %s ==============\n',SBJ);
 eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
 eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
 
+data_all = {};
+evnt_all = {};
+eeg_all  = {};
+eog_all  = {};
+
 import_filename = [SBJ_vars.dirs.import SBJ '_1000hz.mat'];
 load(import_filename);
 data_orig = data;
@@ -139,6 +144,25 @@ if strcmp(psd_line,'yes')
         data_reref.fsample,strcat(psd_dir,SBJ,'_PSD_',pipeline_id),'bp.reref',pipeline_id,psd_fig_type);
 end
 clear data_reref
+
+    data_all{b_ix} = data;
+    evnt_all{b_ix} = evnt;
+    if ~isempty(SBJ_vars.ch_lab.eeg)
+        eeg_all{b_ix} = eeg;
+    end
+    if ~isempty(SBJ_vars.ch_lab.eog)
+        eog_all{b_ix} = eog;
+    end
+
+    %% Concatenate blocks
+data = fn_concat_blocks(data_all);
+evnt = fn_concat_blocks(evnt_all);
+if ~isempty(SBJ_vars.ch_lab.eeg)
+    eeg = fn_concat_blocks(eeg_all);
+end
+if ~isempty(SBJ_vars.ch_lab.eog)
+    eog = fn_concat_blocks(eog_all);
+end
 
 %% Save data
 output_filename = strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat');

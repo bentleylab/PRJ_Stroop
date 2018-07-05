@@ -39,6 +39,8 @@ for b_ix = 1:numel(SBJ_vars.raw_file)
     fprintf('============== Processing %s, %s ==============\n',SBJ,SBJ_vars.raw_file{b_ix});
     if numel(SBJ_vars.raw_file)>1
         block_suffix = strcat('_',SBJ_vars.block_name{b_ix});
+    else
+        block_suffix = SBJ_vars.block_name{b_ix};   % should just be ''
     end
     %% Set up directories
     psd_dir = strcat(SBJ_vars.dirs.import,'raw_psds/');
