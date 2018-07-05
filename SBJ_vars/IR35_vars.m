@@ -9,8 +9,8 @@ end
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'IR35';
-SBJ_vars.raw_file = '2016021711_0006.besa';
-SBJ_vars.block_prefix = '';
+SBJ_vars.raw_file = {'2016021711_0006.besa'};
+SBJ_vars.block_name = {''};
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -75,7 +75,7 @@ SBJ_vars.bs_width    = 2;
 %--------------------------------------
 % Time Parameters
 %--------------------------------------
-SBJ_vars.analysis_time = {[105 1140]};
+SBJ_vars.analysis_time = {{[105 1140]}};
 
 %--------------------------------------
 % Artifact Rejection Parameters

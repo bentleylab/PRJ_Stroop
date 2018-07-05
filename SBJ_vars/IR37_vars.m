@@ -9,8 +9,8 @@ end
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'IR37';
-SBJ_vars.raw_file = '2016031117_0051.besa';
-SBJ_vars.block_prefix = '';
+SBJ_vars.raw_file = {'2016031117_0051.besa'};
+SBJ_vars.block_name = {''};
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -72,7 +72,7 @@ SBJ_vars.bs_width    = 2;
 % photodiode wasn't on for most of 1st block
 % kicks on at 190.5, which is B1T26 (10 full trials left)
 % last block over ~1182
-SBJ_vars.analysis_time = {[180 1194]};
+SBJ_vars.analysis_time = {{[180 1194]}};
 
 %--------------------------------------
 % Artifact Rejection Parameters

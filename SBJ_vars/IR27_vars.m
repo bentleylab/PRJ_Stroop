@@ -9,8 +9,8 @@ end
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'IR27';
-SBJ_vars.raw_file = '2015082615_0003.edf';
-SBJ_vars.block_prefix = '';
+SBJ_vars.raw_file = {'2015082615_0003.edf'};
+SBJ_vars.block_name = {''};
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -76,7 +76,7 @@ SBJ_vars.bs_width    = 2;
 % Time Parameters
 %--------------------------------------
 % data starts ~41s, ends ~972
-SBJ_vars.analysis_time = {[31 982]};
+SBJ_vars.analysis_time = {{[31 982]}};
 
 %--------------------------------------
 % Artifact Rejection Parameters

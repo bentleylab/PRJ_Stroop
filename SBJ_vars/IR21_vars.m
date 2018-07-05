@@ -9,8 +9,8 @@ end
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'IR21';
-SBJ_vars.raw_file = '2015063014_0002.edf';
-SBJ_vars.block_prefix = '';
+SBJ_vars.raw_file = {'2015063014_0002.edf'};
+SBJ_vars.block_name = {''};
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -77,7 +77,7 @@ SBJ_vars.bs_width    = 2;
 %   12 blocks, if you count the one split by the screen freeze as two blocks
 %   events start 75, screen freezes ~168, kicks back in ~213, over !1365
 %   not sure about excluding the freeze, which is ~45s
-SBJ_vars.analysis_time = {[65 1375]};
+SBJ_vars.analysis_time = {{[65 1375]}};
 
 %--------------------------------------
 % Artifact Rejection Parameters

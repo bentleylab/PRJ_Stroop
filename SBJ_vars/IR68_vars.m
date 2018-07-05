@@ -9,8 +9,8 @@ end
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'IR68';
-SBJ_vars.raw_file = '2018012413_0045.besa';
-SBJ_vars.block_prefix = '';
+SBJ_vars.raw_file = {'2018012413_0045.besa'};
+SBJ_vars.block_name = {''};
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -74,7 +74,7 @@ SBJ_vars.bs_width    = 2;
 %--------------------------------------
 % Time Parameters
 %--------------------------------------
-SBJ_vars.analysis_time = {[280 1021], [1115 1463]};
+SBJ_vars.analysis_time = {{[280 1021], [1115 1463]}};
 
 %--------------------------------------
 % Artifact Rejection Parameters

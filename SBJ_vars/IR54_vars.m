@@ -9,8 +9,8 @@ end
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'IR54';
-SBJ_vars.raw_file = '2017012411_0008.besa';
-SBJ_vars.block_prefix = '';
+SBJ_vars.raw_file = {'2017012411_0008.besa'};
+SBJ_vars.block_name = {''};
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -76,7 +76,7 @@ SBJ_vars.bs_width    = 2;
 % Time Parameters
 %--------------------------------------
 % Data starts ~107s, ends ~1101s; end of recording is ~1114s 
-SBJ_vars.analysis_time = {[90 1114]};
+SBJ_vars.analysis_time = {{[90 1114]}};
 
 %--------------------------------------
 % Artifact Rejection Parameters

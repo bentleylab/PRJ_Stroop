@@ -9,8 +9,8 @@ end
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'IR52';
-SBJ_vars.raw_file = '2017010513_0022.besa';
-SBJ_vars.block_prefix = '';
+SBJ_vars.raw_file = {'2017010513_0022.besa'};
+SBJ_vars.block_name = {''};
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -73,7 +73,7 @@ SBJ_vars.bs_width    = 2;
 %--------------------------------------
 % First event is at 6 seconds in! Very tight, be careful with filtering...
 % Last event is over by 495s
-SBJ_vars.analysis_time = {[0.001 505]};
+SBJ_vars.analysis_time = {{[0.001 505]}};
 
 %--------------------------------------
 % Artifact Rejection Parameters

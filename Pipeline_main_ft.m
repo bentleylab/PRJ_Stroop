@@ -32,7 +32,7 @@ eval(SBJ_vars_cmd);
 % FILE TOO BIG, RUNNING THIS VIA SGE
 
 % block_prefix = '';
-% SBJ00_cleaning_prep(SBJ,SBJ_vars.raw_file,proc_vars.plot_psd,block_prefix);
+% !!! outdated command SBJ00_cleaning_prep(SBJ,SBJ_vars.raw_file,proc_vars.plot_psd,block_prefix);
 
 %% ========================================================================
 %   Step 3- Import Data, Resample, and Save Individual Data Types

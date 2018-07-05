@@ -9,8 +9,8 @@ end
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'IR26';
-SBJ_vars.raw_file = '2015082020_0002.edf';
-SBJ_vars.block_prefix = '';
+SBJ_vars.raw_file = {'2015082020_0002.edf'};
+SBJ_vars.block_name = {''};
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -77,7 +77,7 @@ SBJ_vars.bs_width    = 2;
 %--------------------------------------
 % Time Parameters
 %--------------------------------------
-SBJ_vars.analysis_time = {[22 805], [910 1136]};% long gap with no trials after B8T2
+SBJ_vars.analysis_time = {{[22 805], [910 1136]}};% long gap with no trials after B8T2
 
 %--------------------------------------
 % Artifact Rejection Parameters

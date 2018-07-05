@@ -1,1 +1,1 @@
-/home/knight/ecog_tmp/Recon_Functions/viewrecon.m
+/home/knight/ecog/ecog_scripts/Recon_Functions/viewrecon.m

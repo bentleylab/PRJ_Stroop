@@ -9,8 +9,8 @@ end
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'CP24';
-SBJ_vars.raw_file = 'CP24_Dec7_stroop_raw.mat';%'CP24_Dec9_stroop_R2_raw.mat';%CP24_Dec7_stroop_raw.mat
-SBJ_vars.block_prefix = 'B1';
+SBJ_vars.raw_file = {'CP24_Dec7_stroop_raw.mat','CP24_Dec9_stroop_R2_raw.mat'};%CP24_Dec7_stroop_raw.mat
+SBJ_vars.block_name = {'R1','R2'};
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -56,6 +56,7 @@ SBJ_vars.ch_lab.bad = {...
     'RLF2'...% epileptic
     'DC01','DC04','E','EEG Mark1','EEG Mark2','-','Events_Markers'...% Not real data
     };
+% LLFP and LLF have massive noise, maybe can't save them
 SBJ_vars.ch_lab.eeg = {};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};
 SBJ_vars.ch_lab.eog = {};
@@ -71,7 +72,7 @@ SBJ_vars.bs_width    = 2;
 %--------------------------------------
 % Time Parameters
 %--------------------------------------
-SBJ_vars.analysis_time = {[5 1053]};%B@: [7 342]
+SBJ_vars.analysis_time = {{[5 1053]},{[7 342]}};
 
 %--------------------------------------
 % Artifact Rejection Parameters
