@@ -42,8 +42,8 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw,SBJ_vars.raw_file);
 %SBJ_vars.orig_srate = hdr.Fs;
 %clear hdr;
 
-SBJ_vars.ch_lab.probes = {'RMT','RTO','RIHA','RIHP','ROF','RLF','LMT','LTO','LIHA','LIHP','LOF','LLFP','LLF'};
-SBJ_vars.ref_types     = {'CMR','CMR','CMR','CMR','CMR','CMR','CMR','CMR','CMR','CMR','CMR','CMR','CMR'};
+SBJ_vars.ch_lab.probes = {'RMT','RTO','RIHA','RIHP','ROF','RLF','LMT','LTO','LIHA','LIHP','LOF'};%,'LLFP','LLF'};
+SBJ_vars.ref_types     = {'CAR','CAR','CAR','CAR','CAR','CAR','CAR','CAR','CAR','CAR','CAR'};%,'CAR','CAR'};
 SBJ_vars.ch_lab.ROI    = {'RIHA*','RIHP*','ROF*','RLF*','LIHA*','LIHP*','LOF*'};
 SBJ_vars.ch_lab.eeg_ROI = {};
 
@@ -54,7 +54,8 @@ SBJ_vars.ch_lab.eeg_ROI = {};
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'RLF2'...% epileptic
-    'DC01','DC04','E','EEG Mark1','EEG Mark2','-','Events_Markers'...% Not real data
+    'LLF*','LLFP*',...% noisy (on second amplifier)
+    'DC01','DC04','E','EEG Mark1','EEG Mark2','-','Events/Markers'...% Not real data
     };
 % LLFP and LLF have massive noise, maybe can't save them
 SBJ_vars.ch_lab.eeg = {};

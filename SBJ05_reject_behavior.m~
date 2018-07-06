@@ -38,17 +38,11 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     else
         block_suffix = SBJ_vars.block_name{b_ix};   % should just be ''
     end
+    
     run_epochs = load(strcat(SBJ_vars.dirs.events,SBJ,'_bob_bad_epochs_preclean',block_suffix,'.mat'));
-    % Convert to analysis_time within it's run
-    %   NOTE: 1 keeps epochs that are only partially overlaping real data
-    %   (i.e., will be trimmed to edges of analysis_time)
-    at_epochs  = fn_convert_epochs_full2at(run_epochs.bad_epochs,SBJ_vars.analysis_time{b_ix},...
-                                             strcat(SBJ_vars.dirs.preproc,SBJ,'_preclean',block_suffix,'.mat'),1);
-    % Convert to combined run time
     if b_ix>1
-        run_epochs.bad_epochs = run_epochs.bad_epochs+sum(trial_info.run_len(1:b_ix-1));
-    end
-    bob = vertcat(bob,run_epochs.bad_epochs);
+        run_epochs = run_epochs+sum(trial_info.run_len(1:b_ix-1));
+    bob = vertcat(bob,run
 end
 
 % Parameters
@@ -80,16 +74,21 @@ end
 skip_err = find(trial_info.error==1);           % error
 skip_bad = find(trial_info.error<0);          % bad trial
 
-% Toss epochs that overlap with bad_epochs from Bob
-if ~isempty(bob)
-    skip_bob = fn_find_trials_overlap_epochs(bob,1:size(data.trial{1},2),events,trial_lim);
+% Convert visually bad epochs from full time to analysis_time
+%   NOTE: 1 keeps epochs that are only partially overlaping real data
+%   (i.e., will be trimmed to edges of analysis_time)
+if sum(sum(bob.bad_epochs)) > 0
+    bob.bad_epochs = fn_convert_epochs_full2at(bob.bad_epochs,SBJ_vars.analysis_time,...
+                                             strcat(SBJ_vars.dirs.preproc,SBJ,'_preclean.mat'),1);
+    % Toss epochs that overlap with bad_epochs from Bob
+    skip_bob = fn_find_trials_overlap_epochs(bob.bad_epochs,1:size(data.trial{1},2),events,trial_lim);
 else
     skip_bob = [];
 end
-% Toss epochs that overlap with bad_epochs from Colin (extra pass over preprocessed data)
-if ~isempty(colin.bad_epochs)
+if sum(sum(colin.bad_epochs)) > 0
     colin.bad_epochs = fn_convert_epochs_full2at(colin.bad_epochs,SBJ_vars.analysis_time,...
                                              strcat(SBJ_vars.dirs.preproc,SBJ,'_preclean.mat'),1);
+    % Toss epochs that overlap with bad_epochs from Bob
     skip_colin = fn_find_trials_overlap_epochs(colin.bad_epochs,1:size(data.trial{1},2),events,trial_lim);
 else
     skip_colin = [];

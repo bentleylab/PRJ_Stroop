@@ -1,9 +1,9 @@
+function SBJ03_RT_manual_adjustments(SBJ,block,outlier_thresh,save_plot,save_it)
 %% RT Comparison
 % Compare automatically and manually marked RTs; save png with differences
 % Also corrects trial_info variable and saves out corrected and old versions
 % New spreadsheet from Rana should be converted into csv with format:
 %   block_n, trial_n, error (0/1), resp_onset
-function SBJ03_RT_manual_adjustments(SBJ,outlier_thresh,save_plot,save_it)
 %% Parameters
 if isempty(outlier_thresh)
     fprintf('WARNING: No outlier_threshold given; using default = 0.15s\n');
@@ -14,10 +14,16 @@ end
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
-event_dir = strcat(root_dir,'PRJ_Stroop/data/',SBJ,'/03_events/');
-csv_filename = strcat(event_dir,SBJ,'_RT_manual.csv');
-trial_info_man_filename = strcat(event_dir,SBJ,'_trial_info_manual.mat');
-trial_info_auto_filename = strcat(event_dir,SBJ,'_trial_info_auto.mat');
+eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
+if numel(SBJ_vars.raw_file)>1
+    block_suffix = strcat('_',SBJ_vars.block_name{block});
+else
+    block_suffix = SBJ_vars.block_name{block};   % should just be ''
+end
+
+csv_filename = strcat(SBJ_vars.dirs.events,SBJ,'_RT_manual',block_suffix,'.csv');
+trial_info_man_filename = strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_manual',block_suffix,'.mat');
+trial_info_auto_filename = strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_auto',block_suffix,'.mat');
 
 %% Load Data
 load(trial_info_auto_filename);
@@ -67,7 +73,7 @@ legend('auto-man');
 title(strcat('Mean=',num2str(dif_mean),' +/- ',num2str(dif_sd)));
 
 if save_plot
-    saveas(gcf, strcat(event_dir,SBJ,'_RT_comparison.png'));
+    saveas(gcf, strcat(SBJ_vars.dirs.events,SBJ,'_RT_comparison',block_suffix,'.png'));
 end
 
 %% Identify worst discrepancies

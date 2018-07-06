@@ -159,8 +159,8 @@ save(strcat(SBJ_vars.dirs.events,SBJ,'_colin_bad_epochs_preproc.mat'),'-v7.3','b
 %% ========================================================================
 %   Step 9- Reject Bad Trials Based on Behavior and Bob
 %  ========================================================================
-clear data trial_info
 % Load manually corrected trial_info
+clear data trial_info
 ti = {};
 block_lens   = zeros([numel(SBJ_vars.block_name) 1]);
 block_times  = zeros([numel(SBJ_vars.block_name) 1]);
@@ -190,25 +190,13 @@ if numel(ti)<2
     trial_info = ti{1}.trial_info;
 else
     trial_info = ti{1}.trial_info;
-    % Add properties of the individual blocks
-    trial_info.run_len        = block_lens;
-    trial_info.run_time       = block_times;
     trial_info.run_trial_info = ti;     % Keep the original trial_info structs from each run
     for b_ix = 2:numel(SBJ_vars.block_name)
         % Concatenate fields that don't need modification
-        %   Not modifying marker_time and onset_time (no idea what those are...)
-        trial_info.word          = vertcat(trial_info.word,ti{b_ix}.trial_info.word);
-        trial_info.color         = vertcat(trial_info.color,ti{b_ix}.trial_info.color);
-        trial_info.trialtype     = vertcat(trial_info.trialtype,ti{b_ix}.trial_info.trialtype);
-        trial_info.blocktype     = vertcat(trial_info.blocktype,ti{b_ix}.trial_info.blocktype);
-        trial_info.response_time = vertcat(trial_info.response_time,ti{b_ix}.trial_info.response_time);
-        trial_info.marker_time   = vertcat(trial_info.marker_time,ti{b_ix}.trial_info.marker_time);
-        trial_info.onset_time    = vertcat(trial_info.onset_time,ti{b_ix}.trial_info.onset_time);
-        trial_info.condition_n   = vertcat(trial_info.condition_n,ti{b_ix}.trial_info.condition_n);
-        trial_info.error         = vertcat(trial_info.error,ti{b_ix}.trial_info.error);
-        trial_info.run_n         = vertcat(trial_info.run_n,ti{b_ix}.trial_info.run_n);
+        trial_info.word = vertcat(trial_info.word,ti{b_ix}.trial_info.word);
         
-        % Modify then concatenate counts and indices
+        % Reset all counts and indices
+        %   Leaving marker_time and onset_time alone (no idea what those are...)
         trial_info.block_n = vertcat(trial_info.block_n,ti{b_ix}.trial_info.block_n+sum(block_blkcnt(1:b_ix-1)));
         trial_info.trial_n = vertcat(trial_info.trial_n,ti{b_ix}.trial_info.trial_n+sum(block_trlcnt(1:b_ix-1)));
         trial_info.ignore_trials = horzcat(trial_info.ignore_trials,...
@@ -218,9 +206,13 @@ else
             ti{b_ix}.trial_info.word_onset+sum(block_lens(1:b_ix-1)));
         trial_info.resp_onset = vertcat(trial_info.resp_onset,...
             ti{b_ix}.trial_info.resp_onset+sum(block_lens(1:b_ix-1)));
+        
+        % Add properties of the individual blocks
+        trial_info.run_len = block_lens;
+        trial_info.run_time = block_times;
     end
+    
 end
-clear ti block_lens block_times block_trlcnt block_blkcnt
 
 % Toss trials based on behavior and cleaning with Bob
 trial_info_clean = SBJ05_reject_behavior(SBJ,trial_info,pipeline_id);
