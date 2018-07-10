@@ -88,8 +88,6 @@ else
 end
 % Toss epochs that overlap with bad_epochs from Colin (extra pass over preprocessed data)
 if ~isempty(colin.bad_epochs)
-    colin.bad_epochs = fn_convert_epochs_full2at(colin.bad_epochs,SBJ_vars.analysis_time,...
-                                             strcat(SBJ_vars.dirs.preproc,SBJ,'_preclean.mat'),1);
     skip_colin = fn_find_trials_overlap_epochs(colin.bad_epochs,1:size(data.trial{1},2),events,trial_lim);
 else
     skip_colin = [];
@@ -101,9 +99,15 @@ RT_std  = nanstd(trial_info.response_time);
 skip_rt_outlier = find(abs(trial_info.response_time-RT_mean)>proc_vars.RT_std_thresh*RT_std);
 skip_rt_outlier = setdiff(skip_rt_outlier,skip_rt1);    %don't include RT=-1
 
-% Check against RT bounds, toss late but only warn for early
+% Check against RT bounds, toss late but only warn for early (don't toss)
 RT_late = find(trial_info.response_time>proc_vars.rt_bounds(2));
-skip_rt_outlier = vertcat(skip_rt_outlier, RT_late);
+% Toss the trial following the late response (contaminated by
+% response/monitoring during stimulus processing)
+RT_late_next = RT_late+1;
+% Don't toss next trial if it's in a different block (or is the very last trial)
+RT_late_next(logical(diff(horzcat(trial_info.block_n(RT_late),trial_info.block_n(RT_late_next)),1,2))) = [];
+RT_late_next(RT_late_next>max(trial_info.trial_n)) = [];
+skip_rt_outlier = vertcat(skip_rt_outlier, RT_late, RT_late_next);
 RT_early = find(trial_info.response_time(trial_info.response_time>0)<proc_vars.rt_bounds(1));
 
 % Compile all a priori bad trials
@@ -147,7 +151,8 @@ trial_info_clean.resp_onset = round(trial_info_clean.resp_onset);
 % Print results
 fprintf('==============================================================================================\n');
 if ~isempty(RT_late)
-    fprintf('WARNING! %i RTs > %f sec excluded!\n',numel(RT_late),proc_vars.rt_bounds(2));
+    fprintf('WARNING! %i RTs > %f sec excluded, plus %i trailing trials!\n',...
+        numel(RT_late),proc_vars.rt_bounds(2),numel(RT_late_next));
 end
 if ~isempty(RT_early)
     fprintf('WARNING! %i RTs < %f sec detected (not excluded)!\n',numel(RT_early),proc_vars.rt_bounds(1));
