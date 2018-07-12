@@ -42,13 +42,15 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     % Convert to analysis_time within it's run
     %   NOTE: 1 keeps epochs that are only partially overlaping real data
     %   (i.e., will be trimmed to edges of analysis_time)
-    at_epochs  = fn_convert_epochs_full2at(run_epochs.bad_epochs,SBJ_vars.analysis_time{b_ix},...
-                                             strcat(SBJ_vars.dirs.preproc,SBJ,'_preclean',block_suffix,'.mat'),1);
-    % Convert to combined run time
-    if b_ix>1
-        run_epochs.bad_epochs = run_epochs.bad_epochs+sum(trial_info.run_len(1:b_ix-1));
+    if ~isempty(run_epochs.bad_epochs)
+        at_epochs  = fn_convert_epochs_full2at(run_epochs.bad_epochs,SBJ_vars.analysis_time{b_ix},...
+            strcat(SBJ_vars.dirs.preproc,SBJ,'_preclean',block_suffix,'.mat'),1);
+        % Convert to combined run time
+        if b_ix>1
+            run_epochs.bad_epochs = run_epochs.bad_epochs+sum(trial_info.run_len(1:b_ix-1));
+        end
+        bob = vertcat(bob,run_epochs.bad_epochs);
     end
-    bob = vertcat(bob,run_epochs.bad_epochs);
 end
 
 % Parameters
