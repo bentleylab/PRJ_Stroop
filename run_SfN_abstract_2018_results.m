@@ -1,5 +1,5 @@
 %% Set up variables to enter function
-SBJs = {'IR21','IR27','IR31','IR32','IR35','IR39','IR41','IR52','IR54','IR57','IR61'};
+SBJs = {'IR21','IR27','IR31','IR32','IR35','IR39','IR41','IR52','IR54','IR57','IR61','IR65','IR68','IR72','IR74'};
 pipeline_id = 'main_ft';
 actv_win    = '100';
 save_fig    = 1;
@@ -99,36 +99,36 @@ end
 % SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,pipeline_id,an_id,roi_id,...
 %                                                     plt_id,save_fig,fig_vis,fig_filetype)
 % 
-% % %% Plot time series of significant effects by ROI
-% % an_id_s = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
-% % an_id_r = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
-% % roi_id  = 'gROI';
-% % fig_vis = 'off';
-% % plt_id  = 'ts_S0to15_R5to10_evnt_sigline';
-% % SBJ10b_HFA_plot_SR_ROI_RTcorr_ANOVA(SBJs,stat_id,pipeline_id,an_id_s,an_id_r,...
-% %                                                 roi_id,plt_id,save_fig,fig_vis,'png')
-% % 
-% % plt_id  = 'ts_S0to15_R5to10_evnt_siglineSM';
-% % SBJ10c_HFA_GRP_plot_SR_ROIavg_RTcorr_ANOVA(SBJs,stat_id,pipeline_id,an_id_s,an_id_r,...
-% %                                                 roi_id,plt_id,save_fig,fig_vis,'png')
+% %% Plot time series of significant effects by ROI
+% an_id_s = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
+% an_id_r = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
+% roi_id  = 'gROI';
+% fig_vis = 'off';
+% plt_id  = 'ts_S0to15_R5to10_evnt_sigline';
+% SBJ10b_HFA_plot_SR_ROI_RTcorr_ANOVA(SBJs,stat_id,pipeline_id,an_id_s,an_id_r,...
+%                                                 roi_id,plt_id,save_fig,fig_vis,'png')
 % 
-% %% HG active examples
-% conditions  = 'CNI';
-% pipeline_id = 'main_ft';
-% actv_win    = '100';
-% an_id_s     = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
-% an_id_r     = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
-% plt_id      = 'stack_S2to15_R5to10_evnt_c5';
-% save_fig    = 1;
-% fig_vis     = 'off';
-% fig_filetype= 'png';
-% for sbj_ix = 1:numel(SBJs)
-%     fprintf('Plotting for %s\n',SBJs{sbj_ix});
-%     SBJ08b_HFA_plot_SR_stack_cond(SBJs{sbj_ix},conditions,an_id_s,an_id_r,...
-%         actv_win,plt_id,save_fig,fig_vis,fig_filetype)
-%     close all;
-% end
-% 
+% plt_id  = 'ts_S0to15_R5to10_evnt_siglineSM';
+% SBJ10c_HFA_GRP_plot_SR_ROIavg_RTcorr_ANOVA(SBJs,stat_id,pipeline_id,an_id_s,an_id_r,...
+%                                                 roi_id,plt_id,save_fig,fig_vis,'png')
+
+%% HG active examples
+conditions  = 'CNI';
+pipeline_id = 'main_ft';
+actv_win    = '100';
+an_id_s     = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
+an_id_r     = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
+plt_id      = 'stack_S2to15_R5to10_evnt_c5';
+save_fig    = 1;
+fig_vis     = 'off';
+fig_filetype= 'png';
+for sbj_ix = 1:numel(SBJs)
+    fprintf('Plotting for %s\n',SBJs{sbj_ix});
+    SBJ08b_HFA_plot_SR_stack_cond_onset_noLab(SBJs{sbj_ix},conditions,an_id_s,an_id_r,...
+        pipeline_id,actv_win,plt_id,save_fig,fig_vis,fig_filetype)
+    close all;
+end
+
 % %% Link all sig results
 % SBJ10b_HFA_link_sig_ANOVA(SBJs,stat_id,an_id_s,an_id_r)
 
