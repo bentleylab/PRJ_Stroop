@@ -24,36 +24,45 @@ if numel(blocks{end})==1
     one_trl(end) = 1;
 end
 assert(iscell(blocks), 'blocks input is not a cell');
-assert(numel(blocks)>1, 'only one block in this cell');
 assert(all(same_chan), 'blocks have different channels!');
 assert(all(same_fs), 'blocks have different sample rates!');
 assert(all(one_trl), 'at least one block has more than one trial!');
 
-% Initialize matrices
-n_blocks = numel(blocks);
-block_lens = zeros([1 n_blocks]);
-end_times  = zeros([1 n_blocks]);
-for b_ix = 1:n_blocks
-    end_times(b_ix) = blocks{b_ix}.time{1}(end);
-    block_lens(b_ix) = numel(blocks{b_ix}.time{1});
+% If only one block, just return it
+if numel(blocks)<2
+    combined = blocks{1};
+    fprintf('===================================================================================\n');
+    fprintf('WARNING: Only one block submitted to fn_concat_blocks, returning with no change!!!\n');
+    fprintf('===================================================================================\n');
+    
+% If 2 or more blocks, combine them    
+else
+    % Initialize matrices
+    n_blocks = numel(blocks);
+    block_lens = zeros([1 n_blocks]);
+    end_times  = zeros([1 n_blocks]);
+    for b_ix = 1:n_blocks
+        end_times(b_ix) = blocks{b_ix}.time{1}(end);
+        block_lens(b_ix) = numel(blocks{b_ix}.time{1});
+    end
+    time_step = 1/blocks{1}.fsample;
+    
+    data_concat = zeros([numel(blocks{1}.label) sum(block_lens)]);
+    time_concat = zeros([1 sum(block_lens)]);
+    
+    % Combine data
+    data_concat(:,1:block_lens(1)) = blocks{1}.trial{1};
+    time_concat(1,1:block_lens(1)) = blocks{1}.time{1};
+    for b_ix = 2:n_blocks
+        data_concat(:,block_lens(b_ix-1)+1:block_lens(b_ix-1)+block_lens(b_ix)) = blocks{b_ix}.trial{1};
+        time_concat(:,block_lens(b_ix-1)+1:block_lens(b_ix-1)+block_lens(b_ix)) = blocks{b_ix}.time{1}+end_times(b_ix-1)+time_step;
+    end
+    
+    % Create Fieldtrip struct
+    combined = blocks{1};
+    combined.trial = {data_concat};
+    combined.time = {time_concat};
+    % combined.sampleinfo = [1 numel(data_concat)];
 end
-time_step = 1/blocks{1}.fsample;
-
-data_concat = zeros([numel(blocks{1}.label) sum(block_lens)]);
-time_concat = zeros([1 sum(block_lens)]);
-
-% Combine data
-data_concat(:,1:block_lens(1)) = blocks{1}.trial{1};
-time_concat(1,1:block_lens(1)) = blocks{1}.time{1};
-for b_ix = 2:n_blocks
-    data_concat(:,block_lens(b_ix-1)+1:block_lens(b_ix-1)+block_lens(b_ix)) = blocks{b_ix}.trial{1};
-    time_concat(:,block_lens(b_ix-1)+1:block_lens(b_ix-1)+block_lens(b_ix)) = blocks{b_ix}.time{1}+end_times(b_ix-1)+time_step;
-end
-
-% Create Fieldtrip struct
-combined = blocks{1};
-combined.trial = {data_concat};
-combined.time = {time_concat};
-% combined.sampleinfo = [1 numel(data_concat)];
 
 end

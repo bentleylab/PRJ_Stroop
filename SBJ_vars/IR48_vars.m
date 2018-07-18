@@ -43,7 +43,7 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw,SBJ_vars.raw_file);
 %clear hdr;
 
 SBJ_vars.ch_lab.probes = {'FG','AF','MF'};
-SBJ_vars.ref_types     = {'CMR','CMR','CMR'};
+SBJ_vars.ref_types     = {'CAR','CAR','CAR'};
 SBJ_vars.ch_lab.ROI    = {'MF*','FG*','AF*'};
 SBJ_vars.ch_lab.eeg_ROI = {'FPZ'};
 
@@ -81,13 +81,13 @@ SBJ_vars.analysis_time = {{[189 1276]}};
 %--------------------------------------
 % Artifact Rejection Parameters
 %--------------------------------------
-% SBJ_vars.artifact_params.std_limit_raw = 7;
-% SBJ_vars.artifact_params.hard_threshold_raw = 1000;
+SBJ_vars.artifact_params.std_limit_raw = 7;
+SBJ_vars.artifact_params.hard_threshold_raw = 500;
 
-% SBJ_vars.artifact_params.std_limit_diff = 7;
-% SBJ_vars.artifact_params.hard_threshold_diff = 100;
+SBJ_vars.artifact_params.std_limit_diff = 7;
+SBJ_vars.artifact_params.hard_threshold_diff = 70;
 
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
-% SBJ_vars.trial_reject_n = [];
+SBJ_vars.trial_reject_n = [27 165 192 215];
