@@ -43,7 +43,7 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw,SBJ_vars.raw_file);
 %clear hdr;
 
 SBJ_vars.ch_lab.probes = {'FG','AF','MF'};
-SBJ_vars.ref_types     = {'CAR','CAR','CAR'};
+SBJ_vars.ref_types     = {'CMR','CMR','CMR'};
 SBJ_vars.ch_lab.ROI    = {'MF*','FG*','AF*'};
 SBJ_vars.ch_lab.eeg_ROI = {'FPZ'};
 
