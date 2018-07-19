@@ -1,6 +1,6 @@
 figure;
 hold on;
-data = eog_filt_c34;
+data = trials;
 title('eog-filt-c34');
 spacer = 200;
 sec = 500;

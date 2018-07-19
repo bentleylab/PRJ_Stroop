@@ -47,11 +47,11 @@ SBJ_vars.ref_types     = {'CAR','CAR','CAR','CAR','BP'};
 SBJ_vars.ch_lab.ROI    = {'FG*','OF*','ID*'};
 
 SBJ_vars.ch_lab.mislabel = {{'FG17-1','FG27'}};
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ref_exclude = {'OF2','OF5','OF6','OF9','FG10','FG12','FG18','FG19','FG20','FG27','FG28','FG29'}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'AT7','AT1','AT2',...%Jack epileptic
     'PT7','PT8','PT9','PT10',...% Bob epileptic
-    'OF1','FG4','FG5','FG6','FG7','FG8','FG15','FG16',...%bad channels
+    'OF1','FG4','FG5','FG6','FG7','FG8','FG15','FG16','FG57','ID10',...%bad channels
     'CD1','CD2','CD3','CD4','CD5','CD6',...%crazy line noise, but trying to save becuase aMCC!
     'C4','EKG','E','NULL','NULL-1','NULL-2','NULL-3','NULL-4','XREF','DC03','DC04'...%junk
     };
@@ -77,13 +77,13 @@ SBJ_vars.analysis_time = {{[180 1194]}};
 %--------------------------------------
 % Artifact Rejection Parameters
 %--------------------------------------
-% SBJ_vars.artifact_params.std_limit_raw = 7;
-% SBJ_vars.artifact_params.hard_threshold_raw = 1000;
+SBJ_vars.artifact_params.std_limit_raw = 7;
+SBJ_vars.artifact_params.hard_threshold_raw = 800;
 
-% SBJ_vars.artifact_params.std_limit_diff = 7;
-% SBJ_vars.artifact_params.hard_threshold_diff = 100;
+SBJ_vars.artifact_params.std_limit_diff = 7;
+SBJ_vars.artifact_params.hard_threshold_diff = 40;
 
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
-% SBJ_vars.trial_reject_n = [];
+SBJ_vars.trial_reject_n = [167 176 212 229 250 263 285 295];
