@@ -1,11 +1,13 @@
 %% Viewing Recons
-SBJ = 'IR35';
-view_space = 'patient';     % {'patient', 'MNI_vol', 'MNI_srf'}
+SBJ         = 'IR48';
+view_space  = 'pat';     % {'pat', 'mni', 'mni'}
+reg_type    = 'vol';    % {'vol', 'srf'}
 show_labels = true;         % {true, false}
-plt_id = 'loc_SBJ_ROI';
-an_id = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
-actv_win = '100';
-epoch_lim = [0.2 0.4];
+plt_id      = 'loc_SBJ_ROI';
+an_id       = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
+actv_win    = '100';
+epoch_lim   = [0.2 0.4];
+pipeline_id = 'main_ft';
 
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
@@ -22,31 +24,32 @@ eval(SBJ_vars_cmd);
 % plt_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
 % eval(plt_vars_cmd);
 
-if strcmp(SBJ(1:2),'IR')
-    im_dir = ['/home/knight/ecog/DATA_FOLDER/Irvine/' SBJ '/3D_Images/'];
-    recon_name = dir([im_dir 'Recon_*']);
-    recon_dir = [im_dir recon_name.name '/FT_Pipeline/'];
-elseif strcmp(SBJ(1:2),'CP')
-    im_dir = ['/home/knight/ecog/DATA_FOLDER/CPMC/' SBJ '/3D_Images/'];
-    recon_name = dir([im_dir 'Recon_*']);
-    recon_dir = [im_dir recon_name.name '/FT_Pipeline/'];
-else
-    error('what SBJ is this? no recon dir');
-end
-if ~exist([recon_dir '/Electrodes/' SBJ '_elec_acpc.mat']) && ~exist([recon_dir '/Electrodes/' SBJ '_elec_acpc_f.mat'])
-  error('The recon has been started, but is not yet finished')
-end
-warning(['To adjust specific aspects of the 3d figure, such as transparency or adding electrode labels,'...
-    'please explicitly use ft_plot_mesh (to plot the surface) and ft_plot_sens (to plot the electrodes)'...
-    'and refer to the documentation for those functions.']);
+%% 3D Surface + Grids
+% Load mesh
+mesh_r = ft_read_headshape([SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_rh.mat']);
+mesh_l = ft_read_headshape([SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_rh.mat']);
 
-%% Load elec
-load IR35_elec_acpc_f
+% if strcmp(SBJ(1:2),'IR')
+%     im_dir = ['/home/knight/ecog/DATA_FOLDER/Irvine/' SBJ '/3D_Images/'];
+%     recon_name = dir([im_dir 'Recon_*']);
+%     recon_dir = [im_dir recon_name.name '/FT_Pipeline/'];
+% elseif strcmp(SBJ(1:2),'CP')
+%     im_dir = ['/home/knight/ecog/DATA_FOLDER/CPMC/' SBJ '/3D_Images/'];
+%     recon_name = dir([im_dir 'Recon_*']);
+%     recon_dir = [im_dir recon_name.name '/FT_Pipeline/'];
+% else
+%     error('what SBJ is this? no recon dir');
+% end
+% if ~exist([recon_dir '/Electrodes/' SBJ '_elec_acpc.mat']) && ~exist([recon_dir '/Electrodes/' SBJ '_elec_acpc_f.mat'])
+%   error('The recon has been started, but is not yet finished')
+% end
+% warning(['To adjust specific aspects of the 3d figure, such as transparency or adding electrode labels,'...
+%     'please explicitly use ft_plot_mesh (to plot the surface) and ft_plot_sens (to plot the electrodes)'...
+%     'and refer to the documentation for those functions.']);
 
 %% Load and prepare functional data
 actv_filename = strcat(SBJ_vars.dirs.proc,SBJ,'_actv_ROI_',an_id,'_mn',actv_win,'.mat');
 load(actv_filename);
-hfa.elec = elec_acpc_f;
 
 % pair down the tfr
 cfg = [];
@@ -56,6 +59,12 @@ cfg.latency = epoch_lim;
 cfg.avgovertime = 'yes';
 cfg.avgoverrpt = 'yes';
 hfa_sel = ft_selectdata(cfg,hfa);
+
+%% Prepare elec struct
+% Load elec
+load([SBJ_vars.dirs.preproc,SBJ,'_elec_',pipeline_id,'_',view_space,'.mat']);
+cfg = []; cfg.channel = SBJ_vars.ch_lab.ROI;
+hfa_sel.elec = fn_select_elec(cfg,elec);
 
 %% 3D depth plotting
 roi_labels = {...
@@ -100,7 +109,7 @@ cfg = [];
 cfg.funparameter = 'powspctrm';
 cfg.funcolorlim  = 'maxabs';
 cfg.method       = 'cloud';
-% cfg.slice     = '3d';
+% cfg.slice      = '3d';
 % cfg.nslices    = 2;
 cfg.facealpha    = 0.25;
 ft_sourceplot(cfg, hfa_sel, mesh);
@@ -129,7 +138,7 @@ ft_sourceplot(cfg, hfa_sel, mesh);
 
 %% Mesh and Elec loading
 mesh_alpha = 1;
-if strcmp(view_space, 'patient')
+if strcmp(view_space, 'pat')
     tmp = load([recon_dir 'Surfaces/' SBJ '_cortex_lh.mat']); mesh_l = tmp.cortex_lh;
     tmp = load([recon_dir 'Surfaces/' SBJ '_cortex_rh.mat']); mesh_r = tmp.cortex_rh;
     if exist([recon_dir 'Electrodes/' SBJ '_elec_acpc_fr.mat'])

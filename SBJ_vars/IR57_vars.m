@@ -18,6 +18,7 @@ SBJ_vars.dirs.import  = [SBJ_vars.dirs.SBJ '01_import/'];
 SBJ_vars.dirs.preproc = [SBJ_vars.dirs.SBJ '02_preproc/'];
 SBJ_vars.dirs.events  = [SBJ_vars.dirs.SBJ '03_events/'];
 SBJ_vars.dirs.proc    = [SBJ_vars.dirs.SBJ '04_proc/'];
+SBJ_vars.dirs.recon   = [SBJ_vars.dirs.SBJ '05_recon/'];
 if ~exist(SBJ_vars.dirs.import,'dir')
     mkdir(SBJ_vars.dirs.import);
 end
@@ -30,8 +31,17 @@ end
 if ~exist(SBJ_vars.dirs.proc,'dir')
     mkdir(SBJ_vars.dirs.proc);
 end
+if ~exist(SBJ_vars.dirs.recon,'dir')
+    mkdir(SBJ_vars.dirs.recon);
+end
 
 SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw,SBJ_vars.raw_file);
+
+SBJ_vars.recon.surf_l     = [SBJ_vars.dirs.recon 'Surfaces/' SBJ_vars.SBJ '_cortex_lh.mat'];
+SBJ_vars.recon.surf_r     = [SBJ_vars.dirs.recon 'Surfaces/' SBJ_vars.SBJ '_cortex_rh.mat'];
+SBJ_vars.recon.elec_pat   = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_acpc_f.mat'];
+SBJ_vars.recon.elec_mni_v = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_mni_v.mat'];
+SBJ_vars.recon.elec_mni_s = [];
 
 %--------------------------------------
 % Channel Selection
@@ -42,14 +52,17 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw,SBJ_vars.raw_file);
 %SBJ_vars.orig_srate = hdr.Fs;
 %clear hdr;
 
-SBJ_vars.ch_lab.probes = {'RSM','RAC','ROF','RIN','RTI','RAM','RHH','RTH',...
-                         'LSMA','LAC','LOF','LIN','LTI','LAM','LTH'};%'LHH' doesn't count because all elecs are bad
-SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP',...
-                          'BP','BP','BP','BP','BP','BP','BP'};
-SBJ_vars.ch_lab.ROI    = {'RSM*','RAC*','ROF*','RIN*','RTI*',...
+SBJ_vars.ch_lab.probes     = {'RSM','RAC','ROF','RIN','RTI','RAM','RHH','RTH',...
+                              'LSMA','LAC','LOF','LIN','LTI','LAM','LTH'};%'LHH' doesn't count because all elecs are bad
+SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg',...
+                              'seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
+SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP',...
+                              'BP','BP','BP','BP','BP','BP','BP'};
+SBJ_vars.ch_lab.ROI        = {'RSM*','RAC*','ROF*','RIN*','RTI*',...
                               'LAM4-5','LAM5-6','LAC*','LOF*',...%LAM4,5 are inferior anterior insula
                               '-LOF1-2','-RTI2-3','-RIN4-5'}; %these are rejected based on variance
-SBJ_vars.ch_lab.eeg_ROI = {'CZ','FPZ'};
+SBJ_vars.ch_lab.eeg_ROI    = {'CZ','FPZ'};
+
 SBJ_vars.ch_lab.bad = {...
     'RHH1','RHH2','RHH3','RHH4','ROF1','RAM1','RTH1','RTH2',...%epileptic
     'LHH1','LHH2','LHH3','LHH4','LHH5','LHH6','LHH7','LHH8','LHH9','LHH10',...%epileptic

@@ -30,8 +30,17 @@ end
 if ~exist(SBJ_vars.dirs.proc,'dir')
     mkdir(SBJ_vars.dirs.proc);
 end
+if ~exist(SBJ_vars.dirs.recon,'dir')
+    mkdir(SBJ_vars.dirs.recon);
+end
 
 SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw,SBJ_vars.raw_file);
+
+SBJ_vars.recon.surf_l     = [SBJ_vars.dirs.recon 'Surfaces/' SBJ_vars.SBJ '_cortex_lh.mat'];
+SBJ_vars.recon.surf_r     = [SBJ_vars.dirs.recon 'Surfaces/' SBJ_vars.SBJ '_cortex_rh.mat'];
+SBJ_vars.recon.elec_pat   = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_acpc_f.mat'];
+SBJ_vars.recon.elec_mni_v = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_mni_v.mat'];
+SBJ_vars.recon.elec_mni_s = [];
 
 %--------------------------------------
 % Channel Selection
@@ -42,9 +51,11 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw,SBJ_vars.raw_file);
 %SBJ_vars.orig_srate = hdr.Fs;
 %clear hdr;
 
-SBJ_vars.ch_lab.probes = {'RAM','RHH','RTH','ROF','RCI','LAM','LHH','LTH','LOF','LCI'};
-SBJ_vars.ref_types     = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
-SBJ_vars.ch_lab.ROI    = {'ROF*','RCI*','LOF*','LCI*','-LOF1-2'};%LOF1-2 has EKG like spiking in it
+SBJ_vars.ch_lab.probes     = {'RAM','RHH','RTH','ROF','RCI','LAM','LHH','LTH','LOF','LCI'};
+SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
+SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
+SBJ_vars.ch_lab.ROI        = {'ROF*','RCI*','LOF*','LCI*','-LOF1-2'};%LOF1-2 has EKG like spiking in it
+SBJ_vars.ch_lab.eeg_ROI    = {};
 
 SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
 SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'

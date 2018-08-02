@@ -18,6 +18,7 @@ SBJ_vars.dirs.import  = [SBJ_vars.dirs.SBJ '01_import/'];
 SBJ_vars.dirs.preproc = [SBJ_vars.dirs.SBJ '02_preproc/'];
 SBJ_vars.dirs.events  = [SBJ_vars.dirs.SBJ '03_events/'];
 SBJ_vars.dirs.proc    = [SBJ_vars.dirs.SBJ '04_proc/'];
+SBJ_vars.dirs.recon   = [SBJ_vars.dirs.SBJ '05_recon/'];
 if ~exist(SBJ_vars.dirs.import,'dir')
     mkdir(SBJ_vars.dirs.import);
 end
@@ -30,8 +31,17 @@ end
 if ~exist(SBJ_vars.dirs.proc,'dir')
     mkdir(SBJ_vars.dirs.proc);
 end
+if ~exist(SBJ_vars.dirs.recon,'dir')
+    mkdir(SBJ_vars.dirs.recon);
+end
 
 SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw,SBJ_vars.raw_file);
+
+SBJ_vars.recon.surf_l     = [SBJ_vars.dirs.recon 'Surfaces/' SBJ_vars.SBJ '_cortex_lh.mat'];
+SBJ_vars.recon.surf_r     = [SBJ_vars.dirs.recon 'Surfaces/' SBJ_vars.SBJ '_cortex_rh.mat'];
+SBJ_vars.recon.elec_pat   = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_acpc_r.mat'];
+SBJ_vars.recon.elec_mni_v = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_mni_v.mat'];
+SBJ_vars.recon.elec_mni_s = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_mni_s.mat'];
 
 %--------------------------------------
 % Channel Selection
@@ -42,10 +52,11 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw,SBJ_vars.raw_file);
 %SBJ_vars.orig_srate = hdr.Fs;
 %clear hdr;
 
-SBJ_vars.ch_lab.probes = {'FG','AF','MF'};
-SBJ_vars.ref_types     = {'CAR','CAR','CAR'};
-SBJ_vars.ch_lab.ROI    = {'MF*','FG*','AF*'};
-SBJ_vars.ch_lab.eeg_ROI = {'FPZ'};
+SBJ_vars.ch_lab.probes     = {'FG','AF','MF'};
+SBJ_vars.ch_lab.probe_type = {'ecog','ecog','ecog'};
+SBJ_vars.ch_lab.ref_type   = {'CAR','CAR','CAR'};
+SBJ_vars.ch_lab.ROI        = {'MF*','FG*','AF*'};
+SBJ_vars.ch_lab.eeg_ROI    = {'FPZ'};
 
 SBJ_vars.ch_lab.bad = {...
     'FG39','FG40','FG47','FG48','FG55','FG56','FG63','FG64',...%epileptic, Jack (via Jie) said FG47+48

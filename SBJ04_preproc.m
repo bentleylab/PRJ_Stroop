@@ -60,7 +60,7 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     end
     clear data_orig
     
-    %% Rerefrence
+    %% Rereference
     fprintf('============== Re-Referencing %s ==============\n',SBJ);
     if numel(SBJ_vars.ref_types)~=numel(SBJ_vars.ch_lab.probes)
         error('ERROR: Mismatched number of probes and reference types in SBJ_vars');
@@ -89,6 +89,7 @@ for b_ix = 1:numel(SBJ_vars.block_name)
             error(strcat('ERROR: Unrecognized reference type ',SBJ_vars.ref_types{d},...
                 ' for probe ',SBJ_vars.ch_lab.probes{d}));
         end
+        cfg.updatesens = 'yes';
         data_reref{d} = ft_preprocessing(cfg, data);
         
         if strcmp(psd_reref,'yes')
