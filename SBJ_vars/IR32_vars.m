@@ -67,7 +67,7 @@ SBJ_vars.ch_lab.bad = {...
     'FPG7','FPG25','FPG40',...%bad/noisy
     'IHR20','IHR21','IHR30','IHR31',...% noisy
     'DC03','DC04'....% Not real data
-    'E','LSh ','LLE','RSh','V1','V2','V3','V4','V5','V6','REF',...% Not real data
+    'E','LSH','LLE','RSH','V1','V2','V3','V4','V5','V6','REF',...% Not real data
     'EDF Annotations','---(1)','---(2)','---(3)','---(4)','---(5)','---(6)',... % Not real data
     'EKG*',...
     };

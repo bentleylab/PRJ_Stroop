@@ -58,6 +58,9 @@ SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'}
 SBJ_vars.ch_lab.ROI        = {'RAC*','ROF*','LAC*','LOF*','LIN*'};
 SBJ_vars.ch_lab.eeg_ROI    = {};
 
+SBJ_vars.ch_lab.prefix = 'POL ';    % only in the mni elec file, but doesn't hurt to add here
+SBJ_vars.ch_lab.suffix = '-Ref';    % only in the mni elec file, but doesn't hurt to add here
+
 SBJ_vars.ch_lab.bad = {...
     'RHH7','RTH5','RTH6','RTH7',...%epileptic
     'RAC3',...% Noisy

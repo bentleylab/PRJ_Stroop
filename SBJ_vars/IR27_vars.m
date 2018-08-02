@@ -18,6 +18,7 @@ SBJ_vars.dirs.import  = [SBJ_vars.dirs.SBJ '01_import/'];
 SBJ_vars.dirs.preproc = [SBJ_vars.dirs.SBJ '02_preproc/'];
 SBJ_vars.dirs.events  = [SBJ_vars.dirs.SBJ '03_events/'];
 SBJ_vars.dirs.proc    = [SBJ_vars.dirs.SBJ '04_proc/'];
+SBJ_vars.dirs.recon   = [SBJ_vars.dirs.SBJ '05_recon/'];
 if ~exist(SBJ_vars.dirs.import,'dir')
     mkdir(SBJ_vars.dirs.import);
 end
@@ -70,7 +71,7 @@ SBJ_vars.ch_lab.bad = {...
     'LAM9','LAM10','LHH9','LHH10','LTH10','RAM9','RAM10',...%out of brain
     'RHH9','RHH10','RTH9','RTH10','ROF10','RCI10',...%out of brain
     'REF','EKG','RSH','LSH','LLE','E',...%junk channels
-    'V1','V2','V3','V4','V5','V6','EDF Annotation'...%garbage
+    'DC03','DC04','V1','V2','V3','V4','V5','V6','EDF Annotation'...%garbage
     };
 SBJ_vars.ch_lab.eeg = {};
 SBJ_vars.ch_lab.eog = {};

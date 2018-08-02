@@ -1,4 +1,5 @@
 function [selected_elec] = fn_elec_ch_select(elec,ch_lab)
+error('this was custom code, but now use fn_select_elec() written by Arjen et al');
 %% My version of ft_selectdata for .elec structs
 % INPUTS:
 %   elec [struct] - fieldtrip elec structure

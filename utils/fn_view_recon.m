@@ -16,7 +16,7 @@ eval(SBJ_vars_cmd);
 view_angle = [-90 0];
 
 %% Load elec struct
-load([SBJ_vars.dirs.preproc,SBJ,'_elec_',pipeline_id,'_',view_space,'.mat']);
+load([SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,'.mat']);
 
 %% Load brain recon
 if strcmp(view_space,'pat')
@@ -64,7 +64,11 @@ end
 h = figure;
 
 % Plot 3D mesh
-ft_plot_mesh(mesh); %, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha
+mesh_alpha = 0.8;
+if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
+    mesh_alpha = 0.4;
+end
+ft_plot_mesh(mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
 
 % Plot electrodes on top
 if show_labels
