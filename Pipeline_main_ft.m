@@ -109,7 +109,9 @@ end
 %  ========================================================================
 % look at recon and create spreadsheet of general ROI, WM/GM, etc.
 %   save that as tsv
-fn_compile_einfo(SBJ,pipeline_id)
+fn_compile_elec_struct(SBJ,pipeline_id,'pat')
+fn_compile_elec_struct(SBJ,pipeline_id,'mni')
+% fn_compile_einfo(SBJ,pipeline_id)
 
 %% ========================================================================
 %   Step 7- Manually Correct Reaction Times
