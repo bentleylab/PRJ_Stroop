@@ -10,7 +10,7 @@ function fn_view_recon(SBJ, pipeline_id, plot_type, view_space, reg_type, show_l
 %   hemi [str] - {'l', 'r', 'b'} hemisphere to plot
 
 [root_dir, ft_dir] = fn_get_root_dir();
-SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 
 view_angle = [-90 0];

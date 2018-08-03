@@ -61,7 +61,7 @@ SBJ_vars.ch_lab.eeg_ROI    = {'FPZ'};
 SBJ_vars.ch_lab.bad = {...
     'FG39','FG40','FG47','FG48','FG55','FG56','FG63','FG64',...%epileptic, Jack (via Jie) said FG47+48
     'AF12',...%noisy
-    'E','REF','V1','V2','V3','V4','V5','V6','C10','OFG*','PST*','LAM*','LHH*', ...% Not real data
+    'DC01','DC03','E','REF','V1','V2','V3','V4','V5','V6','C10','OFG*','PST*','LAM*','LHH*', ...% Not real data
     'EKG'...
     };
 %     'RSH','LSH','LLE',...% EOG?
