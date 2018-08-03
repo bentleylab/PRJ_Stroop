@@ -170,6 +170,14 @@ for b_ix = 1:numel(SBJ_vars.block_name)
         end
     end
     
+    %% Process Microphone data
+    cfg = [];
+    cfg.channel = SBJ_vars.ch_lab.mic;
+    mic_data = ft_selectdata(cfg,evnt);
+    mic_data = mic_data.trial{1};
+    %rescale to prevent clipping, add 0.05 fudge factor
+    mic_data_rescale = mic_data./(max(abs(mic_data))+0.05);
+    
     %% Final Channel Label Corrections
     % Strip Pre/Suffix if Necessary
     for ch_ix = 1:numel(data.label)
@@ -216,14 +224,6 @@ for b_ix = 1:numel(SBJ_vars.block_name)
             data.label(strcmp(data.label,SBJ_vars.ch_lab.mislabel{ch_ix}(1))) = SBJ_vars.ch_lab.mislabel{ch_ix}(2);
         end
     end
-    
-    %% Process Microphone data
-    cfg = [];
-    cfg.channel = SBJ_vars.ch_lab.mic;
-    mic_data = ft_selectdata(cfg,evnt);
-    mic_data = mic_data.trial{1};
-    %rescale to prevent clipping, add 0.05 fudge factor
-    mic_data_rescale = mic_data./(max(abs(mic_data))+0.05);
     
     %% Save data
     nrl_out_filename = strcat(SBJ_vars.dirs.import,SBJ,'_',num2str(proc_vars.resample_freq),'hz',block_suffix,'.mat');
