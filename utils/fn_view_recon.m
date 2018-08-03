@@ -5,7 +5,7 @@ function fn_view_recon(SBJ, pipeline_id, plot_type, view_space, reg_type, show_l
 %   pipeline_id [str] - name of analysis pipeline, used to pick elec file
 %   plot_type [str] - {'ortho', '3d'} choose 3 slice orthogonal plot or 3D surface rendering
 %   view_space [str] - {'pat', 'mni'}
-%   reg_type [str] - {'vol', 'srf'} choose volume-based or surface-based registration
+%   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
 %   show_labels [0/1] - plot the electrode labels
 %   hemi [str] - {'l', 'r', 'b'} hemisphere to plot
 
@@ -42,10 +42,8 @@ elseif strcmp(view_space,'mni')
         end
 %         mesh.coordsys = 'mni';
     elseif strcmp(reg_type,'srf')
-        if strcmp(hemi,'r')
-            mesh = ft_read_headshape([ft_dir 'subjects/fsaverage/surf/' hemi 'h.pial']);
-        elseif strcmp(hemi,'l')
-            mesh = ft_read_headshape([ft_dir 'subjects/fsaverage/surf/' hemi 'h.pial']);
+        if strcmp(hemi,'r') || strcmp(hemi,'l')
+            mesh = ft_read_headshape([root_dir 'PRJ_Stroop/data/freesurfer/fsaverage/' hemi 'h.pial']);
         elseif strcmp(hemi,'b')
             error('hemisphere "b" not yet implemented for reg_type: "srf"!');
             mesh = ft_read_headshape([ft_dir 'subjects/fsaverage/surf/' hemi 'h.pial']);
@@ -54,7 +52,7 @@ elseif strcmp(view_space,'mni')
         end
         mesh.coordsys = 'fsaverage';
     else
-        error(['Unknown reeregistration type (reg_type): ' reg_type]);
+        error(['Unknown registration type (reg_type): ' reg_type]);
     end
 else
     error(['Unknown view_space: ' view_space]);

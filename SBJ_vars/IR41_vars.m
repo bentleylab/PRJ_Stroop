@@ -61,6 +61,8 @@ SBJ_vars.ch_lab.ROI        = {'LAC*','LES*','LOF*','LSM*','LPC*','LIN*',...
                               'RAC*','ROF*','RIN*','RMT*','RSM*'};
 SBJ_vars.ch_lab.eeg_ROI    = {'CZ','FZ'};
 
+SBJ_vars.ch_lab.mislabel = {{'ROF19','ROF10'}};
+
 SBJ_vars.ch_lab.bad = {...
     'RAM1','RAM2','RAM3','LHH1','LHH2','LHH3',...%epileptic
     'RMT1','LPC7','LPC8','LPC9',...%noisy/bad, also watch out for spread from LPC7-9 in LPC6,11

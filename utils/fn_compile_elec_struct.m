@@ -1,13 +1,13 @@
-function fn_compile_elec_struct(SBJ,pipeline_id,view_space)
-%% Compile ROI info from single electrodes into bipolar pairs
+function fn_compile_elec_struct(SBJ,pipeline_id,view_space,reg_type)
+%% Compile ROI info (biggest changes are from single electrodes into bipolar pairs)
 %   Goes from smallest to largest (ELEC1-ELEC2, ELEC2-ELEC3, etc.)
-%   Pairs are drawn from preprocessed data labels
+%   Pairs are drawn from imported data labels, then preprocessing logic is applied
 %
-% new_labels = cell array of strings with combined labels
-%   can be used with ft_preprocessing as cfg_rereference.montage.labelnew
-% weights = [length(new_labels),length(labels)] matrix of weights to combine elecs
-%   can be used with ft_preprocessing as cfg_rereference.montage.tra
-% left_out_ch = labels of channels that aren't included (don't have contiguous pair)
+% INPUTS:
+%   SBJ [str] - name of subject
+%   pipeline_id [str] - name of analysis pipeline
+%   view_space [str] - {'pat','mni'} select patient native or mni group space
+%   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
 
 % Set up paths
 [root_dir, ft_dir] = fn_get_root_dir();
@@ -16,27 +16,30 @@ addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
 addpath(ft_dir);
 ft_defaults
 
-%% Load data
+%% Load variables
 eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
 eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
 
-if numel(SBJ_vars.raw_file)>1
-    block_suffix = strcat('_',SBJ_vars.block_name{1});
-else
-    block_suffix = SBJ_vars.block_name{1};   % should just be ''
-end
-import_filename = [SBJ_vars.dirs.import SBJ '_',num2str(proc_vars.resample_freq),'hz',block_suffix,'.mat'];
-load(import_filename);
-
-% % Original (single electrode) labels
-% import  = load([SBJ_vars.dirs.import SBJ '_1000hz.mat']);
-% raw_lab = import.data.label;
-
 %% Load Elec struct
 if strcmp(view_space,'pat')
+    if ~isempty(reg_type)
+        warning(['view_space = "' view_space '" does not require reg_type; ignoring reg_type = ' reg_type]);
+    end
+    elec_ext = view_space;
     elec_name = SBJ_vars.recon.elec_pat;
 elseif strcmp(view_space,'mni')
-    elec_name = SBJ_vars.recon.elec_mni_v;
+    elec_ext = [view_space '_' reg_type];
+    if strcmp(reg_type,'v') % volume based
+        elec_name = SBJ_vars.recon.elec_mni_v;
+    elseif strcmp(reg_type,'s') %surface based
+        elec_name = SBJ_vars.recon.elec_mni_s;
+        if isempty(elec_name)
+            warning(['WARNING!!! elec_mni_s does not exist for ' SBJ ', nothing being compiled.']);
+            return
+        end
+    else
+        error(['Unknown reg_type: ' reg_type]);
+    end
 else
     error(['Unknown view_space: ' view_space]);
 end
@@ -66,6 +69,19 @@ if isfield(SBJ_vars.ch_lab,'mislabel')
     end
 end
 
+%% Load data
+if numel(SBJ_vars.raw_file)>1
+    block_suffix = strcat('_',SBJ_vars.block_name{1});
+else
+    block_suffix = SBJ_vars.block_name{1};   % should just be ''
+end
+import_filename = [SBJ_vars.dirs.import SBJ '_',num2str(proc_vars.resample_freq),'hz',block_suffix,'.mat'];
+load(import_filename);
+
+% % Original (single electrode) labels
+% import  = load([SBJ_vars.dirs.import SBJ '_1000hz.mat']);
+% raw_lab = import.data.label;
+
 %% Select imported channels
 cfg = []; cfg.channel = data.label;
 elec = fn_select_elec(cfg,elec);
@@ -87,6 +103,8 @@ end
 
 %% Apply montage per probe
 left_out_ch = {};
+danger_name = false([1 numel(SBJ_vars.ch_lab.probes)]);
+name_holder = cell([2 numel(SBJ_vars.ch_lab.probes)]);
 elec_reref  = cell([1 numel(SBJ_vars.ch_lab.probes)]);
 for d = 1:numel(SBJ_vars.ch_lab.probes)
     cfg = [];
@@ -94,6 +112,15 @@ for d = 1:numel(SBJ_vars.ch_lab.probes)
     probe_elec  = fn_select_elec(cfg,elec);
     %     probe_data = ft_selectdata(cfg,data);   % Grab data from this probe to plot in PSD comparison
     %     probe_data.elec = fn_elec_ch_select(elec,cfg.channel);
+    
+    % Check if the names of these elecs will cause problems
+    eeg1010_match = strfind(probe_elec.label,'AF');
+    if ~isempty([eeg1010_match{:}])
+        danger_name(d)   = true;
+        name_holder{1,d} = probe_elec.label;
+        name_holder{2,d} = fn_generate_random_strings(numel(probe_elec.label),'',10);
+        probe_elec.label = name_holder{2,d};
+    end
     
     % Create referencing scheme
     if strcmp(SBJ_vars.ch_lab.ref_type{d},'BP')
@@ -105,6 +132,7 @@ for d = 1:numel(SBJ_vars.ch_lab.probes)
     else
         elec_reref{d} = probe_elec;
     end
+    elec_refef{d}.chantype = repmat(SBJ_vars.ch_lab.probe_type{d},size(elec_reref{d}.label));
 end
 
 %% Recombine
@@ -115,8 +143,17 @@ for e = 1:numel(elec.chantype)
     elec.chantype{e} = SBJ_vars.ch_lab.probe_type{d};
 end
 
+% Re-label any problematic channel labels
+if any(danger_name)
+    for d_ix = find(danger_name)
+        for s_ix = 1:numel(name_holder{2,d_ix})
+            elec.label{strcmp(elec.label,name_holder{2,2}{s_ix})} = name_holder{1,d_ix}{s_ix};
+        end
+    end
+end
+
 %% Save data
-output_filename = strcat(SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,'.mat');
+output_filename = strcat(SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',elec_ext,'.mat');
 fprintf('============== Saving %s ==============\n',output_filename);
 save(output_filename, '-v7.3', 'elec');
 
