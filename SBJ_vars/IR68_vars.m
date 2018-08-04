@@ -54,7 +54,7 @@ SBJ_vars.recon.elec_mni_s = [];
 
 SBJ_vars.ch_lab.probes     = {'LAM','LHH','LTH','AIN','MIN','PIN','LOF','LAC','LPC'};
 SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
-SBJ_vars.ch_lba.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP','BP'};
+SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP','BP'};
 SBJ_vars.ch_lab.ROI        = {'AIN*','MIN*','PIN*','LOF*','LAC*','LPC*'};
 SBJ_vars.ch_lab.eeg_ROI    = {'CZ'};
 
