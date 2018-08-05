@@ -18,7 +18,7 @@ end
 % IN PROGRESS:
 TBD_SBJs = {'IR26','IR32','IR37','IR41','IR52','IR65','IR74'};
 % 26- needs all processing
-% 32- needs reimport
+% 32- figure out how to deal with interhemispheric L/R (same chanpos, so deleted as duplicates in ft_appendsens
 % 37- needs elec update from Ricahrd
 % 52- needs reimport
 % 65- needs reimport
