@@ -94,7 +94,7 @@ else
     fields = fieldnames(elec);
     for f = 1:numel(fields)
         if size(eval(['elec.' fields{f}]),1) == numel(elec.label)
-            eval(['selected_elec.' fields{f} ' = elec.' fields{f} '(order_idx(matches==1),:);']);
+            eval(['elec.' fields{f} ' = elec.' fields{f} '(order_idx(matches==1),:);']);
         elseif size(eval(['elec.' fields{f}]),1) > numel(elec.label)
             error(['elec field "' fields{f} '" has more elements than elec.label, and will not be re-ordered!!!']);
         end
