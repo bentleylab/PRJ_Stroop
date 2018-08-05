@@ -70,7 +70,7 @@ SBJ_vars.ch_lab.bad = {...
     'RTH2','RTH3','RHH2','RHH3','RHH4','RHH5','RAM1','RAM2','RAM3',...% epileptic
     'RTH7','RTH8',...% spiking artifact
     'RTH10','RIN9','RIN10','RPRE10',...% out of brain (based on my eye, maybe add RAC10 and LIN10 since they're edge)
-    'G','EKG','REF','E'...% not real data
+    'DC03','DC04','G','EKG','REF','E'...% not real data
     };
 SBJ_vars.ch_lab.eeg = {'FPZ','CZ','OZ','C3','C4'};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};

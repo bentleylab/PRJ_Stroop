@@ -70,7 +70,7 @@ SBJ_vars.ch_lab.bad = {...
     'LHH4','LHH5','LAM1','LAM2','LAM3','LAM4',...% noisy, big ERP-like jumps
     'AST*','PST*','AMG*','HH*','TH*',...% Not real data
     'C3-1','C4-1','CZ-1','OZ-1','FPZ','Z','LUE-1','LLE-1','RUE-1','RLE-1','EKG-1',...% Not real data
-    'REF','EKG','GND','XREF'...% note real data
+    'DC01','DC04','REF','EKG','GND','XREF'...% note real data
     };
 SBJ_vars.ch_lab.eeg = {'FZ','CZ','C3','C4','OZ'};% copies of each of these plus FPZ and Z...
 % SBJ_vars.ch_lab.CZ_lap_ref = {};

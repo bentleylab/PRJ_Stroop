@@ -1,4 +1,4 @@
-SBJs = {'IR74'};%,
+SBJs = {};%,
 for s = 1:numel(SBJs)
     fprintf('============================================================================\n');
     fprintf(['\t' SBJs{s} ' pat\n']);
@@ -16,15 +16,13 @@ end
 
 
 % IN PROGRESS:
-TBD_SBJs = {'IR26','IR27','IR32','IR37','IR41','IR52','IR65','IR74'};
+TBD_SBJs = {'IR26','IR32','IR37','IR41','IR52','IR65','IR74'};
 % 26- needs all processing
-% 27- needs reimport
 % 32- needs reimport
 % 37- needs elec update from Ricahrd
-% 41- needs reimport
-% 52- mismatched labels, needs investigation
-% 65- mismatched labels, needs investigation
-% 74- mismatched labels, needs investigation
+% 52- needs reimport
+% 65- needs reimport
+% 74- needs reimport
 
 % DONE:
-%'IR21','IR31','IR35'};%{'IR39','IR48','IR54','IR57','IR61','IR68','IR72',
+%'IR21','IR27','IR31','IR35'};%{'IR39','IR41','IR48','IR54','IR57','IR61','IR68','IR72',
