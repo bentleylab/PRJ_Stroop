@@ -32,7 +32,7 @@ for f_ix = 1:length(notch_freqs)
 end
 
 %% Processing
-SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 
 for b_ix = 1:numel(SBJ_vars.raw_file)
