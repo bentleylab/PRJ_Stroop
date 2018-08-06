@@ -16,13 +16,10 @@ end
 
 
 % IN PROGRESS:
-TBD_SBJs = {'IR26','IR32','IR37','IR41','IR52','IR65','IR74'};
+TBD_SBJs = {'IR26','IR32','IR37'};
 % 26- needs all processing
 % 32- figure out how to deal with interhemispheric L/R (same chanpos, so deleted as duplicates in ft_appendsens
 % 37- needs elec update from Ricahrd
-% 52- needs reimport
-% 65- needs reimport
-% 74- needs reimport
 
 % DONE:
-%'IR21','IR27','IR31','IR35'};%{'IR39','IR41','IR48','IR54','IR57','IR61','IR68','IR72',
+done_SBJs = {'IR21','IR27','IR31','IR35','IR39','IR41','IR48','IR52','IR54','IR57','IR61','IR65','IR68','IR72','IR74'};

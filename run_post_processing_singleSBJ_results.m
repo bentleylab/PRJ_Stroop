@@ -21,10 +21,12 @@ an_id_s = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
 an_id_r = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
 
 % Without condition differences:
-plt_id  = 'summary_trl0to15_evnt';
-SBJ08c_HFA_summary_plot_actv(SBJ,an_id_s,actv_win,plt_id,save_fig,fig_vis)
-plt_id  = 'summary_trl5to1_evnt';
-SBJ08c_HFA_summary_plot_actv(SBJ,an_id_r,actv_win,plt_id,save_fig,fig_vis)
+for s = 1:numel(SBJs)
+    plt_id  = 'summary_trl0to15_evnt';
+    SBJ08c_HFA_summary_plot_actv(SBJs{s},an_id_s,actv_win,plt_id,save_fig,fig_vis)
+    plt_id  = 'summary_trl5to1_evnt';
+    SBJ08c_HFA_summary_plot_actv(SBJs{s},an_id_r,actv_win,plt_id,save_fig,fig_vis)
+end
 
 % %% Plot HFA Correlations
 % stat_id = 'corr_HFA_CI_ts_filt0to6_mS0to25_aS0to1_aR5to1_nb1k';

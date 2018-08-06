@@ -1,0 +1,38 @@
+function [roi_labels] = fn_atlas_lookup(elec, atlas_name)
+% generate a list of roi_labels for a given elec struct and atlas
+% INPUTS:
+%   elec [struct] - elec struct
+%   atlas_name [str] - {'fs',...?}
+
+%% Find ROI Labels of electrodes (Create elec table)
+% edit generate_electable.m % more extensive version
+if atlas_name,'
+atlas{end+1}      = ft_read_atlas([fsdir ...
+    '/mri/aparc+aseg.mgz']); % Desikan-Killiany (+volumetric)
+atlas{end}.coordsys = 'mni';
+name{end+1}       = 'Desikan-Killiany';
+atlas{end+1}      = ft_read_atlas([fsdir ...
+    '/mri/aparc.a2009s+aseg.mgz']); % Destrieux (+volumetric)
+atlas{end}.coordsys = 'mni';
+name{end+1}       = 'Destrieux';
+if isempty(elec) % elec_mni not present
+    elec              = elec_nat;
+end
+elec.elecpos_fs   = elec_nat.elecpos;
+
+% Import atlas of interest
+atlas = ft_read_atlas([ft_dir 'template/atlas/aal/ROI_MNI_V4.nii']);
+% look up label of electrode location
+cfg = [];
+cfg.roi = elec_mni_frv.chanpos(match_str(elec_mni_frv.label, 'LHH1'),:);
+cfg.atlas = atlas;
+cfg.inputcoord = 'mni';
+cfg.output = 'label';
+labels = ft_volumelookup(cfg, atlas);
+[~, indx] = max(labels.count);
+labels.name(indx)
+
+
+end
+
+

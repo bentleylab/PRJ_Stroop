@@ -6,20 +6,22 @@ fig_filetype = 'png';
 if ischar(save_fig); save_fig = str2num(save_fig); end
 if isnumeric(actv_win); actv_win = num2str(actv_win); end
 
-%% Data Preparation
-% Set up paths
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/');
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
-addpath('/home/knight/hoycw/Apps/fieldtrip/');
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+
+%% Set Up Directories
+addpath([root_dir 'PRJ_Stroop/scripts/']);
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+addpath(ft_dir);
 ft_defaults
 
 %% Load Results
 % Load variables
-SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
-an_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/an_vars/' an_id '_vars.m'];
+an_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
-plt_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
+plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 
 % Load data
@@ -142,7 +144,7 @@ end
 
 %% Save figure
 if save_fig
-    fig_dir = ['/home/knight/hoycw/PRJ_Stroop/results/HFA/' SBJ '/summary_actv/'...
+    fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/summary_actv/'...
         an_id '_mn' actv_win '/'];
     if ~exist(fig_dir,'dir')
         mkdir(fig_dir);
