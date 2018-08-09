@@ -28,7 +28,7 @@ addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
 addpath(genpath([ft_dir(1:end-10) 'dPCA/']));
 
 %% Parameters
-SBJ = 'IR48';
+SBJ = 'IR32';
 an_id = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';%'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';%
 conditions = 'CNI';
 
