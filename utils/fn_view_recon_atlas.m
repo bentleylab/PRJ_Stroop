@@ -62,10 +62,10 @@ end
 fprintf('Using atlas: %s\n',atlas_name);
 if strcmp(atlas_name,'DK')                  
     atlas      = ft_read_atlas(SBJ_vars.recon.fs_DK); % Desikan-Killiany (+volumetric)
-    atlas.coordsys = 'mni';
+    atlas.coordsys = 'pat';
 elseif strcmp(atlas_name,'Dx')
     atlas      = ft_read_atlas(SBJ_vars.recon.fs_Dx); % Destrieux (+volumetric)
-    atlas.coordsys = 'mni';
+    atlas.coordsys = 'pat';
 else
     error(['atlas_name unknown: ' atlas_name]);
 end
