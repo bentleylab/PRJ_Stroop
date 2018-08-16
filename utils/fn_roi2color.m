@@ -57,6 +57,8 @@ for r = 1:n_rois
             RGB(r,:) = [158 202 225]./256;
         case 'pMCC'
             RGB(r,:) = [198 219 239]./256;
+        case 'PCC'
+            RGB(r,:) = [239 243 255]./256;
         case 'Precuneus'
             RGB(r,:) = [239 243 255]./256;
             

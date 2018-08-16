@@ -14,73 +14,106 @@ SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 
 view_angle = [-90 0];
+if strcmp(reg_type,'v') || strcmp(reg_type,'s')
+    reg_suffix = ['_' reg_type];
+else
+    reg_suffix = '';
+end
 
 %% Load elec struct
-load([SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,'.mat']);
+load([SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'.mat']);
 
 %% Load brain recon
 if strcmp(view_space,'pat')
-    if strcmp(hemi,'r') || strcmp(hemi,'l')
-        mesh = ft_read_headshape([SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_' hemi 'h.mat']);
-    elseif strcmp(hemi,'b')
-        mesh = ft_read_headshape({[SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_rh.mat'],...
-                                    [SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_lh.mat']});
-    else
-        error(['Unknown hemisphere selected: ' hemi]);
-    end
-    mesh.coordsys = 'acpc';
-elseif strcmp(view_space,'mni')
-    if strcmp(reg_type,'vol')
-        if strcmp(hemi,'r')
-            load([ft_dir 'template/anatomy/surface_pial_right.mat']);
-        elseif strcmp(hemi,'l')
-            load([ft_dir 'template/anatomy/surface_pial_left.mat']);
-        elseif strcmp(hemi,'b')
-            load([ft_dir 'template/anatomy/surface_pial_both.mat']);
-        else
-            error(['Unknown hemisphere option: ' hemi]);
-        end
-%         mesh.coordsys = 'mni';
-    elseif strcmp(reg_type,'srf')
+    if strcmp(plot_type,'3d')
         if strcmp(hemi,'r') || strcmp(hemi,'l')
-            mesh = ft_read_headshape([root_dir 'PRJ_Stroop/data/freesurfer/fsaverage/' hemi 'h.pial']);
+            mesh = ft_read_headshape([SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_' hemi 'h.mat']);
         elseif strcmp(hemi,'b')
-            error('hemisphere "b" not yet implemented for reg_type: "srf"!');
-            mesh = ft_read_headshape([ft_dir 'subjects/fsaverage/surf/' hemi 'h.pial']);
+            mesh = ft_read_headshape({[SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_rh.mat'],...
+                [SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_lh.mat']});
         else
-            error(['Unknown hemisphere option: ' hemi]);
+            error(['Unknown hemisphere selected: ' hemi]);
         end
-        mesh.coordsys = 'fsaverage';
+        mesh.coordsys = 'acpc';
+    elseif strcmp(plot_type,'ortho')
+        mri = ft_read_mri(SBJ_vars.recon.fs_T1);
+        mri.coordsys = 'acpc';
     else
-        error(['Unknown registration type (reg_type): ' reg_type]);
+        error(['Unknown plot_type: ' plot_type]);
+    end
+elseif strcmp(view_space,'mni')
+    if strcmp(plot_type,'3d')
+        if strcmp(reg_type,'v')
+            if strcmp(hemi,'r')
+                load([ft_dir 'template/anatomy/surface_pial_right.mat']);
+            elseif strcmp(hemi,'l')
+                load([ft_dir 'template/anatomy/surface_pial_left.mat']);
+            elseif strcmp(hemi,'b')
+                load([ft_dir 'template/anatomy/surface_pial_both.mat']);
+            else
+                error(['Unknown hemisphere option: ' hemi]);
+            end
+            %         mesh.coordsys = 'mni';
+        elseif strcmp(reg_type,'s')
+            if strcmp(hemi,'r') || strcmp(hemi,'l')
+                mesh = ft_read_headshape([root_dir 'PRJ_Stroop/data/atlases/freesurfer/fsaverage/' hemi 'h.pial']);
+            elseif strcmp(hemi,'b')
+                error('hemisphere "b" not yet implemented for reg_type: "srf"!');
+                mesh = ft_read_headshape([ft_dir 'subjects/fsaverage/surf/' hemi 'h.pial']);
+            else
+                error(['Unknown hemisphere option: ' hemi]);
+            end
+            mesh.coordsys = 'fsaverage';
+        else
+            error(['Unknown registration type (reg_type): ' reg_type]);
+        end
+    elseif strcmp(plot_type,'ortho')
+        error('need to write teh mni space ortho plot code');
+    else
+        error(['Unknown plot_type: ' plot_type]);
     end
 else
     error(['Unknown view_space: ' view_space]);
 end
 
-%% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
-h = figure;
-
-% Plot 3D mesh
-mesh_alpha = 0.8;
-if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
-    mesh_alpha = 0.4;
-end
-ft_plot_mesh(mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
-
-% Plot electrodes on top
-if show_labels
-    ft_plot_sens(elec, 'elecshape', 'sphere', 'label', 'label');
-else
-    ft_plot_sens(elec, 'elecshape', 'sphere');
+%% Orthoplot (pat/mni, v only, 0/1 labels)
+if strcmp(plot_type,'ortho')
+    cfg = [];
+    cfg.elec = elec;
+    ft_electrodeplacement(cfg, mri);
+%     ft_plot_ortho(mri.anatomy, 'transform', mri.transform);%, 'style', 'intersect');
+%     if show_labels
+%         ft_plot_sens(elec, 'label', 'on', 'fontcolor', 'w');
+%     else
+%         ft_plot_sens(elec, 'label', 'off');
+%     end
 end
 
-view(view_angle); material dull; lighting gouraud;
-l = camlight;
-fprintf(['To reset the position of the camera light after rotating the figure,\n' ...
-    'make sure none of the figure adjustment tools (e.g., zoom, rotate) are active\n' ...
-    '(i.e., uncheck them within the figure), and then hit ''l'' on the keyboard\n'])
-set(h, 'windowkeypressfcn',   @cb_keyboard);
+%% 3D Surface + Grids (3d, pat/mni, v/s, 0/1)
+if strcmp(plot_type,'3d')
+    h = figure;
+    
+    % Plot 3D mesh
+    mesh_alpha = 0.8;
+    if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
+        mesh_alpha = 0.4;
+    end
+    ft_plot_mesh(mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
+    
+    % Plot electrodes on top
+    if show_labels
+        ft_plot_sens(elec, 'elecshape', 'sphere', 'label', 'label');
+    else
+        ft_plot_sens(elec, 'elecshape', 'sphere');
+    end
+    
+    view(view_angle); material dull; lighting gouraud;
+    l = camlight;
+    fprintf(['To reset the position of the camera light after rotating the figure,\n' ...
+        'make sure none of the figure adjustment tools (e.g., zoom, rotate) are active\n' ...
+        '(i.e., uncheck them within the figure), and then hit ''l'' on the keyboard\n'])
+    set(h, 'windowkeypressfcn',   @cb_keyboard);
+end
 
 %% Plot SEEG data in 3D
 % % Create volumetric mask of ROIs from fs parcellation/segmentation

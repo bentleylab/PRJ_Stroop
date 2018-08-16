@@ -1,4 +1,4 @@
-function fn_view_recon_atlas(SBJ, pipeline_id, plot_type, view_space, reg_type, show_labels, hemi, atlas_name)%, view_angle)
+function fn_view_recon_atlas(SBJ, pipeline_id, plot_type, view_space, reg_type, show_labels, hemi, atlas_name, roi_style)%, view_angle)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJ [str] - subject ID to plot
@@ -14,9 +14,14 @@ SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 
 view_angle = [-90 0];
+if strcmp(reg_type,'v') || strcmp(reg_type,'s')
+    reg_suffix = ['_' reg_type];
+else
+    reg_suffix = '';
+end
 
 %% Load elec struct
-load([SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,'.mat']);
+load([SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'.mat']);
 
 %% Load brain recon
 if strcmp(view_space,'pat')
@@ -43,7 +48,7 @@ elseif strcmp(view_space,'mni')
 %         mesh.coordsys = 'mni';
     elseif strcmp(reg_type,'srf')
         if strcmp(hemi,'r') || strcmp(hemi,'l')
-            mesh = ft_read_headshape([root_dir 'PRJ_Stroop/data/freesurfer/fsaverage/' hemi 'h.pial']);
+            mesh = ft_read_headshape([root_dir 'PRJ_Stroop/data/atlases/freesurfer/fsaverage/' hemi 'h.pial']);
         elseif strcmp(hemi,'b')
             error('hemisphere "b" not yet implemented for reg_type: "srf"!');
             mesh = ft_read_headshape([ft_dir 'subjects/fsaverage/surf/' hemi 'h.pial']);
@@ -74,7 +79,7 @@ atlas.name = atlas_name;
 
 %% Match elecs to atlas ROIs
 elec_lab = fn_atlas_lookup(elec,atlas);
-elec_lab.roi = fn_atlas2roi_labels(elec_lab.atlas_label,atlas_name,'gROI');
+elec_lab.roi = fn_atlas2roi_labels(elec_lab.atlas_label,atlas_name,roi_style);
 elec_lab.roi_color = fn_roi2color(elec_lab.roi);
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
@@ -83,7 +88,7 @@ h = figure;
 % Plot 3D mesh
 mesh_alpha = 0.8;
 if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
-    mesh_alpha = 0.4;
+    mesh_alpha = 0.2;
 end
 ft_plot_mesh(mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
 

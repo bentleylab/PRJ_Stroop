@@ -35,7 +35,7 @@ for e = 1:numel(elec.label);
     % Assign highest match as label
     if numel(match_cnt)>=1
         elec_lab.atlas_label{e}  = report.name{cnt_idx(1)};
-        elec_lab.atlas_count{e}  = report.count(cnt_idx(1));
+        elec_lab.atlas_count(e)  = report.count(cnt_idx(1));
         elec_lab.atlas_qryrng{e} = report.usedqueryrange{cnt_idx(1)};
         % add additional labels if needed
         if numel(match_cnt)>1
