@@ -19,7 +19,7 @@ if strcmp(reg_type,'v') || strcmp(reg_type,'s')
 else
     reg_suffix = '';
 end
-if strcmp(roi_style,'tissue')
+if strcmp(roi_style,'tissue') || strcmp(roi_style,'tissueC')
     tis_suffix = '_tis';
 else
     tis_suffix = '';
@@ -96,7 +96,11 @@ end
 %% Match elecs to atlas ROIs
 if any(strcmp(atlas_name,{'DK','Dx'}))
     elec.roi       = fn_atlas2roi_labels(elec.atlas_label,atlas_name,roi_style);
-    elec.roi_color = fn_roi2color(elec.roi);
+    if strcmp(roi_style,'tissueC')
+        elec.roi_color = fn_tissue2color(elec);
+    else
+        elec.roi_color = fn_roi2color(elec.roi);
+    end
 elseif any(strcmp(atlas_name,{'Yeo7','Yeo17'}))
     elec.roi       = elec.atlas_label;
     elec.roi_color = fn_atlas2color(atlas.name,elec.roi);

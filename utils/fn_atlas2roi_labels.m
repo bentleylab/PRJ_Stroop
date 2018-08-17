@@ -22,7 +22,7 @@ switch roi_style
         map_ix = 2;
     case 'ROI'
         map_ix = 3;
-    case 'tissue'
+    case {'tissue', 'tissueC'}
         map_ix = 4;
     otherwise
         error(['roi_style unknown: ' roi_style]);

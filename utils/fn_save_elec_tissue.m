@@ -47,22 +47,22 @@ end
 
 %% Convert atlas labels and probabilities to GM probability
 % usedqueryrange search sizes: 1 = 1; 3 = 7; 5 = 33
-tissue_labels = {'GM','WM','CSF','OUT'};
-elec.tissue_prob = zeros([numel(elec.label) numel(tissue_labels)]);
+elec.tissue_labels = {'GM','WM','CSF','OUT'};
+elec.tissue_prob = zeros([numel(elec.label) numel(elec.tissue_labels)]);
 
 % Assign atlas labels to tissue type
 elec.tissue       = fn_atlas2roi_labels(elec.atlas_label,atlas_name,'tissue');
 for e = 1:numel(elec.label)
     % Compute Probability of Tissue Types {GM, WM, CSF, OUT}
-    elec.tissue_prob(e,strcmp(elec.tissue{e},tissue_labels)) = ...
-        elec.tissue_prob(e,strcmp(elec.tissue{e},tissue_labels)) + elec.atlas_prob(e);
+    elec.tissue_prob(e,strcmp(elec.tissue{e},elec.tissue_labels)) = ...
+        elec.tissue_prob(e,strcmp(elec.tissue{e},elec.tissue_labels)) + elec.atlas_prob(e);
     
     % Check for secondary matches and add to total
     if ~isempty(elec.atlas_label2{e})
         elec.tissue2{e} = fn_atlas2roi_labels(elec.atlas_label2{e},atlas_name,'tissue');
         for roi = 1:numel(elec.tissue2{e})
-            elec.tissue_prob(e,strcmp(elec.tissue2{e}{roi},tissue_labels)) = ...
-                elec.tissue_prob(e,strcmp(elec.tissue2{e}{roi},tissue_labels)) + elec.atlas_prob2{e}(roi);
+            elec.tissue_prob(e,strcmp(elec.tissue2{e}{roi},elec.tissue_labels)) = ...
+                elec.tissue_prob(e,strcmp(elec.tissue2{e}{roi},elec.tissue_labels)) + elec.atlas_prob2{e}(roi);
         end
     end
 end
