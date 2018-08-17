@@ -68,7 +68,12 @@ elseif strcmp(view_space,'mni')
             error(['Unknown registration type (reg_type): ' reg_type]);
         end
     elseif strcmp(plot_type,'ortho')
-        error('need to write teh mni space ortho plot code');
+        if strcmp(reg_type,'v')
+            mri = ft_read_mri([ft_dir 'template/anatomy/single_subj_T1_1mm.nii']);
+            mri.coordsys = 'mni';
+        elseif strcmp(reg_type,'s')
+            error('ortho plot with surface based registration doesnt make sense!');
+        end
     else
         error(['Unknown plot_type: ' plot_type]);
     end
@@ -78,6 +83,8 @@ end
 
 %% Orthoplot (pat/mni, v only, 0/1 labels)
 if strcmp(plot_type,'ortho')
+    % ft_electrodeplacement only plots elec.elecpos, so swap in chanpos
+    elec.elecpos = elec.chanpos;
     cfg = [];
     cfg.elec = elec;
     ft_electrodeplacement(cfg, mri);

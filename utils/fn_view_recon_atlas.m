@@ -1,4 +1,4 @@
-function fn_view_recon_atlas(SBJ, pipeline_id, plot_type, view_space, reg_type, show_labels, hemi, atlas_name, roi_style)%, view_angle)
+function fn_view_recon_atlas(SBJ, pipeline_id, view_space, reg_type, show_labels, hemi, atlas_name, roi_style)%, view_angle)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJ [str] - subject ID to plot
@@ -21,7 +21,18 @@ else
 end
 
 %% Load elec struct
-load([SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'.mat']);
+try
+    elec_atlas_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'_',atlas_name,'.mat'];
+    load(elec_atlas_fname);
+catch
+    answer = input(['Could not load requested file: ' elec_atlas_fname ...
+        '\nDo you want to run the atlas matching now? "y" or "n"\n'],'s');
+    if strtcmp(answer,'y')
+        fn_save_elec_atlas(SBJ,pipeline_id,view_space,reg_type,atlas_name);
+    else
+        error('not running atlas assignment, exiting...');
+    end
+end
 
 %% Load brain recon
 if strcmp(view_space,'pat')
@@ -35,7 +46,7 @@ if strcmp(view_space,'pat')
     end
     mesh.coordsys = 'acpc';
 elseif strcmp(view_space,'mni')
-    if strcmp(reg_type,'vol')
+    if strcmp(reg_type,'v')
         if strcmp(hemi,'r')
             load([ft_dir 'template/anatomy/surface_pial_right.mat']);
         elseif strcmp(hemi,'l')
@@ -46,7 +57,7 @@ elseif strcmp(view_space,'mni')
             error(['Unknown hemisphere option: ' hemi]);
         end
 %         mesh.coordsys = 'mni';
-    elseif strcmp(reg_type,'srf')
+    elseif strcmp(reg_type,'s')
         if strcmp(hemi,'r') || strcmp(hemi,'l')
             mesh = ft_read_headshape([root_dir 'PRJ_Stroop/data/atlases/freesurfer/fsaverage/' hemi 'h.pial']);
         elseif strcmp(hemi,'b')
@@ -63,24 +74,28 @@ else
     error(['Unknown view_space: ' view_space]);
 end
 
-%% Load Atlas
-fprintf('Using atlas: %s\n',atlas_name);
-if strcmp(atlas_name,'DK')                  
-    atlas      = ft_read_atlas(SBJ_vars.recon.fs_DK); % Desikan-Killiany (+volumetric)
-    atlas.coordsys = 'acpc';
-elseif strcmp(atlas_name,'Dx')
-    atlas      = ft_read_atlas(SBJ_vars.recon.fs_Dx); % Destrieux (+volumetric)
-    atlas.coordsys = 'acpc';
-else
-    error(['atlas_name unknown: ' atlas_name]);
-end
-atlas.name = atlas_name;
-% elec.elecpos_fs   = elec.elecpos;
+% %% Load Atlas
+% fprintf('Using atlas: %s\n',atlas_name);
+% if strcmp(atlas_name,'DK')                  
+%     atlas      = ft_read_atlas(SBJ_vars.recon.fs_DK); % Desikan-Killiany (+volumetric)
+%     atlas.coordsys = 'acpc';
+% elseif strcmp(atlas_name,'Dx')
+%     atlas      = ft_read_atlas(SBJ_vars.recon.fs_Dx); % Destrieux (+volumetric)
+%     atlas.coordsys = 'acpc';
+% else
+%     error(['atlas_name unknown: ' atlas_name]);
+% end
+% atlas.name = atlas_name;
+% % elec.elecpos_fs   = elec.elecpos;
 
 %% Match elecs to atlas ROIs
-elec_lab = fn_atlas_lookup(elec,atlas);
-elec_lab.roi = fn_atlas2roi_labels(elec_lab.atlas_label,atlas_name,roi_style);
-elec_lab.roi_color = fn_roi2color(elec_lab.roi);
+if any(strcmp(atlas_name,{'DK','Dx'}))
+    elec.roi       = fn_atlas2roi_labels(elec.atlas_label,atlas_name,roi_style);
+    elec.roi_color = fn_roi2color(elec.roi);
+elseif any(strcmp(atlas_name,{'Yeo7','Yeo17'}))
+    elec.roi       = elec.atlas_label;
+    elec.roi_color = fn_atlas2color(atlas.name,elec.roi);
+end
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
 h = figure;
@@ -94,9 +109,9 @@ ft_plot_mesh(mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facea
 
 % Plot electrodes on top
 cfgs = [];
-for e = 1:numel(elec_lab.label)
-    cfgs.channel = elec_lab.label{e};
-    elec_tmp = fn_select_elec(cfgs, elec_lab);
+for e = 1:numel(elec.label)
+    cfgs.channel = elec.label{e};
+    elec_tmp = fn_select_elec(cfgs, elec);
     if show_labels
         ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', elec_tmp.roi_color, 'label', 'label');
     else

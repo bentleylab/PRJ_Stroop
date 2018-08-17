@@ -1,5 +1,5 @@
 %% ATLAS ROI LABEL LOOKUP TABLE
-
+error('Use roi mapping tsv instead!');
 % 'Desikan-Killiany' atlas, default from freesurfer (aparc+aseg.mgz file)
 fs_DK.MPFC = {...
     'ctx-lh-caudalanteriorcingulate',...

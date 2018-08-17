@@ -1,4 +1,5 @@
 function roi_labels = fn_atlas_roi_labels(atlas_name, roi, hemisphere)
+error('Use roi_mapping tsv instead!');
 %% Returns list of atlas ROI labels fitting a general ROI (groi)
 % INPUTS:
 %   atlas_name [str] - atlas loaded by ft_read_atlas

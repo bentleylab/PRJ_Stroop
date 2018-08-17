@@ -87,22 +87,12 @@ cfg = []; cfg.channel = data.label;
 elec = fn_select_elec(cfg,elec);
 
 % Order them to match data.label
-[matches,order_idx] = ismember(data.label,elec.label);
-if sum(matches)~=numel(data.label)
-    error('Mismatch between data.label and elec.label!');
-else
-    fields = fieldnames(elec);
-    for f = 1:numel(fields)
-        if size(eval(['elec.' fields{f}]),1) == numel(elec.label)
-            eval(['elec.' fields{f} ' = elec.' fields{f} '(order_idx(matches==1),:);']);
-        elseif size(eval(['elec.' fields{f}]),1) > numel(elec.label)
-            error(['elec field "' fields{f} '" has more elements than elec.label, and will not be re-ordered!!!']);
-        end
-    end
-end
+elec = fn_reorder_elec(elec, data.label);
 
 %% Apply montage per probe
 left_out_ch = {};
+elec_labels = {};
+elec_types  = {};
 danger_name = false([1 numel(SBJ_vars.ch_lab.probes)]);
 name_holder = cell([2 numel(SBJ_vars.ch_lab.probes)]);
 elec_reref  = cell([1 numel(SBJ_vars.ch_lab.probes)]);
@@ -132,7 +122,13 @@ for d = 1:numel(SBJ_vars.ch_lab.probes)
     else
         elec_reref{d} = probe_elec;
     end
-    elec_refef{d}.chantype = repmat(SBJ_vars.ch_lab.probe_type{d},size(elec_reref{d}.label));
+    if d==1
+        elec_labels = elec_reref{d}.label;
+        elec_types  = repmat(SBJ_vars.ch_lab.probe_type(d),size(elec_reref{d}.label));
+    else
+        elec_labels = cat(find(size(elec_labels)>1), elec_labels, elec_reref{d}.label);
+        elec_types  = cat(find(size(elec_types)>1), elec_types, repmat(SBJ_vars.ch_lab.probe_type(d),size(elec_reref{d}.label)));
+    end
 end
 
 %% Recombine
@@ -140,7 +136,7 @@ cfg = [];
 elec = ft_appendsens(cfg,elec_reref{:});
 elec.type = 'ieeg';
 for e = 1:numel(elec.chantype)
-    elec.chantype{e} = SBJ_vars.ch_lab.probe_type{d};
+    elec.chantype{e} = elec_types{strcmp(elec.label{e},elec_labels)};
 end
 
 % Re-label any problematic channel labels

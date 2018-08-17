@@ -7,7 +7,7 @@ function roi_labels = fn_atlas2roi_labels(labels, atlas_name, roi_style)
 [root_dir, ~] = fn_get_root_dir();
 
 %% Read in Atlas to ROI mappings
-tsv_filename = [root_dir 'PRJ_Stroop/data/atlases/atlas_ROI_mappings_' atlas_name '.tsv'];
+tsv_filename = [root_dir 'PRJ_Stroop/data/atlases/atlas_mappings/atlas_ROI_mappings_' atlas_name '.tsv'];
 fprintf('\tReading roi csv file: %s\n', tsv_filename);
 roi_file = fopen(tsv_filename, 'r');
 % roi.csv contents:
@@ -31,12 +31,8 @@ roi_labels = cell(size(labels));
 for l = 1:numel(labels)
     roi_labels{l} = roi_map{map_ix}{strcmp(roi_map{1},labels{l})};
     if strcmp(labels{l},'no_label_found')
-        n_no_label = n_no_label + 1;
+        warning(['WARNING: no_label_found for label #' num2str(l) '!!!']);
     end
-end
-
-if n_no_label>0
-    warning(['WARNING: no_label_found for ' num2str(n_no_label) ' electrodes!!!']);
 end
 
 % switch atlas_name

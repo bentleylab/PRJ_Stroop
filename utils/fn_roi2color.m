@@ -29,8 +29,10 @@ for r = 1:n_rois
             RGB(r,:) = [56 108 176]./256;
         case 'PAR'          % Maroon
             RGB(r,:) = [128 0 0]./256;
-        case 'TMP'          % Light Gray
-            RGB(r,:) = [0.25 0.25 0.25];
+        case 'TMP'          % Dark Gray
+            RGB(r,:) = [0.2 0.2 0.2];
+        case 'FWM'          % White
+            RGB(r,:) = [1 1 1];
             
             % LPFC Subregions - reds
         case 'FPC'
@@ -59,8 +61,6 @@ for r = 1:n_rois
             RGB(r,:) = [198 219 239]./256;
         case 'PCC'
             RGB(r,:) = [239 243 255]./256;
-        case 'Precuneus'
-            RGB(r,:) = [239 243 255]./256;
             
             % Insula Subregions - greens
         case 'vaINS'
@@ -73,8 +73,6 @@ for r = 1:n_rois
             RGB(r,:) = [161 217 155]./256;
         case 'pINS'
             RGB(r,:) = [199 233 192]./256;
-        case 'STS'
-            RGB(r,:) = [0.3 0.3 0.3];
             
             % OFC Subregions - yellows
         case 'mOFC'
@@ -89,15 +87,26 @@ for r = 1:n_rois
             RGB(r,:) = [136 86 167]./256;
         case 'S1'
             RGB(r,:) = [140 150 198]./256;
+        case 'Precuneus'
+            RGB(r,:) = [179 205 227]./256;
             
             % Weird Cases
-        case 'FWM'          % Gray
-            RGB(r,:) = [0.5 0.5 0.5];
         case ''
-            RGB(r,:) = [0.5 0.5 0.5];
-        case 'OUT'          % Black
-            disp('WARNING: Why are you trying to plot data mainly out of the brain???');
             RGB(r,:) = [0 0 0];
+        case 'OCC'          % Black
+            RGB(r,:) = [0 0 0];
+        case 'HPC'          % Black
+            RGB(r,:) = [0 0 0];
+        case 'AMG'          % Black
+            RGB(r,:) = [0 0 0];
+        case 'STS'
+            RGB(r,:) = [0 0 0];
+        case 'OUT'          % Black
+            warning('WARNING: Why are you trying to plot data mainly out of the brain???');
+            RGB(r,:) = [0 0 0];
+            
+            % Yeo Atlases
+        case
     end
 end
 

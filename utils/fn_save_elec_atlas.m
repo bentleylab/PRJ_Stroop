@@ -29,6 +29,12 @@ if strcmp(atlas_name,'DK')
 elseif strcmp(atlas_name,'Dx')
     atlas      = ft_read_atlas(SBJ_vars.recon.fs_Dx); % Destrieux (+volumetric)
     atlas.coordsys = 'acpc';
+elseif strcmp(atlas_name,'Yeo7')
+    atlas = fn_read_atlas(atlas_name);
+    atlas.coordsys = 'mni';
+elseif strcmp(atlas_name,'Yeo17')
+    atlas = fn_read_atlas(atlas_name);
+    atlas.coordsys = 'mni';
 else
     error(['atlas_name unknown: ' atlas_name]);
 end
@@ -38,6 +44,9 @@ atlas.name = atlas_name;
 elec = fn_atlas_lookup(elec,atlas);
 
 %% Save elec strcut with atlas labels
-save([SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'_',atlas_name,'.mat'],'-v7.3','elec');
+out_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'_',atlas_name,'.mat'];
+fprintf('Saving %s\n',out_fname);
+fprintf('==================================================================\n');
+save(out_fname,'-v7.3','elec');
 
 end
