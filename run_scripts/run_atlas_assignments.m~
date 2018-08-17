@@ -1,4 +1,4 @@
-SBJs = {'IR35','IR39','IR41','IR48','IR54','IR57','IR61','IR68','IR72','IR74','IR62'};%'IR52','IR21','IR27',
+SBJs = {'IR21','IR27','IR35','IR39','IR41','IR48','IR54','IR57','IR61','IR68','IR72','IR74','IR62'};%'IR52',
 % tissue not 100%: 'IR31',
 % bad, need work: SBJs = {'IR65','IR67','IR69'};
 
