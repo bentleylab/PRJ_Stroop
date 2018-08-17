@@ -1,50 +1,77 @@
-function [elec_lab] = fn_atlas_lookup(elec, atlas)
+function [elec_lab] = fn_atlas_lookup(elec, atlas, varargin)
 % generate a list of roi_labels for a given elec struct and atlas
 % INPUTS:
 %   elec [struct] - elec struct
 %   atlas [struct] - atlas loaded from ft_read_atlas
+%   varargin [cell array] - used to pass in {'max_qry_rng','min_qry_range'}
+%       either should be pased in form 'm**_qry_rng',[1 3 5]
 
 
 % edit generate_electable.m % more extensive version
 
+% Handle variable inputs
+if ~isempty(varargin)
+    for v = 1:2:numel(varargin)
+        if strcmp(varargin{v},'max_qry_rng') && any(ismember(varargin{v+1},[1 3 5]))
+            max_qry_rng = varargin{v+1};
+        elseif strcmp(varargin{v},'min_qry_rng') && any(ismember(varargin{v+1},[1 3 5]))
+            min_qry_rng = varargin{v+1};
+        else
+            error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
+        end
+    end
+end
+
+if ~exist('max_qry_rng','var')
+    max_qry_rng = 5;
+end
+if ~exist('min_qry_rng','var')
+    min_qry_rng = 1;
+end
+
 %% Find ROI Labels of electrodes (Create elec table)
 % Initialize the new fields
 elec_lab = elec;
-elec_lab.atlas_name   = atlas.name;
-elec_lab.atlas_label  = cell(size(elec.label));
-elec_lab.atlas_count  = zeros(size(elec.label));
-elec_lab.atlas_qryrng = cell(size(elec.label));
+elec_lab.atlas_name    = atlas.name;
+elec_lab.atlas_label   = cell(size(elec.label));
+elec_lab.atlas_prob    = zeros(size(elec.label));
+elec_lab.atlas_qryrng  = cell(size(elec.label));
+elec_lab.atlas_qrysz   = zeros(size(elec.label));
 elec_lab.atlas_label2  = cell(size(elec.label));
-elec_lab.atlas_count2  = cell(size(elec.label));
+elec_lab.atlas_prob2   = cell(size(elec.label));
 elec_lab.atlas_qryrng2 = cell(size(elec.label));
 
 cfg = [];
-cfg.atlas = atlas;
-cfg.inputcoord = elec.coordsys;
-cfg.output = 'single';
-cfg.maxqueryrange = 5;
+cfg.atlas              = atlas;
+cfg.inputcoord         = elec.coordsys;
+cfg.output             = 'multiple';
+cfg.minqueryrange      = min_qry_rng;
+cfg.maxqueryrange      = max_qry_rng;
+cfg.querymethod        = 'sphere';
+cfg.round2nearestvoxel = 'yes';
 for e = 1:numel(elec.label);
     % Search for this elec
     cfg.roi = elec.chanpos(e,:);
     report = ft_volumelookup(cfg,atlas);
     
     % Report label for this elec
-    [sorted_cnt cnt_idx] = sort(report.count,1,'descend');
+    [sorted_cnt, cnt_idx] = sort(report.count,1,'descend');
     match_cnt = find(sorted_cnt);
     
     % Assign highest match as label
     if numel(match_cnt)>=1
         elec_lab.atlas_label{e}  = report.name{cnt_idx(1)};
-        elec_lab.atlas_count(e)  = report.count(cnt_idx(1));
+        elec_lab.atlas_prob(e)   = report.count(cnt_idx(1))/sum(report.count);
         elec_lab.atlas_qryrng{e} = report.usedqueryrange{cnt_idx(1)};
+        elec_lab.atlas_qrysz(e)  = sum(report.count);
         % add additional labels if needed
         if numel(match_cnt)>1
-            elec_lab.atlas_label2{e} = report.name(cnt_idx(2:numel(match_cnt)));
-            elec_lab.atlas_count2{e} = report.count(cnt_idx(2:numel(match_cnt)));
+            elec_lab.atlas_label2{e}  = report.name(cnt_idx(2:numel(match_cnt)));
+            elec_lab.atlas_prob2{e}   = report.count(cnt_idx(2:numel(match_cnt)))/sum(report.count);
             elec_lab.atlas_qryrng2{e} = report.usedqueryrange(cnt_idx(2:numel(match_cnt)));
         else
-            elec_lab.atlas_label2{e} = '';
-            elec_lab.atlas_count2{e} = NaN;
+            elec_lab.atlas_label2{e}  = '';
+            elec_lab.atlas_prob2{e}   = NaN;
             elec_lab.atlas_qryrng2{e} = [];
         end
     else   % No matches found

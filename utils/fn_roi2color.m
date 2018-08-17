@@ -105,8 +105,16 @@ for r = 1:n_rois
             warning('WARNING: Why are you trying to plot data mainly out of the brain???');
             RGB(r,:) = [0 0 0];
             
-            % Yeo Atlases
-        case
+%             % Yeo Atlases
+%         case
+            % Tissue Types
+        case 'GM'
+            RGB(r,:) = [0.4 0.4 0.4];
+        case 'WM'
+            RGB(r,:) = [1 1 1];
+        case 'CSF'
+            RGB(r,:) = [0 0 0];
+        % case 'OUT' is covered above
     end
 end
 

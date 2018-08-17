@@ -12,7 +12,7 @@ fprintf('\tReading roi csv file: %s\n', tsv_filename);
 roi_file = fopen(tsv_filename, 'r');
 % roi.csv contents:
 %   atlas_label, gROI_label, ROI_label, Notes (not read in)
-roi_map = textscan(roi_file, '%s %s %s', 'HeaderLines', 1,...
+roi_map = textscan(roi_file, '%s %s %s %s', 'HeaderLines', 1,...
     'Delimiter', '\t', 'MultipleDelimsAsOne', 0);
 fclose(roi_file);
 
@@ -22,6 +22,8 @@ switch roi_style
         map_ix = 2;
     case 'ROI'
         map_ix = 3;
+    case 'tissue'
+        map_ix = 4;
     otherwise
         error(['roi_style unknown: ' roi_style]);
 end

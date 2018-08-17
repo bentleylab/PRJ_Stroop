@@ -19,10 +19,15 @@ if strcmp(reg_type,'v') || strcmp(reg_type,'s')
 else
     reg_suffix = '';
 end
+if strcmp(roi_style,'tissue')
+    tis_suffix = '_tis';
+else
+    tis_suffix = '';
+end
 
 %% Load elec struct
 try
-    elec_atlas_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'_',atlas_name,'.mat'];
+    elec_atlas_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'_',atlas_name,tis_suffix,'.mat'];
     load(elec_atlas_fname);
 catch
     answer = input(['Could not load requested file: ' elec_atlas_fname ...
