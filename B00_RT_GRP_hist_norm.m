@@ -121,7 +121,11 @@ legend(cond_lab);
 fig_filename = [fig_dir,fig_name,'.',fig_type];
 if save_fig ==1
     fprintf('Saving %s\n',fig_filename);
-    eval(['export_fig ' fig_filename]);
+    if strcmp(fig_type,'eps')
+        eval(['export_fig ' fig_filename]);
+    else
+        saveas(gcf,fig_filename);
+    end
 end
 
 end

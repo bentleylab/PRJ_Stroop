@@ -18,9 +18,9 @@ fclose(roi_file);
 
 %% Map the labels
 switch roi_style
-    case 'gROI'
+    case {'gROI','main3'}
         map_ix = 2;
-    case 'ROI'
+    case {'ROI','thryROI'}
         map_ix = 3;
     case {'tissue', 'tissueC'}
         map_ix = 4;

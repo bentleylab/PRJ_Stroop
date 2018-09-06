@@ -38,6 +38,9 @@ switch roi_id
     case 'OFC'
         labels = {'mOFC','lOFC'};
         einfo_col = 2;
+    case {'tissue', 'tissueC'}
+        labels = {'GM','WM','CSF','OUT'};
+        einfo_col = [];
     case 'ALL'
         load('~/PRJ_Stroop/data/full_roi_lists.mat');
         labels = all_rois;

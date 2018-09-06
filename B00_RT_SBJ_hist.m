@@ -87,7 +87,11 @@ legend(trial_legend);
 fig_filename = strcat(fig_dir,fig_name,'.',fig_type);
 if save_fig ==1
     fprintf('Saving %s\n',fig_filename);
-    eval(['export_fig ' fig_filename]);
+    if strcmp(fig_type,'eps')
+        eval(['export_fig ' fig_filename]);
+    else
+        saveas(gcf,fig_filename);
+    end
 end
 
 %% Compare trial types within each block type
@@ -120,9 +124,13 @@ for b_ix = 1:length(block_lab)
 end
 
 fig_filename = strcat(fig_dir,fig_name,'.',fig_type);
-if save_fig ==1
+if save_fig
     fprintf('Saving %s\n',fig_filename);
-    eval(['export_fig ' fig_filename]);
+    if strcmp(fig_type,'eps')
+        eval(['export_fig ' fig_filename]);
+    else
+        saveas(gcf,fig_filename);
+    end
 end
 
 %% Compare block effects within trial type
@@ -156,7 +164,11 @@ end
 fig_filename = strcat(fig_dir,fig_name,'.',fig_type);
 if save_fig ==1
     fprintf('Saving %s\n',fig_filename);
-    eval(['export_fig ' fig_filename]);
+    if strcmp(fig_type,'eps')
+        eval(['export_fig ' fig_filename]);
+    else
+        saveas(gcf,fig_filename);
+    end
 end
 
 

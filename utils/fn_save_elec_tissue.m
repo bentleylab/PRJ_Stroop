@@ -39,7 +39,7 @@ elec = fn_atlas_lookup(elec,atlas,'max_qry_rng',5,'min_qry_rng',5);
 
 % Check that all atlas_prob add to 1
 for e = 1:numel(elec.label)
-    if round(elec.atlas_prob(e)+sum(elec.atlas_prob2{e}))<1
+    if elec.atlas_prob(e)+sum(elec.atlas_prob2{e})<0.99999  % sometimes it's 0.99999999999999988898
         error(['Electrode ' elec.label{e} ' has atlas_prob = '...
             num2str(elec.atlas_prob(e)+sum(elec.atlas_prob2{e}))]);
     end
