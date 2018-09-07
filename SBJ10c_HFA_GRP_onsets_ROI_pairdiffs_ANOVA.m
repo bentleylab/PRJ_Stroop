@@ -1,5 +1,5 @@
 function SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,pipeline_id,an_id,roi_id,...
-                                                    plt_id,save_fig,fig_vis,fig_filetype)
+                                                    atlas_id,gm_thresh,plt_id,save_fig,fig_vis)%,fig_filetype)
 % Load HFA analysis results for active and condition-differentiating
 %   epochs, plot a summary of those time period per electrode
 % clear all; %close all;
@@ -11,22 +11,23 @@ if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Data Preparation
 % Set up paths
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/');
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
-addpath('/home/knight/hoycw/Apps/fieldtrip/');
+[root_dir, ft_dir] = fn_get_root_dir();
+addpath([root_dir 'PRJ_Stroop/scripts/']);
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+addpath(ft_dir);
 ft_defaults
 
 %% Prep variables
-an_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/an_vars/' an_id '_vars.m'];
+an_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
-plt_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
+plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
-stat_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m'];
+stat_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
 
 % Get condition info
-[grp_lab, grp_colors, grp_style] = fn_group_label_styles(model_lab);
-cond_lab = {'corr(RT)', grp_lab{:}};
+[grp_lab, ~, ~] = fn_group_label_styles(model_lab);
+cond_lab = [grp_lab, {'corr(RT)'}];
 
 % Get event timing
 mean_RTs = zeros(size(SBJs));
@@ -37,8 +38,7 @@ elseif strcmp(an_id(1:5),'HGm_R')
 end
 
 % Load all ROI info
-load('~/PRJ_Stroop/data/full_roi_lists.mat');
-[roi_list, roi_colors, einfo_roi_col] = fn_roi_label_styles(roi_id);
+[roi_list, roi_colors, ~] = fn_roi_label_styles(roi_id);
 
 % Set up onset counts
 all_onsets          = cell([numel(SBJs) numel(roi_list) numel(grp_lab)+1]);
@@ -48,7 +48,7 @@ all_onset_elec_lab  = cell([numel(SBJs) numel(roi_list) numel(grp_lab)+1]);
 for sbj_ix = 1:numel(SBJs)
     SBJ = SBJs{sbj_ix};
     % Load variables
-    SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+    SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
     eval(SBJ_vars_cmd);
     
     % Compute mean RT
@@ -71,28 +71,35 @@ for sbj_ix = 1:numel(SBJs)
     win_center = round(mean(win_lim,2));
     
     %% Load ROI and GM/WM info
-    einfo_filename = [SBJ_vars.dirs.preproc SBJ '_einfo_' pipeline_id '.mat'];
-    load(einfo_filename);
-    % Electrode Info Table:
-    %   label- name of electrode
-    %   ROI- specific region
-    %   gROI- general region (LPFC, MPFC, OFC, FWM=frontal white matter)
-    %   ROI2- specific region of second electrode
-    %   tissue- primary tissue type
-    %   GM weight- percentage of electrode pair in GM
-    %   Out- 0/1 flag for whether this is partially out of the brain
-
-    if ~isempty(setdiff(stat.label,einfo(:,1)))
-        error('ERROR: Electrodes do not match between stat and einfo!');
-    end
+    elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_' atlas_id '_tis.mat'];
+    load(elec_tis_fname);
+    
+    % Sort elecs by stat labels
+    cfgs = []; cfgs.channel = stat.label;
+    elec    = fn_select_elec(cfgs,elec);
+    roi_lab = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
+    
+    % Get GM probability from tissue labels {'GM','WM','CSF','OUT'}
+    gm_bin  = elec.tissue_prob(:,1)>gm_thresh;
         
     %% Aggregate results per ROI
     for ch_ix = 1:numel(stat.label)
-        roi_ix = [];
-        einfo_ix = strmatch(stat.label(ch_ix),einfo(:,1),'exact');
-        % Check for condition differences, get epochs
-        if strmatch(einfo(einfo_ix,einfo_roi_col),roi_list,'exact')
-            roi_ix = strmatch(einfo(einfo_ix,einfo_roi_col),roi_list,'exact');
+        % If elec matches roi_list and is in GM, get stats
+        if any(strcmp(roi_lab{ch_ix},roi_list)) && gm_bin(ch_ix)
+            roi_ix = find(strcmp(roi_lab{ch_ix},roi_list));
+            % Get ANOVA group onsets
+            for grp_ix = 1:numel(grp_lab)
+                if any(squeeze(qvals(grp_ix,ch_ix,:))<0.05)
+                    sig_onsets = stat.time(win_lim(squeeze(qvals(grp_ix,ch_ix,:))<0.05,1));
+                    if strcmp(event_lab,'resp') && (sig_onsets(1)<0)
+                        all_onsets{sbj_ix,roi_ix,grp_ix} = [all_onsets{sbj_ix,roi_ix,grp_ix} sig_onsets(1)];
+                        all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} = [all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} stat.label(ch_ix)];
+                    elseif strcmp(event_lab,'stim') && (sig_onsets(1)<mean_RTs(sbj_ix))
+                        all_onsets{sbj_ix,roi_ix,grp_ix} = [all_onsets{sbj_ix,roi_ix,grp_ix} sig_onsets(1)];
+                        all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} = [all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} stat.label(ch_ix)];
+                    end
+                end
+            end
             
             % Get RT correlation onset
             if sum(squeeze(stat.mask(ch_ix,1,:)))>0
@@ -102,25 +109,15 @@ for sbj_ix = 1:numel(SBJs)
                 onset_time = stat.time(mask_chunks(1,1));
                 % Exclude differences after the mean RT for this SBJ
                 if strcmp(event_lab,'resp') && (onset_time<0)
-                    all_onsets{sbj_ix,roi_ix,1} = [all_onsets{sbj_ix,roi_ix,1} onset_time];
-                    all_onset_elec_lab{sbj_ix,roi_ix,1} = [all_onset_elec_lab{sbj_ix,roi_ix,1} stat.label(ch_ix)];
+                    all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} = ...
+                        [all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} onset_time];
+                    all_onset_elec_lab{sbj_ix,roi_ix,numel(grp_lab)+1} = ...
+                        [all_onset_elec_lab{sbj_ix,roi_ix,numel(grp_lab)+1} stat.label(ch_ix)];
                 elseif strcmp(event_lab,'stim') && (onset_time<mean_RTs(sbj_ix))
-                    all_onsets{sbj_ix,roi_ix,1} = [all_onsets{sbj_ix,roi_ix,1} onset_time];
-                    all_onset_elec_lab{sbj_ix,roi_ix,1} = [all_onset_elec_lab{sbj_ix,roi_ix,1} stat.label(ch_ix)];
-                end
-            end
-            
-            % Get ANOVA group onsets
-            for grp_ix = 1:numel(grp_lab)
-                if any(squeeze(qvals(grp_ix,ch_ix,:))<0.05)
-                    sig_onsets = stat.time(win_lim(squeeze(qvals(grp_ix,ch_ix,:))<0.05,1));
-                    if strcmp(event_lab,'resp') && (sig_onsets(1)<0)
-                        all_onsets{sbj_ix,roi_ix,grp_ix+1} = [all_onsets{sbj_ix,roi_ix,grp_ix+1} sig_onsets(1)];
-                        all_onset_elec_lab{sbj_ix,roi_ix,grp_ix+1} = [all_onset_elec_lab{sbj_ix,roi_ix,grp_ix+1} stat.label(ch_ix)];
-                    elseif strcmp(event_lab,'stim') && (sig_onsets(1)<mean_RTs(sbj_ix))
-                        all_onsets{sbj_ix,roi_ix,grp_ix+1} = [all_onsets{sbj_ix,roi_ix,grp_ix+1} sig_onsets(1)];
-                        all_onset_elec_lab{sbj_ix,roi_ix,grp_ix+1} = [all_onset_elec_lab{sbj_ix,roi_ix,grp_ix+1} stat.label(ch_ix)];
-                    end
+                    all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} = ...
+                        [all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} onset_time];
+                    all_onset_elec_lab{sbj_ix,roi_ix,numel(grp_lab)+1} = ...
+                        [all_onset_elec_lab{sbj_ix,roi_ix,numel(grp_lab)+1} stat.label(ch_ix)];
                 end
             end
         end
@@ -168,27 +165,31 @@ end
 hist_bins = linspace(-0.3,0.3,10);
 for cond_ix = 1:numel(cond_lab)
     fprintf('========================== %s ==========================\n',cond_lab{cond_ix});
-    fig_name = ['GRP_HFA_onset_diffs_' cond_lab{cond_ix} '_' event_lab];
-    figure('Name',fig_name,'units','normalized',...
-        'outerposition',[0 0 0.9 1],'Visible',fig_vis);
+%     fig_name = ['GRP_HFA_onset_diffs_' cond_lab{cond_ix} '_' event_lab ...
+%         '_GM' num2str(gm_thresh)];
+%     figure('Name',fig_name,'units','normalized',...
+%         'outerposition',[0 0 0.9 1],'Visible',fig_vis);
     for pair_ix = 1:size(roi_pairs,1)
-        ax = subplot(1,size(roi_pairs,1),pair_ix);
+%         ax = subplot(1,size(roi_pairs,1),pair_ix);
         sbj_cnt = 0;
         fprintf('-------------------------- %s-%s --------------------------\n',...
             roi_list{roi_pairs(pair_ix,1)},roi_list{roi_pairs(pair_ix,2)});
         for sbj_ix = 1:numel(SBJs)
-            if any(onset_diffs{sbj_ix,pair_ix,cond_ix})
-                fprintf('%s (n_pairs = %i) mean = %.3f; sd = %.3f\n', SBJs{sbj_ix}, numel(onset_diffs{sbj_ix,pair_ix,cond_ix}), ...
+            if ~isempty([onset_diffs{sbj_ix,pair_ix,cond_ix}])
+                fprintf('%s (n_pairs = %i) mean = %.3f; sd = %.3f\n', ...
+                    SBJs{sbj_ix}, numel(onset_diffs{sbj_ix,pair_ix,cond_ix}), ...
                     nanmean(onset_diffs{sbj_ix,pair_ix,cond_ix}), nanstd([onset_diffs{sbj_ix,pair_ix,cond_ix}]));
                 sbj_cnt= sbj_cnt+1;
             end
         end
         % aggregate across subjects
-        if any([onset_diffs{:,pair_ix,cond_ix}])
-            histogram([onset_diffs{:,pair_ix,cond_ix}],hist_bins);
-            line([nanmean([onset_diffs{:,pair_ix,cond_ix}]) nanmean([onset_diffs{:,pair_ix,cond_ix}])], ylim,...
-                'Color','k','LineWidth',2);
-            fprintf('GRP (n_pairs = %i, n_sbj = %i) mean = %.3f; sd = %.3f\n', numel([onset_diffs{:,pair_ix,cond_ix}]), sbj_cnt,...
+        if ~isempty([onset_diffs{:,pair_ix,cond_ix}])
+%             histogram([onset_diffs{:,pair_ix,cond_ix}],hist_bins);
+%             line([nanmean([onset_diffs{:,pair_ix,cond_ix}]) ...
+%                 nanmean([onset_diffs{:,pair_ix,cond_ix}])], ylim,...
+%                 'Color','k','LineWidth',2);
+            fprintf('GRP (n_pairs = %i, n_sbj = %i) mean = %.3f; sd = %.3f\n', ...
+                numel([onset_diffs{:,pair_ix,cond_ix}]), sbj_cnt,...
                 nanmean([onset_diffs{:,pair_ix,cond_ix}]), nanstd([onset_diffs{:,pair_ix,cond_ix}]));
         end
         ax.Title.String = [roi_list{roi_pairs(pair_ix,1)} '-' roi_list{roi_pairs(pair_ix,2)}];
@@ -197,6 +198,7 @@ for cond_ix = 1:numel(cond_lab)
 end
 
 % %% Plot ROI Results
+% error('copy over new version of plotting that uses elec and gm_thresh!');
 % for cond_ix = 1:numel(cond_lab)
 %     % Create and format the plot
 %     fig_name = ['GRP_HFA_onsets_' cond_lab{cond_ix} '_' roi_id '_' event_lab '_meanRTout'];

@@ -6,15 +6,18 @@ if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Data Preparation
 % Set up paths
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/');
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
-addpath('/home/knight/hoycw/Apps/fieldtrip/');
+[root_dir, ft_dir] = fn_get_root_dir();
+addpath([root_dir 'PRJ_Stroop/scripts/']);
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+addpath(ft_dir);
 ft_defaults
 
 %% Load Results
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m']);
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
+SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+eval(SBJ_vars_cmd);plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
+eval(plt_vars_cmd);
+stat_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m'];
+eval(stat_vars_cmd);
 
 [grp_lab, grp_colors, grp_style] = fn_group_label_styles(model_lab);
 [rt_lab, rt_color, rt_style]     = fn_group_label_styles('RT');
@@ -37,8 +40,8 @@ clear tmp
 sample_rate = (numel(stat{1}.time)-1)/(stat{1}.time(end)-stat{1}.time(1));
 
 % Load ROI and GM/WM info
-einfo_filename = [SBJ_vars.dirs.preproc SBJ '_einfo_' pipeline_id '.mat'];
-load(einfo_filename);
+% einfo_filename = [SBJ_vars.dirs.preproc SBJ '_einfo_' pipeline_id '.mat'];
+% load(einfo_filename);
 % Electrode Info Table:
 %   label- name of electrode
 %   ROI- specific region
@@ -86,9 +89,9 @@ stat{2} = ft_selectdata(cfg_trim,stat{2});
 % end
 
 %% Plot Results
-fig_dir = ['/home/knight/hoycw/PRJ_Stroop/results/HFA/' SBJ '/' stat_id '/SR/' an_id_s '-' an_id_r '/'];
+fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/' stat_id '/SR/' an_id_s '-' an_id_r '/'];
 if ~exist(fig_dir,'dir')
-    mkdir(fig_dir);
+    [~] = mkdir(fig_dir);
 end
 
 % Find plot limits
@@ -221,7 +224,7 @@ for ch_ix = 1:numel(stat{1}.label)
         end
         
         % Plotting parameters
-        axs(1).Title.String  = [stat{sr_ix}.label{ch_ix} ' (' einfo{ch_ix,2} ') :' event_lab{sr_ix}];
+        axs(1).Title.String  = [stat{sr_ix}.label{ch_ix} ':' event_lab{sr_ix}];% (' einfo{ch_ix,2} ') 
         axs(1).Box           = 'off';
         axs(1).YLim          = ylims1;
         axs(1).YTick         = yticks1;

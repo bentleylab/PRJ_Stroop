@@ -25,18 +25,6 @@ save_out = 0;
 % SBJ10c_HFA_GRP_elec_cnt_tis_RT_ANOVA(SBJs,stat_id,an_id_s,roi_id,atlas_id,gm_thresh,pipeline_id,save_out)
 SBJ10c_HFA_GRP_elec_cnt_tis_RT_ANOVA(SBJs,stat_id,an_id_r,roi_id,atlas_id,gm_thresh,pipeline_id,save_out)
 
-%% Print Results according to activation (what elecs are non-active but sig?)
-stat_id = 'corrRT_CNI_pcon_WL200_WS50';
-an_id_s = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
-an_id_r = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
-roi_id  = 'ROI';
-atlas_id = 'Dx';
-gm_thresh = 0;
-
-
-% SBJ10c_HFA_GRP_elec_cnt_nact_RT_ANOVA(SBJs,stat_id,an_id_s,actv_win,roi_id,atlas_id,gm_thresh,pipeline_id)
-SBJ10c_HFA_GRP_elec_cnt_nact_RT_ANOVA(SBJs,stat_id,an_id_r,actv_win,roi_id,atlas_id,gm_thresh,pipeline_id)
-
 %% Proportions of significant effects across ROI
 stat_id     = 'corrRT_CNI_pcon_WL200_WS50';
 atlas_id    = 'Dx';
@@ -55,7 +43,7 @@ for an_ix = 1:numel(an_opts)
 end
 % end
 
-roi_ix = 1;
+roi_ix = 2;
 for an_ix = 1:numel(an_opts)
     SBJ10c_HFA_SBJ_summary_bar_perc_actv_GMlim_RT_ANOVA_ROI(SBJs,stat_id,pipeline_id,...
         an_opts{an_ix},actv_win,roi_opts{roi_ix},atlas_id,0,plt_id,save_fig,fig_vis,fig_filetype);
@@ -68,24 +56,9 @@ for roi_ix = 1:numel(roi_opts)
     for an_ix = 1:2
 %         SBJ10c_HFA_GRP_onsets_ROI_RTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
 %                                                     atlas_id,0,plt_opts{an_ix},1,'on',fig_filetype)
-        SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
+        SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,pipeline_id,an_id_s,roi_id,...
                                                     atlas_id,0,plt_opts{an_ix},save_fig,fig_vis)
     end
-end
-
-%% Plot ANOVA with RT correlation by ROI to see any patterns
-stat_id = 'corrRT_CNI_pcon_WL200_WS50';
-an_id_s = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
-an_id_r = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
-plt_id  = 'ts_S0to15_R5to10_evnt_sigline';
-roi_opts    = {'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
-
-roi_ix = 2;
-for sbj_ix = 1:numel(SBJs)
-    fprintf('Plotting for %s\n',SBJs{sbj_ix});
-    SBJ10b_ANOVA_plot_SR_RTcorr_ROIcomb(SBJs{sbj_ix},pipeline_id,stat_id,an_id_s,an_id_r,atlas_id,...
-        roi_opts{roi_ix},plt_id,1,'on','svg');
-    close all;
 end
 
 %% Plot HFA Correlations
@@ -121,6 +94,17 @@ end
 % an_id       = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
 % an_id       = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
 % % submit: SBJ10a_corrRT_regressRT_ANOVA(SBJ,an_id,stat_id)
+% 
+% %% Plot ANOVA with RT correlation
+% stat_id = 'corrRT_CNI_pcon_WL200_WS50';
+% an_id_s = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
+% an_id_r = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
+% plt_id  = 'ts_S0to15_R5to10_evnt_sigline';
+% for sbj_ix = 1:numel(SBJs)
+%     fprintf('Plotting for %s\n',SBJs{sbj_ix});
+%     SBJ10b_ANOVA_plot_SR_RTcorr(SBJs{sbj_ix},pipeline_id,stat_id,an_id_s,an_id_r,plt_id,1,'off','svg');
+%     close all;
+% end
 % 
 %% # elecs and # sig per ROI per SBJ
 % WARNING: This reveals a non-trivial amount of change after last ANOVA
