@@ -4,6 +4,7 @@ plt_vars.sig_cut = 0.01;
 plt_vars.corr_cut = 0;
 plt_vars.exclude_FWM = 1;
 plt_vars.exclude_OUT = 1;
+plt_vars.exclude_noLab = 1;
 
 plt_vars.double_sig_dot = 1;
 plt_vars.sig_dot_size = 25;
