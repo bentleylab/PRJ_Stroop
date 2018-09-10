@@ -15,12 +15,12 @@ SBJ="${SGE_TASK}"
 FUNCTION='SBJ11a_corr_HFA_acE_surr'
 
 # set up matlab function call
-func_call="${FUNCTION}('${SBJ}', '${pipeline_id}', '${stat_id}', '${an_id}', '${plt_id}')"
+func_call="${FUNCTION}('${SBJ}', '${pipeline_id}', '${stat_id}', '${an_id}', '${atlas_id}', '${roi_id}', '${plt_id}')"
 
 # define commands to execute via SGE
 echo ${SBJ}
 echo ${func_call}
 echo $$
-echo ${func_call} > NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}_${pipeline_id}_${stat_id}_${an_id}_${plt_id}.m
-time matlab -nodesktop -nosplash -nodisplay < NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}_${pipeline_id}_${stat_id}_${an_id}_${plt_id}.m
-rm NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}_${pipeline_id}_${stat_id}_${an_id}_${plt_id}.m
+echo ${func_call} > NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}_${pipeline_id}_${stat_id}_${an_id}_${atlas_id}_${roi_id}_${plt_id}.m
+time matlab -nodesktop -nosplash -nodisplay < NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}_${pipeline_id}_${stat_id}_${an_id}_${atlas_id}_${roi_id}_${plt_id}.m
+rm NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}_${pipeline_id}_${stat_id}_${an_id}_${atlas_id}_${roi_id}_${plt_id}.m

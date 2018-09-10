@@ -29,7 +29,7 @@ load(elec_fname);
 % Sort elecs by stat labels
 cfgs = []; cfgs.channel = hfa.label;
 elec = fn_select_elec(cfgs,elec);
-if strcmp(atlas_id(1:3),'Yeo7') || strcmp(atlas_id(1:3),'Yeo7')
+if strcmp(atlas_id,'Yeo7') || strcmp(atlas_id,'Yeo17')
     elec.roi = elec.atlas_label;
 else
     elec.roi = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
