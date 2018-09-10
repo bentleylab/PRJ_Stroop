@@ -1,36 +1,36 @@
-function SBJ11a_corr_HFA_acE_surr(SBJ,pipeline_id,stat_id,an_id_main,plt_id)
+function SBJ11a_corr_HFA_acE_surr(SBJ,pipeline_id,stat_id,an_id_main,atlas_id,roi_id,plt_id)
 % Build connectivity matrix based on HFA correlations
 %   non-parametric stats via circular shift of trial time series
 
 %% Data Preparation
 % Set up paths
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/');
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
-addpath('/home/knight/hoycw/Apps/fieldtrip/');
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+addpath([root_dir 'PRJ_Stroop/scripts/']);
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+addpath(ft_dir);
 ft_defaults
 
 %% Load Results
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/an_vars/' an_id_main '_vars.m']);
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id_main '_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m']);
 
 % Load data
-hfa_filename1 = strcat(SBJ_vars.dirs.proc,SBJ,'_HFA_ROI_',an_id_main,'.mat');
-load(hfa_filename1,'hfa');
+hfa_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_HFA_ROI_',an_id_main,'.mat');
+load(hfa_fname,'hfa');
 
-% Load ROI and GM/WM info
-einfo_filename = [SBJ_vars.dirs.preproc SBJ '_einfo_' pipeline_id '.mat'];
-load(einfo_filename);
-% Electrode Info Table:
-%   label- name of electrode
-%   ROI- specific region
-%   gROI- general region (LPFC, MPFC, OFC, FWM=frontal white matter)
-%   ROI2- specific region of second electrode
-%   tissue- primary tissue type
-%   GM weight- percentage of electrode pair in GM
-%   Out- 0/1 flag for whether this is partially out of the brain
+%% Load ROI and GM/WM info
+elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_' atlas_id '.mat'];
+load(elec_fname);
+
+% Sort elecs by stat labels
+cfgs = []; cfgs.channel = hfa.label;
+elec = fn_select_elec(cfgs,elec);
+elec.roi = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
+elec.roi_id = roi_id;
 
 %% Prep Data
 % Channel Selection
@@ -49,33 +49,29 @@ if stat_vars.actv_epochs_overlap
     error('good idea, but not yet implemented...');
 end
 if plt_vars.exclude_FWM
-    good_e = intersect(good_e,hfa.label(~strcmp(einfo(:,3),'FWM')));
+    good_e = intersect(good_e,hfa.label(~strcmp(roi_lab,'FWM')));
 end
 if plt_vars.exclude_OUT
-    good_e = intersect(good_e,hfa.label(~strcmp(einfo(:,3),'OUT')));
+    good_e = intersect(good_e,hfa.label(~strcmp(roi_lab,'OUT')));
 end
 
 % Select Channels and Epoch of Interest
 cfgs = [];
 cfgs.channel = good_e;
+elec = fn_select_elec(cfgs,elec);
 cfgs.latency = stat_vars.stat_lim;
 hfa = ft_selectdata(cfgs,hfa);
 
-% Clean up einfo after removing channels
-good_ix = NaN(size(good_e));
-for e_ix = 1:numel(good_e)
-    good_ix(e_ix) = find(strcmp(einfo(:,1),good_e{e_ix}));
-end
-einfo = einfo(good_ix,:);
-
 % Sort by ROI
-einfo = sortrows(einfo,plt_vars.sort_vec);
-ch_roi_idx = zeros([numel(hfa.label) 1]);
-for ch_ix = 1:numel(hfa.label)
-    ch_roi_idx(ch_ix) = find(strcmp(hfa.label,einfo{ch_ix,1}));
+[~,roi_sort_idx] = sort(elec.roi);
+hfa.label     = hfa.label(roi_sort_idx);
+hfa.powspctrm = hfa.powspctrm(:,roi_sort_idx,:,:);
+elec_fields = fieldnames(elec);
+for field_ix = 1:numel(elec_fields)
+    if any(size(eval(['elec.' elec_fields{field_ix}]))==numel(elec.label))
+        eval(['elec.' elec_fields{field_ix} ' = elec.' elec_fields{field_ix} '(roi_sort_idx,:);']);
+    end
 end
-hfa.label     = hfa.label(ch_roi_idx);
-hfa.powspctrm = hfa.powspctrm(:,ch_roi_idx,:,:);
 
 %% Smooth HFA time series
 for ch_ix = 1:numel(hfa.label)
@@ -137,7 +133,7 @@ end
 [~, ~, ~, qvals] = fdr_bh(pvals);
 
 %% Save Data
-data_out_filename = [SBJ_vars.dirs.proc SBJ '_' stat_id '_' an_id_main '.mat'];
-save(data_out_filename, '-v7.3', 'hfa','pairs','corr_mat','corr_vals','qvals');
+data_out_filename = [SBJ_vars.dirs.proc SBJ '_' stat_id '_' an_id_main '_' roi_id '_' atlas_id '.mat'];
+save(data_out_filename, '-v7.3', 'hfa','pairs','corr_mat','corr_vals','qvals','elec');
 
 end

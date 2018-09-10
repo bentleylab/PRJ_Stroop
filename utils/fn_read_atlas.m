@@ -9,7 +9,7 @@ function [atlas] = fn_read_atlas(atlas_name)
 switch atlas_name
     case 'Yeo7'
         atlas_fname = [root_dir 'PRJ_Stroop/data/atlases/Yeo/Yeo_JNeurophysiol11_MNI152/'...
-            'Yeo2011_7Networks_MNI152_FreeSurferConformed1mm_LiberalMask.nii.gz'];
+            'Yeo2011_7Networks_MNI152_FreeSurferConformed1mm_LiberalMask_colin27.nii'];
         atlas_table_fname = [root_dir 'PRJ_Stroop/data/atlases/Yeo/Yeo_JNeurophysiol11_MNI152/'...
             'Yeo2011_7Networks_ColorLUT.txt'];
         value = 1:7;
@@ -33,7 +33,7 @@ switch atlas_name
             ];
     case 'Yeo17'
         atlas_fname = [root_dir 'PRJ_Stroop/data/atlases/Yeo/Yeo_JNeurophysiol11_MNI152/'...
-            'Yeo2011_17Networks_MNI152_FreeSurferConformed1mm_LiberalMask.nii.gz'];
+            'Yeo2011_17Networks_MNI152_FreeSurferConformed1mm_LiberalMask_colin27.nii'];
         atlas_table_fname = [root_dir 'PRJ_Stroop/data/atlases/Yeo/Yeo_JNeurophysiol11_MNI152/'...
             'Yeo2011_7Networks_ColorLUT.txt'];
         value = 1:17;
