@@ -29,7 +29,11 @@ load(elec_fname);
 % Sort elecs by stat labels
 cfgs = []; cfgs.channel = hfa.label;
 elec = fn_select_elec(cfgs,elec);
-elec.roi = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
+if strcmp(atlas_id(1:3),'Yeo7') || strcmp(atlas_id(1:3),'Yeo7')
+    elec.roi = elec.atlas_label;
+else
+    elec.roi = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
+end
 elec.roi_id = roi_id;
 
 %% Prep Data
@@ -49,10 +53,13 @@ if stat_vars.actv_epochs_overlap
     error('good idea, but not yet implemented...');
 end
 if plt_vars.exclude_FWM
-    good_e = intersect(good_e,hfa.label(~strcmp(roi_lab,'FWM')));
+    good_e = intersect(good_e,hfa.label(~strcmp(elec.roi,'FWM')));
 end
 if plt_vars.exclude_OUT
-    good_e = intersect(good_e,hfa.label(~strcmp(roi_lab,'OUT')));
+    good_e = intersect(good_e,hfa.label(~strcmp(elec.roi,'OUT')));
+end
+if plt_vars.exclude_noLab
+    good_e = intersect(good_e,hfa.label(~strcmp(elec.roi,'no_label_found')));
 end
 
 % Select Channels and Epoch of Interest
