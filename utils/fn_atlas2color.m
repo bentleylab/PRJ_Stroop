@@ -10,13 +10,13 @@ function [RGB] = fn_atlas2color(atlas_name,rois)
 switch atlas_name
     case 'Yeo7'
         labels = {
-            '7Networks_1'
-            '7Networks_2'
-            '7Networks_3'
-            '7Networks_4'
-            '7Networks_5'
-            '7Networks_6'
-            '7Networks_7'
+            'Vis'%'7Networks_1'
+            'SM'%'7Networks_2'
+            'DAttn'%'7Networks_3'
+            'VAttn'%'7Networks_4'
+            'Limb'%'7Networks_5'
+            'FP'%'7Networks_6'
+            'Def'%'7Networks_7'
             'no_label_found'
             };
         colors = [

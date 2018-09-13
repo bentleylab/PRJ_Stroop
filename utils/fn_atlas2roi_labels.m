@@ -18,6 +18,8 @@ fclose(roi_file);
 
 %% Map the labels
 switch roi_style
+    case {'Yeo7','Yeo17'}
+        map_ix = 2;
     case {'gROI','main3'}
         map_ix = 2;
     case {'ROI','thryROI'}

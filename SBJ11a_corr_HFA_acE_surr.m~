@@ -24,17 +24,18 @@ load(hfa_fname,'hfa');
 
 %% Load ROI and GM/WM info
 if strcmp(atlas_id,'Yeo7') || strcmp(atlas_id,'Yeo17')
-    elec_space = 'mni_v';
-else
-    elec_space = 'pat';
-end
-elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_' elec_space '_' atlas_id '.mat'];
+    ele
+elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_' atlas_id '.mat'];
 load(elec_fname);
 
 % Sort elecs by stat labels
 cfgs = []; cfgs.channel = hfa.label;
 elec = fn_select_elec(cfgs,elec);
-elec.roi = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
+if strcmp(atlas_id,'Yeo7') || strcmp(atlas_id,'Yeo17')
+    elec.roi = elec.atlas_label;
+else
+    elec.roi = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
+end
 elec.roi_id = roi_id;
 
 %% Prep Data

@@ -1,5 +1,5 @@
-function SBJ11b_corr_HFA_acE_plot_mat_ts(SBJ,pipeline_id,stat_id,an_id_main,plt_id,...
-    plot_ts,plot_scnd_mtx,save_fig,fig_vis,fig_filetype)
+function SBJ11b_corr_HFA_acE_plot_mat_ts(SBJ,pipeline_id,stat_id,an_id_main,roi_id,atlas_id,plt_id,...
+    plot_ts,plot_scnd_mtx,plot_hist,save_fig,fig_vis,fig_filetype)
 % Build connectivity matrix based on HFA correlations, plot as matrix
 %   non-parametric stats via circular shift of trial time series
 
@@ -7,16 +7,18 @@ if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Data Preparation
 % Set up paths
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/');
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
-addpath('/home/knight/hoycw/Apps/fieldtrip/');
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+addpath([root_dir 'PRJ_Stroop/scripts/']);
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+addpath(ft_dir);
 ft_defaults
 
 %% Load Results
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m']);
 
 if strcmp(stat_vars.event_lab,'stim')
     [cond_lab, cond_colors, ~] = fn_condition_label_styles(stat_vars.conditions);
@@ -33,63 +35,31 @@ if strcmp(stat_vars.event_lab,'stim')
 end
 
 % Load data
-corr_filename = [SBJ_vars.dirs.proc SBJ '_' stat_id '_' an_id_main '.mat'];
+corr_filename = [SBJ_vars.dirs.proc SBJ '_' stat_id '_' an_id_main '_' roi_id '_' atlas_id '.mat'];
 load(corr_filename);
 sig_pairs = find(qvals<=plt_vars.sig_cut);
 corr_cut_pairs = find(abs(corr_vals)>=plt_vars.corr_cut);
 plot_pairs = intersect(sig_pairs,corr_cut_pairs);
 
 %% Load ROI and GM/WM info
-einfo_filename = [SBJ_vars.dirs.preproc SBJ '_einfo_' pipeline_id '.mat'];
-load(einfo_filename);
-% Select active electrodes
-if stat_vars.only_actv_ch
+% No need to load elec, it was saved in SBJ11a with the correct sorting
 
-actv_ix = zeros(size(einfo,1),1);
-for e_ix = 1:numel(hfa.label)
-    if any(strcmp(einfo(:,1),hfa.label{e_ix}))
-        actv_ix(strcmp(einfo(:,1),hfa.label{e_ix})) = 1;
-    end
-end
-einfo = einfo(logical(actv_ix),:);
-einfo = sortrows(einfo,plt_vars.sort_vec);
-einfo_fields = {'label','ROI','gROI','ROI2','tissue','GM weight','Out'};
-% Electrode Info Table:
-%   label- name of electrode
-%   ROI- specific region
-%   gROI- general region (LPFC, MPFC, OFC, FWM=frontal white matter)
-%   ROI2- specific region of second electrode
-%   tissue- primary tissue type
-%   GM weight- percentage of electrode pair in GM
-%   Out- 0/1 flag for whether this is partially out of the brain
-
-% Major and Minor divisions in einfo for plotting lines to divide matrix
-major_lab = unique(einfo(:,plt_vars.sort_vec(1)));
-maj_line_pos = NaN(length(major_lab),1);
+% Major and Minor divisions in ROIs for plotting lines to divide matrix
+major_lab = unique(elec.roi);
+line_pos = zeros([numel(elec.label) 2]);
 for lab_ix = 2:length(major_lab)      % Skip #1 because that'll just be line 1 of the first section
-    tmp_idx = find(ismember(einfo(:,plt_vars.sort_vec(1)),major_lab(lab_ix)));
-    maj_line_pos(lab_ix) = tmp_idx(1);
+    line_pos(find(ismember(elec.roi,major_lab(lab_ix)),1),1) = 1;
 end
-einfo(:,8)={0};
-einfo(maj_line_pos(2:end),8)={1};
-
-minor_lab = unique(einfo(:,plt_vars.sort_vec(2)));     % these are labels with "sort1-sort2"
-min_line_pos = NaN(length(minor_lab),1);
-for lab_ix=2:length(minor_lab)
-    tmp_idx = find(ismember(einfo(:,plt_vars.sort_vec(2)),minor_lab(lab_ix)));
-    min_line_pos(lab_ix) = tmp_idx(1);
-end
-einfo(:,9)={0};
-einfo(min_line_pos(2:end),9)={1};
+% !!! add in minor divisions to line_pos(:,2)
 
 %% Plot Correlation Matrix with significance
 fprintf('=========================== Plotting Correlation Matrix ===========================\n');
 % Thin out the labels
 if any(plt_vars.thin_labels)
-    [x_lab,y_lab] = fn_thin_labels(einfo,plt_vars.sort_vec,plt_vars.thin_labels);
+    roi_lab = fn_thin_labels(elec.roi,plt_vars.thin_labels(1));
 end
 
-fig_name = strcat(SBJ,'_corr_HFA_acE_mat_',plt_id);
+fig_name = strcat(SBJ,'_corr_HFA_acE_mat_',roi_id,'_',atlas_id,'_',plt_id);
 figure('Name',fig_name,'Visible',fig_vis,'units','normalized','outerposition',plt_vars.fig_dim);
 % colormap(color_map);
 hold on;
@@ -106,10 +76,10 @@ end
 % Draw Labels
 % set(gcf,'OuterPosition',plt_vars.subplot_pos(sr_ix,:),'PlotBoxAspectRatio',[1 1 1]);
 ax_tick = 1:numel(hfa.label);
-set(gca,'XLim',[0.5 numel(hfa.label)+0.5],'XTick',ax_tick,'XTickLabel',x_lab,'FontSize',plt_vars.font_sz);
-set(gca,'YLim',[0.5 numel(hfa.label)+0.5],'YTick',ax_tick,'YTickLabel',y_lab,'FontSize',plt_vars.font_sz);
-xlabel(einfo_fields{plt_vars.sort_vec(1)});
-ylabel(einfo_fields{plt_vars.sort_vec(2)});
+set(gca,'XLim',[0.5 numel(hfa.label)+0.5],'XTick',ax_tick,'XTickLabel',roi_lab,'FontSize',plt_vars.font_sz);
+set(gca,'YLim',[0.5 numel(hfa.label)+0.5],'YTick',ax_tick,'YTickLabel',roi_lab,'FontSize',plt_vars.font_sz);
+xlabel(roi_id);
+ylabel(roi_id);%einfo_fields{plt_vars.sort_vec(2)});
 
 % Set color scale
 max_corr = max(abs(corr_vals));
@@ -119,44 +89,101 @@ colorbar;
 
 % Get divisions between major zones of matrix
 if plt_vars.plt_maj_div
-    maj_divs = find([einfo{:,8}]==1)-0.5;
+    maj_divs = find(line_pos(:,1))-0.5;
     for line_ix = 1:length(maj_divs)
         line(xlim,[maj_divs(line_ix) maj_divs(line_ix)],'Color','k','LineStyle','-','LineWidth',plt_vars.div_line_width);
         line([maj_divs(line_ix) maj_divs(line_ix)],ylim,'Color','k','LineStyle','-','LineWidth',plt_vars.div_line_width);
     end
 end
 if plt_vars.plt_min_div
-    min_divs = find(([einfo{:,9}]==1)&([einfo{:,8}]~=1))-0.5;
+    min_divs = find(line_pos(:,2)&~line_pos(:,1))-0.5;
     for line_ix = 1:length(min_divs)
         line(xlim,[min_divs(line_ix) min_divs(line_ix)],'Color','k','LineStyle','--','LineWidth',plt_vars.div_line_width);
         line([min_divs(line_ix) min_divs(line_ix)],ylim,'Color','k','LineStyle','--','LineWidth',plt_vars.div_line_width);
     end
 end
 
-subplot_name = strcat(stat_vars.event_lab,': ',num2str(numel(plot_pairs)),' sig');
+subplot_name = strcat(stat_vars.event_lab,': ',num2str(numel(plot_pairs)),'/',num2str(numel(qvals)),' sig');
 title(subplot_name,'interpreter','none');
 colorbar
 
 % Save Fig
 if save_fig
-    results_dir = ['~/PRJ_Stroop/results/HFA/',SBJ,'/',stat_id,'/',an_id_main,'/'];
+    results_dir = [root_dir 'PRJ_Stroop/results/HFA/',SBJ,'/',stat_id,'/',an_id_main,'/',roi_id,'-',atlas_id,'/'];
     if ~exist(results_dir,'dir')
         mkdir(results_dir);
     end
     saveas(gcf,[results_dir,fig_name,'.',fig_filetype]);
 end
 
-%% Averaged within main ROI Matrix
-fig_name = strcat(SBJ,'_corr_HFA_acE_mat_avg_main_',plt_id);
+%% Average Correlation within ROI Matrix
+fprintf('=========================== Plotting Average ROI Correlation Matrix ===========================\n');
+
+fig_name = strcat(SBJ,'_corr_HFA_acE_ROIavg_mat_',roi_id,'_',atlas_id,'_',plt_id);
+figure('Name',fig_name,'Visible',fig_vis,'units','normalized','outerposition',plt_vars.fig_dim);
+% colormap(color_map);
+hold on;
+
+% Get ROIs of each electrode pair
+rois = unique(elec.roi);% numel(unique(einfo(:,plt_vars.sort_vec(2))))];
+pair_rois = zeros(size(pairs));
+for pair_ix = 1:size(pairs,1)
+    pair_rois(pair_ix,:) = [find(strcmp(elec.roi{pairs(pair_ix,1)},rois)) ...
+                find(strcmp(elec.roi{pairs(pair_ix,2)},rois))];
+end
+
+% Average correlation values for sig elecs on ROI pairs
+if numel(rois)>1
+    roi_pairs = nchoosek(1:numel(rois),2);
+    roi_corr = NaN(numel(rois));
+    for pair_ix = 1:size(roi_pairs,1)
+        roi_pair_idx = all([pair_rois(:,1)==roi_pairs(pair_ix,1) pair_rois(:,2)==roi_pairs(pair_ix,2)],2);
+        roi_corr(roi_pairs(pair_ix,1),roi_pairs(pair_ix,2)) = mean(corr_vals(roi_pair_idx));
+        % NOT FAIR: mean(corr_vals(intersect(plot_pairs,find(roi_pair_idx))));
+        %   shoudl still average in the non-sig pairs because they are
+        % members of the ROIs
+    end
+end
+
+% Average correlation values for sig elecs within same ROI pairs (diagonals, not included in nchoosek above)
+for roi_ix = 1:numel(rois)
+    roi_pair_idx = all([pair_rois(:,1)==roi_ix pair_rois(:,2)==roi_ix],2);
+    roi_corr(roi_ix,roi_ix) = mean(corr_vals(roi_pair_idx));
+end
+imagesc(roi_corr); axis xy;
+
+ax_tick = 1:numel(rois);
+set(gca,'XLim',[0.5 numel(rois)+0.5],'XTick',ax_tick,'XTickLabel',rois,'FontSize',plt_vars.font_sz);
+set(gca,'YLim',[0.5 numel(rois)+0.5],'YTick',ax_tick,'YTickLabel',rois,'FontSize',plt_vars.font_sz);
+xlabel(roi_id);
+ylabel(roi_id);
+
+subplot_name = strcat(stat_vars.event_lab,': Average corr by ',roi_id);
+title(subplot_name,'interpreter','none');
+colorbar;
+max_roi_corr = max(abs(roi_corr(:)));
+caxis([-max_roi_corr max_roi_corr]);
+
+% Save Fig
+if save_fig
+    saveas(gcf,[results_dir,fig_name,'.',fig_filetype]);
+end
+
+%% Proportion Significant within ROI Matrix
+fig_name = strcat(SBJ,'_corr_HFA_acE_mat_avg_main_',roi_id,'_',atlas_id,'_',plt_id);
 figure('Name',fig_name,'Visible',fig_vis,'units','normalized','outerposition',plt_vars.fig_dim);
 hold on;
 
-rois = unique(einfo(:,plt_vars.sort_vec(1)));% numel(unique(einfo(:,plt_vars.sort_vec(2))))];
+% Count number of sig and total pairs for each combination of ROIs
+rois = unique(elec.roi);% numel(unique(einfo(:,plt_vars.sort_vec(2))))];
 roi_corr_cnt = zeros(numel(rois));
 roi_elec_cnt = zeros(numel(rois));
 for pair_ix = 1:size(pairs,1)
-    roi_ix = sort([find(strcmp(rois,einfo{pairs(pair_ix,1),plt_vars.sort_vec(1)})),...
-                    find(strcmp(rois,einfo{pairs(pair_ix,2),plt_vars.sort_vec(1)}))]);
+    % Sort (now min/max) roi_ix so that all results are aggregated on one side of
+    % diagonal (it doesn't matter which elec was in which ROI)
+%     roi_ix = sort([find(strcmp(elec.roi{pairs(pair_ix,1)},rois)) ...
+%                 find(strcmp(elec.roi{pairs(pair_ix,2)},rois))]);
+    roi_ix = sort(pair_rois(pair_ix,:));
     roi_elec_cnt(roi_ix(1),roi_ix(2)) = roi_elec_cnt(roi_ix(1),roi_ix(2))+1;
     if qvals(pair_ix)<=plt_vars.sig_cut
         roi_corr_cnt(roi_ix(1),roi_ix(2)) = roi_corr_cnt(roi_ix(1),roi_ix(2))+1;
@@ -167,10 +194,10 @@ imagesc(roi_corr_cnt./roi_elec_cnt); axis xy;
 ax_tick = 1:numel(rois);
 set(gca,'XLim',[0.5 numel(rois)+0.5],'XTick',ax_tick,'XTickLabel',rois,'FontSize',plt_vars.font_sz);
 set(gca,'YLim',[0.5 numel(rois)+0.5],'YTick',ax_tick,'YTickLabel',rois,'FontSize',plt_vars.font_sz);
-xlabel(einfo_fields{plt_vars.sort_vec(1)});
-ylabel(einfo_fields{plt_vars.sort_vec(1)});
+xlabel(roi_id);
+ylabel(roi_id);
 
-subplot_name = strcat(stat_vars.event_lab,': Proportion sig by ',einfo_fields{plt_vars.sort_vec(1)});
+subplot_name = strcat(stat_vars.event_lab,': Proportion sig by ',roi_id);
 title(subplot_name,'interpreter','none');
 colorbar;
 caxis([0 1]);
@@ -189,85 +216,89 @@ if save_fig
 end
 
 %% Averaged within secondary ROI Matrix
-if plot_scnd_mtx
-    fig_name = strcat(SBJ,'_corr_HFA_acE_mat_avg_scnd_',plt_id);
+% No point in this since I'm using roi_id...
+
+% if plot_scnd_mtx
+%     fig_name = strcat(SBJ,'_corr_HFA_acE_mat_avg_scnd_',roi_id,'_',atlas_id,'_',plt_id);
+%     figure('Name',fig_name,'Visible',fig_vis,'units','normalized','outerposition',plt_vars.fig_dim);
+%     hold on;
+%     
+%     rois = unique(einfo(:,plt_vars.sort_vec(2)));
+%     roi_corr_cnt = zeros(numel(rois));
+%     roi_elec_cnt = zeros(numel(rois));
+%     for pair_ix = 1:size(pairs,1)
+%         roi_ix = sort([find(strcmp(rois,einfo{pairs(pair_ix,1),plt_vars.sort_vec(2)})),...
+%                     find(strcmp(rois,einfo{pairs(pair_ix,2),plt_vars.sort_vec(2)}))]);   % use sort to make sure all on one side of matrix
+%         roi_elec_cnt(roi_ix(1),roi_ix(2)) = roi_elec_cnt(roi_ix(1),roi_ix(2))+1;
+%         if qvals(pair_ix)<=plt_vars.sig_cut
+%             roi_corr_cnt(roi_ix(1),roi_ix(2)) = roi_corr_cnt(roi_ix(1),roi_ix(2))+1;
+%         end
+%     end
+%     imagesc(roi_corr_cnt./roi_elec_cnt); axis xy;
+%
+%     ax_tick = 1:numel(rois);
+%     set(gca,'XLim',[0.5 numel(rois)+0.5],'XTick',ax_tick,'XTickLabel',rois,'FontSize',plt_vars.font_sz);
+%     set(gca,'YLim',[0.5 numel(rois)+0.5],'YTick',ax_tick,'YTickLabel',rois,'FontSize',plt_vars.font_sz);
+%     xlabel(einfo_fields{plt_vars.sort_vec(2)});
+%     ylabel(einfo_fields{plt_vars.sort_vec(2)});
+%
+%     subplot_name = strcat(stat_vars.event_lab,': Proportion sig by ',einfo_fields{plt_vars.sort_vec(2)});
+%     title(subplot_name,'interpreter','none');
+%     colorbar;
+%     caxis([0 1]);
+%
+%
+%     % % One color bar for whole figure
+%     % c=axes('OuterPosition', [0.5 0 0.5 1], 'Visible', 'off');
+%     % tickDiv=(colors(2)-colors(1))/5;
+%     % colorbar('YTick',[colors(1):tickDiv:colors(2)]);
+%     % caxis(colors);
+%
+%     %         suptitle(strcat(SBJ,',',task,': ',fband_pairs{fband},' (combined) ',sortID,'_cscale.',colorscale));
+%     % Save plot
+%     if save_fig
+%         saveas(gcf,[results_dir,fig_name,'.',fig_filetype]);
+%     end
+% end
+%
+%% Plot Distribution of correlation values
+if plot_hist
+    fig_name = strcat(SBJ,'_corr_HFA_acE_hist_',roi_id,'_',atlas_id,'_',plt_id);
     figure('Name',fig_name,'Visible',fig_vis,'units','normalized','outerposition',plt_vars.fig_dim);
     hold on;
     
-    rois = unique(einfo(:,plt_vars.sort_vec(2)));
-    roi_corr_cnt = zeros(numel(rois));
-    roi_elec_cnt = zeros(numel(rois));
-    for pair_ix = 1:size(pairs,1)
-        roi_ix = sort([find(strcmp(rois,einfo{pairs(pair_ix,1),plt_vars.sort_vec(2)})),...
-                    find(strcmp(rois,einfo{pairs(pair_ix,2),plt_vars.sort_vec(2)}))]);   % use sort to make sure all on one side of matrix
-        roi_elec_cnt(roi_ix(1),roi_ix(2)) = roi_elec_cnt(roi_ix(1),roi_ix(2))+1;
-        if qvals(pair_ix)<=plt_vars.sig_cut
-            roi_corr_cnt(roi_ix(1),roi_ix(2)) = roi_corr_cnt(roi_ix(1),roi_ix(2))+1;
-        end
-    end
-    imagesc(roi_corr_cnt./roi_elec_cnt); axis xy;
+    %     ksdensity(corr_vals);
+    histogram(corr_vals,plt_vars.hist_bins,'Normalization','probability');
+    %     y_vals = ylim;
+    %     heights = rand(sum(qvals<plt_vars.sig_cut),1)*plt_vars.y_jitter*diff(y_vals)+mean(y_vals);
+    %     scatter(corr_vals(plot_pairs),heights);
     
-    ax_tick = 1:numel(rois);
-    set(gca,'XLim',[0.5 numel(rois)+0.5],'XTick',ax_tick,'XTickLabel',rois,'FontSize',plt_vars.font_sz);
-    set(gca,'YLim',[0.5 numel(rois)+0.5],'YTick',ax_tick,'YTickLabel',rois,'FontSize',plt_vars.font_sz);
-    xlabel(einfo_fields{plt_vars.sort_vec(2)});
-    ylabel(einfo_fields{plt_vars.sort_vec(2)});
+    %     subplot(2,2,sr_ix+2); hold on;
+    scatter(corr_vals(setdiff(1:numel(corr_vals),plot_pairs)),qvals(setdiff(1:numel(qvals),plot_pairs)),'k');
+    scatter(corr_vals(plot_pairs),qvals(plot_pairs),'r');
+    xlabel('Correlation');
+    ylabel('qval / normalized count');
+    title(stat_vars.event_lab);
     
-    subplot_name = strcat(stat_vars.event_lab,': Proportion sig by ',einfo_fields{plt_vars.sort_vec(2)});
-    title(subplot_name,'interpreter','none');
-    colorbar;
-    caxis([0 1]);
+    % Compare Stim and Response locked
+    % subplot(1,3,3); hold on;
+    % sig_pairs1 = find(qvals{1}<=plt_vars.sig_cut);
+    % sig_pairs2 = find(qvals{2}<=plt_vars.sig_cut);
+    % sig_pairs = union(sig_pairs1,sig_pairs2);
+    % ns_pairs = setdiff(1:numel(qvals{1}),sig_pairs);
+    % scatter(corr_vals{1}(ns_pairs),corr_vals{2}(ns_pairs),'k');
+    % scatter(corr_vals{1}(sig_pairs1),corr_vals{2}(sig_pairs1),'r','Marker','x');
+    % scatter(corr_vals{1}(sig_pairs2),corr_vals{2}(sig_pairs2),'r','Marker','+');
+    % scatter(corr_vals{1}(intersect(sig_pairs1,sig_pairs2)),corr_vals{2}(intersect(sig_pairs1,sig_pairs2)),'c','Marker','*');
+    % xlabel([stat_vars.event_lab{1} ' Correlations']);
+    % ylabel([stat_vars.event_lab{2} ' Correlations']);
+    % legend('not sig',[stat_vars.event_lab{1} '-sig'],[stat_vars.event_lab{2} '-sig'],'both sig');
+    % title([stat_vars.event_lab{1} ' vs. ' stat_vars.event_lab{2}]);
     
-    
-    % % One color bar for whole figure
-    % c=axes('OuterPosition', [0.5 0 0.5 1], 'Visible', 'off');
-    % tickDiv=(colors(2)-colors(1))/5;
-    % colorbar('YTick',[colors(1):tickDiv:colors(2)]);
-    % caxis(colors);
-    
-    %         suptitle(strcat(SBJ,',',task,': ',fband_pairs{fband},' (combined) ',sortID,'_cscale.',colorscale));
     % Save plot
     if save_fig
         saveas(gcf,[results_dir,fig_name,'.',fig_filetype]);
     end
-end
-
-%% Plot Distribution of correlation values
-fig_name = strcat(SBJ,'_corr_HFA_acE_hist_',plt_id);
-figure('Name',fig_name,'Visible',fig_vis,'units','normalized','outerposition',plt_vars.fig_dim);
-hold on;
-
-%     ksdensity(corr_vals);
-histogram(corr_vals,plt_vars.hist_bins,'Normalization','probability');
-%     y_vals = ylim;
-%     heights = rand(sum(qvals<plt_vars.sig_cut),1)*plt_vars.y_jitter*diff(y_vals)+mean(y_vals);
-%     scatter(corr_vals(plot_pairs),heights);
-
-%     subplot(2,2,sr_ix+2); hold on;
-scatter(corr_vals(setdiff(1:numel(corr_vals),plot_pairs)),qvals(setdiff(1:numel(qvals),plot_pairs)),'k');
-scatter(corr_vals(plot_pairs),qvals(plot_pairs),'r');
-xlabel('Correlation');
-ylabel('qval / normalized count');
-title(stat_vars.event_lab);
-
-% Compare Stim and Response locked
-% subplot(1,3,3); hold on;
-% sig_pairs1 = find(qvals{1}<=plt_vars.sig_cut);
-% sig_pairs2 = find(qvals{2}<=plt_vars.sig_cut);
-% sig_pairs = union(sig_pairs1,sig_pairs2);
-% ns_pairs = setdiff(1:numel(qvals{1}),sig_pairs);
-% scatter(corr_vals{1}(ns_pairs),corr_vals{2}(ns_pairs),'k');
-% scatter(corr_vals{1}(sig_pairs1),corr_vals{2}(sig_pairs1),'r','Marker','x');
-% scatter(corr_vals{1}(sig_pairs2),corr_vals{2}(sig_pairs2),'r','Marker','+');
-% scatter(corr_vals{1}(intersect(sig_pairs1,sig_pairs2)),corr_vals{2}(intersect(sig_pairs1,sig_pairs2)),'c','Marker','*');
-% xlabel([stat_vars.event_lab{1} ' Correlations']);
-% ylabel([stat_vars.event_lab{2} ' Correlations']);
-% legend('not sig',[stat_vars.event_lab{1} '-sig'],[stat_vars.event_lab{2} '-sig'],'both sig');
-% title([stat_vars.event_lab{1} ' vs. ' stat_vars.event_lab{2}]);
-
-% Save plot
-if save_fig
-    saveas(gcf,[results_dir,fig_name,'.',fig_filetype]);
 end
 
 %% Plot Time Series of Correlated Electrode Pairs

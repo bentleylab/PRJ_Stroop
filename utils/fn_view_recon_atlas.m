@@ -79,19 +79,19 @@ else
     error(['Unknown view_space: ' view_space]);
 end
 
-% %% Load Atlas
-% fprintf('Using atlas: %s\n',atlas_name);
-% if strcmp(atlas_name,'DK')                  
-%     atlas      = ft_read_atlas(SBJ_vars.recon.fs_DK); % Desikan-Killiany (+volumetric)
-%     atlas.coordsys = 'acpc';
-% elseif strcmp(atlas_name,'Dx')
-%     atlas      = ft_read_atlas(SBJ_vars.recon.fs_Dx); % Destrieux (+volumetric)
-%     atlas.coordsys = 'acpc';
-% else
-%     error(['atlas_name unknown: ' atlas_name]);
-% end
-% atlas.name = atlas_name;
-% % elec.elecpos_fs   = elec.elecpos;
+%% Load Atlas
+fprintf('Using atlas: %s\n',atlas_name);
+if strcmp(atlas_name,'DK')                  
+    atlas      = ft_read_atlas(SBJ_vars.recon.fs_DK); % Desikan-Killiany (+volumetric)
+    atlas.coordsys = 'acpc';
+elseif strcmp(atlas_name,'Dx')
+    atlas      = ft_read_atlas(SBJ_vars.recon.fs_Dx); % Destrieux (+volumetric)
+    atlas.coordsys = 'acpc';
+else
+    error(['atlas_name unknown: ' atlas_name]);
+end
+atlas.name = atlas_name;
+% elec.elecpos_fs   = elec.elecpos;
 
 %% Match elecs to atlas ROIs
 if any(strcmp(atlas_name,{'DK','Dx'}))

@@ -107,7 +107,7 @@ plot_scnd_mtx = 0;
 fig_filetype = 'png';
 for sbj_ix = 1:numel(SBJs)
     fprintf('Running for %s\n',SBJs{sbj_ix});
-%     SBJ11a_corr_HFA_acE_surr(SBJs{sbj_ix},pipeline_id,stat_id,an_id_main,plt_id)
+    SBJ11a_corr_HFA_acE_surr(SBJs{sbj_ix},pipeline_id,stat_id,an_id_main,plt_id)
     SBJ11b_corr_HFA_acE_plot_mat_ts(SBJs{sbj_ix},pipeline_id,stat_id,an_id_main,roi_id,atlas_id,plt_id,...
         plot_ts,plot_scnd_mtx,plot_hist,save_fig,'off',fig_filetype)
 %     pause;
