@@ -1,4 +1,4 @@
-function [labels, colors, einfo_col] = fn_roi_label_styles(roi_id)
+function [labels, colors] = fn_roi_label_styles(roi_id)
 %% Converts the name of a set of ROIs into labels, plotting colors
 % condition_name: [str] 'ROI', 'gROI', 'INS', 'LPFC', 'MPFC', 'OFC'
 % colors from http://colorbrewer2.org/#type=qualitative&scheme=Set1&n=3
@@ -15,11 +15,13 @@ switch roi_id
         labels(strmatch('OUT',labels,'exact')) = [];
         labels(strmatch('',labels,'exact')) = [];
         einfo_col = 2;
+case 'Yeo7'
+        labels = {'Vis','SM','DAttn','VAttn','Limb','FP','Def'};
     case 'Main3'
         labels = {'LPFC','MPFC','INS'};
         einfo_col = 3;
     case 'gROI'
-        labels = {'LPFC','MPFC','INS','OFC','PAR'};
+        labels = {'LPFC','MPFC','INS','OFC','PAR','TMP'};
         einfo_col = 3;
     case 'thryROI'
         labels = {'DLPFC','VLPFC','PM','aMCC','preSMA','SMA','daINS','vaINS','FO'};
