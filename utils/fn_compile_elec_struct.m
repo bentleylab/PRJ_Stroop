@@ -149,6 +149,11 @@ if any(danger_name)
 end
 
 %% Save data
+% Check if elec.cfg.previosu got ridiculously large, and keep only first
+var_stats = whos('elec');
+if var_stats.bytes>1000000
+    elec.cfg = rmfield(elec.cfg,'previous');
+end
 output_filename = strcat(SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',elec_ext,'.mat');
 fprintf('============== Saving %s ==============\n',output_filename);
 save(output_filename, '-v7.3', 'elec');

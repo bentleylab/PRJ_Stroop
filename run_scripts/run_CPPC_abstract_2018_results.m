@@ -69,14 +69,22 @@ end
 % end
 
 %% Plot onsets of ANOVA+RT
+stat_id     = 'corrRT_CNI_pcon_WL200_WS50';
+atlas_opts  = {'Dx','Yeo7'};%'Dx';
+an_opts     = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
+median_yn   = 0;
+roi_opts    = {'gROI','Yeo7'};%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
+fig_filetype= 'png';
 plt_opts       = {'onsets_trl0to15_evnt_roi','onsets_trl5to1_evnt_roi'};
 fig_filetype = 'png';%'svg'
 for roi_ix = 1:numel(roi_opts)
     for an_ix = 1:2
+        SBJ10c_HFA_GRP_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},median_yn,roi_opts{roi_ix},...
+                                                    atlas_opts{roi_ix},0,plt_opts{an_ix},1,'on',fig_filetype)
 %         SBJ10c_HFA_GRP_onsets_ROI_RTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
 %                                                     atlas_id,0,plt_opts{an_ix},1,'on',fig_filetype)
-        SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
-                                                    atlas_id,0,plt_opts{an_ix},save_fig,fig_vis)
+%         SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
+%                                                     atlas_id,0,plt_opts{an_ix},save_fig,fig_vis)
     end
 end
 
