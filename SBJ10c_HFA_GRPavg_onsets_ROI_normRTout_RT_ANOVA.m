@@ -1,22 +1,32 @@
-function SBJ10c_HFA_GRP_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_id,roi_id,...
+function SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_id,grp_metric,roi_id,...
                                                     atlas_id,gm_thresh,plt_id,save_fig,fig_vis,fig_filetype)
 % Load HFA analysis results for active and condition-differentiating
 %   epochs, plot a summary of those time period per electrode
 % Normalize all onset times by mean(RT)
+% INPUTS:
+%   grp_metric [str] - {'mean','median','none'}
+%       mean/median will compute that metric within each SBJ (variance is across SBJs)
+%       none- all electrode onsets are aggregated as if from the same SBJ
 % clear all; %close all;
 % fig_filetype = 'png';
 label_spacer = 0;
 groi_label_spacer = '      ';
 if ischar(save_fig); save_fig = str2num(save_fig); end
 % if isnumeric(actv_win); actv_win = num2str(actv_win); end
+if strcmp(grp_metric,'median')
+    grp_metric_lab = 'mdn';
+elseif strcmp(grp_metric,'mean')
+    grp_metric_lab = 'avg';
+else
+    error(['Unknown grp_metric: ' grp_metric]);
+end
 
 %% Data Preparation
 % Set up paths
-[root_dir, ft_dir] = fn_get_root_dir();
+[root_dir, app_dir] = fn_get_root_dir();
 addpath([root_dir 'PRJ_Stroop/scripts/']);
 addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
-addpath(ft_dir);
-ft_defaults
+addpath([app_dir 'Violinplot-Matlab/']);
 
 %% Prep variables
 an_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m'];
@@ -40,6 +50,13 @@ end
 
 % Load all ROI info
 [roi_list, roi_colors] = fn_roi_label_styles(roi_id);
+if any(strcmp(atlas_id,{'DK','Dx'}))
+    view_space = 'pat';
+elseif any(strcmp(atlas_id,{'Yeo7','Yeo17'}))
+    view_space = 'mni_v';
+else
+    error(['Unknown atlas_id: ' atlas_id]);
+end
 
 % Set up onset counts
 all_onsets  = cell([numel(SBJs) numel(roi_list) numel(grp_lab)+1]);
@@ -71,8 +88,18 @@ for sbj_ix = 1:numel(SBJs)
     win_center = round(mean(win_lim,2));
     
     %% Load ROI and GM/WM info
-    elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_' atlas_id '_tis.mat'];
-    load(elec_tis_fname);
+    if any(strcmp(atlas_id,{'DK','Dx'})) % these have tissue probabilities
+        elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_' view_space '_' atlas_id '_tis.mat'];
+        load(elec_tis_fname);
+    else
+        % Load tissue prob
+        elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_Dx_tis.mat'];
+        load(elec_tis_fname);
+        tiss_prob = elec.tissue_prob;
+        elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_' view_space '_' atlas_id '.mat'];
+        load(elec_fname);
+        elec.tissue_prob = tiss_prob;
+    end
     
     % Sort elecs by stat labels
     cfgs = []; cfgs.channel = stat.label;
@@ -130,34 +157,44 @@ for sbj_ix = 1:numel(SBJs)
     clear SBJ SBJ_vars hfa stat einfo w2
 end
 %% Compute medians per gROI
-median_onsets = NaN([numel(SBJs) numel(roi_list) numel(grp_lab)+1]);
-for sbj_ix = 1:numel(SBJs)
-    for roi_ix = 1:numel(roi_list)
-        for grp_ix = 1:numel(grp_lab)
-            median_onsets(sbj_ix,roi_ix,grp_ix) = nanmedian(all_onsets{sbj_ix,roi_ix,grp_ix});
+plot_onsets = cell([numel(roi_list) numel(cond_lab)]);
+for roi_ix = 1:numel(roi_list)
+    for cond_ix = 1:numel(cond_lab)
+        if ~strcmp(grp_metric,'none')
+            % Aggregate onsets per ROI within each SBJ
+            for sbj_ix = 1:numel(SBJs)
+                if strcmp(grp_metric,'median')
+                    plot_onsets{roi_ix,cond_ix} = [plot_onsets{roi_ix,cond_ix} nanmedian(all_onsets{sbj_ix,roi_ix,cond_ix})];
+                elseif strcmp(grp_metric,'mean')
+                    plot_onsets{roi_ix,cond_ix} = [plot_onsets{roi_ix,cond_ix} nanmean(all_onsets{sbj_ix,roi_ix,cond_ix})];
+                end
+            end
+        else
+            plot_onsets{roi_ix,cond_ix} = [all_onsets{:,roi_ix,cond_ix}];
+            % Report results in text
+            %         fprintf('%s , %s: %f (N=%i)\n',SBJs{sbj_ix},groi_list{groi_ix},...
+            %             median_onsets(sbj_ix,groi_ix),numel(cond_g_onsets{sbj_ix,groi_ix}));
+            %         disp(cond_g_onsets{sbj_ix,groi_ix});
+            %         fprintf('\n');
         end
-        median_onsets(sbj_ix,roi_ix,numel(grp_lab)+1) = nanmedian(all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1});
-%         fprintf('%s , %s: %f (N=%i)\n',SBJs{sbj_ix},groi_list{groi_ix},...
-%             median_onsets(sbj_ix,groi_ix),numel(cond_g_onsets{sbj_ix,groi_ix}));
-%         disp(cond_g_onsets{sbj_ix,groi_ix});
-%         fprintf('\n');
     end
 end
 
 %% Plot GROI Results
 for cond_ix = 1:numel(cond_lab)
     % Create and format the plot
-    fig_name = ['GRP_HFA_onsets_' cond_lab{cond_ix} '_' roi_id '_' event_lab...
-        '_GM' num2str(gm_thresh) '_meanRTout'];
+    fig_name = ['GRP' grp_metric_lab '_HFA_onsets_' cond_lab{cond_ix} '_' roi_id '_' event_lab...
+        '_GM' num2str(gm_thresh) '_normRTout'];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.9 1],'Visible',fig_vis);
     
-    % Plot Condition Difference Onsets per SBJ
-    ax = subplot(2,1,1);
+    !!! get violinplot working!!!
+    % Plot Condition Difference Onsets per ROI
+%     ax = subplot(2,1,1);
     hold on;
     median_line_height = 0.3;
-    SBJ_y_spacer       = 0.35;
-    SBJ_ys             = SBJ_y_spacer*[1:numel(SBJs)]-median_line_height/3;
+    ROI_y_spacer       = 0.35;
+    ROI_ys             = ROI_y_spacer*[1:numel(SBJs)]-median_line_height/3;
     rt_marker_width    = 3;
     rt_marker_size     = 250;
     onset_marker_size  = 150;
@@ -170,7 +207,7 @@ for cond_ix = 1:numel(cond_lab)
         for roi_ix = 1:numel(roi_list)
             if ~isempty(all_onsets{sbj_ix,roi_ix,cond_ix})
                 tmp_s = scatter(all_onsets{sbj_ix,roi_ix,cond_ix},...
-                    repmat(SBJ_ys(sbj_ix)+roi_y_offset(roi_ix),...
+                    repmat(ROI_ys(sbj_ix)+roi_y_offset(roi_ix),...
                     [1 numel(all_onsets{sbj_ix,roi_ix,cond_ix})]),...
                     onset_marker_size,'o','filled');
                 set(tmp_s,'MarkerFaceColor',roi_colors{roi_ix},'MarkerEdgeColor','k');
@@ -180,7 +217,7 @@ for cond_ix = 1:numel(cond_lab)
             end
         end
         if strcmp(event_lab,'stim')
-            r = scatter(1-plt_vars.plt_lim(1),SBJ_ys(sbj_ix),rt_marker_size,'+');
+            r = scatter(1-plt_vars.plt_lim(1),ROI_ys(sbj_ix),rt_marker_size,'+');
             if sbj_ix==1
                 s        = {s{:} r};
                 roi_flag = [roi_flag 1];
@@ -188,15 +225,17 @@ for cond_ix = 1:numel(cond_lab)
             end
         else
 %             error('plotting RT markers for resp-locked looks wrong...');
-            r = scatter(mean_RTs(sbj_ix),SBJ_ys(sbj_ix),rt_marker_size,'+');
+            r = scatter(mean_RTs(sbj_ix),ROI_ys(sbj_ix),rt_marker_size,'+');
         end
         set(r,'MarkerEdgeColor','k','LineWidth',rt_marker_width);
-        for roi_ix = 1:numel(roi_list)
-            line([median_onsets(sbj_ix,roi_ix,cond_ix) median_onsets(sbj_ix,roi_ix,cond_ix)],...
-                [SBJ_ys(sbj_ix)-median_line_height/2 SBJ_ys(sbj_ix)+median_line_height/2],...
-                'Color',roi_colors{roi_ix},'LineStyle','-','LineWidth',3);
+        if grp_metric
+            for roi_ix = 1:numel(roi_list)
+                line([median_onsets(sbj_ix,roi_ix,cond_ix) median_onsets(sbj_ix,roi_ix,cond_ix)],...
+                    [ROI_ys(sbj_ix)-median_line_height/2 ROI_ys(sbj_ix)+median_line_height/2],...
+                    'Color',roi_colors{roi_ix},'LineStyle','-','LineWidth',3);
+            end
         end
-        line([plt_vars.plt_lim(1) plt_vars.plt_lim(2)],[SBJ_ys(sbj_ix) SBJ_ys(sbj_ix)],...
+        line([plt_vars.plt_lim(1) plt_vars.plt_lim(2)],[ROI_ys(sbj_ix) ROI_ys(sbj_ix)],...
             'Color',[0.2 0.2 0.2],'LineStyle',':');
     end
     for roi_ix = 1:numel(roi_list)
@@ -209,16 +248,16 @@ for cond_ix = 1:numel(cond_lab)
     
     % ax = gca;
     % Plot labels
-    % ax.XLabel.String   = 'Time (s)';
-    % ax.XLabel.FontSize = 14;
+%     ax.XLabel.String   = '% Reaction Time';
+%     ax.XLabel.FontSize = 14;
     ax.XLim    = plt_vars.plt_lim;
     ax.XTick   = plt_vars.plt_lim(1):plt_vars.x_step_sz:plt_vars.plt_lim(2);
     ax.XColor  = 'k';
     
     ax.YLabel.String   = 'Subject';
     ax.YLabel.FontSize = 14;
-    ax.YLim            = [0 max(SBJ_ys)+median_line_height/2];
-    ax.YTick           = SBJ_ys;        % Ticks anywhere non-zero in plot_idx
+    ax.YLim            = [0 max(ROI_ys)+median_line_height/2];
+    ax.YTick           = ROI_ys;        % Ticks anywhere non-zero in plot_idx
     ax.YTickLabel      = SBJs;
     % ax.YTickLabelRotation = 45;
     ax.YColor  = 'k';
@@ -235,26 +274,36 @@ for cond_ix = 1:numel(cond_lab)
     % hist_alpha = 0.6;
     hist_data = zeros([numel(roi_list) numel(plt_vars.x_data)-1]);
     for roi_ix = 1:numel(roi_list)
-        hist_data(roi_ix,:)  = histcounts(median_onsets(:,roi_ix,cond_ix),plt_vars.x_data);
+        if grp_metric
+            hist_data(roi_ix,:)  = histcounts(median_onsets(:,roi_ix,cond_ix),plt_vars.x_data);
+        else
+            hist_data(roi_ix,:)  = histcounts([all_onsets{:,roi_ix,cond_ix}],plt_vars.x_data);
+        end
     end
     b = bar(plt_vars.x_data(1:end-1)+(diff(plt_vars.x_data(1:2))/2),hist_data',1,'stacked');
     for roi_ix = numel(roi_list):-1:1 %backwards so OFC doesn't overwrite LPFC mean onset
         set(b(roi_ix),'FaceColor',roi_colors{roi_ix},'EdgeColor','k');
-        l(roi_ix) = line([nanmean(median_onsets(:,roi_ix,cond_ix))...
-            nanmean(median_onsets(:,roi_ix,cond_ix))],...
-            ax2.YLim,'Color',roi_colors{roi_ix},'LineStyle','-','LineWidth',3);
-        fprintf('%s mean(RT) for %s:\t%f\n',cond_lab{cond_ix},roi_list{roi_ix},...
-            nanmean(median_onsets(:,roi_ix,cond_ix)));
+        if grp_metric
+            l(roi_ix) = line([nanmean(median_onsets(:,roi_ix,cond_ix))...
+                nanmean(median_onsets(:,roi_ix,cond_ix))],...
+                ax2.YLim,'Color',roi_colors{roi_ix},'LineStyle','-','LineWidth',3);
+            fprintf('%s mean(RT) for %s:\t%f\n',cond_lab{cond_ix},roi_list{roi_ix},...
+                nanmean(median_onsets(:,roi_ix,cond_ix)));
+        end
     end
     legend(b,roi_list{:},'Location','northeast');
     % Plot labels
-    ax2.XLabel.String   = 'Time (s)';
+    ax2.XLabel.String   = '% Reaction Time';
     ax2.XLabel.FontSize = 14;
     ax2.XLim    = plt_vars.plt_lim;
     ax2.XTick   = plt_vars.plt_lim(1):plt_vars.x_step_sz:plt_vars.plt_lim(2);
     ax2.XColor  = 'k';
     
-    ax2.YLabel.String   = '# Median Onsets';
+    if grp_metric
+        ax2.YLabel.String   = '# Median Onsets';
+    else
+        ax2.YLabel.String   = '# Onsets';
+    end
     ax2.YLabel.FontSize = 14;
     % ax2.YLim            = [0 numel(SBJs)+1];
     ax2.YTick           = 1:1:ax2.YLim(2);        % Ticks anywhere non-zero in plot_idx
@@ -262,7 +311,11 @@ for cond_ix = 1:numel(cond_lab)
     % ax2.YTickLabelRotation = 45;
     ax2.YColor  = 'k';
     
-    ax2.Title.String = ['Group-Level Median ' cond_lab{cond_ix} ' Onsets by ' roi_id];
+    if grp_metric
+        ax2.Title.String = ['Group-Level Median ' cond_lab{cond_ix} ' Onsets by ' roi_id];
+    else
+        ax2.Title.String = ['Group-Level ' cond_lab{cond_ix} ' Onsets by ' roi_id];
+    end
     ax2.Title.FontSize = 16;
     
     % Reposition axes
