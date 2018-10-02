@@ -10,7 +10,7 @@ function fn_compile_einfo(SBJ,pipeline_id)
 % left_out_ch = labels of channels that aren't included (don't have contiguous pair)
 
 % Set up paths
-[root_dir, ft_dir] = fn_get_root_dir();
+[root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 addpath([root_dir 'PRJ_Stroop/scripts/']);
 addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
 addpath(ft_dir);

@@ -1,5 +1,5 @@
 %% IR69 Processing Variables
-[root_dir, ft_dir] = fn_get_root_dir();
+[root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 if isempty(strfind(path,'fieldtrip'))
     addpath(ft_dir);
     ft_defaults
@@ -9,11 +9,12 @@ end
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'IR69';
-SBJ_vars.raw_file = {''};
-SBJ_vars.block_name = {''};
+SBJ_vars.raw_file = {'IR69_raw_R1.mat'};
+SBJ_vars.block_name = {'_R1'};% there's a second block I don't want to process right now, so leaving blank here
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
+SBJ_vars.dirs.SU      = [SBJ_vars.dirs.raw 'SU_2018-02-07_13-17-17/'];
 SBJ_vars.dirs.import  = [SBJ_vars.dirs.SBJ '01_import/'];
 SBJ_vars.dirs.preproc = [SBJ_vars.dirs.SBJ '02_preproc/'];
 SBJ_vars.dirs.events  = [SBJ_vars.dirs.SBJ '03_events/'];
@@ -55,15 +56,15 @@ SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preo
 %SBJ_vars.orig_srate = hdr.Fs;
 %clear hdr;
 
-SBJ_vars.ch_lab.probes     = {};
-SBJ_vars.ch_lab.probe_type = {};
-SBJ_vars.ch_lab.ref_type   = {};
-SBJ_vars.ch_lab.ROI        = {};
+SBJ_vars.ch_lab.probes     = {'RAM','RHH','RTH','ROF','FOA','mram','mrhh','mrth','mrof','mfoa'};
+SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','su','su','su','su','su'};
+SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','','','','',''};
+SBJ_vars.ch_lab.ROI        = {'ROF*','FOA*'};
 SBJ_vars.ch_lab.eeg_ROI    = {};
 
-SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
-SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
-SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
+% SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
+SBJ_vars.ch_lab.suffix = '_0010';    % after every channel except 'EDF Annotations'
+% SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
 
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
@@ -71,8 +72,8 @@ SBJ_vars.ch_lab.bad = {...
 SBJ_vars.ch_lab.eeg = {};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};
 SBJ_vars.ch_lab.eog = {};
-SBJ_vars.ch_lab.photod = {};
-SBJ_vars.ch_lab.mic    = {};
+SBJ_vars.ch_lab.photod = {'Photo1'};
+SBJ_vars.ch_lab.mic    = {'Mic1'};
 
 %--------------------------------------
 % Line Noise Parameters
@@ -83,7 +84,9 @@ SBJ_vars.bs_width    = 2;
 %--------------------------------------
 % Time Parameters
 %--------------------------------------
-SBJ_vars.analysis_time = {{}};
+% R1: ~108 to ~1070
+% R2: TBD...
+SBJ_vars.analysis_time = {{[98.0 1080.0]}};
 
 %--------------------------------------
 % Artifact Rejection Parameters

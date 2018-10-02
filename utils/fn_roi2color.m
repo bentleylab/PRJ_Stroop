@@ -106,7 +106,21 @@ for r = 1:n_rois
             RGB(r,:) = [0 0 0];
             
 %             % Yeo Atlases
-%         case
+        case 'Vis'
+            RGB(r,:) = [120  18 134]./256;
+        case 'SM'
+            RGB(r,:) = [70 130 180]./256;
+        case 'DAttn'
+            RGB(r,:) = [0 118  14]./256;
+        case 'VAttn'
+            RGB(r,:) = [196  58 250]./256;
+        case 'Limb'
+            RGB(r,:) = [220 248 164]./256;
+        case 'FP'
+            RGB(r,:) = [230 148  34]./256;
+        case 'Def'
+            RGB(r,:) = [205  62  78]./256;
+
             % Tissue Types
         case 'GM'
             RGB(r,:) = [0.4 0.4 0.4];

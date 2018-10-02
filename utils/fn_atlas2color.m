@@ -17,7 +17,7 @@ switch atlas_name
             'Limb'%'7Networks_5'
             'FP'%'7Networks_6'
             'Def'%'7Networks_7'
-            'no_label_found'
+            'OUT'
             };
         colors = [
             120  18 134;

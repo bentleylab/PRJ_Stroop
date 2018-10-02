@@ -10,7 +10,7 @@ function fn_compile_elec_struct(SBJ,pipeline_id,view_space,reg_type)
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
 
 % Set up paths
-[root_dir, ft_dir] = fn_get_root_dir();
+[root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 addpath([root_dir 'PRJ_Stroop/scripts/']);
 addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
 addpath(ft_dir);
@@ -149,6 +149,11 @@ if any(danger_name)
 end
 
 %% Save data
+% Check if elec.cfg.previosu got ridiculously large, and keep only first
+var_stats = whos('elec');
+if var_stats.bytes>1000000
+    elec.cfg = rmfield(elec.cfg,'previous');
+end
 output_filename = strcat(SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',elec_ext,'.mat');
 fprintf('============== Saving %s ==============\n',output_filename);
 save(output_filename, '-v7.3', 'elec');

@@ -15,7 +15,7 @@ if isnumeric(actv_win); actv_win = num2str(actv_win); end
 
 %% Data Preparation
 % Set up paths
-[root_dir, ft_dir] = fn_get_root_dir();
+[root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 addpath([root_dir 'PRJ_Stroop/scripts/']);
 addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
 addpath(ft_dir);

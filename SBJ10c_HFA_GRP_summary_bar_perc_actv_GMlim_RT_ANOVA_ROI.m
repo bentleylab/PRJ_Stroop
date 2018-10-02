@@ -15,7 +15,7 @@ if isnumeric(actv_win); actv_win = num2str(actv_win); end
 
 %% Data Preparation
 % Set up paths
-[root_dir, ft_dir] = fn_get_root_dir();
+[root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 addpath([root_dir 'PRJ_Stroop/scripts/']);
 addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
 addpath(ft_dir);
@@ -36,7 +36,7 @@ eval(stat_vars_cmd);
 % end
 
 % Load all ROI info
-[roi_list, roi_colors, ~] = fn_roi_label_styles(roi_id);
+[roi_list, roi_colors] = fn_roi_label_styles(roi_id);
 
 % Get event timing
 if strcmp(an_id(1:5),'HGm_S')
@@ -74,8 +74,16 @@ for sbj_ix = 1:numel(SBJs)
     tmp = load(actv_filename,'hfa'); hfa_actv = tmp.hfa;
     
     %% Load ROI and GM/WM info
-    elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_' atlas_id '_tis.mat'];
-    load(elec_tis_fname);
+    if gm_thresh>0
+        elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_' atlas_id '_tis.mat'];
+    else
+        if strcmp(atlas_id,'Yeo7')
+            elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_mni_v_' atlas_id '.mat'];
+        else
+            elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_' atlas_id '.mat'];
+        end
+    end
+    load(elec_fname);
     
     % Sort elecs by stat labels
     cfgs = []; cfgs.channel = stat.label;
@@ -83,7 +91,11 @@ for sbj_ix = 1:numel(SBJs)
     roi_lab    = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
     
     % Get GM probability from tissue labels {'GM','WM','CSF','OUT'}
-    gm_bin  = elec.tissue_prob(:,1)>gm_thresh;
+    if gm_thresh>0
+        gm_bin  = elec.tissue_prob(:,1)>gm_thresh;
+    else
+        gm_bin = ones(size(elec.label));
+    end
     
     %% Process parameters
     %!!! is this the best way to do this??? Maybe not...
