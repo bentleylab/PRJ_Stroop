@@ -2,7 +2,7 @@
 % Yeo atlases need to be warped to the Colin27 brain (all patients warped there)
 
 %% Set up directories
-[root_dir, ft_dir] = fn_get_root_dir();
+[root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 yeo_v_dir = [root_dir 'PRJ_Stroop/data/atlases/Yeo/Yeo_JNeurophysiol11_MNI152/'];
 
 %% Load Yeo's template brain

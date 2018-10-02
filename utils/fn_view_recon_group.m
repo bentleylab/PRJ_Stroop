@@ -9,7 +9,7 @@ function fn_view_recon_group(SBJs, pipeline_id, plot_type, reg_type, show_labels
 %   show_labels [0/1] - plot the electrode labels
 %   hemi [str] - {'l', 'r', 'b'} hemisphere to plot
 
-[root_dir, ft_dir] = fn_get_root_dir();
+[root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 
 view_angle = [-90 0];
 if strcmp(reg_type,'v') || strcmp(reg_type,'s')

@@ -1,5 +1,5 @@
 %% IR61 Processing Variables
-[root_dir, ft_dir] = fn_get_root_dir();
+[root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 if isempty(strfind(path,'fieldtrip'))
     addpath(ft_dir);
     ft_defaults

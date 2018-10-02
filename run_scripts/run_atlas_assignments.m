@@ -7,7 +7,7 @@
 % SBJs = {'IR21','IR27','IR31','IR35','IR39','IR41','IR48','IR52','IR54','IR57','IR61','IR68','IR72','IR74'};
 
 % Full SBJ list (completed and ready to run)
-SBJs = {'CP24','IR21','IR27','IR31','IR35','IR39','IR41','IR48','IR52','IR54','IR57','IR61','IR65','IR68','IR72','IR74'};
+SBJs = {'CP24','IR21','IR27','IR31','IR32','IR35','IR39','IR41','IR48','IR52','IR54','IR57','IR61','IR65','IR68','IR72','IR74'};
 
 SBJs = {'IR32'};
 fn_compile_elec_struct(SBJs{1},'main_ft','pat','');

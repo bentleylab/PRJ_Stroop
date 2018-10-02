@@ -1,5 +1,5 @@
-SBJs = {};%,
-for s = 8:numel(SBJs)
+SBJs = {};
+for s = 1:numel(SBJs)
     fprintf('============================================================================\n');
     fprintf(['\t' SBJs{s} ' pat\n']);
     fprintf('============================================================================\n');
@@ -16,10 +16,10 @@ end
 
 
 % IN PROGRESS:
-TBD_SBJs = {'IR26','IR32','IR37'};
+TBD_SBJs = {'IR26'};
 % 26- needs all processing
-% 32- figure out how to deal with interhemispheric L/R (same chanpos, so deleted as duplicates in ft_appendsens
 % 37- needs elec update from Ricahrd
+% never: IR37 (lesion)
 
 % DONE:
-done_SBJs = {'IR21','IR27','IR31','IR35','IR39','IR41','IR48','IR52','IR54','IR57','IR61','IR65','IR68','IR72','IR74'};
+done_SBJs = {'IR21','IR27','IR31','IR32','IR35','IR39','IR41','IR48','IR52','IR54','IR57','IR61','IR65','IR68','IR72','IR74'};

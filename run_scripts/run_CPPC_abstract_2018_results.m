@@ -6,7 +6,7 @@ addpath(ft_dir);
 ft_defaults
 
 %% Set up variables to enter function
-SBJs = {'IR21','IR31','IR35','IR39','IR41','IR52','IR54','IR57','IR61','IR68','IR72','IR74'};%'IR26','IR32','IR65',  %NOT 'IR27','IR48',
+SBJs = {'IR21','IR31','IR32','IR35','IR39','IR41','IR52','IR54','IR57','IR61','IR65','IR68','IR72','IR74'};%ALMOST: 'CP24','IR26',  %NEVER: 'IR27','IR37','IR48',
 pipeline_id = 'main_ft';
 actv_win    = '100';
 save_fig    = 1;

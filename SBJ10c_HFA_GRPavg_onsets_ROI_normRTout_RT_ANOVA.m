@@ -23,10 +23,9 @@ end
 
 %% Data Preparation
 % Set up paths
-[root_dir, app_dir] = fn_get_root_dir();
+[root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 addpath([root_dir 'PRJ_Stroop/scripts/']);
 addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
-addpath([app_dir 'Violinplot-Matlab/']);
 
 %% Prep variables
 an_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m'];
@@ -156,26 +155,38 @@ for sbj_ix = 1:numel(SBJs)
     end
     clear SBJ SBJ_vars hfa stat einfo w2
 end
-%% Compute medians per gROI
-plot_onsets = cell([numel(roi_list) numel(cond_lab)]);
-for roi_ix = 1:numel(roi_list)
-    for cond_ix = 1:numel(cond_lab)
+%% Aggregate/Process onsets per gROI
+% Format as struct to fit violinplot
+plot_onsets = cell([numel(cond_lab) 1]);
+struct_str = [];    % Create the fields for each ROI inside the cells
+for roi_ix = 1:numel(roi_list);
+    struct_str = [struct_str '''' roi_list{roi_ix} ''',[],'];
+end
+for cond_ix = 1:numel(cond_lab)
+    plot_onsets{cond_ix} = eval(['struct(' struct_str(1:end-1) ');']);
+    for roi_ix = 1:numel(roi_list)
         if ~strcmp(grp_metric,'none')
             % Aggregate onsets per ROI within each SBJ
             for sbj_ix = 1:numel(SBJs)
                 if strcmp(grp_metric,'median')
-                    plot_onsets{roi_ix,cond_ix} = [plot_onsets{roi_ix,cond_ix} nanmedian(all_onsets{sbj_ix,roi_ix,cond_ix})];
+                    eval(['plot_onsets{cond_ix}.' roi_list{roi_ix} ' = [plot_onsets{cond_ix}.' ...
+                        roi_list{roi_ix} ' nanmedian(all_onsets{sbj_ix,roi_ix,cond_ix})];']);
                 elseif strcmp(grp_metric,'mean')
-                    plot_onsets{roi_ix,cond_ix} = [plot_onsets{roi_ix,cond_ix} nanmean(all_onsets{sbj_ix,roi_ix,cond_ix})];
+                    eval(['plot_onsets{cond_ix}.' roi_list{roi_ix} ' = [plot_onsets{cond_ix}.' ...
+                        roi_list{roi_ix} ' nanmean(all_onsets{sbj_ix,roi_ix,cond_ix})];']);
+                    %                     plot_onsets{roi_ix,cond_ix} = [plot_onsets{roi_ix,cond_ix} nanmean(all_onsets{sbj_ix,roi_ix,cond_ix})];
                 end
             end
         else
-            plot_onsets{roi_ix,cond_ix} = [all_onsets{:,roi_ix,cond_ix}];
+            eval(['plot_onsets{cond_ix}.' roi_list{roi_ix} ' = [all_onsets{:,roi_ix,cond_ix}];']);
             % Report results in text
             %         fprintf('%s , %s: %f (N=%i)\n',SBJs{sbj_ix},groi_list{groi_ix},...
             %             median_onsets(sbj_ix,groi_ix),numel(cond_g_onsets{sbj_ix,groi_ix}));
             %         disp(cond_g_onsets{sbj_ix,groi_ix});
             %         fprintf('\n');
+        end
+        if eval(['all(isnan(plot_onsets{cond_ix}.' roi_list{roi_ix} '))'])
+            plot_onsets{cond_ix} = eval(['rmfield(plot_onsets{cond_ix},''' roi_list{roi_ix} ''')']);
         end
     end
 end
@@ -189,6 +200,7 @@ for cond_ix = 1:numel(cond_lab)
         'outerposition',[0 0 0.9 1],'Visible',fig_vis);
     
     !!! get violinplot working!!!
+    violinplot(plot_onsets{cond_ix});%add in colors
     % Plot Condition Difference Onsets per ROI
 %     ax = subplot(2,1,1);
     hold on;

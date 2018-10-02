@@ -9,9 +9,9 @@ addpath(ft_dir);
 ft_defaults
 
 %% Read photodiode
-photo_label = 'Photo1_0010';
+photo_label = 'Photo1_0003';
 inverted = 1;
-nlx_dir = [root_dir 'PRJ_Stroop/data/IR69/00_raw/SU_R1_2018-02-07_13-17-17/'];
+nlx_dir = [root_dir 'PRJ_Stroop/data/IR75/00_raw/SU_2018-06-01_14-37-09/'];
 photo = ft_read_neuralynx_interp({[nlx_dir 'photo/' photo_label '.ncs']});
 photo.label = {'Photo1'};
 if inverted
