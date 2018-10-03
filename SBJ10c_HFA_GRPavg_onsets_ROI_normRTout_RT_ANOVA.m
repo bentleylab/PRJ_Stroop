@@ -13,11 +13,6 @@ label_spacer = 0;
 groi_label_spacer = '      ';
 if ischar(save_fig); save_fig = str2num(save_fig); end
 % if isnumeric(actv_win); actv_win = num2str(actv_win); end
-if strcmp(plt_vars.grp_metric,'all')
-    SBJ_colors = distinguishable_colors(numel(SBJs));
-else
-    error(['Unknown plt_vars.grp_metric: ' plt_vars.grp_metric]);
-end
 
 %% Data Preparation
 % Set up paths
@@ -53,6 +48,9 @@ elseif any(strcmp(atlas_id,{'Yeo7','Yeo17'}))
     view_space = 'mni_v';
 else
     error(['Unknown atlas_id: ' atlas_id]);
+end
+if strcmp(plt_vars.grp_metric,'all')
+    SBJ_colors = distinguishable_colors(numel(SBJs));
 end
 
 % Set up onset counts
@@ -167,6 +165,8 @@ for cond_ix = 1:numel(cond_lab)
         if strcmp(plt_vars.grp_metric,'all')
             plot_onsets{cond_ix}{roi_ix} = [all_onsets{:,roi_ix,cond_ix}]';
             plot_onset_sbj{cond_ix}{roi_ix} = [];
+        else
+            plot_onsets{cond_ix}{roi_ix} = [];
         end
         for sbj_ix = 1:numel(SBJs)
             % Aggregate onsets per ROI within each SBJ
@@ -188,8 +188,10 @@ for cond_ix = 1:numel(cond_lab)
         end
     end
     plot_onsets{cond_ix} = padcat(plot_onsets{cond_ix}{:});
-    plot_onset_sbj{cond_ix} = padcat(plot_onset_sbj{cond_ix}{:});
     [~,good_roi_map{cond_ix}] = find(~all(isnan(plot_onsets{cond_ix}),1)==1);
+    if strcmp(plt_vars.grp_metric,'all')
+        plot_onset_sbj{cond_ix} = padcat(plot_onset_sbj{cond_ix}{:});
+    end
 end
 
 %% Plot GROI Results
@@ -202,13 +204,14 @@ for cond_ix = 1:numel(cond_lab)
     
     violins = violinplot(plot_onsets{cond_ix}(:,good_roi_map{cond_ix}),roi_list(good_roi_map{cond_ix}),...
                             'ViolinAlpha',0.3);
+                        
+    % Adjust plot propeties
     for roi_ix = 1:numel(good_roi_map{cond_ix})
-        % Change violin color to match ROI
-        if strcmp(plt_vars.grp_metric,'all')
+        if strcmp(plt_vars.violin_colors,'SBJ')
+            % Change scatter colors to mark SBJ
             violins(roi_ix).ViolinColor = [0.8 0.8 0.8];
             violins(roi_ix).BoxPlot.FaceColor = roi_colors{good_roi_map{cond_ix}(roi_ix)};
             violins(roi_ix).EdgeColor = roi_colors{good_roi_map{cond_ix}(roi_ix)};
-        % Change scatter colors to mark SBJ
             if sum(~isnan(plot_onsets{cond_ix}(:,good_roi_map{cond_ix}(roi_ix))))>1
                 scat_colors = zeros([numel(violins(roi_ix).ScatterPlot.XData) 3]);
                 for sbj_ix = 1:numel(SBJs)
@@ -223,6 +226,7 @@ for cond_ix = 1:numel(cond_lab)
                     SBJ_colors(plot_onset_sbj{cond_ix}(1,good_roi_map{cond_ix}(roi_ix)),:);
             end
         else
+            % Change violin color to match ROI
             violins(roi_ix).ViolinColor = roi_colors{good_roi_map{cond_ix}(roi_ix)};
         end
     end
