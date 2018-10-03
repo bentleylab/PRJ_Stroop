@@ -1,4 +1,5 @@
 %% Atlas alignment
+warning('this didnt work well and I used AFNI!!!');
 % Yeo atlases need to be warped to the Colin27 brain (all patients warped there)
 
 %% Set up directories

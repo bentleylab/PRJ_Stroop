@@ -1,10 +1,10 @@
-function SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_id,roi_id,...
+function SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_id,grp_metric,roi_id,...
                                                     atlas_id,gm_thresh,plt_id,save_fig,fig_vis,fig_filetype)
 % Load HFA analysis results for active and condition-differentiating
 %   epochs, plot a summary of those time period per electrode
 % Normalize all onset times by mean(RT)
 % INPUTS:
-%   plt_vars.grp_metric [str] - {'avg','mdn','all'}
+%   grp_metric [str] - {'mean','median','all'}
 %       mean/median will compute that metric within each SBJ (variance is across SBJs)
 %       all- all electrode onsets are aggregated as if from the same SBJ
 % clear all; %close all;
@@ -13,10 +13,15 @@ label_spacer = 0;
 groi_label_spacer = '      ';
 if ischar(save_fig); save_fig = str2num(save_fig); end
 % if isnumeric(actv_win); actv_win = num2str(actv_win); end
-if strcmp(plt_vars.grp_metric,'all')
+if strcmp(grp_metric,'median')
+    grp_metric_lab = 'mdn';
+elseif strcmp(grp_metric,'mean')
+    grp_metric_lab = 'avg';
+elseif strcmp(grp_metric,'all')
+    grp_metric_lab = 'all';
     SBJ_colors = distinguishable_colors(numel(SBJs));
 else
-    error(['Unknown plt_vars.grp_metric: ' plt_vars.grp_metric]);
+    error(['Unknown grp_metric: ' grp_metric]);
 end
 
 %% Data Preparation
@@ -164,21 +169,25 @@ for cond_ix = 1:numel(cond_lab)
     plot_onset_sbj{cond_ix}  = {};
     good_roi_map{cond_ix} = zeros(size(roi_list));
     for roi_ix = 1:numel(roi_list)
-        if strcmp(plt_vars.grp_metric,'all')
+        if strcmp(grp_metric,'all')
             plot_onsets{cond_ix}{roi_ix} = [all_onsets{:,roi_ix,cond_ix}]';
             plot_onset_sbj{cond_ix}{roi_ix} = [];
+%             sbj_vec = zeros(size(plot_onsets{cond_ix}{roi_ix}));
+%             sbj_vec_ix = 1;
         end
         for sbj_ix = 1:numel(SBJs)
             % Aggregate onsets per ROI within each SBJ
-            if strcmp(plt_vars.grp_metric,'all')
+            if strcmp(grp_metric,'all')
                 plot_onset_sbj{cond_ix}{roi_ix} = [plot_onset_sbj{cond_ix}{roi_ix};...
                                                     repmat(sbj_ix,size(all_onsets{sbj_ix,roi_ix,cond_ix}))'];
-            elseif strcmp(plt_vars.grp_metric,'mdn')
+%                 sbj_vec(sbj_vec_ix:sbj_vec_ix+numel(all_onsets{sbj_ix,roi_ix,cond_ix})) = sbj_ix;
+%                 sbj_vec_ix = sbj_vec_ix+numel(all_onsets{sbj_ix,roi_ix,cond_ix});
+            elseif strcmp(grp_metric,'median')
                 plot_onsets{cond_ix}{roi_ix} = [plot_onsets{cond_ix}{roi_ix}; nanmedian(all_onsets{sbj_ix,roi_ix,cond_ix})];
-            elseif strcmp(plt_vars.grp_metric,'avg')
+            elseif strcmp(grp_metric,'mean')
                 plot_onsets{cond_ix}{roi_ix} = [plot_onsets{cond_ix}{roi_ix}; nanmean(all_onsets{sbj_ix,roi_ix,cond_ix})];
             else
-                error(['Unknown plt_vars.grp_metric: ' plt_vars.grp_metric]);
+                error(['Unknown grp_metric: ' grp_metric]);
             end
             % Report results in text
             %         fprintf('%s , %s: %f (N=%i)\n',SBJs{sbj_ix},groi_list{groi_ix},...
@@ -186,6 +195,9 @@ for cond_ix = 1:numel(cond_lab)
             %         disp(cond_g_onsets{sbj_ix,groi_ix});
             %         fprintf('\n');
         end
+%         if strcmp(grp_metric,'all')
+%             plot_onset_sbj{cond_ix}{roi_ix} = sbj_vec;
+%         end
     end
     plot_onsets{cond_ix} = padcat(plot_onsets{cond_ix}{:});
     plot_onset_sbj{cond_ix} = padcat(plot_onset_sbj{cond_ix}{:});
@@ -195,35 +207,23 @@ end
 %% Plot GROI Results
 for cond_ix = 1:numel(cond_lab)
     % Create and format the plot
-    fig_name = ['GRP' plt_vars.grp_metric '_HFA_onsets_' cond_lab{cond_ix} '_' roi_id '_' event_lab...
+    fig_name = ['GRP' grp_metric_lab '_HFA_onsets_' cond_lab{cond_ix} '_' roi_id '_' event_lab...
         '_GM' num2str(gm_thresh) '_normRTout'];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.6],'Visible',fig_vis);
     
-    violins = violinplot(plot_onsets{cond_ix}(:,good_roi_map{cond_ix}),roi_list(good_roi_map{cond_ix}),...
-                            'ViolinAlpha',0.3);
+    violins = violinplot(plot_onsets{cond_ix}(:,good_roi_map{cond_ix}),roi_list(good_roi_map{cond_ix}));
     for roi_ix = 1:numel(good_roi_map{cond_ix})
-        % Change violin color to match ROI
-        if strcmp(plt_vars.grp_metric,'all')
-            violins(roi_ix).ViolinColor = [0.8 0.8 0.8];
-            violins(roi_ix).BoxPlot.FaceColor = roi_colors{good_roi_map{cond_ix}(roi_ix)};
-            violins(roi_ix).EdgeColor = roi_colors{good_roi_map{cond_ix}(roi_ix)};
-        % Change scatter colors to mark SBJ
-            if sum(~isnan(plot_onsets{cond_ix}(:,good_roi_map{cond_ix}(roi_ix))))>1
-                scat_colors = zeros([numel(violins(roi_ix).ScatterPlot.XData) 3]);
-                for sbj_ix = 1:numel(SBJs)
-                    scat_colors(plot_onset_sbj{cond_ix}(:,good_roi_map{cond_ix}(roi_ix))==sbj_ix,:) = repmat(SBJ_colors(sbj_ix,:),...
-                        sum(plot_onset_sbj{cond_ix}(:,good_roi_map{cond_ix}(roi_ix))==sbj_ix),1);
-                end
-                violins(roi_ix).ScatterPlot.MarkerFaceColor = 'flat';   % Necessary for CData to work
-                violins(roi_ix).ScatterPlot.MarkerEdgeColor = 'flat';   % Necessary for CData to work
-                violins(roi_ix).ScatterPlot.CData = scat_colors;
-            else   % violin.MedianColor is plotted over only ScatterPlot point
-                violins(roi_ix).MedianColor = ...
-                    SBJ_colors(plot_onset_sbj{cond_ix}(1,good_roi_map{cond_ix}(roi_ix)),:);
+        violins(roi_ix).ViolinColor = roi_colors{good_roi_map{cond_ix}(roi_ix)};
+        if size(scat_colors,1)>1
+            scat_colors = zeros([numel(violins(roi_ix).ScatterPlot.XData) 3]);
+            for sbj_ix = 1:numel(SBJs)
+                scat_colors(plot_onset_sbj{cond_ix}(:,roi_ix)==sbj_ix,:) = repmat(SBJ_colors(sbj_ix,:),...
+                    sum(plot_onset_sbj{cond_ix}(:,roi_ix)==sbj_ix),1);
             end
-        else
-            violins(roi_ix).ViolinColor = roi_colors{good_roi_map{cond_ix}(roi_ix)};
+            violins(roi_ix).ScatterPlot.CData = scat_colors;
+        else   % violin scatter only has this property and no other data if only 1 point
+            violins(roi_ix).ScatterPlot.MarkerFaceColor = SBJ_colors(plot_onset_sbj{cond_ix}(:,roi_i,:);
         end
     end
     

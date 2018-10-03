@@ -85,6 +85,9 @@ end
 if strcmp(plot_type,'ortho')
     % ft_electrodeplacement only plots elec.elecpos, so swap in chanpos
     elec.elecpos = elec.chanpos;
+    if isfield(elec,'tra')
+        elec = rmfield(elec, 'tra');    % error if elec.tra shows the difference between original elecpos and new chanpos post-reref
+    end
     cfg = [];
     cfg.elec = elec;
     ft_electrodeplacement(cfg, mri);

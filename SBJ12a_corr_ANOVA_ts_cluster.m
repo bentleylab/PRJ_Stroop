@@ -1,6 +1,8 @@
-function SBJ12a_corr_ANOVA_ts_cluster(SBJ,pipeline_id,stat_id,clust_id,an_id_s,an_id_r,roi_id,atlas_id,plt_id)
+function SBJ12a_corr_ANOVA_ts_cluster(SBJ,pipeline_id,stat_id,clust_id,an_id_s,an_id_r,roi_id,atlas_id,plt_id,fig_vis,save_fig)
 % Build connectivity matrix based on HFA correlations
 %   non-parametric stats via circular shift of trial time series
+fig_filetype = 'png';
+sr_ix = 1;
 
 %% Data Preparation
 % Set up paths
@@ -109,40 +111,65 @@ stat{2} = ft_selectdata(cfg_trim,stat{2});
 % runs pdist (distance metric), linkage (), cluster ()
 
 roi_list = unique(elec.roi);
-if strcmp(clust_vars.n_clust,'roi_match')
-    n_clust  = numel(roi_list);
-else
-    n_clust = str2num(clust_vars.n_clust);
+if isnumeric(clust_vars.k_method)
+    n_clust = clust_vars.k_method;
+elseif strcmp(clust_vars.k_method,'roi_match')
+    n_clust  = numel(unique(elec.roi));
 end
-sr_ix = 1;
+clust_data = cell(size(cond_lab));
 clusters = zeros([numel(elec.label) numel(cond_lab)]);
 centroids = cell([numel(cond_lab) 1]);
-dist_sums = zeros([numel(cond_lab) n_clust]);
-distances = zeros([numel(cond_lab) numel(elec.label) n_clust]);
 for cond_ix = 1:numel(cond_lab)
     if cond_ix <= numel(grp_lab)
-        clust_data = squeeze(w2{sr_ix}.trial(cond_ix,:,:));
+        clust_data{cond_ix} = squeeze(w2{sr_ix}.trial(cond_ix,:,:));
     else
-        clust_data = squeeze(stat{sr_ix}.rho(:,1,:));
+        clust_data{cond_ix} = squeeze(stat{sr_ix}.rho(:,1,:));
     end
     if strcmp(clust_vars.clust_method,'hier')
-        dists = pdist(clust_data, clust_vars.dist_metric);
+        dists = pdist(clust_data{cond_ix}, clust_vars.dist_metric);
         links = linkage(dists, clust_vars.link_method);
         clusters(:,cond_ix) = cluster(links, 'maxclust', n_clust);
     elseif strcmp(clust_vars.clust_method,'kmeans')
+        if strcmp(clust_vars.k_method,'CH')
+            eva = evalclusters(clust_data{cond_ix},'kmeans','CalinskiHarabasz','KList',[1:numel(unique(elec.roi))]);
+            n_clust = eva.OptimalK;
+        end
+        dist_sums = zeros([numel(cond_lab) n_clust]);
+        distances = zeros([numel(cond_lab) numel(elec.label) n_clust]);
         [clusters(:,cond_ix), centroids{cond_ix}, dist_sums(cond_ix,:), distances(cond_ix,:,:)] = ...
-            kmeans(clust_data, n_clust, 'distance', clust_vars.dist_metric, 'replicates', clust_vars.n_iter);
+            kmeans(clust_data{cond_ix}, n_clust, 'distance', clust_vars.dist_metric, 'replicates', clust_vars.n_iter);
     end
 end
 
 %% Plot Quality assessment of Clustering
-if strcmp(clust_method,'hier')
+fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/clust/' clust_id '/' an_id_s '-' an_id_r '/'];
+if ~exist(fig_dir,'dir')
+    mkdir(fig_dir);
+end
+
+if strcmp(clust_vars.clust_method,'hier')
 % dendrogram plot the tree
-elseif strcmp(clust_method,'kmeans')
+elseif strcmp(clust_vars.clust_method,'kmeans')
 %     figure;for s=1:6;subplot(2,3,s);histogram(D(:,s));title(['clust ' num2str(s) ': sumD=' num2str(sumD(s))]);end
 % figure;for s=1:6;subplot(2,3,s);plot(stat{sr_ix}.time,centroids(s,:));title(['clust ' num2str(s) ': sumD=' num2str(sumD(s))]);end
 end
 
+% Silhouette plot
+fig_name = [SBJ '_ANOVA_clust_' stat_id '_SR_' cond_lab{cond_ix} '_' roi_id '_' atlas_id '_silhouette'];
+f = figure('Name',fig_name,'units','normalized',...
+    'outerposition',[0 0 1 1],'Visible',fig_vis);
+for cond_ix = 1:numel(cond_lab)
+    ax = subplot(1,numel(cond_lab),cond_ix);
+    [sil,~] = silhouette(clust_data{cond_ix},clusters(:,cond_ix));
+    ax.Title.String  = [cond_lab{cond_ix} ' silhouette = ' num2str(mean(sil))];
+end
+% Save figure
+if save_fig
+    fig_filename = [fig_dir fig_name '.' fig_filetype];
+    fprintf('Saving %s\n',fig_filename);
+    saveas(gcf,fig_filename);
+    %eval(['export_fig ' fig_filename]);
+end
 
 %% Plot ANOVA Time Series by Cluster (colored by ROI)
 % Find plot limits
@@ -195,6 +222,9 @@ for cond_ix = 1:numel(cond_lab)
                 else
                     error('Plot the bold version of significance!');
                 end
+%                 % Plot centroid
+%                 plot(win_center{sr_ix},centroids{cond_ix}(clust_ix,:),...
+%                     'Color',[0.4 0.4 0.4],'LineStyle','--','LineWidth',2);
             else
                 % RT correlation significant time periods
                 ylims = ylims2;
@@ -215,9 +245,12 @@ for cond_ix = 1:numel(cond_lab)
                 else
                     error('plot the bold line version of sig!');
                 end
+%                 % Plot centroid
+%                 plot(1:numel(stat{sr_ix}.time),centroids{cond_ix}(clust_ix,:),...
+%                     'Color',[0.4 0.4 0.4],'LineStyle','--','LineWidth',2);
             end
         end
-        
+                
         % Plot event
         if strcmp(event_lab{sr_ix},'stim')
             x_tick_lab       = plt_vars.plt_lim_S(1):plt_vars.x_step_sz:plt_vars.plt_lim_S(2);
@@ -245,15 +278,146 @@ for cond_ix = 1:numel(cond_lab)
         ax.XTick         = 0:plt_vars.x_step_sz*sample_rate:size(stat{sr_ix}.time,2);
         ax.XTickLabel    = x_tick_lab;
         ax.XLabel.String = 'Time (s)';
+    end
+    % Save figure
+    if save_fig
+        fig_filename = [fig_dir fig_name '.' fig_filetype];
+        fprintf('Saving %s\n',fig_filename);
+        saveas(gcf,fig_filename);
+        %eval(['export_fig ' fig_filename]);
+    end
+    
+    %% Plot cluster centroids
+    if strcmp(clust_vars.clust_method,'kmeans')
+        fig_name = [SBJ '_ANOVA_clust_' stat_id '_SR_' cond_lab{cond_ix} '_' roi_id '_' atlas_id '_centroids'];
+        f = figure('Name',fig_name,'units','normalized',...
+            'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
         
-        % Save figure
-        %     if save_fig
-        %         fig_filename = [fig_dir fig_name '.' fig_filetype];
-        %         fprintf('Saving %s\n',fig_filename);
-        %         saveas(gcf,fig_filename);
-        %         %eval(['export_fig ' fig_filename]);
-        %     end
+        % Plot centroids
+        if cond_ix<=numel(grp_lab)
+            plot(win_center{sr_ix},centroids{cond_ix});%(clust_ix,:));%,...
+%                 'Color',[0.4 0.4 0.4],'LineStyle','--','LineWidth',2);
+        else
+            plot(1:numel(stat{sr_ix}.time),centroids{cond_ix});%(clust_ix,:));%,...
+%                 'Color',[0.4 0.4 0.4],'LineStyle','--','LineWidth',2);
+        end
+        
+        % Plot event
+        if strcmp(event_lab{sr_ix},'stim')
+            x_tick_lab       = plt_vars.plt_lim_S(1):plt_vars.x_step_sz:plt_vars.plt_lim_S(2);
+            mean_RT_pre = find(stat{sr_ix}.time<=mean_RT);
+            event_line = line([mean_RT_pre(end) mean_RT_pre(end)],ylim,...
+                'LineWidth',plt_vars.evnt_width, 'Color',plt_vars.evnt_color,...
+                'LineStyle',plt_vars.evnt_style);
+        else
+            x_tick_lab       = plt_vars.plt_lim_R(1):plt_vars.x_step_sz:plt_vars.plt_lim_R(2);
+            % Plot Response Marker
+            event_line = line([find(stat{sr_ix}.time==0) find(stat{sr_ix}.time==0)],ylim,...
+                'LineWidth',plt_vars.evnt_width, 'Color',plt_vars.evnt_color,...
+                'LineStyle',plt_vars.evnt_style);
+            %                 main_lines = [main_lines event_line];
+            %                 lgd_lab = {lgd_lab{:} 'RT'};
+        end
+        
+        % Plotting parameters
+        ax.Title.String  = ['Cluster Centroids: ' event_lab{sr_ix}];
+        ax.Box           = 'off';
+%         ax.YLim          = ylims;
+%         ax.YTick         = yticks;
+%         ax.YLabel.String = ylab;
+        ax.XLim          = [0,size(stat{sr_ix}.time,2)];
+        ax.XTick         = 0:plt_vars.x_step_sz*sample_rate:size(stat{sr_ix}.time,2);
+        ax.XTickLabel    = x_tick_lab;
+        ax.XLabel.String = 'Time (s)';
+        
     end
 end
 
 end
+
+
+
+%% ========================================================================
+%% Plot cluster means vs. centroids
+%%=========================================================================
+% for cond_ix = 1:numel(cond_lab)
+%     fig_name = [SBJ '_ANOVA_clust_' stat_id '_SR_' cond_lab{cond_ix} '_' roi_id '_' atlas_id];
+%     f = figure('Name',fig_name,'units','normalized');
+%     ax = subplot(2, 1, 1);
+%     hold on;
+%     for clust_ix = 1:n_clust
+%         clust_elecs = find(clusters(:,cond_ix)==clust_ix);
+%         if cond_ix <= numel(grp_lab)
+%             ylab = '% Variance Explained';
+%             data = squeeze(mean(w2{sr_ix}.trial(cond_ix,clust_elecs,:),2));
+%             plot(win_center{sr_ix},(data-mean(data))/std(data),'Color',roi_colors(clust_ix,:));
+%         else
+%             % RT correlation significant time periods
+%             data = squeeze(mean(stat{sr_ix}.rho(clust_elecs,:,:),1));
+%             ylab = 'Correlation with RT';
+%             plot(1:numel(stat{sr_ix}.time),(data-mean(data))/std(data),'Color',roi_colors(clust_ix,:));
+%         end
+%     end
+%     
+%     % Plot event
+%     if strcmp(event_lab{sr_ix},'stim')
+%         x_tick_lab       = plt_vars.plt_lim_S(1):plt_vars.x_step_sz:plt_vars.plt_lim_S(2);
+%         mean_RT_pre = find(stat{sr_ix}.time<=mean_RT);
+%         event_line = line([mean_RT_pre(end) mean_RT_pre(end)],ylims,...
+%             'LineWidth',plt_vars.evnt_width, 'Color',plt_vars.evnt_color,...
+%             'LineStyle',plt_vars.evnt_style);
+%     else
+%         x_tick_lab       = plt_vars.plt_lim_R(1):plt_vars.x_step_sz:plt_vars.plt_lim_R(2);
+%         % Plot Response Marker
+%         event_line = line([find(stat{sr_ix}.time==0) find(stat{sr_ix}.time==0)],ylims,...
+%             'LineWidth',plt_vars.evnt_width, 'Color',plt_vars.evnt_color,...
+%             'LineStyle',plt_vars.evnt_style);
+%     end
+%     
+%     % Plotting parameters
+%     ax.Title.String  = ['z-scored Cluster Means: ' event_lab{sr_ix}];
+%     ax.Box           = 'off';
+%     ax.YLabel.String = ylab;
+%     ax.XLim          = [0,size(stat{sr_ix}.time,2)];
+%     ax.XTick         = 0:plt_vars.x_step_sz*sample_rate:size(stat{sr_ix}.time,2);
+%     ax.XTickLabel    = x_tick_lab;
+%     ax.XLabel.String = 'Time (s)';
+%     
+%     %% Centroids
+%     ax = subplot(2, 1, 2);
+%     hold on;
+%     for clust_ix = 1:n_clust
+%         if cond_ix <= numel(grp_lab)
+%             ylab = '% Variance Explained';
+%             plot(win_center{sr_ix},centroids{cond_ix}(clust_ix,:),'Color',roi_colors(clust_ix,:));
+%         else
+%             % RT correlation significant time periods
+%             ylab = 'Correlation with RT';
+%             plot(1:numel(stat{sr_ix}.time),centroids{cond_ix}(clust_ix,:),'Color',roi_colors(clust_ix,:));
+%         end
+%     end
+%     
+%     % Plot event
+%     if strcmp(event_lab{sr_ix},'stim')
+%         x_tick_lab       = plt_vars.plt_lim_S(1):plt_vars.x_step_sz:plt_vars.plt_lim_S(2);
+%         mean_RT_pre = find(stat{sr_ix}.time<=mean_RT);
+%         event_line = line([mean_RT_pre(end) mean_RT_pre(end)],ylim,...
+%             'LineWidth',plt_vars.evnt_width, 'Color',plt_vars.evnt_color,...
+%             'LineStyle',plt_vars.evnt_style);
+%     else
+%         x_tick_lab       = plt_vars.plt_lim_R(1):plt_vars.x_step_sz:plt_vars.plt_lim_R(2);
+%         % Plot Response Marker
+%         event_line = line([find(stat{sr_ix}.time==0) find(stat{sr_ix}.time==0)],ylim,...
+%             'LineWidth',plt_vars.evnt_width, 'Color',plt_vars.evnt_color,...
+%             'LineStyle',plt_vars.evnt_style);
+%     end
+%     
+%     % Plotting parameters
+%     ax.Title.String  = ['Cluster Centroids: ' event_lab{sr_ix}];
+%     ax.Box           = 'off';
+%     ax.YLabel.String = ylab;
+%     ax.XLim          = [0,size(stat{sr_ix}.time,2)];
+%     ax.XTick         = 0:plt_vars.x_step_sz*sample_rate:size(stat{sr_ix}.time,2);
+%     ax.XTickLabel    = x_tick_lab;
+%     ax.XLabel.String = 'Time (s)';
+% end
