@@ -307,7 +307,7 @@ for cond_ix = 1:numel(cond_lab)
     %% Save figure
     if save_fig
         fig_dir = [root_dir 'PRJ_Stroop/results/HFA/GRP_onsets_ROI/'...
-            stat_id '_' roi_id '_' an_id '/'];
+            stat_id '/' roi_id '/' an_id '/'];
         if ~exist(fig_dir,'dir')
             [~] = mkdir(fig_dir);
         end

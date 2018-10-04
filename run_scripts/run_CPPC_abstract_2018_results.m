@@ -75,19 +75,25 @@ gm_thresh   = 0;
 median_yn   = 0;
 roi_opts    = {'gROI','Yeo7'};%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
 atlas_opts  = {'Dx','Yeo7'};%'Dx';
-plt_opts    = {{'onsets_trl0to15_violin_allSBJ','onsets_trl0to15_violin_allROI','onsets_trl0to15_violin_avgROI'},...
-               {'onsets_trl5to1_violin_allSBJ','onsets_trl5to1_violin_allROI','onsets_trl5to1_violin_avgROI'}};
+plt_opts    = {{'onsets_trl0to15_evnt_roi'},{'onsets_trl5to1_evnt_roi'}};
+% plt_opts    = {{'onsets_trl0to15_violin_allSBJ','onsets_trl0to15_violin_allROI','onsets_trl0to15_violin_avgROI'},...
+%                {'onsets_trl5to1_violin_allSBJ','onsets_trl5to1_violin_allROI','onsets_trl5to1_violin_avgROI'}};
 fig_filetype = 'png';%'svg'
 for roi_ix = 1:numel(roi_opts)
     for an_ix = 1:numel(an_opts)
         for plt_ix = 1:numel(plt_opts{1})
             fprintf('roi: %s; an: %s; plt: %s\n',roi_opts{roi_ix},an_opts{an_ix},plt_opts{an_ix}{plt_ix});
-            SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
-                                                    atlas_opts{roi_ix},gm_thresh,plt_opts{an_ix}{plt_ix},1,'on',fig_filetype)
-%         SBJ10c_HFA_GRP_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},median_yn,roi_opts{roi_ix},...
-%                                                     atlas_opts{roi_ix},0,plt_opts{an_ix},1,'on',fig_filetype)
+%             % Violin Plots
+%             SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
+%                                                     atlas_opts{roi_ix},gm_thresh,plt_opts{an_ix}{plt_ix},1,'on',fig_filetype)
+            % Music plots- Normalized
+            SBJ10c_HFA_GRP_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},median_yn,roi_opts{roi_ix},...
+                                                    atlas_opts{roi_ix},0,plt_opts{an_ix}{plt_ix},1,'off',fig_filetype);
+            close all;
+%             % Music plots- subject-specific RTs
 %         SBJ10c_HFA_GRP_onsets_ROI_RTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
 %                                                     atlas_id,0,plt_opts{an_ix},1,'on',fig_filetype)
+%             % Pair differences
 %         SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
 %                                                     atlas_id,0,plt_opts{an_ix},save_fig,fig_vis)
         end

@@ -15,7 +15,7 @@ switch roi_id
         labels(strmatch('OUT',labels,'exact')) = [];
         labels(strmatch('',labels,'exact')) = [];
         einfo_col = 2;
-case 'Yeo7'
+    case 'Yeo7'
         labels = {'Vis','SM','DAttn','VAttn','Limb','FP','Def'};
     case 'Main3'
         labels = {'LPFC','MPFC','INS'};
@@ -23,6 +23,9 @@ case 'Yeo7'
     case 'gROI'
         labels = {'LPFC','MPFC','INS','OFC','PAR','TMP'};
         einfo_col = 3;
+    case 'MnLPFC'
+        labels = {'DLPFC','VLPFC','PM','aMCC','preSMA','SMA'};
+        einfo_col = 2;
     case 'thryROI'
         labels = {'DLPFC','VLPFC','PM','aMCC','preSMA','SMA','daINS','vaINS','FO'};
         einfo_col = 2;
