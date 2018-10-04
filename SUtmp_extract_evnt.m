@@ -1,11 +1,11 @@
 % function create_nk_photodiode(subjectm)
-if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
-else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';app_dir=[root_dir 'Apps/'];
+else root_dir='/Volumes/hoycw_clust/';app_dir='/Users/colinhoy/Code/Apps/';end
 addpath([root_dir 'PRJ_Stroop/scripts/']);
 addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
-addpath(genpath('/Users/colinhoy/Code/Apps/wave_clus/'));
+addpath(genpath([app_dir 'wave_clus/']));
 addpath(genpath('/Users/colinhoy/Code/Apps/UR_NLX2MAT_releaseDec2015/'));
-addpath(ft_dir);
+addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% Read photodiode
