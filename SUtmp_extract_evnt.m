@@ -1,6 +1,7 @@
 % function create_nk_photodiode(subjectm)
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';app_dir=[root_dir 'Apps/'];
 else root_dir='/Volumes/hoycw_clust/';app_dir='/Users/colinhoy/Code/Apps/';end
+%% Paths
 addpath([root_dir 'PRJ_Stroop/scripts/']);
 addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
 addpath(genpath([app_dir 'wave_clus/']));
@@ -8,57 +9,88 @@ addpath(genpath('/Users/colinhoy/Code/Apps/UR_NLX2MAT_releaseDec2015/'));
 addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
+%% SBJ vars
+SBJ = 'IR75';
+b_ix = 1;   %block
+eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/SU_nlx_proc_vars.m']);
+
+if numel(SBJ_vars.raw_file)>1
+    block_suffix = strcat('_',SBJ_vars.block_name{b_ix});
+else
+    block_suffix = SBJ_vars.block_name{b_ix};   % should just be ''
+end
+
 %% Read photodiode
-photo_label = 'Photo1_0003';
+photo_label = ['Photo1' SBJ_vars.ch_lab.suffix];
 inverted = 1;
-nlx_dir = [root_dir 'PRJ_Stroop/data/IR75/00_raw/SU_2018-06-01_14-37-09/'];
-photo = ft_read_neuralynx_interp({[nlx_dir 'photo/' photo_label '.ncs']});
+photo = ft_read_neuralynx_interp({[SBJ_vars.dirs.SU 'photo/' photo_label '.ncs']});
 photo.label = {'Photo1'};
+
+% Preprocess
 if inverted
     photo.trial{1} = photo.trial{1}*-1;
 end
+cfgpp = []; cfgpp.demean = 'yes';
+photo = ft_preprocessing(cfgpp,photo);
+
+% Cut to analysis time
+if numel(SBJ_vars.analysis_time{b_ix})>1
+    error('havent set up processing for multi block concat!');
+end
+cfgs = []; cfgs.latency = SBJ_vars.analysis_time{b_ix}{1};
+photo = ft_selectdata(cfgs,photo);
+photo.time{1} = photo.time{1}-SBJ_vars.analysis_time{b_ix}{1}(1);
 
 %% Read, downsample, and save mic
-mic_label = 'Mic1_0010';
-mic = ft_read_neuralynx_interp({[nlx_dir 'mic/' mic_label '.ncs']});
+mic_label = ['Mic1' SBJ_vars.ch_lab.suffix];
+mic = ft_read_neuralynx_interp({[SBJ_vars.dirs.SU 'mic/' mic_label '.ncs']});
 mic.label = {'Mic1'};
-if proc_vars.resample_mic
+
+% Cut to analysis time
+mic = ft_selectdata(cfgs,mic);
+mic.time{1} = mic.time{1}-SBJ_vars.analysis_time{b_ix}{1}(1);
+
+% Downsample
+if proc_vars.mic_resample
     cfg_dsmp = [];
     cfg_dsmp.resamplefs = photo.fsample;
     mic_dsmp = ft_resampledata(cfg_dsmp,mic);
 end
 
 %% Align Photodiode and Mic
-fname = {[nlx_dir 'photo/' photo_label '.ncs'], [nlx_dir 'mic/' mic_label '.ncs']};
-% get the minimum and maximum timestamp across all channels
-for i = 1:numel(fname)
-  ts    = ft_read_data(fname{i}, 'timestamp', true);  
-  mn(i) = ts(1);
-  mx(i) = ts(end); 
-  ts1   = ts(1);
-  md(i) = mode(diff(double(ts-ts1)));
+% [shared_time,photo_time,mic_time] = intersect(photo.time{1},mic.time{1});
 
-  % get the minimum and maximum across all channels
-  if i>1 && mn(i)<min_all
-    min_all = mn(i);
-  else
-    min_all = mn(i);
-  end
-  
-  if i>1 && mx(i)>max_all
-    max_all = mx(i);
-  else
-    max_all = mx(i); 
-  end
-end
-
-% take the mode of the modes and construct the interpolation axis
-% the interpolation axis should be casted in doubles
-mode_dts  = mode(md);
-rng       = double(max_all-min_all); % this is small num, can be double
-offset    = double(mn-min_all); % store the offset per channel
-offsetmx  = double(max_all-mx);
-tsinterp  = [0:mode_dts:rng]; % the timestamp interpolation axis
+% fname = {[SBJ_vars.dirs.SU 'photo/' photo_label '.ncs'], [SBJ_vars.dirs.SU 'mic/' mic_label '.ncs']};
+% % get the minimum and maximum timestamp across all channels
+% for i = 1:numel(fname)
+%   ts    = ft_read_data(fname{i}, 'timestamp', true);  
+%   mn(i) = ts(1);
+%   mx(i) = ts(end); 
+%   ts1   = ts(1);
+%   md(i) = mode(diff(double(ts-ts1)));
+% 
+%   % get the minimum and maximum across all channels
+%   if i>1 && mn(i)<min_all
+%     min_all = mn(i);
+%   else
+%     min_all = mn(i);
+%   end
+%   
+%   if i>1 && mx(i)>max_all
+%     max_all = mx(i);
+%   else
+%     max_all = mx(i); 
+%   end
+% end
+% 
+% % take the mode of the modes and construct the interpolation axis
+% % the interpolation axis should be casted in doubles
+% mode_dts  = mode(md);
+% rng       = double(max_all-min_all); % this is small num, can be double
+% offset    = double(mn-min_all); % store the offset per channel
+% offsetmx  = double(max_all-mx);
+% tsinterp  = [0:mode_dts:rng]; % the timestamp interpolation axis
 
 
 %% Process Microphone data
@@ -67,8 +99,20 @@ mic_data = mic.trial{1};
 mic_data_rescale = mic_data./(max(abs(mic_data))+0.05);
 
 %% Concatenate photo and mic
+% Check that time vectors are close enough
+dif = photo.time{1}-mic_dsmp.time{1};
+if max(dif)>0.0000001
+    error('time vectors not aligned, check that!');
+elseif ~isequal(photo.time{1},mic_dsmp.time{1})
+    warning(['Mic and photo time vectors still not equal, but differences is small: ' num2str(max(dif))]);
+    mic_dsmp.time{1} = photo.time{1};
+end
+
+% Append
 cfga = [];
+cfga.keepsampleinfo = 'no';
 evnt = ft_appenddata(cfga,photo,mic_dsmp);
+evnt.fsample = photo.fsample;
 
 %% Save data out
 evnt_out_filename = strcat(SBJ_vars.dirs.import,SBJ,'_evnt',block_suffix,'.mat');
@@ -78,6 +122,7 @@ save(evnt_out_filename, '-v7.3', 'evnt');
 mic_data_filename = strcat(SBJ_vars.dirs.import,SBJ,'_mic_recording',block_suffix,'.wav');
 audiowrite(mic_data_filename,mic_data_rescale,evnt.fsample);
 
+%% Arjen combination old stuff
 % nlx_hdr = ft_read_header(nlx_photo_dir);
 % nlx_photo_ix = find(~cellfun(@isempty, regexp(nlx_hdr.label, photo_label))== 1);
 % nlx_photo = ft_read_data(nlx_photo_dir, 'header', nlx_hdr, 'chanidx', 1);

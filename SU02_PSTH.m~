@@ -24,30 +24,25 @@ load([SBJ_vars.dirs.events SBJ '_trial_info_auto',block_suffix,'.mat']);
 % Clustering Results
 %   spikes [n_spikes, time] - waveforms
 %   cluster_class [n_spikes, 2] - cluster class (int), then time in ms
-load([SBJ_vars.dirs.preproc 'micro_clusters/semi_auto/times_' micro_ch_lab SBJ_vars.ch_lab.suffix '.mat']);
-micro_hdr = ft_read_header([SBJ_vars.dirs.SU 'micro/' micro_ch_lab SBJ_vars.ch_lab.suffix '.ncs']);
+nlx_dir = [SBJ_vars.dirs.raw 'SU_R1_2018-02-07_13-17-17/'];
+load([nlx_dir 'micro/times_' micro_ch_lab '_0010.mat']);
+micro_hdr = ft_read_header([nlx_dir 'micro/' micro_ch_lab '_0010.ncs']);
 
 %% Process data
 % Adjust spike times from 1000 kHz time stamps to sec
 cluster_class(:,2) = (cluster_class(:,2)-double(micro_hdr.FirstTimeStamp)/1000)/1000;
-% Account for analysis time
-if numel(SBJ_vars.analysis_time{b_ix})>1
-    error('havent set up processing for multi block concat!');
-end
-cluster_class(:,2) = cluster_class(:,2) - SBJ_vars.analysis_time{b_ix}{1}(1);
 
 %% Plot PSTH for each cluster across all conditions
-units = sort(unique(cluster_class(:,1)));
-clus_lab = {};
-clus_colors = distinguishable_colors(numel(units));
+units = unique(cluster_class(:,1));
+clus_lab = {'Cluster 1','Cluster 2','Cluster 3','Cluster 4'};
+clus_colors = {'k','r','b','g'};
 spike_times = {[numel(units) 1]};
 for clus_ix = 1:numel(units)
     spike_times{clus_ix} = cluster_class(cluster_class(:,1)==clus_ix,2);
-    clus_lab{clus_ix} = ['Cluster ' num2str(clus_ix)];
 end
 
 psth_lim = [-0.25 2];
-bin_sz = 0.05;    % histogram bins in s
+bin_sz = 0.05;    % histogram bins in ms
 bins = psth_lim(1):bin_sz:psth_lim(2);
 psth = zeros([numel(units) numel(bins)-1]);
 figure; hold on;

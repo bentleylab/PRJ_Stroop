@@ -55,7 +55,8 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     [evnt, hdr] = fn_format_data_ft2KLA(evnt);
     
     % Plot event channels
-    plot(linspace(0,hdr.length_in_seconds,hdr.n_samples), evnt);
+    plot(linspace(0,hdr.length_in_seconds,hdr.n_samples), evnt(2,:)); hold on;
+    plot(linspace(0,hdr.length_in_seconds,hdr.n_samples), evnt(1,:));
     
     %% ========================================================================
     %   Step 4b- Manually Clean Photodiode Trace: Mark Sections to Correct
@@ -99,7 +100,7 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     if proc_vars.resample_freq~=1000
         error('ERROR!!! SBJ02_behav_parse assumes 1 kHz neural sampling rate!!!\n');
     end
-    SBJ02_behav_parse(SBJ,b_ix,proc_vars.rt_bounds,1,1)
+    SU01_behav_parse(SBJ,b_ix,proc_vars.rt_bounds,1,1)
     % Be sure to save the two figures coming from this function!
     %   i.e., SBJ_photodiode_segmentation.fig & SBJ_events.fig
 end
