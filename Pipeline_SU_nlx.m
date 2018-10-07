@@ -11,6 +11,7 @@ else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtri
 %% Set Up Directories
 addpath([root_dir 'PRJ_Stroop/scripts/']);
 addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+addpath(genpath('/Users/colinhoy/Code/Apps/wave_clus/'));
 addpath(ft_dir);
 ft_defaults
 
@@ -71,8 +72,13 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     %% ========================================================================
     %   Step 4c- Manually Clean Photodiode Trace: Apply Corrections
     %  ========================================================================
-    photod_ix = strmatch(SBJ_vars.ch_lab.photod,hdr.channel_labels);
-    mic_ix = strmatch(SBJ_vars.ch_lab.mic,hdr.channel_labels);
+    photod_ix = strmatch('photo',hdr.channel_labels);
+    mic_ix = strmatch('mic',hdr.channel_labels);
+    
+    % If contionuous drift, use cftool to find slop on empty period and subtract
+    % drift_model = slope*[1:size(evnt,2)];
+    % evnt(photod_ix,:) = evnt(photod_ix,:)-drift_model;
+    
     % Correct baseline shift
     for shift_ix = 1:length(bsln_shift_times)
         epoch_idx = floor(bsln_shift_times{shift_ix}(1)*hdr.sample_rate):floor(bsln_shift_times{shift_ix}(2)*hdr.sample_rate);

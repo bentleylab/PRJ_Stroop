@@ -14,7 +14,7 @@ bsln_times = {...
     };
 
 % Record epochs (in sec) when baseline has shifted
-%   this was taken care of in IR69_photo_minimal_processing.m
+%   drift throughout: cftools says -2.958e-05 slope, -297.2 intercept (ignored)
 bsln_shift_times = {};
 % Record amount of shift in baseline for each epoch 
 bsln_shift_val = [];
