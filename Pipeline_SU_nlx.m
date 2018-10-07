@@ -29,8 +29,8 @@ eval(SBJ_vars_cmd);
 %% ========================================================================
 %   Step 2- Quick Import and Processing for Data Cleaning/Inspection
 %  ========================================================================
-% FILE TOO BIG, RUNNING THIS VIA SGE
-SU00_extract_data(SBJ,proc_vars.resample_freq??)
+SU00_extract_evnt(SBJ)
+% SU00_extract_data(SBJ,proc_vars.resample_freq??)
 % block_prefix = '';
 % !!! outdated command SBJ00_cleaning_prep(SBJ,SBJ_vars.raw_file,proc_vars.plot_psd,block_prefix);
 
@@ -57,6 +57,9 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     % Plot event channels
     plot(linspace(0,hdr.length_in_seconds,hdr.n_samples), evnt(2,:)); hold on;
     plot(linspace(0,hdr.length_in_seconds,hdr.n_samples), evnt(1,:));
+    
+    % Get baseline value:
+    % mean(evnt(1,start*hdr.sample_rate:stop*hdr.sample_rate))
     
     %% ========================================================================
     %   Step 4b- Manually Clean Photodiode Trace: Mark Sections to Correct
@@ -103,6 +106,18 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     SU01_behav_parse(SBJ,b_ix,proc_vars.rt_bounds,1,1)
     % Be sure to save the two figures coming from this function!
     %   i.e., SBJ_photodiode_segmentation.fig & SBJ_events.fig
+end
+
+%% Plot PSTH
+conditions  = 'CNI';
+an_opts     = {'PSTH_S_trl2to150_bn20','PSTH_R_trl5to1_bn20'};
+plt_id      = {'ts_trl2to15_errbr_evnt','ts_trl5to1_errbr_evnt'};
+plot_ISI    = 0;
+fig_vis     = 'on';
+save_plots  = 1;
+close_plots = 0;
+for an_ix = 1:numel(an_opts)
+    SU02_PSTH_ft(SBJ,conditions,pipeline_id,an_opts{an_ix},plt_id{an_ix},plot_ISI,fig_vis,save_plots,close_plots);
 end
 
 %% ========================================================================

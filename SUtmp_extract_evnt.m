@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% SBJ vars
-SBJ = 'IR82';
+SBJ = 'IR67';
 b_ix = 1;   %block
 eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
 eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/SU_nlx_proc_vars.m']);

@@ -1,9 +1,9 @@
-event_lab  = 'S';           % event around which to cut trials
-trial_lim_s = [-0.2 1.5];       % window in SEC for cutting trials
+event_lab  = 'R';           % event around which to cut trials
+trial_lim_s = [-0.5 1.0];       % window in SEC for cutting trials
 %plt_lim     = [-0.2 1];         % window for plotting these results
 demean_yn   = 'yes';
 %bsln_lim    = [-0.2 0];    % window in SEC for baseline correction
-stat_lim    = [0 1.5];            % window in SEC for stats
+stat_lim    = [-0.5 1.0];            % window in SEC for stats
 n_boots     = 1000;             % Repetitions for non-parametric stats
 
 bin_sz      = 0.02;           % bin size in SEC

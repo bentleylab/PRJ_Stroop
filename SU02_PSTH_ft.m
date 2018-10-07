@@ -1,11 +1,7 @@
+function SU02_PSTH_ft(SBJ,conditions,pipeline_id,an_id,plt_id,plot_ISI,fig_vis,save_plots,close_plots)
 %% Fieldtrip-based PSTH analysis
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
-SBJ = 'IR82';
-an_id = 'PSTH_S_trl2to150_bn20';
-plot_ISI = 1;
-conditions = 'CNI';
-pipeline_id = 'SU_nlx';
 
 %% Add paths
 addpath([root_dir 'PRJ_Stroop/scripts/']);
@@ -20,8 +16,11 @@ an_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
 proc_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m'];
 eval(proc_vars_cmd);
+plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
+eval(plt_vars_cmd);
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
+
 if numel(SBJ_vars.analysis_time)>1
     error('havent set up multi-run processing yet!');
 elseif numel(SBJ_vars.analysis_time{1})>1
@@ -39,7 +38,7 @@ else
     error(['Bad event_lab: ' event_lab]);
 end
 % Compile cond_type, RT, trial_n
-[cond_lab, cond_colors, ~] = fn_condition_label_styles(conditions);
+[cond_lab, cond_colors, cond_style] = fn_condition_label_styles(conditions);
 cond_idx = false([length(cond_lab) length(trial_info.trial_n)]);
 for cond_ix = 1:length(cond_lab)
     % Get binary condition index
@@ -103,11 +102,15 @@ if plot_ISI
         cfg.colormap     = jet(300); % colormap
         cfg.scatter      = 'no'; % do not plot the individual isis per spike as scatters
         fig_name = [SBJ '_' isih.label{u} '_ISI_dist'];
-        f = figure('Name',fig_name,'Visible','off');
+        f = figure('Name',fig_name,'Visible',fig_vis);
         ft_spike_plot_isireturn(cfg,isih);
         title(['Total spikes = ' num2str(numel(spike_trl.timestamp{u}))]);
-        saveas(gcf,[fig_dir fig_name '.png']);
-        close(f);
+        if save_plots
+            saveas(gcf,[fig_dir fig_name '.png']);
+        end
+        if close_plots
+            close(f);
+        end
     end
 end
 
@@ -126,10 +129,16 @@ psth = ft_spike_psth(cfg,spike_trl);
 %   psth.trial       = contains PSTH per unit per trial 
 %   psth.var         = contains variance of PSTH per unit across trials
 
-% Run while keeping trials for stats
+% Compute per condition while keeping trials for stats
+psth_cond = {};
+n_trials = zeros([1 numel(cond_lab)]);
 cfg.keeptrials  = 'yes';
-% cfg.trials      = find(trial_info.condition_n==cond_n);
-psth_trl = ft_spike_psth(cfg,spike_trl);
+for cond_ix = 1:numel(cond_lab)
+    cfg.trials = find(cond_mat(:,1)==cond_ix);
+    psth_cond{cond_ix} = ft_spike_psth(cfg,spike_trl);
+    % Grab n_trials for design matrix
+    n_trials(cond_ix) = size(psth_cond{cond_ix}.trial,1);
+end
 
 %% Plot Raster
 fig_dir = [root_dir 'PRJ_Stroop/results/SU/raster/' an_id '/'];
@@ -140,21 +149,148 @@ cfg.topplotfunc  = 'line'; % plot as a line
 cfg.latency      = 'maxperiod';%trial_lim_s;
 cfg.errorbars    = 'std'; % plot with the standard deviation
 cfg.interactive  = 'no'; % toggle off interactive mode
-for u = 1:numel(spike_trl.label)
+for u = 1:6%1:numel(spike_trl.label)
     cfg.spikechannel = spike_trl.label(u);
     fig_name = [SBJ '_' spike_trl.label{u} '_PSTH_raster_' event_lab];
-    figure('Name',fig_name,'Visible','on');
-    f = ft_spike_plot_raster(cfg, spike_trl, psth);
+    figure('Name',fig_name,'Visible',fig_vis);
+    raster = ft_spike_plot_raster(cfg, spike_trl, psth);
     
     % Add RTs
-    axes(f.hdl.axRaster);
+    axes(raster.hdl.axRaster);
     for cond_ix = 1:numel(cond_lab)
         idx = cond_mat(:,1)==cond_ix;
-        scatter(cond_mat(idx,2)-trial_lim_s(1),find(idx),'.',...
-            'MarkerEdgeColor',[cond_colors{cond_ix}]);%,'MarkerEdgeColor');
+        if strcmp(event_lab,'S')
+            scatter(cond_mat(idx,2)-trial_lim_s(1),find(idx),'.',...
+                'MarkerEdgeColor',[cond_colors{cond_ix}]);%,'MarkerEdgeColor');
+        else
+            scatter(zeros(size(cond_mat(idx,2))),find(idx),'.',...
+                'MarkerEdgeColor',[cond_colors{cond_ix}]);%,'MarkerEdgeColor');
+        end
     end
     
     % Save
-    saveas(gcf,[fig_dir fig_name '.png']);
-    close(gcf);
+    if save_plots
+        saveas(gcf,[fig_dir fig_name '.png']);
+    end
+    if close_plots
+        close(gcf);
+    end
+end
+
+%% Compute PSTH differences
+design = zeros(2,sum(n_trials));
+for cond_ix = 1:numel(cond_lab)
+    if cond_ix==1
+        design(1,1:n_trials(cond_ix)) = cond_ix;                                % Conditions (Independent Variable)
+        design(2,1:n_trials(cond_ix)) = 1:n_trials(cond_ix);                    % Trial Numbers
+    else
+        design(1,sum(n_trials(1:cond_ix-1))+1:sum(n_trials(1:cond_ix)))= cond_ix; % Conditions (Independent Variable)
+        design(2,sum(n_trials(1:cond_ix-1))+1:sum(n_trials(1:cond_ix)))= 1:n_trials(cond_ix);
+    end
+end
+
+% Prepare neighbors layout
+% cfgn = [];
+% cfgn.method  = 'distance';
+% cfgn.layout  = 'ordered';
+% cfgn.channel = elecs;
+% neighbors    = ft_prepare_neighbours(cfgn,psth_cond_allch{1});
+% for u = 1:numel(psth_cond{1}.label)
+%     neighbors(u).label = psth_cond{1}.label{u};
+%     neighbors(u).neighblabel = {};
+% end
+
+% Calculate statistics
+cfg_stat.design           = design;
+[stat] = ft_timelockstatistics(cfg_stat, psth_cond{:});
+
+%% Plot rasters by condition
+fig_dir = [root_dir 'PRJ_Stroop/results/SU/raster/' conditions '/' an_id '/'];
+if ~exist(fig_dir,'dir'); mkdir(fig_dir); end
+sig_ch = {};
+cfg              = [];
+cfg.topplotfunc  = 'line'; % plot as a line
+cfg.latency      = 'maxperiod';%trial_lim_s;
+cfg.errorbars    = 'std'; % plot with the standard deviation
+cfg.interactive  = 'no'; % toggle off interactive mode
+for u = 1:6%1:numel(stat.label)
+    cfg.spikechannel = spike_trl.label(u);
+    fig_name = [SBJ '_' conditions '_' spike_trl.label{u} '_PSTH_raster_' event_lab];
+    f = figure('Name',fig_name,'Visible',fig_vis);
+    raster = ft_spike_plot_raster(cfg, spike_trl, psth);
+    
+    % Add RTs
+    axes(raster.hdl.axRaster);
+    for cond_ix = 1:numel(cond_lab)
+        idx = cond_mat(:,1)==cond_ix;
+        if strcmp(event_lab,'S')
+            scatter(cond_mat(idx,2)-trial_lim_s(1),find(idx),'.',...
+                'MarkerEdgeColor',[cond_colors{cond_ix}]);%,'MarkerEdgeColor');
+        else
+            scatter(zeros(size(cond_mat(idx,2))),find(idx),'.',...
+                'MarkerEdgeColor',[cond_colors{cond_ix}]);%,'MarkerEdgeColor');
+        end
+    end
+    
+    % Replot top PSTH by condition
+    cla(raster.hdl.axTopPlot);
+    plot_info.fig        = f;
+    plot_info.x_step     = plt_vars.x_step_sz*psth_cond{1}.fsample;
+    plot_info.x_lab      = trial_lim_s(1):plt_vars.x_step_sz:trial_lim_s(2);
+    plot_info.legend_loc = plt_vars.legend_loc;
+    plot_info.sig_alpha  = plt_vars.sig_alpha;
+    plot_info.sig_color  = plt_vars.sig_color;
+    % Stimulus plotting params
+    event_info.time      = -trial_lim_s(1)*psth_cond{1}.fsample;
+    event_info.name      = {event_lab};
+    event_info.width     = plt_vars.evnt_width;
+    event_info.color     = {plt_vars.evnt_color};
+    event_info.style     = {plt_vars.evnt_style};
+    % Condition plotting params
+    cond_info.name       = cond_lab;
+    cond_info.style      = cond_style;
+    cond_info.color      = cond_colors;
+    cond_info.alpha      = repmat(plt_vars.errbar_alpha,[1 numel(cond_lab)]);
+    
+%     subplot(plot_rc(1),plot_rc(2),u);
+    plot_info.ax     = raster.hdl.axTopPlot;
+    plot_info.title  = stat.label{u};
+    plot_info.legend = plt_vars.legend;
+    
+    % Compute means and variance
+    means = NaN([numel(cond_lab) size(psth_cond{1}.avg,2)]);
+    var = NaN([numel(cond_lab) size(psth_cond{1}.avg,2)]);
+    for cond_ix = 1:numel(cond_lab)
+        means(cond_ix,:) = psth_cond{cond_ix}.avg(u,:);
+        var(cond_ix,:) = squeeze(std(psth_cond{cond_ix}.trial(:,u,:),[],1)./sqrt(size(psth_cond{cond_ix}.trial,1)))';
+        % psth_cond{cond_ix}.var is for some reason wayyyy bigger! (almsot 1000x)
+    end
+    % Find significant time periods
+    if sum(stat.mask(u,:))>0
+        sig_ch = {sig_ch{:} stat.label{u}};
+        mask_chunks = fn_find_chunks(stat.mask(u,:));
+        sig_chunks = mask_chunks;
+        sig_chunks(stat.mask(u,sig_chunks(:,1))==0,:) = [];
+        % If stat and psth_cond aren't on same time axis, adjust sig_chunk indices
+        if (size(stat.time,2)~=size(psth_cond{1}.time,2)) || (sum(stat.time==psth_cond{1}.time)~=numel(stat.time))
+            for chunk_ix = 1:size(sig_chunks,1)
+                sig_chunks(chunk_ix,1) = find(psth_cond{1}.time==stat.time(sig_chunks(chunk_ix,1)));
+                sig_chunks(chunk_ix,2) = find(psth_cond{1}.time==stat.time(sig_chunks(chunk_ix,2)));
+            end
+        end
+        fprintf('%s -- %i SIGNIFICANT CLUSTERS FOUND, plotting with significance shading...\n',...
+                                                                stat.label{u},size(sig_chunks,1));
+        fn_plot_ts_error_bar_sig(plot_info,means,var,sig_chunks,event_info,cond_info);
+    else
+        fprintf('%s -- NO SIGNIFICANT CLUSTERS FOUND, plotting without significance shading...\n',stat.label{u});
+        fn_plot_ts_error_bar(plot_info,means,var,event_info,cond_info);
+    end
+        
+    % Save
+    if save_plots
+        saveas(gcf,[fig_dir fig_name '.png']);
+    end
+    if close_plots
+        close(gcf);
+    end
 end
