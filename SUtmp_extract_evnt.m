@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% SBJ vars
-SBJ = 'IR75';
+SBJ = 'IR82';
 b_ix = 1;   %block
 eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
 eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/SU_nlx_proc_vars.m']);
@@ -22,10 +22,9 @@ else
 end
 
 %% Read photodiode
-photo_label = ['Photo1' SBJ_vars.ch_lab.suffix];
 inverted = 1;
-photo = ft_read_neuralynx_interp({[SBJ_vars.dirs.SU 'photo/' photo_label '.ncs']});
-photo.label = {'Photo1'};
+photo = ft_read_neuralynx_interp({[SBJ_vars.dirs.SU 'photo/' SBJ_vars.ch_lab.photod{1} SBJ_vars.ch_lab.suffix '.ncs']});
+photo.label = {'photo'};
 
 % Preprocess
 if inverted
@@ -42,10 +41,16 @@ cfgs = []; cfgs.latency = SBJ_vars.analysis_time{b_ix}{1};
 photo = ft_selectdata(cfgs,photo);
 photo.time{1} = photo.time{1}-SBJ_vars.analysis_time{b_ix}{1}(1);
 
+% Resample if at very high srate
+if proc_vars.photo_resample && photo.fsample~=proc_vars.evnt_resample_freq
+    cfg_dsmp = [];
+    cfg_dsmp.resamplefs = proc_vars.evnt_resample_freq;
+    photo = ft_resampledata(cfg_dsmp,photo);
+end    
+
 %% Read, downsample, and save mic
-mic_label = ['Mic1' SBJ_vars.ch_lab.suffix];
-mic = ft_read_neuralynx_interp({[SBJ_vars.dirs.SU 'mic/' mic_label '.ncs']});
-mic.label = {'Mic1'};
+mic = ft_read_neuralynx_interp({[SBJ_vars.dirs.SU 'mic/' SBJ_vars.ch_lab.mic{1} SBJ_vars.ch_lab.suffix '.ncs']});
+mic.label = {'mic'};
 
 % Cut to analysis time
 mic = ft_selectdata(cfgs,mic);
@@ -101,7 +106,7 @@ mic_data_rescale = mic_data./(max(abs(mic_data))+0.05);
 %% Concatenate photo and mic
 % Check that time vectors are close enough
 dif = photo.time{1}-mic_dsmp.time{1};
-if max(dif)>0.0000001
+if max(dif)>0.000001
     error('time vectors not aligned, check that!');
 elseif ~isequal(photo.time{1},mic_dsmp.time{1})
     warning(['Mic and photo time vectors still not equal, but differences is small: ' num2str(max(dif))]);

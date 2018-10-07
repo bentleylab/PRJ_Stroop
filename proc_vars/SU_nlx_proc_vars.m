@@ -1,9 +1,9 @@
 %% Pipeline Processing Variables: "main_ft"
 
 % Data Preprocessing
-proc_vars.mic_resample      = 1;
-proc_vars.mic_resample_freq = 5000;
-proc_vars.photo_resample    = 0;
+proc_vars.evnt_resample_freq = 4000;
+proc_vars.mic_resample       = 1;
+proc_vars.photo_resample     = 1;
 
 proc_vars.plot_psd      = '1by1';         % type of plot for channel PSDs
 proc_vars.resample_yn   = 'yes';

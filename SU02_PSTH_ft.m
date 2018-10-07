@@ -1,8 +1,9 @@
 %% Fieldtrip-based PSTH analysis
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
-SBJ = 'IR75';
+SBJ = 'IR82';
 an_id = 'PSTH_S_trl2to150_bn20';
+plot_ISI = 1;
 conditions = 'CNI';
 pipeline_id = 'SU_nlx';
 
@@ -124,6 +125,11 @@ psth = ft_spike_psth(cfg,spike_trl);
 %   psth.avg         = contains average PSTH per unit 
 %   psth.trial       = contains PSTH per unit per trial 
 %   psth.var         = contains variance of PSTH per unit across trials
+
+% Run while keeping trials for stats
+cfg.keeptrials  = 'yes';
+% cfg.trials      = find(trial_info.condition_n==cond_n);
+psth_trl = ft_spike_psth(cfg,spike_trl);
 
 %% Plot Raster
 fig_dir = [root_dir 'PRJ_Stroop/results/SU/raster/' an_id '/'];
