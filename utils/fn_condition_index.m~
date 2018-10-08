@@ -15,21 +15,10 @@ switch condition_label
     case 'cI'
         con_idx = [condition_num==1]+[condition_num==2]+[condition_num==3];
         inc_idx = [condition_num==7]+[condition_num==8]+[condition_num==9];
-        condition_idx = zeros(size(condition_num));
-        for t = 2:numel(condition_num)
-            if con_idx(t-1)==1 && inc_idx(t)==1
-                condition_idx(t) = 1;
-            end
-        end
+        for t = 
     case 'iI'
         con_idx = [condition_num==1]+[condition_num==2]+[condition_num==3];
         inc_idx = [condition_num==7]+[condition_num==8]+[condition_num==9];
-        condition_idx = zeros(size(condition_num));
-        for t = 2:numel(condition_num)
-            if inc_idx(t-1)==1 && inc_idx(t)==1
-                condition_idx(t) = 1;
-            end
-        end
     case 'con'
         condition_idx = [condition_num==1]+[condition_num==2]+[condition_num==3];
     case 'neu'

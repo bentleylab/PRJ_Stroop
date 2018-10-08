@@ -122,7 +122,7 @@ plot_ISI    = 1;
 fig_vis     = 'on';
 save_plots  = 1;
 close_plots = 0;
-for an_ix = 1:numel(an_opts)
+for an_ix = 1%:numel(an_opts)
     SU02_PSTH_ft(SBJ,conditions,pipeline_id,an_opts{an_ix},plt_opts{an_ix},plot_ISI,fig_vis,save_plots,close_plots);
 end
 

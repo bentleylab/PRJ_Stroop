@@ -21,7 +21,7 @@ eval(SBJ_evnt_clean_cmd);
 %% Read photodiode
 photo_label = 'Photo1_0010';
 inverted = 1;
-nlx_dir = [root_dir 'PRJ_Stroop/data/IR69/00_raw/SU_R1_2018-02-07_13-17-17/'];
+nlx_dir = [root_dir 'PRJ_Stroop/data/IR69/00_raw/SU_2018-02-07_13-17-17/'];
 photo = ft_read_neuralynx_interp({[nlx_dir 'photo/' photo_label '.ncs']});
 photo.label = {'Photo1'};
 if inverted
@@ -97,6 +97,61 @@ for stim_ix = 1:length(stim_times)
     epoch_idx(epoch_idx<1) = [];
     evnt(photod_ix,epoch_idx) = stim_yval(stim_ix);
 end
+
+%% Cut to analysis time
+tmp_photo = ft_read_neuralynx_interp({[SBJ_vars.dirs.SU 'photo/' SBJ_vars.ch_lab.photod{1} SBJ_vars.ch_lab.suffix '.ncs']});
+tmp_photo.trial{1} = evnt;
+cfgs = []; cfgs.latency = SBJ_vars.analysis_time{b_ix}{1};
+tmp_photo = ft_selectdata(cfgs,tmp_photo);
+tmp_photo.time{1} = tmp_photo.time{1}-SBJ_vars.analysis_time{b_ix}{1}(1);
+
+%% Read, downsample, and save mic
+mic = ft_read_neuralynx_interp({[SBJ_vars.dirs.SU 'mic/' SBJ_vars.ch_lab.mic{1} SBJ_vars.ch_lab.suffix '.ncs']});
+mic.label = {'mic'};
+
+% Cut to analysis time
+mic = ft_selectdata(cfgs,mic);
+mic.time{1} = mic.time{1}-SBJ_vars.analysis_time{b_ix}{1}(1);
+
+% Downsample
+if proc_vars.mic_resample
+    cfg_dsmp = [];
+    cfg_dsmp.resamplefs = photo.fsample;
+    mic_dsmp = ft_resampledata(cfg_dsmp,mic);
+end
+
+%% Process Microphone data
+mic_data = mic.trial{1};
+%rescale to prevent clipping, add 0.05 fudge factor
+mic_data_rescale = mic_data./(max(abs(mic_data))+0.05);
+
+%% Concatenate photo and mic
+% Check that time vectors are close enough
+dif = tmp_photo.time{1}-mic_dsmp.time{1};
+if max(dif)>0.000001
+    error('time vectors not aligned, check that!');
+elseif ~isequal(photo.time{1},mic_dsmp.time{1})
+    warning(['Mic and photo time vectors still not equal, but differences is small: ' num2str(max(dif))]);
+    mic_dsmp.time{1} = tmp_photo.time{1};
+end
+
+% Append
+evnt = vertcat(tmp_photo.trial{1},mic_dsmp.trial{1});
+photod_ix = 1;
+mic_ix = 2;
+ignore_trials = [];
+% cfga = [];
+% cfga.keepsampleinfo = 'no';
+% evnt = ft_appenddata(cfga,photo,mic_dsmp);
+% evnt.fsample = photo.fsample;
+
+%% Save data out
+evnt_out_filename = strcat(SBJ_vars.dirs.import,SBJ,'_evnt',block_suffix,'.mat');
+save(evnt_out_filename, '-v7.3', 'evnt');
+
+% Save Microphone data separately as .wav for listening
+mic_data_filename = strcat(SBJ_vars.dirs.import,SBJ,'_mic_recording',block_suffix,'.wav');
+audiowrite(mic_data_filename,mic_data_rescale,evnt.fsample);
 
 %% Save corrected data
 out_filename = [SBJ_vars.dirs.preproc SBJ '_evnt_clean',block_suffix,'.mat'];

@@ -1,17 +1,22 @@
 function SBJ08a_HFA_stats(SBJ,conditions,pipeline_id,an_id)
-error('why arent you running _save_ to prep for SBJ10a_ANOVA?');
+if ~strcmp(conditions,'CSE')
+    error('why arent you running _save_ to prep for SBJ10a_ANOVA?');
+end
 % Calculates high frequency activity, computes cluster-based statistics, and plots the results
 % clear all; %close all;
-% Set up paths
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/');
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
-addpath('/home/knight/hoycw/Apps/fieldtrip/');
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+
+%% Set up paths
+addpath([root_dir 'PRJ_Stroop/scripts/']);
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+addpath(ft_dir);
 ft_defaults
 
 %% Data Preparation
-SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
-an_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/an_vars/' an_id '_vars.m'];
+an_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
 % eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
 
