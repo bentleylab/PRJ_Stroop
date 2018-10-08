@@ -32,6 +32,11 @@ if strcmp(cluster_dir,'')
     cluster_dir = [SBJ_vars.dirs.preproc 'micro_clusters/semi_auto/'];
 end
 clust_fnames = dir([cluster_dir 'times*' SBJ_vars.ch_lab.suffix '.mat']);
+if exist([cluster_dir 'from_nse'])
+    from_nse = true;
+else
+    from_nse = false;
+end
 
 % Initialize spike struct
 spike.label = {};
@@ -44,7 +49,12 @@ unit = 0;
 for ch = 1:numel(clust_fnames)
     % Get Channel label
     uscores = strfind(clust_fnames(ch).name,'_');
-    ch_lab  = clust_fnames(ch).name(uscores(1)+1:uscores(2)-1);
+    if isempty(SBJ_vars.ch_lab.suffix)
+        stop_pos = strfind(clust_fnames(ch).name,'.mat');
+    else
+        stop_pos = strfind(clust_fnames(ch).name,SBJ_vars.ch_lab.suffix);
+    end
+    ch_lab  = clust_fnames(ch).name(uscores(1)+1:stop_pos-1);
     % Get first time stamp
     if ch==1
         micro_hdr = ft_read_header([SBJ_vars.dirs.SU 'micro/' ch_lab SBJ_vars.ch_lab.suffix '.ncs']);
@@ -53,12 +63,16 @@ for ch = 1:numel(clust_fnames)
     load([cluster_dir clust_fnames(ch).name]);
     
     %% Process Channel Clusters
-    clust_n = sort(unique(cluster_class(:,1))>0);
+    clust_n = sort(unique(cluster_class(:,1)));
     % Remove rejected cluster
     clust_n(clust_n==0) = [];
     
-    % Adjust spike times from 1000 kHz time stamps to sec
-    cluster_class(:,2) = (cluster_class(:,2)-double(micro_hdr.FirstTimeStamp)/1000)/1000;
+    % Subtract NLX first time stamp (which should be converted from 1000 kHz to 1 kHz)
+    if ~from_nse
+        cluster_class(:,2) = (cluster_class(:,2)-double(micro_hdr.FirstTimeStamp)/1000);
+    end
+    % Adjust spike times from ms to sec
+    cluster_class(:,2) = cluster_class(:,2)/1000;
     % Account for analysis time
     cluster_class(:,2) = cluster_class(:,2) - SBJ_vars.analysis_time{1}{1}(1);
     % Toss spikes before analysis_time

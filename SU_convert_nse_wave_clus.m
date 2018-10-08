@@ -1,4 +1,6 @@
 %% Load NLX .nse spike file and prepare for wave_clus input
+%   This script was developed based on the issue in the wave_clus github:
+%           https://github.com/csn-le/wave_clus/issues/34
 % Paths
 SBJ = 'IR67';
 b_ix = 1;   %block
@@ -27,13 +29,13 @@ for ch = 1:numel(nse_fnames)
         spikeImport = ft_read_spike([SBJ_vars.dirs.SU 'spikes/' nse_fnames(ch).name]);
         spikes = squeeze(spikeImport.waveform{1}(1,:,:))';
         par = set_parameters;
-        par.w_pre = 8;      % This is the default for Cheetah and Pegasus, confirmed in IR67 WedPM_Pegasus2018-01-24_17-59-36.log
+        par.w_pre = spikeImport.hdr.AlignmentPt;      % This is the default for Cheetah and Pegasus, confirmed in IR67 WedPM_Pegasus2018-01-24_17-59-36.log
         par.w_post = size(spikes,2)-par.w_pre;
+        par.sr = spikeImport.hdr.SamplingFrequency;
         par.channels = 1;
-        par.sr = hdr.Fs;
         
         Fs = spikeImport.hdr.SamplingFrequency;
-        index = double((spikeImport.timestamp{1}-spikeImport.hdr.FirstTimeStamp)/hdr.TimeStampPerSample/hdr.Fs);
+        index = 1000*double((spikeImport.timestamp{1}-spikeImport.hdr.FirstTimeStamp))/hdr.TimeStampPerSample/hdr.Fs;
         
         out_dir = [SBJ_vars.dirs.import 'mat_spikes/'];
         if ~exist(out_dir,'dir'); mkdir(out_dir); end

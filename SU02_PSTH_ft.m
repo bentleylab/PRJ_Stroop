@@ -141,41 +141,41 @@ for cond_ix = 1:numel(cond_lab)
 end
 
 %% Plot Raster
-fig_dir = [root_dir 'PRJ_Stroop/results/SU/raster/' an_id '/'];
-if ~exist(fig_dir,'dir'); mkdir(fig_dir); end
-
-cfg              = [];
-cfg.topplotfunc  = 'line'; % plot as a line
-cfg.latency      = 'maxperiod';%trial_lim_s;
-cfg.errorbars    = 'std'; % plot with the standard deviation
-cfg.interactive  = 'no'; % toggle off interactive mode
-for u = 1:6%1:numel(spike_trl.label)
-    cfg.spikechannel = spike_trl.label(u);
-    fig_name = [SBJ '_' spike_trl.label{u} '_PSTH_raster_' event_lab];
-    figure('Name',fig_name,'Visible',fig_vis);
-    raster = ft_spike_plot_raster(cfg, spike_trl, psth);
-    
-    % Add RTs
-    axes(raster.hdl.axRaster);
-    for cond_ix = 1:numel(cond_lab)
-        idx = cond_mat(:,1)==cond_ix;
-        if strcmp(event_lab,'S')
-            scatter(cond_mat(idx,2)-trial_lim_s(1),find(idx),'.',...
-                'MarkerEdgeColor',[cond_colors{cond_ix}]);%,'MarkerEdgeColor');
-        else
-            scatter(zeros(size(cond_mat(idx,2))),find(idx),'.',...
-                'MarkerEdgeColor',[cond_colors{cond_ix}]);%,'MarkerEdgeColor');
-        end
-    end
-    
-    % Save
-    if save_plots
-        saveas(gcf,[fig_dir fig_name '.png']);
-    end
-    if close_plots
-        close(gcf);
-    end
-end
+% fig_dir = [root_dir 'PRJ_Stroop/results/SU/raster/' an_id '/'];
+% if ~exist(fig_dir,'dir'); mkdir(fig_dir); end
+% 
+% cfg              = [];
+% cfg.topplotfunc  = 'line'; % plot as a line
+% cfg.latency      = 'maxperiod';%trial_lim_s;
+% cfg.errorbars    = 'std'; % plot with the standard deviation
+% cfg.interactive  = 'no'; % toggle off interactive mode
+% for u = 1:numel(spike_trl.label)
+%     cfg.spikechannel = spike_trl.label(u);
+%     fig_name = [SBJ '_' spike_trl.label{u} '_PSTH_raster_' event_lab];
+%     figure('Name',fig_name,'Visible',fig_vis);
+%     raster = ft_spike_plot_raster(cfg, spike_trl, psth);
+%     
+%     % Add RTs
+%     axes(raster.hdl.axRaster);
+%     for cond_ix = 1:numel(cond_lab)
+%         idx = cond_mat(:,1)==cond_ix;
+%         if strcmp(event_lab,'S')
+%             scatter(cond_mat(idx,2)-trial_lim_s(1),find(idx),'.',...
+%                 'MarkerEdgeColor',[cond_colors{cond_ix}]);%,'MarkerEdgeColor');
+%         else
+%             scatter(zeros(size(cond_mat(idx,2))),find(idx),'.',...
+%                 'MarkerEdgeColor',[cond_colors{cond_ix}]);%,'MarkerEdgeColor');
+%         end
+%     end
+%     
+%     % Save
+%     if save_plots
+%         saveas(gcf,[fig_dir fig_name '.png']);
+%     end
+%     if close_plots
+%         close(gcf);
+%     end
+% end
 
 %% Compute PSTH differences
 design = zeros(2,sum(n_trials));
@@ -213,7 +213,7 @@ cfg.topplotfunc  = 'line'; % plot as a line
 cfg.latency      = 'maxperiod';%trial_lim_s;
 cfg.errorbars    = 'std'; % plot with the standard deviation
 cfg.interactive  = 'no'; % toggle off interactive mode
-for u = 1:6%1:numel(stat.label)
+for u = 1:numel(stat.label)
     cfg.spikechannel = spike_trl.label(u);
     fig_name = [SBJ '_' conditions '_' spike_trl.label{u} '_PSTH_raster_' event_lab];
     f = figure('Name',fig_name,'Visible',fig_vis);
@@ -285,7 +285,10 @@ for u = 1:6%1:numel(stat.label)
         fprintf('%s -- NO SIGNIFICANT CLUSTERS FOUND, plotting without significance shading...\n',stat.label{u});
         fn_plot_ts_error_bar(plot_info,means,var,event_info,cond_info);
     end
-        
+    
+    fprintf('SIGNIFICANT CHANNELS:\n');
+    disp(sig_ch);
+    
     % Save
     if save_plots
         saveas(gcf,[fig_dir fig_name '.png']);
