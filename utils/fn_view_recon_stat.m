@@ -105,6 +105,19 @@ if strcmp(stat_id,'actv')
             elec_colors{ch_ix,1} = ns_color;
         end
     end
+elseif strcmp(stat_id,'CSE')
+    load([SBJ_vars.dirs.proc,SBJ,'_',stat_id,'_ROI_',an_id,'.mat']);
+    elec = fn_reorder_elec(elec,stat.label);
+    grp_lab = {};
+%     grp_colors = {'k','r','b'};
+    elec_colors = cell([numel(stat.label) 1]);
+    for ch_ix = 1:numel(stat.label)
+        if any(stat.mask(ch_ix,1,:))
+            elec_colors{ch_ix,1} = [1 0 0];
+        else
+            elec_colors{ch_ix,1} = ns_color;
+        end
+    end    
 else    % ANOVA
     eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
     [grp_lab, grp_colors, ~] = fn_group_label_styles(model_lab);
@@ -159,6 +172,8 @@ f = {};
 for grp_ix = 1:numel(grp_lab)+1
     if strcmp(stat_id,'actv')
         plot_name = [SBJ '_actv_HFA_' an_id];
+    elseif strcmp(stat_id,'CSE')
+        plot_name = [SBJ '_' stat_id '_' an_id];
     else
         if grp_ix<=numel(grp_lab)
             plot_name = [SBJ '_ANOVA_' grp_lab{grp_ix} '_' stat_id '_' an_id];

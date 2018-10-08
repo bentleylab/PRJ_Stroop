@@ -215,21 +215,18 @@ end
 %% CSE Effects
 % % might be interesting to compare mean traces, but I didn't run it because
 % % I haven't wanted to run the SBJ08a_HFA_stats for 'CI'...
-conditions  = 'CSE';
-an_opts     = {'HGm_S_zbtS_trl2to151_sm10_wn100_stat15','HGm_R_zbtS_trl5to101_sm10_wn100_stat5to1'};
-plt_id      = 'ts_S15R1_errbr_evnt';
-save_fig    = 1;
-fig_vis     = 'off';
-view_space  = 'pat';
-reg_type    = '';
+conditions = 'CSE';
+an_opts    = {'HGm_S_zbtS_trl2to151_sm10_wn100_stat15','HGm_R_zbtS_trl5to101_sm10_wn100_stat5to1'};
+plt_id  = 'ts_S15R1_errbr_evnt';
+view_space = 'pat';
+reg_type = '';
 show_labels = 1;
-hemi        = 'b';
+hemi = 'b';
 for ix = 1:numel(SBJs)
-%     for an_ix = 1:numel(an_opts)
-%         fn_view_recon_stat(SBJs{ix}, pipeline_id, conditions, an_opts{an_ix}, view_space, reg_type, show_labels, hemi);
-%     end
-    SBJ08b_HFA_plot_SR_stats(SBJs{ix},conditions,an_opts{1},an_opts{2},plt_id,save_fig,fig_vis);
-    close all;
+    for an_ix = 1:an_opts
+        fn_view_recon_stat(SBJs{ix}, pipeline_id, conditions, an_opts{an_ix}, view_space, reg_type, show_labels, hemi);
+    end
+    SBJ08b_HFA_plot_SR_stats(SBJ,conditions,an_id_s,an_id_r,plt_id,save_fig,fig_vis);
 end
 % SBJ_elecs = {{'IR35','LOF6-7'},{'IR41','LIN6-7'},{'IR35','LPC5-6'},{'IR35','LAC1-2'},{'IR39','ROF7-8'},...
 %              {'IR41','RSM3-4'},{'IR41','RIN3-4'},{'IR35','RIN3-4'},{'IR39','LOF3-4'}};
