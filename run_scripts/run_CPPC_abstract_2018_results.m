@@ -215,10 +215,13 @@ end
 %% HG condition examples
 % % might be interesting to compare mean traces, but I didn't run it because
 % % I haven't wanted to run the SBJ08a_HFA_stats for 'CI'...
-% conditions = 'CI';
-% an_id_s = 'HGm_S_zbtS_trl2to15_sm10_wn100_stat15';
-% an_id_r = 'HGm_R_zbtS_trl5to1_sm10_wn100_stat5to1';
-% plt_id  = 'ts_S15R1_errbr_evnt';
+conditions = 'CSE';
+an_id_s     = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
+an_id_r     = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
+plt_id  = 'ts_S15R1_errbr_evnt';
+for ix = 1:numel(SBJs)
+    SBJ08b_HFA_plot_SR_stats(SBJ,conditions,an_id_s,an_id_r,plt_id,save_fig,fig_vis);
+end
 % SBJ_elecs = {{'IR35','LOF6-7'},{'IR41','LIN6-7'},{'IR35','LPC5-6'},{'IR35','LAC1-2'},{'IR39','ROF7-8'},...
 %              {'IR41','RSM3-4'},{'IR41','RIN3-4'},{'IR35','RIN3-4'},{'IR39','LOF3-4'}};
 %          %IR35 RIN3-4 used for SFN poster
