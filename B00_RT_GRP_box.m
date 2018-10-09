@@ -11,7 +11,7 @@ addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
 
 % Analysis Parameters
 conditions = 'CNI';
-SBJs = {'IR21','IR31','IR32','IR35','IR39','IR41','IR54','IR57'};
+SBJs = {'IR21','IR31','IR32','IR35','IR39','IR41','IR52','IR54','IR57','IR61','IR65','IR68','IR72','IR74'};%ALMOST: 'CP24','IR26',  %NEVER: 'IR27','IR37','IR48',
 
 late_RT_cut = 0.6;      % window in sec before next stim to eliminate
 % Plotting parameters

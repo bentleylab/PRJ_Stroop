@@ -12,6 +12,9 @@ actv_win    = '100';
 save_fig    = 1;
 fig_vis     = 'on';
 
+%% ================================================================================
+%   BEHAVIOR
+%  =================================================================================
 %% RT behavior group level
 % didn't change...
 for s = 1:numel(SBJs)
@@ -19,7 +22,12 @@ for s = 1:numel(SBJs)
 end
 B00_RT_GRP_hist_norm(SBJs,'CNI',save_fig,fig_vis);
 B00_RT_GRP_hist(SBJs,'CNI',save_fig,fig_vis);
+% IR21 is the only one with a significant CSE behavioral effect (cI > iI)
+% B00_RT_SBJ_hist_CSE(SBJs(1),'CSE',0,fig_vis);
 
+%% ================================================================================
+%   QUALITY CHECKS
+%  =================================================================================
 %% Print Results according to GM %
 stat_id = 'corrRT_CNI_pcon_WL200_WS50';
 an_id_s = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
@@ -40,34 +48,42 @@ roi_id  = 'ROI';
 atlas_id = 'Dx';
 gm_thresh = 0;
 
-
 % SBJ10c_HFA_GRP_elec_cnt_nact_RT_ANOVA(SBJs,stat_id,an_id_s,actv_win,roi_id,atlas_id,gm_thresh,pipeline_id)
 SBJ10c_HFA_GRP_elec_cnt_nact_RT_ANOVA(SBJs,stat_id,an_id_r,actv_win,roi_id,atlas_id,gm_thresh,pipeline_id)
 
+%% ================================================================================
+%   Effects by ROI
+%  =================================================================================
 %% Proportions of significant effects across ROI
 stat_id     = 'corrRT_CNI_pcon_WL200_WS50';
-atlas_id    = 'Yeo7';%'Dx';
+atlas_id    = {'Yeo7','Dx'};
 an_opts     = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
 plt_id      = 'onsets_trl0to15_evnt_roi';
-roi_opts    = {'Yeo7'};%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
+roi_opts    = {'Yeo7','gROI'};%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
 gm_lim      = [0 0.01 0.1];
 fig_vis     = 'on';
 fig_filetype= 'png';
-roi_ix = 1;
+% roi_ix = 1;
 gm_ix = 1;
-% for gm_ix = 1:numel(gm_lim)
-for an_ix = 1:numel(an_opts)
-    SBJ10c_HFA_GRP_summary_bar_perc_actv_GMlim_RT_ANOVA_ROI(SBJs,stat_id,pipeline_id,...
-        an_opts{an_ix},actv_win,roi_opts{roi_ix},atlas_id,gm_lim(gm_ix),plt_id,save_fig,fig_vis,fig_filetype);
+for roi_ix = 1:numel(roi_opts)
+    for an_ix = 1:numel(an_opts)
+        SBJ10c_HFA_GRP_summary_bar_perc_GMlim_CSE_RT_ANOVA_ROI(SBJs,stat_id,pipeline_id,...
+            an_opts{an_ix},roi_opts{roi_ix},atlas_id{roi_ix},gm_lim(gm_ix),plt_id,save_fig,fig_vis,fig_filetype);
+        SBJ10c_HFA_GRP_summary_bar_perc_actv_GMlim_RT_ANOVA_ROI(SBJs,stat_id,pipeline_id,...
+            an_opts{an_ix},actv_win,roi_opts{roi_ix},atlas_id{roi_ix},gm_lim(gm_ix),plt_id,save_fig,fig_vis,fig_filetype);
+    end
 end
-% end
 
+% Individual SBJs
 % roi_ix = 1;
 % for an_ix = 1:numel(an_opts)
 %     SBJ10c_HFA_SBJ_summary_bar_perc_actv_GMlim_RT_ANOVA_ROI(SBJs,stat_id,pipeline_id,...
 %         an_opts{an_ix},actv_win,roi_opts{roi_ix},atlas_id,0,plt_id,save_fig,fig_vis,fig_filetype);
 % end
 
+%% ================================================================================
+%   EFFECT ONSETS
+%  =================================================================================
 %% Plot onsets of ANOVA+RT
 stat_id     = 'corrRT_CNI_pcon_WL200_WS50';
 an_opts     = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
@@ -100,6 +116,9 @@ for roi_ix = 1:numel(roi_opts)
     end
 end
 
+%% ================================================================================
+%   EFFECT COMMONALITIES ACROSS ROIS
+%  =================================================================================
 %% Plot ANOVA with RT correlation by ROI to see any patterns
 stat_id = 'corrRT_CNI_pcon_WL200_WS50';
 an_id_s = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
@@ -225,12 +244,14 @@ reg_type    = '';
 show_labels = 1;
 hemi        = 'b';
 for ix = 1:numel(SBJs)
-%     for an_ix = 1:numel(an_opts)
-%         fn_view_recon_stat(SBJs{ix}, pipeline_id, conditions, an_opts{an_ix}, view_space, reg_type, show_labels, hemi);
-%     end
-    SBJ08b_HFA_plot_SR_stats(SBJs{ix},conditions,an_opts{1},an_opts{2},plt_id,save_fig,fig_vis);
-    close all;
+    for an_ix = 1:numel(an_opts)
+        fn_view_recon_stat(SBJs{ix}, pipeline_id, conditions, an_opts{an_ix}, view_space, reg_type, show_labels, hemi);
+    end
+    pause
+%     SBJ08b_HFA_plot_SR_stats(SBJs{ix},conditions,an_opts{1},an_opts{2},plt_id,save_fig,fig_vis);
+%     close all;
 end
+
 % SBJ_elecs = {{'IR35','LOF6-7'},{'IR41','LIN6-7'},{'IR35','LPC5-6'},{'IR35','LAC1-2'},{'IR39','ROF7-8'},...
 %              {'IR41','RSM3-4'},{'IR41','RIN3-4'},{'IR35','RIN3-4'},{'IR39','LOF3-4'}};
 %          %IR35 RIN3-4 used for SFN poster
@@ -238,3 +259,12 @@ end
 %     SBJ08b_HFA_plot_SR_stats_svg(SBJ_elecs{ix}{1},SBJ_elecs{ix}{2},conditions,pipeline_id,...
 %         an_id_s,an_id_r,plt_id,save_fig,fig_vis);
 % end
+
+%% Plot recons and save nice figs
+% an_opts     = {'HGm_S_zbtS_trl2to151_sm10_wn100_stat15','HGm_R_zbtS_trl5to101_sm10_wn100_stat5to1'};
+an_opts     = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
+
+an_ix = 1;
+fn_view_recon_atlas_grp_stat_sphr(SBJs,pipeline_id,'corrRT_CNI_pcon_WL200_WS50',an_opts{an_ix},'v',0,'r','Yeo7','Yeo7',1);
+fn_view_recon_atlas_grp_stat_sphr(SBJs,pipeline_id,'corrRT_CNI_pcon_WL200_WS50',an_opts{an_ix},'v',0,'l','Yeo7','Yeo7',1);
+

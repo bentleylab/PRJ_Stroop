@@ -40,6 +40,20 @@ if ~isempty(setdiff(stat{1}.label,stat{2}.label))
     error('ERROR: channels do not match between the two analyses!');
 end
 
+%% Load elec structs
+% Dx for anatomy
+elec_atlas_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_main_ft_pat_Dx.mat'];
+tmp = load(elec_atlas_fname); elec_dx = tmp.elec;
+cfg = []; cfg.channel = stat{1}.label;
+elec_dx = fn_select_elec(cfg,elec_dx);
+elec_dx = fn_reorder_elec(elec_dx,stat{1}.label);
+elec_dx.roi = fn_atlas2roi_labels(elec_dx.atlas_label,'Dx','gROI');
+% Yeo7 for network
+elec_atlas_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_main_ft_mni_v_Yeo7.mat'];
+tmp = load(elec_atlas_fname); elec_yeo7 = tmp.elec;
+elec_yeo7 = fn_select_elec(cfg,elec_yeo7);
+elec_yeo7.roi = fn_atlas2roi_labels(elec_yeo7.atlas_label,'Yeo7','Yeo7');
+
 %% Prep Data
 % Trim data to plotting epoch
 cfg_trim = [];
@@ -100,7 +114,8 @@ for ch_ix = 1:numel(stat{1}.label)
     for set_ix = 1:2
         subplot(1,2,set_ix);
         plot_info.ax     = gca;
-        plot_info.title  = [stat{set_ix}.label{ch_ix} ':' event_lab{set_ix}];
+        plot_info.title  = [stat{set_ix}.label{ch_ix} '-(Dx,' elec_dx.roi{ch_ix} ',' ...
+                                    elec_dx.atlas_label{ch_ix} ')-(Yeo7,' elec_yeo7.roi{ch_ix} ')'];
         plot_info.legend = plt_vars.legend;
         if strcmp(event_lab{set_ix},'stim')
             plot_info.x_lab = plt_vars.plt_lim_S(1):plt_vars.x_step_sz:plt_vars.plt_lim_S(2);
@@ -130,7 +145,7 @@ for ch_ix = 1:numel(stat{1}.label)
         end
         % Find significant time periods
         if sum(stat{set_ix}.mask(ch_ix,:))>0
-            sig_ch = {sig_ch{:} stat{set_ix}.label{ch_ix}};
+            sig_ch = {sig_ch{:} plot_info.title};
             mask_chunks = fn_find_chunks(stat{set_ix}.mask(ch_ix,:));
             sig_chunks = mask_chunks;
             sig_chunks(stat{set_ix}.mask(ch_ix,sig_chunks(:,1))==0,:) = [];
