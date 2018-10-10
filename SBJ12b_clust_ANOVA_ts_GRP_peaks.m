@@ -102,7 +102,9 @@ end
 for cond_ix = 1:numel(cond_lab)
     figure('Name',cond_lab{cond_ix});
     for sbj_ix = 1:numel(SBJs)
-        elec{sbj_ix}.clust_bin
+%         elec{sbj_ix}.clusters = clusters{sbj_ix};
+%         elec{sbj_ix}.clust_bin = [clust_bin{sbj_ix,:}];
+%         elec{sbj_ix}.cond_lab = cond_lab;
         for ch_ix = 1:size(clusters{sbj_ix},1)
             clust_n = clusters{sbj_ix}(ch_ix,cond_ix);
             time_bin = clust_bin{sbj_ix,cond_ix}(clust_n)+1;

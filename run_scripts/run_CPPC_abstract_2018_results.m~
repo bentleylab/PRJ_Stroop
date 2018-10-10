@@ -181,23 +181,19 @@ end
 clust_id = 'kmeans_corr_nROI_itr1k';%'kmeans_corr_nCH_itr1k_srCmb',
 stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
 an_opts  = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
-hemi_opts = {'r','l'};
-roi_id   = 'mgROI';
-atlas_id = 'Dx';
+% roi_id   = 'mgROI';
+% atlas_id = 'Dx';
 % plt_id   = 'ts_S0to15_R5to10_evnt_sigline';
 plot_ns  = 1;
 plot_out = 0;
 plot_clusters = 1;
-plot_recon = 0;
 show_labels = 1;
 % fig_vis  = 'off';
 % save_fig = 1;
 for sbj_ix = 1:numel(SBJs)
-    for an_ix = 2%1:2
-        for hemi_ix = 1:2
-            fn_view_recon_clust(SBJs{sbj_ix}, clust_id, stat_id, an_opts{an_ix}, atlas_id, roi_id,...
-                    'pat', '', show_labels, 'b', plot_out, plot_ns, plot_clusters, plot_recon);%hemi_opts{hemi_ix}
-        end
+    for an_ix = 1:2%1:numel(clust_opts)
+        fn_view_recon_clust(SBJs{sbj_ix}, clust_id, stat_id, an_opts{an_ix}, ...
+                    'pat', '', show_labels, hemi, plot_out, plot_ns, plot_clusters);
     end
 end
 
