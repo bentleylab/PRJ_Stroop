@@ -20,6 +20,9 @@ switch roi_id
     case 'Main3'
         labels = {'LPFC','MPFC','INS'};
         einfo_col = 3;
+    case 'mgROI'
+        labels = {'LPFC','MPFC','INS','OFC'};
+        einfo_col = 3;
     case 'gROI'
         labels = {'LPFC','MPFC','INS','OFC','PAR','TMP'};
         einfo_col = 3;

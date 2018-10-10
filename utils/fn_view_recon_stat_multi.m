@@ -1,4 +1,5 @@
-function fn_view_recon_2stat(SBJ, pipeline_id, stat_id, an_id, view_space, reg_type, show_labels, hemi)
+function fn_view_recon_stat_multi(SBJ, pipeline_id, stat_id, an_id, view_space, reg_type, show_labels, hemi)
+error('didnt write this yet, but need it for CSE 2 effects');
 %% Plot a reconstruction with electrodes colored according to statistics
 %   FUTURE 1: this is a static brain, need to adapt to a movie!
 %   FUTURE 2: add option for stat_var to be a cell with 2nd stat for edge

@@ -1,9 +1,8 @@
-function SBJ12a_corr_ANOVA_ts_cluster(SBJ,pipeline_id,stat_id,clust_id,an_id,roi_id,atlas_id,plt_id,fig_vis,save_fig,plot_out)
+function SBJ12b_clust_ANOVA_ts_GRP_ROI(SBJs,pipeline_id,stat_id,clust_id,an_id,roi_id,atlas_id,plt_id,fig_vis,save_fig)
 % Build connectivity matrix based on HFA correlations
 %   non-parametric stats via circular shift of trial time series
 fig_filetype = 'png';
-plot_out = 0;
-
+error('finish this!');
 %% Data Preparation
 % Set up paths
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
@@ -27,12 +26,13 @@ eval(['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m']);
 [rt_lab, rt_color, rt_style]     = fn_group_label_styles('RT');
 % end
 cond_lab = [grp_lab rt_lab];
+event_lab = {'stim', 'resp'};
 
 % Get event timing
 if strcmp(an_id(1:5),'HGm_S')
-    event_lab = 'stim';
+    event = 'stim';
 elseif strcmp(an_id(1:5),'HGm_R')
-    event_lab = 'resp';
+    event = 'resp';
 end
 
 % Compute mean RT
@@ -50,7 +50,7 @@ load(f_name);
 sample_rate = (numel(stat.time)-1)/(stat.time(end)-stat.time(1));
 
 %% Load ROI and GM/WM info
-[roi_list, roi_colors] = fn_roi_label_styles(roi_id);
+% [roi_list, roi_colors, ~] = fn_roi_label_styles(roi_id);
 if strcmp(atlas_id,'Yeo7') || strcmp(atlas_id,'Yeo17')
     elec_space = 'mni_v';
 else
@@ -65,23 +65,9 @@ elec = fn_select_elec(cfgs,elec);
 if ~all(strcmp(elec.label,w2.label))
     error('need to reorder elec!');
 end
-
-% Get ROI info per elec
 elec.roi = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
 elec.roi_id = roi_id;
 elec.roi_color = fn_roi2color(elec.roi);
-
-% Exclude elecs not in atlas ROIs
-if ~plot_out
-    atlas_in_elecs = {};
-    for roi_ix = 1:numel(roi_list)
-        atlas_in_elecs = [atlas_in_elecs; elec.label(strcmp(elec.roi,roi_list{roi_ix}))];
-    end
-    cfgs = []; cfgs.channel = atlas_in_elecs;
-    elec = fn_select_elec(cfgs, elec);
-    stat = ft_selectdata(cfgs,stat);
-    w2 = ft_selectdata(cfgs,w2);
-end
 
 %% Prep Data
 % FDR correct pvalues for ANOVA
@@ -101,7 +87,7 @@ w2.trial = w2.trial*100;
 %   NOTE: stat should be on stat_lim(1):stat_lim(2)+0.001 time axis
 %   w2 should fit within that since it's averaging into a smaller window
 cfg_trim = [];
-if strcmp(event_lab,'stim')
+if strcmp(event,'stim')
     cfg_trim.latency = plt_vars.plt_lim_S;
 else
     cfg_trim.latency = plt_vars.plt_lim_R;
@@ -117,6 +103,7 @@ stat = ft_selectdata(cfg_trim,stat);
 %   T: Mx1 integer assignment to cluster #
 % runs pdist (distance metric), linkage (), cluster ()
 
+roi_list = unique(elec.roi);
 if isnumeric(clust_vars.k_method)
     n_clust = clust_vars.k_method;
 elseif strcmp(clust_vars.k_method,'roi_match')
@@ -152,7 +139,7 @@ for cond_ix = 1:numel(cond_lab)
     end
 end
 
-out_fname = [SBJ_vars.dirs.proc SBJ '_' clust_id '_' stat_id '_' an_id '_' atlas_id '_' roi_id '.mat'];
+out_fname = [SBJ_vars.dirs.proc SBJ '_' clust_id '_' stat_id '_' an_id '.mat'];
 if strcmp(clust_vars.k_method,'CH')
     save(out_fname,'-v7.3','eva','clust_data','clusters','clust_colors','clust_names',...
         'centroids','dist_sums','distances','elec');
@@ -162,7 +149,7 @@ else
 end
 
 %% Plot Quality assessment of Clustering
-fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/clust/' clust_id '/' stat_id '/' an_id '/'];
+fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/clust/' clust_id '/' an_id '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
@@ -175,7 +162,7 @@ elseif strcmp(clust_vars.clust_method,'kmeans')
 end
 
 % Silhouette plot
-fig_name = [SBJ '_ANOVA_clust_' cond_lab{cond_ix} '_' roi_id '_' atlas_id '_silhouette'];
+fig_name = [SBJ '_ANOVA_clust_' stat_id '_SR_' cond_lab{cond_ix} '_' roi_id '_' atlas_id '_silhouette'];
 f = figure('Name',fig_name,'units','normalized',...
     'outerposition',[0 0 1 1],'Visible',fig_vis);
 for cond_ix = 1:numel(cond_lab)
@@ -203,14 +190,15 @@ max_rho = max(max(squeeze(stat.rho)));
 min_rho = min(min(squeeze(stat.rho)));
 ylims2  = [round(min_rho*10)/10-0.1 round(max_rho*10)/10+0.1]; % extra on top and bottom for StdErr
 yticks2 = ylims2(1):0.1:ylims2(2);
-% y_sig = zeros([1 numel(grp_lab)+1]);
-% y_sig(1) = mean([min_w2,max_w2]);
-% for grp_ix = 2:numel(grp_lab)+2
-%     y_sig(grp_ix) = y_sig(grp_ix-1)+ylim1_fudge;
-% end
+y_sig = zeros([1 numel(grp_lab)+1]);
+y_sig(1) = mean([min_w2,max_w2]);
+for grp_ix = 2:numel(grp_lab)+2
+    y_sig(grp_ix) = y_sig(grp_ix-1)+ylim1_fudge;
+end
 
+%!!! SR plotting or separate? maybe need to combine them on one plot axis...
 for cond_ix = 1:numel(cond_lab)
-    fig_name = [SBJ '_clust_' cond_lab{cond_ix} '_' atlas_id '_' roi_id];
+    fig_name = [SBJ '_clust_' stat_id '_' an_id '_' cond_lab{cond_ix} '_' roi_id '_' atlas_id];
     f = figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 1 1],'Visible',fig_vis);
     [subplot_lay, ~] = fn_num_subplots(n_clust);
@@ -308,7 +296,7 @@ for cond_ix = 1:numel(cond_lab)
     
     %% Plot cluster centroids
     if strcmp(clust_vars.clust_method,'kmeans')
-        fig_name = [SBJ '_clust_' cond_lab{cond_ix} '_' atlas_id '_' roi_id '_centroids'];
+        fig_name = [SBJ '_clust_' stat_id '_' an_id '_' cond_lab{cond_ix} '_' roi_id '_' atlas_id '_centroids'];
         f = figure('Name',fig_name,'units','normalized',...
             'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
         
@@ -343,7 +331,6 @@ for cond_ix = 1:numel(cond_lab)
         end
         
         % Plotting parameters
-        ax = gca;
         ax.Title.String  = ['Cluster Centroids: ' event_lab];
         ax.Box           = 'off';
 %         ax.YLim          = ylims;
@@ -365,31 +352,27 @@ for cond_ix = 1:numel(cond_lab)
 end
 
 %% Print clustering composition report
+report_fname = [SBJ_vars.dirs.proc SBJ '_clust_' stat_id '_' an_id '_' cond_lab{cond_ix} '_' roi_id '_' atlas_id '_composition.txt'];
+report = fopen(report_fname,'w');
 for cond_ix = 1:numel(cond_lab)
-    report_fname = [SBJ_vars.dirs.proc SBJ '_' clust_id '_' stat_id '_' an_id '_' cond_lab{cond_ix} '_' atlas_id '_' roi_id '_composition.csv'];
-    report = fopen(report_fname,'wt');
-    fprintf(report,'clust_name');
-    for roi_ix = 1:numel(roi_list)
-        fprintf(report,',%s',roi_list{roi_ix});
-    end
-    fprintf(report,'\n');
-%     fprintf(report,'=============================================================\n');
-%     fprintf(report,'\t%s\n',cond_lab{cond_ix});
+    fprintf(report,'=============================================================\n');
+    fprintf(report,'\t%s\n',cond_lab{cond_ix});
     %     comp_str = ['Cluster %i:' repmat('\t%.02f %s,',[1 numel(clust_n)]) '\n'];
-    for clust_ix = 1:n_clust
-        fprintf(report,'%s',clust_names{clust_ix});
+    for clust_ix = 1:numel(n_clust)
         cfgs = [];
         cfgs.channel = elec.label(clusters(:,cond_ix)==clust_ix);
         elec_clust = fn_select_elec(cfgs, elec);
         
+        fprintf(report,'Cluster #%i:',clust_ix);
         for roi_ix = 1:numel(roi_list)
-            fprintf(report,',%.04f',...
-                sum(strcmp(elec_clust.roi,roi_list{roi_ix}))/numel(elec_clust.label));
+            fprintf(report,'\t%.02f %s,',...
+                sum(strcmp(elec_clust.roi,roi_list{roi_ix}))/numel(elec_clust.label),...
+                roi_list{roi_ix});
         end
         fprintf(report,'\n');
     end
-    fclose(report);
 end
+fclose(report);
 
 
 end

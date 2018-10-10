@@ -28,28 +28,28 @@ B00_RT_GRP_hist(SBJs,'CNI',save_fig,fig_vis);
 %% ================================================================================
 %   QUALITY CHECKS
 %  =================================================================================
-%% Print Results according to GM %
-stat_id = 'corrRT_CNI_pcon_WL200_WS50';
-an_id_s = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
-an_id_r = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
-roi_id  = 'gROI';
-atlas_id = 'Dx';
-gm_thresh = 0.01;
-save_out = 0;
+% %% Print Results according to GM %
+% stat_id = 'corrRT_CNI_pcon_WL200_WS50';
+% an_id_s = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
+% an_id_r = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
+% roi_id  = 'gROI';
+% atlas_id = 'Dx';
+% gm_thresh = 0.01;
+% save_out = 0;
+% 
+% % SBJ10c_HFA_GRP_elec_cnt_tis_RT_ANOVA(SBJs,stat_id,an_id_s,roi_id,atlas_id,gm_thresh,pipeline_id,save_out)
+% SBJ10c_HFA_GRP_elec_cnt_tis_RT_ANOVA(SBJs,stat_id,an_id_r,roi_id,atlas_id,gm_thresh,pipeline_id,save_out)
 
-% SBJ10c_HFA_GRP_elec_cnt_tis_RT_ANOVA(SBJs,stat_id,an_id_s,roi_id,atlas_id,gm_thresh,pipeline_id,save_out)
-SBJ10c_HFA_GRP_elec_cnt_tis_RT_ANOVA(SBJs,stat_id,an_id_r,roi_id,atlas_id,gm_thresh,pipeline_id,save_out)
-
-%% Print Results according to activation (what elecs are non-active but sig?)
-stat_id = 'corrRT_CNI_pcon_WL200_WS50';
-an_id_s = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
-an_id_r = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
-roi_id  = 'ROI';
-atlas_id = 'Dx';
-gm_thresh = 0;
-
-% SBJ10c_HFA_GRP_elec_cnt_nact_RT_ANOVA(SBJs,stat_id,an_id_s,actv_win,roi_id,atlas_id,gm_thresh,pipeline_id)
-SBJ10c_HFA_GRP_elec_cnt_nact_RT_ANOVA(SBJs,stat_id,an_id_r,actv_win,roi_id,atlas_id,gm_thresh,pipeline_id)
+% %% Print Results according to activation (what elecs are non-active but sig?)
+% stat_id = 'corrRT_CNI_pcon_WL200_WS50';
+% an_id_s = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
+% an_id_r = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
+% roi_id  = 'ROI';
+% atlas_id = 'Dx';
+% gm_thresh = 0;
+% 
+% % SBJ10c_HFA_GRP_elec_cnt_nact_RT_ANOVA(SBJs,stat_id,an_id_s,actv_win,roi_id,atlas_id,gm_thresh,pipeline_id)
+% SBJ10c_HFA_GRP_elec_cnt_nact_RT_ANOVA(SBJs,stat_id,an_id_r,actv_win,roi_id,atlas_id,gm_thresh,pipeline_id)
 
 %% ================================================================================
 %   Effects by ROI
@@ -59,18 +59,19 @@ stat_id     = 'corrRT_CNI_pcon_WL200_WS50';
 atlas_id    = {'Yeo7','Dx'};
 an_opts     = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
 plt_id      = 'onsets_trl0to15_evnt_roi';
-roi_opts    = {'Yeo7','gROI'};%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
+roi_opts    = {'Yeo7','mgROI'};%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
 gm_lim      = [0 0.01 0.1];
+plot_out    = 0;
 fig_vis     = 'on';
 fig_filetype= 'png';
 % roi_ix = 1;
 gm_ix = 1;
 for roi_ix = 1:numel(roi_opts)
-    for an_ix = 1:numel(an_opts)
-        SBJ10c_HFA_GRP_summary_bar_perc_GMlim_CSE_RT_ANOVA_ROI(SBJs,stat_id,pipeline_id,...
-            an_opts{an_ix},roi_opts{roi_ix},atlas_id{roi_ix},gm_lim(gm_ix),plt_id,save_fig,fig_vis,fig_filetype);
-        SBJ10c_HFA_GRP_summary_bar_perc_actv_GMlim_RT_ANOVA_ROI(SBJs,stat_id,pipeline_id,...
-            an_opts{an_ix},actv_win,roi_opts{roi_ix},atlas_id{roi_ix},gm_lim(gm_ix),plt_id,save_fig,fig_vis,fig_filetype);
+    for an_ix = 2%1:numel(an_opts)
+        SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_CSE_RT_ANOVA_ROI(SBJs,stat_id,pipeline_id,...
+            an_opts{an_ix},roi_opts{roi_ix},atlas_id{roi_ix},gm_lim(gm_ix),plt_id,plot_out,save_fig,fig_vis,fig_filetype);
+%         SBJ10c_HFA_GRP_summary_bar_perc_actv_GMlim_RT_ANOVA_ROI(SBJs,stat_id,pipeline_id,...
+%             an_opts{an_ix},actv_win,roi_opts{roi_ix},atlas_id{roi_ix},gm_lim(gm_ix),plt_id,save_fig,fig_vis,fig_filetype);
     end
 end
 
@@ -119,56 +120,59 @@ end
 %% ================================================================================
 %   EFFECT COMMONALITIES ACROSS ROIS
 %  =================================================================================
-%% Plot ANOVA with RT correlation by ROI to see any patterns
-stat_id = 'corrRT_CNI_pcon_WL200_WS50';
-an_id_s = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
-an_id_r = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
-plt_id  = 'ts_S0to15_R5to10_evnt_sigline';
-roi_opts    = {'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
-
-roi_ix = 2;
-for sbj_ix = 1:numel(SBJs)
-    fprintf('Plotting for %s\n',SBJs{sbj_ix});
-    SBJ10b_ANOVA_plot_SR_RTcorr_ROIcomb(SBJs{sbj_ix},pipeline_id,stat_id,an_id_s,an_id_r,atlas_id,...
-        roi_opts{roi_ix},plt_id,1,'on','svg');
-    close all;
-end
-
-%% Plot HFA Correlations
-stat_id    = 'corr_HFA_ts_filt0to6_mS0to25_aS0to1_aR5to1_nb1k';
-an_id_main = 'HGm_S_zbtS_trl2to251_sm0_wn100_stat0';
-roi_id     = 'Yeo7';%'gROI','thryROI','Yeo7'
-atlas_id   = 'Yeo7';%'Dx','Yeo7'
-plt_id     = 'corr_mat_ts_S0to15_R5to10_gR_q01_r1';
-plot_hist  = 0;
-plot_ts    = 0;        % 0=none, 1=all, n=highest n correlations
-plot_scnd_mtx = 0;
-fig_filetype = 'png';
-for sbj_ix = 1:numel(SBJs)
-    fprintf('Running for %s\n',SBJs{sbj_ix});
-%     SBJ11a_corr_HFA_acE_surr(SBJs{sbj_ix},pipeline_id,stat_id,an_id_main,atlas_id,roi_id,plt_id)
-    SBJ11b_corr_HFA_acE_plot_mat_ts(SBJs{sbj_ix},pipeline_id,stat_id,an_id_main,roi_id,atlas_id,plt_id,...
-        plot_ts,plot_scnd_mtx,plot_hist,save_fig,'off',fig_filetype)
-%     pause;
-end
-
-SBJ11c_corr_HFA_acE_plot_mat_grp(SBJs,pipeline_id,stat_id,an_id_main,roi_id,atlas_id,plt_id,...
-                                                plot_scnd_mtx,save_fig,fig_vis,fig_filetype);
+% %% Plot ANOVA with RT correlation by ROI to see any patterns
+% stat_id = 'corrRT_CNI_pcon_WL200_WS50';
+% an_id_s = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
+% an_id_r = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
+% plt_id  = 'ts_S0to15_R5to10_evnt_sigline';
+% roi_opts    = {'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
+% 
+% roi_ix = 2;
+% for sbj_ix = 1:numel(SBJs)
+%     fprintf('Plotting for %s\n',SBJs{sbj_ix});
+%     SBJ10b_ANOVA_plot_SR_RTcorr_ROIcomb(SBJs{sbj_ix},pipeline_id,stat_id,an_id_s,an_id_r,atlas_id,...
+%         roi_opts{roi_ix},plt_id,1,'on','svg');
+%     close all;
+% end
+% 
+% %% Plot HFA Correlations
+% stat_id    = 'corr_HFA_ts_filt0to6_mS0to25_aS0to1_aR5to1_nb1k';
+% an_id_main = 'HGm_S_zbtS_trl2to251_sm0_wn100_stat0';
+% roi_id     = 'Yeo7';%'gROI','thryROI','Yeo7'
+% atlas_id   = 'Yeo7';%'Dx','Yeo7'
+% plt_id     = 'corr_mat_ts_S0to15_R5to10_gR_q01_r1';
+% plot_hist  = 0;
+% plot_ts    = 0;        % 0=none, 1=all, n=highest n correlations
+% plot_scnd_mtx = 0;
+% fig_filetype = 'png';
+% for sbj_ix = 1:numel(SBJs)
+%     fprintf('Running for %s\n',SBJs{sbj_ix});
+% %     SBJ11a_corr_HFA_acE_surr(SBJs{sbj_ix},pipeline_id,stat_id,an_id_main,atlas_id,roi_id,plt_id)
+%     SBJ11b_corr_HFA_acE_plot_mat_ts(SBJs{sbj_ix},pipeline_id,stat_id,an_id_main,roi_id,atlas_id,plt_id,...
+%         plot_ts,plot_scnd_mtx,plot_hist,save_fig,'off',fig_filetype)
+% %     pause;
+% end
+% 
+% SBJ11c_corr_HFA_acE_plot_mat_grp(SBJs,pipeline_id,stat_id,an_id_main,roi_id,atlas_id,plt_id,...
+%                                                 plot_scnd_mtx,save_fig,fig_vis,fig_filetype);
 
 %% Cluster ANOVA time series
-clust_opts= {'kmeans_corr_nCH_itr1k_srCmb','kmeans_corr_nROI_itr1k_srCmb'};
+clust_id = 'kmeans_corr_nROI_itr1k';%'kmeans_corr_nCH_itr1k_srCmb',
 stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
-an_id_s  = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
-an_id_r  = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
-roi_id   = 'Yeo7';
-atlas_id = 'Yeo7';
+an_opts  = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
+an_id = an_opts{2};
+roi_id   = 'mgROI';
+atlas_id = 'Dx';
 plt_id   = 'ts_S0to15_R5to10_evnt_sigline';
+plot_out = 0;
 fig_vis  = 'off';
 save_fig = 1;
 for sbj_ix = 1:numel(SBJs)
-    for clust_ix = 1:numel(clust_opts)
-        SBJ12a_corr_ANOVA_ts_cluster(SBJs{sbj_ix},pipeline_id,stat_id,clust_opts{clust_ix},an_id_s,an_id_r,...
-            roi_id,atlas_id,plt_id,fig_vis,save_fig);
+    for an_ix = 1:2%1:numel(clust_opts)
+        SBJ12a_corr_ANOVA_ts_cluster(SBJs{sbj_ix},pipeline_id,stat_id,clust_id,an_opts{an_ix},...
+            roi_id,atlas_id,plt_id,fig_vis,save_fig,plot_out);
+%         fn_view_recon_clust(SBJ, pipeline_id, clust_id, stat_id, an_id, ...
+%                     view_space, reg_type, show_labels, hemi, plot_out)
         close all;
     end
 end
