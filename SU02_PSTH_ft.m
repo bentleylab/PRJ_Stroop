@@ -177,6 +177,23 @@ end
 %     end
 % end
 
+%% Smooth PSTH
+if 
+for ch_ix = 1:numel(hfa.label)
+    for f_ix = 1:numel(hfa.freq)
+        if strcmp(lp_yn,'yes') && strcmp(hp_yn,'yes')
+            hfa.powspctrm(:,ch_ix,f_ix,:) = fn_EEGlab_bandpass(...
+                hfa.powspctrm(:,ch_ix,f_ix,:), roi.fsample, hp_freq, lp_freq);
+        elseif strcmp(lp_yn,'yes')
+            hfa.powspctrm(:,ch_ix,f_ix,:) = fn_EEGlab_lowpass(...
+                squeeze(hfa.powspctrm(:,ch_ix,f_ix,:)), roi.fsample, lp_freq);
+        elseif strcmp(hp_yn,'yes')
+            error('Why are you only high passing?');
+        else
+            error('Why did you say yes smooth but no to both low and high pass?');
+        end
+    end
+end
 %% Compute PSTH differences
 design = zeros(2,sum(n_trials));
 for cond_ix = 1:numel(cond_lab)

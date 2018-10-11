@@ -42,8 +42,15 @@ SBJ08b_HFA_plot_SR_stack_cond_onset_noLab(SBJ,conditions,an_id_s,an_id_r,...
 % I haven't wanted to run the SBJ08a_HFA_stats for 'CI'...
 conditions = 'CI';
 plt_id     = 'ts_S15R1_errbr_evnt';
-SBJ08b_HFA_plot_SR_stats_svg('IR35','LAC2-3',conditions,pipeline_id,...
+SBJ08b_HFA_plot_SR_stats_svg('IR35','LPC5-6',conditions,pipeline_id,...
     an_id_s,an_id_r,plt_id,save_fig,fig_vis);
+
+%% SU examples
+SBJ = 'IR75';
+conditions = 'CNI';
+pipeline_id = 'SU_nlx';
+an_id = 
+SU02_PSTH_ft(SBJ,conditions,pipeline_id,an_id,plt_id,plot_ISI,fig_vis,save_plots,close_plots)
 
 %% Proportions of significant effects across ROI
 stat_id     = 'corrRT_CNI_pcon_WL200_WS50';
