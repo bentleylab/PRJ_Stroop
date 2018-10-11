@@ -140,6 +140,18 @@ for cond_ix = 1:numel(cond_lab)
     n_trials(cond_ix) = size(psth_cond{cond_ix}.trial,1);
 end
 
+%% Smooth PSTH
+if lp_yn
+    for ch_ix = 1:numel(psth.label)
+        psth.avg(ch_ix,:) = fn_EEGlab_lowpass(...
+            psth.avg(ch_ix,:), psth.fsample, lp_freq);
+        for cond_ix = 1:numel(cond_lab)
+            psth_cond{cond_ix}.avg(ch_ix,:) = fn_EEGlab_lowpass(...
+                psth_cond{cond_ix}.avg(ch_ix,:), psth_cond{cond_ix}.fsample, lp_freq);
+        end
+    end
+end
+
 %% Plot Raster
 % fig_dir = [root_dir 'PRJ_Stroop/results/SU/raster/' an_id '/'];
 % if ~exist(fig_dir,'dir'); mkdir(fig_dir); end
@@ -177,23 +189,6 @@ end
 %     end
 % end
 
-%% Smooth PSTH
-if 
-for ch_ix = 1:numel(hfa.label)
-    for f_ix = 1:numel(hfa.freq)
-        if strcmp(lp_yn,'yes') && strcmp(hp_yn,'yes')
-            hfa.powspctrm(:,ch_ix,f_ix,:) = fn_EEGlab_bandpass(...
-                hfa.powspctrm(:,ch_ix,f_ix,:), roi.fsample, hp_freq, lp_freq);
-        elseif strcmp(lp_yn,'yes')
-            hfa.powspctrm(:,ch_ix,f_ix,:) = fn_EEGlab_lowpass(...
-                squeeze(hfa.powspctrm(:,ch_ix,f_ix,:)), roi.fsample, lp_freq);
-        elseif strcmp(hp_yn,'yes')
-            error('Why are you only high passing?');
-        else
-            error('Why did you say yes smooth but no to both low and high pass?');
-        end
-    end
-end
 %% Compute PSTH differences
 design = zeros(2,sum(n_trials));
 for cond_ix = 1:numel(cond_lab)
@@ -230,7 +225,7 @@ cfg.topplotfunc  = 'line'; % plot as a line
 cfg.latency      = 'maxperiod';%trial_lim_s;
 cfg.errorbars    = 'std'; % plot with the standard deviation
 cfg.interactive  = 'no'; % toggle off interactive mode
-for u = 1:numel(stat.label)
+for u = 1%:numel(stat.label)
     cfg.spikechannel = spike_trl.label(u);
     fig_name = [SBJ '_' conditions '_' spike_trl.label{u} '_PSTH_raster_' event_lab];
     f = figure('Name',fig_name,'Visible',fig_vis);
@@ -308,7 +303,7 @@ for u = 1:numel(stat.label)
     
     % Save
     if save_plots
-        saveas(gcf,[fig_dir fig_name '.png']);
+        saveas(gcf,[fig_dir fig_name '.' fig_ftype]);
     end
     if close_plots
         close(gcf);

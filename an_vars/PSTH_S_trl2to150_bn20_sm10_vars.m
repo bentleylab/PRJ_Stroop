@@ -9,9 +9,9 @@ n_boots     = 1000;             % Repetitions for non-parametric stats
 bin_sz      = 0.02;           % bin size in SEC
 min_spikes  = 'n_trials';       % minimum number of spikes to be analyzed
 
-lp_yn       = 'yes';
-lp_freq     = 20;
-hp_yn       = '';
+lp_yn       = true;
+lp_freq     = 10;
+hp_yn       = false;
 hp_freq     = 0.5;
 
 cfg_stat = [];
