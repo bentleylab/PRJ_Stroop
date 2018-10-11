@@ -1,4 +1,4 @@
-function B00_RT_GRP_hist_norm(SBJs,conditions,save_fig,fig_vis)
+function B00_RT_GRP_hist_norm(SBJs,conditions,save_fig,fig_vis,fig_type)
 %% RT Behavioral analysis- draw box plots per SBJ and for Group
 % Check which root directory
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
@@ -19,7 +19,6 @@ hist_alpha    = 0.5;
 bin_size      = 0.1;      % in normalized z-scores
 line_w        = 2;
 [cond_lab, cond_colors, cond_styles] = fn_condition_label_styles(conditions);
-fig_type      = 'png';
 
 % Process parameters
 fig_dir  = strcat([root_dir 'PRJ_Stroop/results/RTs/GRP/']);

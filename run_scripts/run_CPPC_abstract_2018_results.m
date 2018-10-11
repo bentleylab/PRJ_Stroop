@@ -87,26 +87,29 @@ end
 %  =================================================================================
 %% Plot onsets of ANOVA+RT
 stat_id     = 'corrRT_CNI_pcon_WL200_WS50';
-an_opts     = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
+clust_id    = 'kmeans_corr_nROI_itr1k';%'kmeans_corr_nCH_itr1k_srCmb',
+an_opts     = {'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};%'HGm_S_zbtS_trl2to151_sm0_wn100_stat15',
 gm_thresh   = 0;
 median_yn   = 0;
-roi_opts    = {'gROI','Yeo7'};%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
-atlas_opts  = {'Dx','Yeo7'};%'Dx';
-plt_opts    = {{'onsets_trl0to15_evnt_roi'},{'onsets_trl5to1_evnt_roi'}};
-% plt_opts    = {{'onsets_trl0to15_violin_allSBJ','onsets_trl0to15_violin_allROI','onsets_trl0to15_violin_avgROI'},...
+roi_opts    = {'mgROI'};%,'Yeo7'};%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
+atlas_opts  = {'Dx'};%,'Yeo7'};%'Dx';
+% plt_opts    = {{'onsets_trl5to1_evnt_roi'}};%{'onsets_trl0to15_evnt_roi'},
+plt_opts    = {{'onsets_trl0to15_violin_allROI','onsets_trl5to1_violin_avgROI'}};%{{'onsets_trl0to15_violin_allSBJ','onsets_trl0to15_violin_allROI','onsets_trl0to15_violin_avgROI'},...
 %                {'onsets_trl5to1_violin_allSBJ','onsets_trl5to1_violin_allROI','onsets_trl5to1_violin_avgROI'}};
 fig_filetype = 'png';%'svg'
-for roi_ix = 1:numel(roi_opts)
+for roi_ix = 1%:numel(roi_opts)
     for an_ix = 1:numel(an_opts)
-        for plt_ix = 1:numel(plt_opts{1})
+        for plt_ix = 1%:numel(plt_opts{1})
             fprintf('roi: %s; an: %s; plt: %s\n',roi_opts{roi_ix},an_opts{an_ix},plt_opts{an_ix}{plt_ix});
 %             % Violin Plots
-%             SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
-%                                                     atlas_opts{roi_ix},gm_thresh,plt_opts{an_ix}{plt_ix},1,'on',fig_filetype)
+            SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
+                                                    atlas_opts{roi_ix},gm_thresh,plt_opts{an_ix}{plt_ix},1,'on',fig_filetype)
+            SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA_clustBin(SBJs,clust_id,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
+                                                    atlas_opts{roi_ix},gm_thresh,plt_opts{an_ix}{plt_ix},1,'on',fig_filetype)
             % Music plots- Normalized
-            SBJ10c_HFA_GRP_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},median_yn,roi_opts{roi_ix},...
-                                                    atlas_opts{roi_ix},0,plt_opts{an_ix}{plt_ix},1,'off',fig_filetype);
-            close all;
+%             SBJ10c_HFA_GRP_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},median_yn,roi_opts{roi_ix},...
+%                                                     atlas_opts{roi_ix},0,plt_opts{an_ix}{plt_ix},1,'off',fig_filetype);
+%             close all;
 %             % Music plots- subject-specific RTs
 %         SBJ10c_HFA_GRP_onsets_ROI_RTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
 %                                                     atlas_id,0,plt_opts{an_ix},1,'on',fig_filetype)
@@ -190,14 +193,15 @@ plot_out = 0;
 plot_clusters = 1;
 plot_recon = 0;
 show_labels = 1;
-% fig_vis  = 'off';
-% save_fig = 1;
+fig_vis  = 'off';
+save_fig = 1;
 for sbj_ix = 1:numel(SBJs)
     for an_ix = 2%1:2
-        for hemi_ix = 1:2
+        for sig_ix = 0:1%:2
             fn_view_recon_clust(SBJs{sbj_ix}, clust_id, stat_id, an_opts{an_ix}, atlas_id, roi_id,...
-                    'pat', '', show_labels, 'b', plot_out, plot_ns, plot_clusters, plot_recon);%hemi_opts{hemi_ix}
+                    'pat', '', show_labels, 'b', plot_out, sig_ix, plot_clusters, plot_recon, fig_vis, save_fig);%hemi_opts{hemi_ix}
         end
+        close all;
     end
 end
 

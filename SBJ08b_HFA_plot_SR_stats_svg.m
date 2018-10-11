@@ -1,21 +1,20 @@
 function SBJ08b_HFA_plot_SR_stats_svg(SBJ,elec,conditions,pipeline_id,an_id_s,an_id_r,plt_id,save_fig,fig_vis)
-% Plots ERPs computed in SBJ07a_ERP_stats
-% clear all; %close all;
-
 fig_filetype = 'svg';
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Data Preparation
 % Set up paths
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/');
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
-addpath('/home/knight/hoycw/Apps/fieldtrip/');
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+addpath([root_dir 'PRJ_Stroop/scripts/']);
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+addpath(ft_dir);
 ft_defaults
 
 %% Load Results
-SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
-plt_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
+plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 
 [cond_lab, cond_colors, cond_style] = fn_condition_label_styles(conditions);
@@ -72,7 +71,7 @@ for cond_ix = 1:numel(cond_lab)
 end
 
 %% Plot Results
-fig_dir = ['/home/knight/hoycw/PRJ_Stroop/results/HFA/' SBJ '/' conditions '/SR/' an_id_s '-' an_id_r '/'];
+fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/' conditions '/SR/' an_id_s '-' an_id_r '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end

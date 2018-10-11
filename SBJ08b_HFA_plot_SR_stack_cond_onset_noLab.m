@@ -4,21 +4,23 @@ function SBJ08b_HFA_plot_SR_stack_cond_onset_noLab(SBJ,conditions,an_id_s,an_id_
 %   sorts by condition, then by RT; scatter for RTs in stim-locked
 %   onset addition is a dotted line at the (trial-averaged) HFA onset
 % clear all; %close all;
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 if ischar(save_fig); save_fig = str2num(save_fig); end
 if isnumeric(actv_win); actv_win = num2str(actv_win); end
 
 %% Data Preparation
 % Set up paths
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/');
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
-addpath('/home/knight/hoycw/Apps/fieldtrip/');
+addpath([root_dir 'PRJ_Stroop/scripts/']);
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+addpath(ft_dir);
 ft_defaults
 
 %% Load Results
-SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
-plt_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
+plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 
 % Load einfo
@@ -83,10 +85,10 @@ RT_mean = mean(round(1000*trial_info.response_time)); % converts sec to ms
 RT_mean = RT_mean-plt_vars.plt_lim_S(1)*1000;
 
 %% Plot Results
-fig_dir = ['/home/knight/hoycw/PRJ_Stroop/results/HFA/' SBJ '/stack_' conditions '/' an_id_s '-' an_id_r '/'];
-if ~exist(fig_dir,'dir')
-    mkdir(fig_dir);
-end
+fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/stack_' conditions '/' an_id_s '-' an_id_r '/'];
+% if ~exist(fig_dir,'dir')
+%     mkdir(fig_dir);
+% end
 
 % Create a figure for each channel
 for ch_ix = 1:numel(hfa{1}.label)

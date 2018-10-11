@@ -1,5 +1,6 @@
 function fn_view_recon_clust(SBJ, clust_id, stat_id, an_id, atlas_id, roi_id,...
-                    view_space, reg_type, show_labels, hemi, plot_out, plot_ns, plot_clusters, plot_recon)%, view_angle)
+                    view_space, reg_type, show_labels, hemi, plot_out, plot_ns, plot_clusters, plot_recon,...
+                    fig_vis, save_fig)%, view_angle)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJ [str] - subject ID to plot
@@ -13,7 +14,7 @@ function fn_view_recon_clust(SBJ, clust_id, stat_id, an_id, atlas_id, roi_id,...
 %   plot_out [0/1] - exclude electrodes that don't match atlas or aren't in hemisphere
 %   plot_ns [0/1] - plot electrodes without significant effects?
 %   plot_clusters [0/1] - plot time series (ANOVA and centroid) per bin
-
+fig_filetype = 'png';
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
@@ -74,7 +75,8 @@ clust_names  = cell([1 numel(roi_list)]);
 for clust_ix = 1:numel(roi_list)
     clust_names{clust_ix} = ['C' num2str(clust_ix)];
 end
-bin_colors = [43 131 186; 171 221 164; 253 174 97; 215 25 28]./255;%diverging, green to red light middle
+bin_colors = [27 158 119; 117 112 179; 217 95 2; 231 41 138]./255; %qualitative max diff from gROI, cool to hot
+% bin_colors = [43 131 186; 171 221 164; 253 174 97; 215 25 28]./255;%diverging, green to red light middle
 % bin_colors = [230 97 1; 253 184 99; 178 171 210; 94 60 153]./255;%diverging red to purple, too soft
 % bin_colors = [240 249 232; 186 228 188; 123 204 196; 43 140 190]./255;
 % bin_colors = [161, 218, 180; 65, 182, 196; 44 127 184; 37 52 148]./255;%darker, not enough contrast
@@ -125,10 +127,12 @@ end
 if ~plot_ns
     plot_ch = false([numel(elec.label) numel(cond_lab)]);
     for cond_ix = 1:numel(cond_lab)
-        if strcmp(cond_lab,'RT') && sum(squeeze(stat.mask(ch_ix,1,:)))>0
-            plot_ch(ch_ix,cond_ix) = true;
-        elseif any(squeeze(qvals(cond_ix,ch_ix,:))<0.05)
-            plot_ch(ch_ix,cond_ix) = true;
+        for ch_ix = 1:numel(elec.label)
+            if ~strcmp(cond_lab{cond_ix},'RT') && any(squeeze(qvals(cond_ix,ch_ix,:))<0.05)
+                plot_ch(ch_ix,cond_ix) = true;
+            elseif sum(squeeze(stat.mask(ch_ix,1,:)))>0
+                plot_ch(ch_ix,cond_ix) = true;
+            end
         end
     end
 else
@@ -158,7 +162,11 @@ yticks2 = ylims2(1):0.1:ylims2(2);
 if plot_clusters
     for cond_ix = 1%:numel(cond_lab)
         % Plot all ANOVA ts
-        f = figure('Name',[cond_lab{cond_ix} '_' event_lab]);
+        fig_name = [SBJ '_' cond_lab{cond_ix} '_' event_lab '_' roi_id '_' atlas_id '_binTS'];
+        if ~plot_ns
+            fig_name = [fig_name '_sig'];
+        end
+        f = figure('Name',fig_name,'Visible',fig_vis);
         ax = [];
         for ch_ix = 1:size(clusters,1)
             clust_n = clusters(ch_ix,cond_ix);
@@ -193,16 +201,29 @@ if plot_clusters
                 end
             end
         end
-        for bin_ix = 1:numel(roi_list)
-            subplot(4,1,bin_ix);
+        for clust_ix = 1:numel(clust_bin{cond_ix})            
+            time_bin = clust_bin{cond_ix}(clust_ix)+1;
+            subplot(4,1,time_bin);
+            % Plot centroids for overall trends
+            y_scale_factor = 0.15;
             if cond_ix <= numel(grp_lab)
                 ylims = ylims1;
                 yticks = yticks1;
                 ylab = '% Variance Explained';
+                y_data = centroids{cond_ix}(clust_ix,:);
+                ylim_scaled = [ylims(1)+diff(ylims)*y_scale_factor ylims(2)-diff(ylims)*y_scale_factor];
+                y_data = ylim_scaled(1) + [(y_data-min(y_data))./(max(y_data)-min(y_data))].*(ylim_scaled(2)-ylim_scaled(1));
+                plot(win_center,y_data,...
+                    'Color',bin_colors(time_bin,:),'LineWidth',2.5,'LineStyle',':');
             else
                 ylims = ylims2;
                 yticks = yticks2;
                 ylab = 'Correlation with RT';
+                y_data = centroids{cond_ix}(clust_ix,:);
+                ylim_scaled = [ylims(1)+diff(ylims)*y_scale_factor ylims(2)-diff(ylims)*y_scale_factor];
+                y_data = ylim_scaled(1) + [(y_data-min(y_data))./(max(y_data)-min(y_data))].*(ylim_scaled(2)-ylim_scaled(1));
+                plot(1:numel(stat.time),y_data,...
+                    'Color',bin_colors(time_bin,:),'LineWidth',2.5,'LineStyle',':');
             end
             
             % Plot event
@@ -230,116 +251,122 @@ if plot_clusters
 %             set(gca,'XLabel','Time (s)');
         end
         
-        % Plot centroids for overall trends
-        f = figure('Name',[cond_lab{cond_ix} '_centroid_' event_lab]);
-        ax = [];
-        for clust_ix = 1:size(centroids{cond_ix},1)
-            time_bin = clust_bin{cond_ix}(clust_ix)+1;
-            ax(bin_ix) = subplot(4,1,time_bin); hold on;
-            if cond_ix <= numel(grp_lab)
-                plot(win_center,centroids{cond_ix}(clust_ix,:),'Color',bin_colors(time_bin,:));
-            else
-                plot(1:numel(stat.time),centroids{cond_ix}(clust_ix,:),'Color',bin_colors(time_bin,:));
-            end
-            
-            % Plot event
-            if strcmp(event_lab,'stim')
-                x_tick_lab       = plt_vars.plt_lim_S(1):plt_vars.x_step_sz:plt_vars.plt_lim_S(2);
-                mean_RT_pre = find(stat.time<=mean_RT);
-                event_line = line([mean_RT_pre(end) mean_RT_pre(end)],ylim,...
-                    'LineWidth',plt_vars.evnt_width, 'Color',plt_vars.evnt_color,...
-                    'LineStyle',plt_vars.evnt_style);
-            else
-                x_tick_lab       = plt_vars.plt_lim_R(1):plt_vars.x_step_sz:plt_vars.plt_lim_R(2);
-                event_line = line([find(stat.time==0) find(stat.time==0)],ylim,...
-                    'LineWidth',plt_vars.evnt_width, 'Color',plt_vars.evnt_color,...
-                    'LineStyle',plt_vars.evnt_style);
-            end
-            
-            % Plotting parameters
-%             ax(bin_ix).Box           = 'off';
-%             set(gca,'YLim',ylims);
-%             set(gca,'YTick',yticks);
-%             set(gca,'YLabel',ylab);
-            set(gca,'XLim',[0,size(stat.time,2)]);
-            set(gca,'XTick',0:plt_vars.x_step_sz*sample_rate:size(stat.time,2));
-            set(gca,'XTickLabel',x_tick_lab);
-%             set(gca,'XLabel','Time (s)');
+        if save_fig
+            fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/clust/' clust_id '/' stat_id '/' an_id '/'];
+            fig_fname = [fig_dir fig_name '.' fig_filetype];
+            fprintf('Saving %s\n',fig_fname);
+            saveas(gcf,fig_fname);
         end
+%         % Plot centroids for overall trends
+%         f = figure('Name',[cond_lab{cond_ix} '_centroid_' event_lab]);
+%         ax = [];
+%         for clust_ix = 1:size(centroids{cond_ix},1)
+%             time_bin = clust_bin{cond_ix}(clust_ix)+1;
+%             ax(bin_ix) = subplot(4,1,time_bin); hold on;
+%             if cond_ix <= numel(grp_lab)
+%                 plot(win_center,centroids{cond_ix}(clust_ix,:),'Color',bin_colors(time_bin,:));
+%             else
+%                 plot(1:numel(stat.time),centroids{cond_ix}(clust_ix,:),'Color',bin_colors(time_bin,:));
+%             end
+%             
+%             % Plot event
+%             if strcmp(event_lab,'stim')
+%                 x_tick_lab       = plt_vars.plt_lim_S(1):plt_vars.x_step_sz:plt_vars.plt_lim_S(2);
+%                 mean_RT_pre = find(stat.time<=mean_RT);
+%                 event_line = line([mean_RT_pre(end) mean_RT_pre(end)],ylim,...
+%                     'LineWidth',plt_vars.evnt_width, 'Color',plt_vars.evnt_color,...
+%                     'LineStyle',plt_vars.evnt_style);
+%             else
+%                 x_tick_lab       = plt_vars.plt_lim_R(1):plt_vars.x_step_sz:plt_vars.plt_lim_R(2);
+%                 event_line = line([find(stat.time==0) find(stat.time==0)],ylim,...
+%                     'LineWidth',plt_vars.evnt_width, 'Color',plt_vars.evnt_color,...
+%                     'LineStyle',plt_vars.evnt_style);
+%             end
+%             
+%             % Plotting parameters
+% %             ax(bin_ix).Box           = 'off';
+% %             set(gca,'YLim',ylims);
+% %             set(gca,'YTick',yticks);
+% %             set(gca,'YLabel',ylab);
+%             set(gca,'XLim',[0,size(stat.time,2)]);
+%             set(gca,'XTick',0:plt_vars.x_step_sz*sample_rate:size(stat.time,2));
+%             set(gca,'XTickLabel',x_tick_lab);
+% %             set(gca,'XLabel','Time (s)');
+%         end
     end
 end
 
-%% Remove electrodes that aren't in atlas ROIs
-if ~plot_out
-    atlas_out_elecs = elec.label(strcmp(elec.atlas_label,'no_label_found'));
-    if ~isempty(atlas_out_elecs)
-        error('there shouldnt be elecs that arent in the ROIs, only hemi! check yoself...');
-    end
-    if ~strcmp(hemi,'b')
-        plot_ch(~strcmp(elec.hemi,hemi),:) = false;
-    end
-end
-
-%% Load brain recon
-if strcmp(view_space,'pat')
-    if strcmp(hemi,'r') || strcmp(hemi,'l')
-        mesh = ft_read_headshape([SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_' hemi 'h.mat']);
-    elseif strcmp(hemi,'b')
-        mesh = ft_read_headshape({[SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_rh.mat'],...
-            [SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_lh.mat']});
-    else
-        error(['Unknown hemisphere selected: ' hemi]);
-    end
-    mesh.coordsys = 'acpc';
-elseif strcmp(view_space,'mni')
-    if strcmp(reg_type,'v')
-        if strcmp(hemi,'r')
-            load([ft_dir 'template/anatomy/surface_pial_right.mat']);
-        elseif strcmp(hemi,'l')
-            load([ft_dir 'template/anatomy/surface_pial_left.mat']);
-        elseif strcmp(hemi,'b')
-            load([ft_dir 'template/anatomy/surface_pial_both.mat']);
-        else
-            error(['Unknown hemisphere option: ' hemi]);
-        end
-        %         mesh.coordsys = 'mni';
-    elseif strcmp(reg_type,'s')
-        if strcmp(hemi,'r') || strcmp(hemi,'l')
-            mesh = ft_read_headshape([root_dir 'PRJ_Stroop/data/atlases/freesurfer/fsaverage/' hemi 'h.pial']);
-        elseif strcmp(hemi,'b')
-            error('hemisphere "b" not yet implemented for reg_type: "srf"!');
-            mesh = ft_read_headshape([ft_dir 'subjects/fsaverage/surf/' hemi 'h.pial']);
-        else
-            error(['Unknown hemisphere option: ' hemi]);
-        end
-        mesh.coordsys = 'fsaverage';
-    else
-        error(['Unknown registration type (reg_type): ' reg_type]);
-    end
-else
-    error(['Unknown view_space: ' view_space]);
-end
-
-%% Match elecs to atlas ROIs
-clust_n = unique(clusters);
-elec.clust = clusters;
-% clust_colors = distinguishable_colors(numel(clust_n));
-% if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
-%     elec.roi       = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
-%     if strcmp(roi_id,'tissueC')
-%         elec.roi_color = fn_tissue2color(elec);
-%     elseif strcmp(atlas_id,'Yeo7')
-%         elec.roi_color = fn_atlas2color(atlas.name,elec.roi);
-%     else
-%         elec.roi_color = fn_roi2color(elec.roi);
-%     end
-% elseif any(strcmp(atlas_id,{'Yeo17'}))
-%     elec.roi       = elec.atlas_label;
-%     elec.roi_color = fn_atlas2color(atlas.name,elec.roi);
-% end
-
-%% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
 if plot_recon
+    %% Remove electrodes that aren't in atlas ROIs
+    if ~plot_out
+        atlas_out_elecs = elec.label(strcmp(elec.atlas_label,'no_label_found'));
+        if ~isempty(atlas_out_elecs)
+            error('there shouldnt be elecs that arent in the ROIs, only hemi! check yoself...');
+        end
+        if ~strcmp(hemi,'b')
+            plot_ch(~strcmp(elec.hemi,hemi),:) = false;
+        end
+    end
+    
+    %% Load brain recon
+    if strcmp(view_space,'pat')
+        if strcmp(hemi,'r') || strcmp(hemi,'l')
+            mesh = ft_read_headshape([SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_' hemi 'h.mat']);
+        elseif strcmp(hemi,'b')
+            mesh = ft_read_headshape({[SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_rh.mat'],...
+                [SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_lh.mat']});
+        else
+            error(['Unknown hemisphere selected: ' hemi]);
+        end
+        mesh.coordsys = 'acpc';
+    elseif strcmp(view_space,'mni')
+        if strcmp(reg_type,'v')
+            if strcmp(hemi,'r')
+                load([ft_dir 'template/anatomy/surface_pial_right.mat']);
+            elseif strcmp(hemi,'l')
+                load([ft_dir 'template/anatomy/surface_pial_left.mat']);
+            elseif strcmp(hemi,'b')
+                load([ft_dir 'template/anatomy/surface_pial_both.mat']);
+            else
+                error(['Unknown hemisphere option: ' hemi]);
+            end
+            %         mesh.coordsys = 'mni';
+        elseif strcmp(reg_type,'s')
+            if strcmp(hemi,'r') || strcmp(hemi,'l')
+                mesh = ft_read_headshape([root_dir 'PRJ_Stroop/data/atlases/freesurfer/fsaverage/' hemi 'h.pial']);
+            elseif strcmp(hemi,'b')
+                error('hemisphere "b" not yet implemented for reg_type: "srf"!');
+                mesh = ft_read_headshape([ft_dir 'subjects/fsaverage/surf/' hemi 'h.pial']);
+            else
+                error(['Unknown hemisphere option: ' hemi]);
+            end
+            mesh.coordsys = 'fsaverage';
+        else
+            error(['Unknown registration type (reg_type): ' reg_type]);
+        end
+    else
+        error(['Unknown view_space: ' view_space]);
+    end
+    
+    %% Match elecs to atlas ROIs
+    clust_n = unique(clusters);
+    elec.clust = clusters;
+    % clust_colors = distinguishable_colors(numel(clust_n));
+    % if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
+    %     elec.roi       = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
+    %     if strcmp(roi_id,'tissueC')
+    %         elec.roi_color = fn_tissue2color(elec);
+    %     elseif strcmp(atlas_id,'Yeo7')
+    %         elec.roi_color = fn_atlas2color(atlas.name,elec.roi);
+    %     else
+    %         elec.roi_color = fn_roi2color(elec.roi);
+    %     end
+    % elseif any(strcmp(atlas_id,{'Yeo17'}))
+    %     elec.roi       = elec.atlas_label;
+    %     elec.roi_color = fn_atlas2color(atlas.name,elec.roi);
+    % end
+    
+    %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
     f = {};
     for cond_ix = 1%:numel(cond_lab)
         if strcmp(stat_id,'actv')
@@ -349,7 +376,7 @@ if plot_recon
         else
             plot_name = [SBJ '_ANOVA_' cond_lab{cond_ix} '_' stat_id '_' an_id];
         end
-        f{cond_ix} = figure('Name',plot_name);
+        f{cond_ix} = figure('Name',plot_name,'Visible',fig_vis);
         
         % Plot 3D mesh
         mesh_alpha = 0.8;
@@ -453,14 +480,14 @@ else
 end
 % get focus back to figure
 if ~strcmp(get(h, 'type'), 'figure')
-  set(h, 'enable', 'off');
-  drawnow;
-  set(h, 'enable', 'on');
+    set(h, 'enable', 'off');
+    drawnow;
+    set(h, 'enable', 'on');
 end
 
 if strcmp(key, 'l') % reset the light position
-  delete(findall(h,'Type','light')) % shut out the lights
-  camlight; lighting gouraud; % add a new light from the current camera position
+    delete(findall(h,'Type','light')) % shut out the lights
+    camlight; lighting gouraud; % add a new light from the current camera position
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -473,17 +500,17 @@ key = eventdata.Key;
 % NOTE: shift+numpad number does not work on UNIX, since the shift
 % modifier is always sent for numpad events
 if isunix()
-  shiftInd = match_str(eventdata.Modifier, 'shift');
-  if ~isnan(str2double(eventdata.Character)) && ~isempty(shiftInd)
-    % now we now it was a numpad keystroke (numeric character sent AND
-    % shift modifier present)
-    key = eventdata.Character;
-    eventdata.Modifier(shiftInd) = []; % strip the shift modifier
-  end
+    shiftInd = match_str(eventdata.Modifier, 'shift');
+    if ~isnan(str2double(eventdata.Character)) && ~isempty(shiftInd)
+        % now we now it was a numpad keystroke (numeric character sent AND
+        % shift modifier present)
+        key = eventdata.Character;
+        eventdata.Modifier(shiftInd) = []; % strip the shift modifier
+    end
 elseif ispc()
-  if strfind(eventdata.Key, 'numpad')
-    key = eventdata.Character;d
-  end
+    if strfind(eventdata.Key, 'numpad')
+        key = eventdata.Character;d
+    end
 end
 
 if ~isempty(eventdata.Modifier)
