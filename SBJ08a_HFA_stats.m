@@ -1,7 +1,7 @@
 function SBJ08a_HFA_stats(SBJ,conditions,pipeline_id,an_id)
-if ~strcmp(conditions,'CSE')
-    error('why arent you running _save_ to prep for SBJ10a_ANOVA?');
-end
+%if ~strcmp(conditions,'CSE')
+%    error('why arent you running _save_ to prep for SBJ10a_ANOVA?');
+%end
 % Calculates high frequency activity, computes cluster-based statistics, and plots the results
 % clear all; %close all;
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
