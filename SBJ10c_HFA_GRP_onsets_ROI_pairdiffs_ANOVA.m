@@ -38,13 +38,12 @@ elseif strcmp(an_id(1:5),'HGm_R')
 end
 
 % Load all ROI info
-[roi_list, roi_colors, ~] = fn_roi_label_styles(roi_id);
+[roi_list, roi_colors] = fn_roi_label_styles(roi_id);
 
+%% Load Results
 % Set up onset counts
 all_onsets          = cell([numel(SBJs) numel(roi_list) numel(grp_lab)+1]);
 all_onset_elec_lab  = cell([numel(SBJs) numel(roi_list) numel(grp_lab)+1]);
-
-%% Load Results
 for sbj_ix = 1:numel(SBJs)
     SBJ = SBJs{sbj_ix};
     % Load variables
@@ -71,27 +70,27 @@ for sbj_ix = 1:numel(SBJs)
     win_center = round(mean(win_lim,2));
     
     %% Load ROI and GM/WM info
-    elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_' atlas_id '_tis.mat'];
+    elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_' atlas_id '.mat'];%_tis
     load(elec_tis_fname);
     
     % Sort elecs by stat labels
     cfgs = []; cfgs.channel = stat.label;
     elec    = fn_select_elec(cfgs,elec);
-    roi_lab = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
+    elec.roi = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
     
-    % Get GM probability from tissue labels {'GM','WM','CSF','OUT'}
-    gm_bin  = elec.tissue_prob(:,1)>gm_thresh;
+%     % Get GM probability from tissue labels {'GM','WM','CSF','OUT'}
+%     gm_bin  = elec.tissue_prob(:,1)>gm_thresh;
         
     %% Aggregate results per ROI
     for ch_ix = 1:numel(stat.label)
         % If elec matches roi_list and is in GM, get stats
-        if any(strcmp(roi_lab{ch_ix},roi_list)) && gm_bin(ch_ix)
-            roi_ix = find(strcmp(roi_lab{ch_ix},roi_list));
+        if any(strcmp(elec.roi{ch_ix},roi_list))% && gm_bin(ch_ix)
+            roi_ix = find(strcmp(elec.roi{ch_ix},roi_list));
             % Get ANOVA group onsets
             for grp_ix = 1:numel(grp_lab)
                 if any(squeeze(qvals(grp_ix,ch_ix,:))<0.05)
                     sig_onsets = stat.time(win_lim(squeeze(qvals(grp_ix,ch_ix,:))<0.05,1));
-                    if strcmp(event_lab,'resp') && (sig_onsets(1)<0)
+                    if strcmp(event_lab,'resp')% && (sig_onsets(1)<0)
                         all_onsets{sbj_ix,roi_ix,grp_ix} = [all_onsets{sbj_ix,roi_ix,grp_ix} sig_onsets(1)];
                         all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} = [all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} stat.label(ch_ix)];
                     elseif strcmp(event_lab,'stim') && (sig_onsets(1)<mean_RTs(sbj_ix))
@@ -125,6 +124,7 @@ for sbj_ix = 1:numel(SBJs)
     
     clear SBJ SBJ_vars hfa stat einfo w2
 end
+
 %% Compute median onsets and onset differences per ROI pair
 roi_pairs = nchoosek(1:numel(roi_list),2);
 median_onsets = NaN([numel(SBJs) numel(roi_list) numel(grp_lab)+1]);

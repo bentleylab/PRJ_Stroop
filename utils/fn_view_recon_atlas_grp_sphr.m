@@ -26,10 +26,15 @@ else
     tis_suffix = '';
 end
 
+% ROI info
+[roi_list, ~] = fn_roi_label_styles(roi_id);
+fprintf('Using atlas: %s\n',atlas_id);
+
 %% Load elec struct
 elec = cell([numel(SBJs) 1]);
 good_sbj = true(size(SBJs));
-all_atlas_labels = {};
+all_roi_labels = {};
+all_roi_colors = [];
 for sbj_ix = 1:numel(SBJs)
     SBJ = SBJs{sbj_ix};
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
@@ -60,37 +65,60 @@ for sbj_ix = 1:numel(SBJs)
             error([elec_atlas_fname 'doesnt exist, exiting...']);
 %         end
     end
+    
+    % Append SBJ name to labels
     for e_ix = 1:numel(elec{sbj_ix}.label)
         elec{sbj_ix}.label{e_ix} = [SBJs{sbj_ix} '_' elec{sbj_ix}.label{e_ix}];
     end
     
+    % Match elecs to atlas ROIs
+    if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
+        elec{sbj_ix}.roi       = fn_atlas2roi_labels(elec{sbj_ix}.atlas_label,atlas_id,roi_id);
+        if strcmp(roi_id,'tissueC')
+            elec{sbj_ix}.roi_color = fn_tissue2color(elec{sbj_ix});
+        elseif strcmp(atlas_id,'Yeo7')
+            elec{sbj_ix}.roi_color = fn_atlas2color(atlas_id,elec{sbj_ix}.roi);
+        else
+            elec{sbj_ix}.roi_color = fn_roi2color(elec{sbj_ix}.roi);
+        end
+    elseif any(strcmp(atlas_id,{'Yeo17'}))
+        elec{sbj_ix}.roi       = elec{sbj_ix}.atlas_label;
+        elec{sbj_ix}.roi_color = fn_atlas2color(atlas_id,elec{sbj_ix}.roi);
+    end
+    
     % Remove electrodes that aren't in atlas ROIs
     if ~plot_out
-        atlas_out_elecs = elec{sbj_ix}.label(strcmp(elec{sbj_ix}.atlas_label,'no_label_found'));
+        atlas_in_elecs = {};
+        for roi_ix = 1:numel(roi_list)
+            atlas_in_elecs = [atlas_in_elecs; elec{sbj_ix}.label(strcmp(elec{sbj_ix}.roi,roi_list(roi_ix)))];
+        end
     else
-        atlas_out_elecs = {};
+        atlas_in_elecs = elec{sbj_ix}.label;
     end
     if ~strcmp(hemi,'b')
-        hemi_out_elecs = elec{sbj_ix}.label(~strcmp(elec{sbj_ix}.hemi,hemi));
+        hemi_in_elecs = elec{sbj_ix}.label(strcmp(elec{sbj_ix}.hemi,hemi));
     else
-        hemi_out_elecs = {};
+        hemi_in_elecs = elec{sbj_ix}.label;
     end
     % fn_select_elec messes up if you try to toss all elecs
-    if numel(intersect(elec{sbj_ix}.label,[atlas_out_elecs; hemi_out_elecs]))==numel(elec{sbj_ix}.label)
+    good_elecs = intersect(atlas_in_elecs, hemi_in_elecs);
+    if numel(intersect(elec{sbj_ix}.label,good_elecs))==0
         elec{sbj_ix} = {};
         good_sbj(sbj_ix) = false;
     else
         cfgs = [];
-        cfgs.channel = [{'all'} fn_ch_lab_negate(atlas_out_elecs) fn_ch_lab_negate(hemi_out_elecs)];
+        cfgs.channel = good_elecs;
         elec{sbj_ix} = fn_select_elec(cfgs, elec{sbj_ix});
-        all_atlas_labels = [all_atlas_labels; elec{sbj_ix}.atlas_label];
+        all_roi_labels = [all_roi_labels; elec{sbj_ix}.roi];
+        all_roi_colors = [all_roi_colors; elec{sbj_ix}.roi_color];
     end
     clear SBJ SBJ_vars SBJ_vars_cmd
 end
 
-% Combine elec structs
+%% Combine elec structs
 elec = ft_appendsens([],elec{good_sbj});
-elec.atlas_label = all_atlas_labels;    % appendsens strips that field
+elec.roi       = all_roi_labels;    % appendsens strips that field
+elec.roi_color = all_roi_colors;    % appendsens strips that field
 
 %% Load brain recon
 if strcmp(view_space,'pat')
@@ -122,41 +150,6 @@ elseif strcmp(view_space,'mni')
     end
 else
     error(['Unknown view_space: ' view_space]);
-end
-
-%% Load Atlas
-fprintf('Using atlas: %s\n',atlas_id);
-% if strcmp(atlas_id,'DK')                  
-%     atlas      = ft_read_atlas(SBJ_vars.recon.fs_DK); % Desikan-Killiany (+volumetric)
-%     atlas.coordsys = 'acpc';
-% elseif strcmp(atlas_id,'Dx')
-%     atlas      = ft_read_atlas(SBJ_vars.recon.fs_Dx); % Destrieux (+volumetric)
-%     atlas.coordsys = 'acpc';
-if strcmp(atlas_id,'Yeo7')
-    atlas = fn_read_atlas(atlas_id);
-    atlas.coordsys = 'mni';
-elseif strcmp(atlas_id,'Yeo17')
-    atlas = fn_read_atlas(atlas_id);
-    atlas.coordsys = 'mni';
-% else
-%     error(['atlas_name unknown: ' atlas_id]);
-end
-atlas.name = atlas_id;
-% elec.elecpos_fs   = elec.elecpos;
-
-%% Match elecs to atlas ROIs
-if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
-    elec.roi       = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
-    if strcmp(roi_id,'tissueC')
-        elec.roi_color = fn_tissue2color(elec);
-    elseif strcmp(atlas_id,'Yeo7')
-        elec.roi_color = fn_atlas2color(atlas.name,elec.roi);
-    else
-        elec.roi_color = fn_roi2color(elec.roi);
-    end
-elseif any(strcmp(atlas_id,{'Yeo17'}))
-    elec.roi       = elec.atlas_label;
-    elec.roi_color = fn_atlas2color(atlas.name,elec.roi);
 end
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)

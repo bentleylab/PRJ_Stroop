@@ -1,4 +1,4 @@
-function fn_view_recon_atlas_grp_stat_sphr(SBJs, pipeline_id, stat_id, an_id, ...
+function fn_view_recon_atlas_grp_stat_sphr_clust(SBJs, pipeline_id, clust_id, stat_id, an_id, ...
                         reg_type, show_labels, hemi, atlas_id, roi_id, plot_out)%, view_angle)
 %% Plot a reconstruction with electrodes
 % INPUTS:
@@ -50,10 +50,22 @@ if exist(sig_report_fname)
 end
 sig_report = fopen(sig_report_fname,'a');
 
-%% Load Atlas
-% ROI info
+% Cluster info
+if strcmp(an_id(1:5),'HGm_S')
+    event_lab = 'stim';
+    peak_bins = [0.3 0.6 1 2];
+elseif strcmp(an_id(1:5),'HGm_R')
+    event_lab = 'resp';
+    peak_bins = [7 14 21 40; 7 14 21 40; 400 800 1200 2000];
+end
 [roi_list, ~] = fn_roi_label_styles(roi_id);
+clust_names  = cell([1 numel(roi_list)]);
+for clust_ix = 1:numel(roi_list)
+    clust_names{clust_ix} = ['C' num2str(clust_ix)];
+end
+bin_colors = [0 0 1; 0 1 1; 1 0 1; 1 0 0];  %garish blue, cyan, magenta, red
 
+%% Load Atlas
 fprintf('Using atlas: %s\n',atlas_id);
 % if strcmp(atlas_id,'DK')                  
 %     atlas      = ft_read_atlas(SBJ_vars.recon.fs_DK); % Desikan-Killiany (+volumetric)
@@ -78,6 +90,7 @@ elec_sbj = cell([numel(SBJs) numel(cond_lab)]);
 good_sbj = true([numel(SBJs) numel(cond_lab)]);
 all_roi_labels = cell([numel(cond_lab) 1]);
 all_roi_colors = cell([numel(cond_lab) 1]);
+all_tbins      = cell([numel(cond_lab) 1]);
 for sbj_ix = 1:numel(SBJs)
     SBJ = SBJs{sbj_ix};
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
@@ -217,7 +230,7 @@ for sbj_ix = 1:numel(SBJs)
             fprintf(sig_report,'\t!!! 0 sig_ch remain\n');
         else
             cfgs = [];
-            cfgs.channel = good_elecs;
+            cfgs.channel = [good_elecs; {'-IR32_IHL8'}];%tmp fix !!!
             elec_sbj{sbj_ix,cond_ix} = fn_select_elec(cfgs, elec_sbj{sbj_ix,cond_ix});
             all_roi_labels{cond_ix} = [all_roi_labels{cond_ix}; elec_sbj{sbj_ix,cond_ix}.roi];
             all_roi_colors{cond_ix} = [all_roi_colors{cond_ix}; elec_sbj{sbj_ix,cond_ix}.roi_color];
@@ -227,6 +240,34 @@ for sbj_ix = 1:numel(SBJs)
     end
     fprintf(sig_report,'===============================================================\n');
     
+    %% Load clusters and match
+    % contains: 'clust_data','clusters','centroids','dist_sums','distances','elec'
+    %   and maybe 'eva' if nCH criterion
+    clust_fname = [SBJ_vars.dirs.proc SBJ '_' clust_id '_' stat_id '_' an_id '_' atlas_id '_' roi_id '.mat'];
+    tmp = load(clust_fname);
+    % Update labels with SBJ name
+    for e_ix = 1:numel(tmp.elec.label)
+        tmp.elec.label{e_ix} = [SBJ '_' tmp.elec.label{e_ix}];
+    end
+    
+    
+    % Sort clusters by peak time
+    for cond_ix = 1:numel(cond_lab)
+        if ~isempty(elec_sbj{sbj_ix,cond_ix})
+            elec_sbj{sbj_ix,cond_ix}.tbin = zeros([numel(elec_sbj{sbj_ix,cond_ix}.label) 1]);
+            for ch_ix = 1:numel(elec_sbj{sbj_ix,cond_ix}.label)
+                clust_e_ix = strcmp(elec_sbj{sbj_ix,cond_ix}.label{ch_ix},tmp.elec.label);
+                if ~any(clust_e_ix)
+                    error(['sig elec not foudn in clust elec! ' SBJ '-' elec_sbj{sbj_ix,cond_ix}.label{ch_ix}]);
+                end
+                [~,peak_time] = max(tmp.centroids{cond_ix},[],2);
+                [~,clust_bin] = histc(peak_time,peak_bins(cond_ix,:));
+                clust_n = tmp.clusters(clust_e_ix,cond_ix);
+                elec_sbj{sbj_ix,cond_ix}.tbin(ch_ix) = clust_bin(clust_n)+1;
+            end
+            all_tbins{cond_ix} = [all_tbins{cond_ix}; elec_sbj{sbj_ix,cond_ix}.tbin];
+        end
+    end
     clear SBJ SBJ_vars SBJ_vars_cmd
 end
 
@@ -236,6 +277,7 @@ for cond_ix = 1:numel(cond_lab)
     elec{cond_ix} = ft_appendsens([],elec_sbj{good_sbj(:,cond_ix),cond_ix});
     elec{cond_ix}.roi       = all_roi_labels{cond_ix};    % appendsens strips that field
     elec{cond_ix}.roi_color = all_roi_colors{cond_ix};    % appendsens strips that field
+    elec{cond_ix}.tbin      = all_tbins{cond_ix};    % appendsens strips that field
 end
 
 %% Load brain recon
@@ -290,10 +332,10 @@ for cond_ix = 1%:numel(cond_lab)
         elec_tmp = fn_select_elec(cfgs,elec{cond_ix});
         if show_labels
             ft_plot_sens(elec_tmp, 'elecshape', 'sphere',...
-                'facecolor', elec_tmp.roi_color, 'label', 'label');
+                'facecolor', bin_colors(elec_tmp.tbin,:), 'label', 'label');
         else
             ft_plot_sens(elec_tmp, 'elecshape', 'sphere',...
-                'facecolor', elec_tmp.roi_color);
+                'facecolor', bin_colors(elec_tmp.tbin,:));
         end
     end
     

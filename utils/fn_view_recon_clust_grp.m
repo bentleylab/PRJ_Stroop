@@ -1,6 +1,7 @@
-function fn_view_recon_clust(SBJ, clust_id, stat_id, an_id, atlas_id, roi_id,...
-                    view_space, reg_type, show_labels, hemi, plot_out, plot_ns, plot_clusters, plot_recon,...
+function fn_view_recon_clust_grp(SBJs, clust_id, stat_id, an_id, atlas_id, roi_id,...
+                    reg_type, show_labels, hemi, plot_out, plot_ns, plot_clusters, plot_recon,...
                     fig_vis, save_fig)%, view_angle)
+                error('didnt finsih wrote reconatlas grp stt sphr clust instead')
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJ [str] - subject ID to plot
@@ -16,10 +17,8 @@ function fn_view_recon_clust(SBJ, clust_id, stat_id, an_id, atlas_id, roi_id,...
 %   plot_clusters [0/1] - plot time series (ANOVA and centroid) per bin
 fig_filetype = 'svg';
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
-SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
-eval(SBJ_vars_cmd);
-plt_id   = 'ts_S0to15_R5to10_evnt_sigline';
-eval(['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m']);
+view_space = 'mni';
+pipeline_id = 'main_ft';
 
 view_angle = [-90 0];
 if strcmp(reg_type,'v') || strcmp(reg_type,'s')
@@ -39,18 +38,14 @@ if strcmp(stat_id,'actv') || strcmp(stat_id,'CSE')
     cond_lab = stat_id;
 elseif strcmp(stat_id,'corrRT_CNI_pcon_WL200_WS50')
     % Get condition info
-    [grp_lab, grp_colors, grp_style] = fn_group_label_styles(model_lab);
+    [grp_lab, ~, ~] = fn_group_label_styles(model_lab);
     % if rt_correlation
-    [rt_lab, rt_color, rt_style]     = fn_group_label_styles('RT');
+    [rt_lab, ~, ~]     = fn_group_label_styles('RT');
     % end
     cond_lab = [grp_lab rt_lab];
 else
     error(['Unknown stat_id: ' stat_id]);
 end
-
-% Get event timing
-load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
-mean_RT = mean(trial_info.response_time);
 
 if strcmp(an_id(1:5),'HGm_S')
     event_lab = 'stim';
@@ -63,7 +58,7 @@ stat_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.
 eval(stat_vars_cmd);
 
 % ROI info
-[roi_list, roi_colors] = fn_roi_label_styles(roi_id);
+[roi_list, ~] = fn_roi_label_styles(roi_id);
 if strcmp(atlas_id,'Yeo7') || strcmp(atlas_id,'Yeo17')
     elec_space = 'mni_v';
 else
@@ -83,68 +78,79 @@ bin_colors = [0 0 1; 0 1 1; 1 0 1; 1 0 0];  %garish blue, cyan, magenta, red
 % bin_colors = [161, 218, 180; 65, 182, 196; 44 127 184; 37 52 148]./255;%darker, not enough contrast
 
 %% Load cluster data
-% Load elec struct (already in the clust .mat)
-% contains: 'clust_data','clusters','centroids','dist_sums','distances','elec'
-%   and maybe 'eva' if nCH criterion
-clust_fname = [SBJ_vars.dirs.proc SBJ '_' clust_id '_' stat_id '_' an_id '_' atlas_id '_' roi_id '.mat'];
-load(clust_fname);
-
-%% Load stats
-f_name = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id '.mat'];
-load(f_name);
-
-% Select analysis (ROI) elecs
-cfgs = []; cfgs.channel = elec.label;
-stat = ft_selectdata(cfgs,stat);
-w2 = ft_selectdata(cfgs,w2);
-
-% Get Sliding Window Parameters
-win_lim    = fn_sliding_window_lim(stat.time,win_len,win_step);
-win_center = round(mean(win_lim,2));
-
-% Convert % explained variance to 0-100 scale
-w2.trial = w2.trial*100;
-
-% Trim data to plotting epoch
-%   NOTE: stat should be on stat_lim(1):stat_lim(2)+0.001 time axis
-%   w2 should fit within that since it's averaging into a smaller window
-cfg_trim = [];
-if strcmp(event_lab,'stim')
-    cfg_trim.latency = plt_vars.plt_lim_S;
-else
-    cfg_trim.latency = plt_vars.plt_lim_R;
-end
-% hfa{1}  = ft_selectdata(cfg_trim,hfa{1});
-stat = ft_selectdata(cfg_trim,stat);
-sample_rate = (numel(stat.time)-1)/(stat.time(end)-stat.time(1));
-
-qvals = NaN(size(w2.pval));
-for ch_ix = 1:numel(stat.label)
-    % FDR correct pvalues for ANOVA
-    [~, ~, ~, qvals(:,ch_ix,:)] = fdr_bh(squeeze(w2.pval(:,ch_ix,:)));%,0.05,'pdep','yes');
-end
-
-%% Exclude non-sig elecs
-if ~plot_ns
-    plot_ch = false([numel(elec.label) numel(cond_lab)]);
-    for cond_ix = 1:numel(cond_lab)
-        for ch_ix = 1:numel(elec.label)
-            if ~strcmp(cond_lab{cond_ix},'RT') && any(squeeze(qvals(cond_ix,ch_ix,:))<0.05)
-                plot_ch(ch_ix,cond_ix) = true;
-            elseif sum(squeeze(stat.mask(ch_ix,1,:)))>0
-                plot_ch(ch_ix,cond_ix) = true;
+cond_ix = 1;
+elec_sbj = cell([numel(SBJs) numel(cond_lab)]);
+good_sbj = true([numel(SBJs) numel(cond_lab)]);
+all_roi_labels = cell([numel(cond_lab) 1]);
+all_roi_colors = cell([numel(cond_lab) 1]);
+for sbj_ix = 1:numel(SBJs)
+    SBJ = SBJs{sbj_ix};
+    SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+    eval(SBJ_vars_cmd);
+    
+    % Load elec struct (already in the clust .mat)
+    % contains: 'clust_data','clusters','centroids','dist_sums','distances','elec'
+    %   and maybe 'eva' if nCH criterion
+    clust_fname = [SBJ_vars.dirs.proc SBJ '_' clust_id '_' stat_id '_' an_id '_' atlas_id '_' roi_id '.mat'];
+    load(clust_fname);
+    
+    %% Load stats
+    f_name = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id '.mat'];
+    load(f_name);
+    
+    % Select analysis (ROI) elecs
+    cfgs = []; cfgs.channel = elec.label;
+    stat = ft_selectdata(cfgs,stat);
+    w2 = ft_selectdata(cfgs,w2);
+    
+    % Get Sliding Window Parameters
+    win_lim    = fn_sliding_window_lim(stat.time,win_len,win_step);
+    win_center = round(mean(win_lim,2));
+    
+    % Convert % explained variance to 0-100 scale
+    w2.trial = w2.trial*100;
+    
+    % Trim data to plotting epoch
+    %   NOTE: stat should be on stat_lim(1):stat_lim(2)+0.001 time axis
+    %   w2 should fit within that since it's averaging into a smaller window
+    cfg_trim = [];
+    if strcmp(event_lab,'stim')
+        cfg_trim.latency = plt_vars.plt_lim_S;
+    else
+        cfg_trim.latency = plt_vars.plt_lim_R;
+    end
+    % hfa{1}  = ft_selectdata(cfg_trim,hfa{1});
+    stat = ft_selectdata(cfg_trim,stat);
+    sample_rate = (numel(stat.time)-1)/(stat.time(end)-stat.time(1));
+    
+    qvals = NaN(size(w2.pval));
+    for ch_ix = 1:numel(stat.label)
+        % FDR correct pvalues for ANOVA
+        [~, ~, ~, qvals(:,ch_ix,:)] = fdr_bh(squeeze(w2.pval(:,ch_ix,:)));%,0.05,'pdep','yes');
+    end
+    
+    %% Exclude non-sig elecs
+    if ~plot_ns
+        plot_ch = false([numel(elec.label) numel(cond_lab)]);
+        for cond_ix = 1:numel(cond_lab)
+            for ch_ix = 1:numel(elec.label)
+                if any(strcmp(cond_lab{cond_ix},{'CNI','pcon'})) && any(squeeze(qvals(cond_ix,ch_ix,:))<0.05)
+                    plot_ch(ch_ix,cond_ix) = true;
+                elseif strcmp(cond_lab{cond_ix},'RT') && sum(squeeze(stat.mask(ch_ix,1,:)))>0
+                    plot_ch(ch_ix,cond_ix) = true;
+                end
             end
         end
+    else
+        plot_ch = true([numel(elec.label) numel(cond_lab)]);
     end
-else
-    plot_ch = true([numel(elec.label) numel(cond_lab)]);
-end
-
-%% Sort clusters by peak time
-clust_bin = cell([numel(cond_lab) 1]);
-for cond_ix = 1:numel(cond_lab)
-    [~,peak_time] = max(centroids{cond_ix},[],2);
-    [~,clust_bin{cond_ix}] = histc(peak_time,peak_bins(cond_ix,:));
+    
+    %% Sort clusters by peak time
+    clust_bin = cell([numel(cond_lab) 1]);
+    for cond_ix = 1:numel(cond_lab)
+        [~,peak_time] = max(centroids{cond_ix},[],2);
+        [~,clust_bin{cond_ix}] = histc(peak_time,peak_bins(cond_ix,:));
+    end
 end
 
 %% Plot centroids across SBJ

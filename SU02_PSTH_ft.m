@@ -1,4 +1,4 @@
-function SU02_PSTH_ft(SBJ,conditions,pipeline_id,an_id,plt_id,plot_ISI,fig_vis,save_plots,close_plots)
+function SU02_PSTH_ft(SBJ,conditions,pipeline_id,an_id,plt_id,plot_ISI,fig_vis,save_plots,fig_ftype,close_plots)
 %% Fieldtrip-based PSTH analysis
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
@@ -225,7 +225,7 @@ cfg.topplotfunc  = 'line'; % plot as a line
 cfg.latency      = 'maxperiod';%trial_lim_s;
 cfg.errorbars    = 'std'; % plot with the standard deviation
 cfg.interactive  = 'no'; % toggle off interactive mode
-for u = 1%:numel(stat.label)
+for u = 1:numel(stat.label)
     cfg.spikechannel = spike_trl.label(u);
     fig_name = [SBJ '_' conditions '_' spike_trl.label{u} '_PSTH_raster_' event_lab];
     f = figure('Name',fig_name,'Visible',fig_vis);

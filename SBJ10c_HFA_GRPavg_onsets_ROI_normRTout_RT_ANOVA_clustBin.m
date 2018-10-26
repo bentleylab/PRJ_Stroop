@@ -60,7 +60,8 @@ clust_names  = cell([1 numel(roi_list)]);
 for clust_ix = 1:numel(roi_list)
     clust_names{clust_ix} = ['C' num2str(clust_ix)];
 end
-bin_colors = {[27 158 119]./255, [117 112 179]./255, [217 95 2]./255, [231 41 138]./255}; %qualitative max diff from gROI, cool to hot
+bin_colors = {[0 0 1], [0 1 1], [1 0 1], [1 0 0]};  %garish blue, cyan, magenta, red
+% bin_colors = {[27 158 119]./255, [117 112 179]./255, [217 95 2]./255, [231 41 138]./255}; %qualitative max diff from gROI, cool to hot
 
 %% Load Results
 % Set up onset counts
