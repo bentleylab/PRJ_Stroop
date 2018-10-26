@@ -7,16 +7,20 @@ function SBJ09a_TFR_stats(SBJ,conditions,pipeline_id,an_id)
 %   an_id [str] - which analysis variables to use
 
 % clear all; %close all;
-% Set up paths
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/');
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
-addpath('/home/knight/hoycw/Apps/fieldtrip/');
+%% Check which root directory
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+
+%% Set Up Directories
+addpath([root_dir 'PRJ_Stroop/scripts/']);
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+addpath(ft_dir);
 ft_defaults
 
 %% Data Preparation
 % Load Data
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/an_vars/' an_id '_vars.m']);
+eval(['run ' root_dir 'hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m']);
 
 load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'));
