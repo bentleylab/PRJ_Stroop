@@ -35,7 +35,7 @@ end
 atlas.name = atlas_name;
 
 %% Match elecs to atlas ROIs
-elec = fn_atlas_lookup(elec,atlas,'max_qry_rng',5,'min_qry_rng',5);
+elec = fn_atlas_lookup(elec,atlas,'min_qry_rng',5,'max_qry_rng',5);
 
 % Check that all atlas_prob add to 1
 for e = 1:numel(elec.label)

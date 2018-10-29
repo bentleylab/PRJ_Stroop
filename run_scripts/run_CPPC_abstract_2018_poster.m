@@ -24,7 +24,7 @@ B00_RT_GRP_hist_norm(SBJs,'CNI',save_fig,fig_vis,fig_type);
 %   Effects by ROI
 %  =================================================================================
 %% HG active examples
-SBJ         = 'IR35';
+SBJ         = 'IR74';
 conditions  = 'CNI';
 pipeline_id = 'main_ft';
 actv_win    = '100';
@@ -42,8 +42,12 @@ SBJ08b_HFA_plot_SR_stack_cond_onset_noLab(SBJ,conditions,an_id_s,an_id_r,...
 % I haven't wanted to run the SBJ08a_HFA_stats for 'CI'...
 conditions = 'CI';
 plt_id     = 'ts_S15R1_errbr_evnt';
-SBJ08b_HFA_plot_SR_stats_svg('IR35','LPC5-6',conditions,pipeline_id,...
+SBJ08b_HFA_plot_SR_stats_svg('IR57','LAC5-6',conditions,pipeline_id,...
     an_id_s,an_id_r,plt_id,save_fig,fig_vis);
+% SBJ08b_HFA_plot_SR_stats_svg('IR72','LPC2-3',conditions,pipeline_id,...
+%     an_id_s,an_id_r,plt_id,save_fig,fig_vis);
+% SBJ08b_HFA_plot_SR_stats_svg('IR74','LIN1-2',conditions,pipeline_id,...
+%     an_id_s,an_id_r,plt_id,save_fig,fig_vis);
 
 %% SU examples
 SBJ = 'IR82';% also ran IR75

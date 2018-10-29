@@ -1,4 +1,4 @@
-function SBJ08b_HFA_plot_SR_stats_svg(SBJ,elec,conditions,pipeline_id,an_id_s,an_id_r,plt_id,save_fig,fig_vis)
+function SBJ08b_HFA_plot_SR_stats_svg(SBJ,elec_name,conditions,pipeline_id,an_id_s,an_id_r,plt_id,save_fig,fig_vis)
 fig_filetype = 'svg';
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
@@ -22,18 +22,10 @@ event_lab = {'stim', 'resp'};
 % Load RTs
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
 
-einfo_filename = [SBJ_vars.dirs.preproc SBJ '_einfo_' pipeline_id '.mat'];
-load(einfo_filename);
-% Electrode Info Table:
-%   label- name of electrode
-%   ROI- specific region
-%   gROI- general region (LPFC, MPFC, OFC, FWM=frontal white matter)
-%   ROI2- specific region of second electrode
-%   tissue- primary tissue type
-%   GM weight- percentage of electrode pair in GM
-%   Out- 0/1 flag for whether this is partially out of the brain
-einfo_ix = strmatch(elec,einfo(:,1),'exact');
-roi = einfo{einfo_ix,2};
+elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_Dx_tis.mat'];
+load(elec_fname);
+roi = fn_atlas2roi_labels(elec.atlas_label(strcmp(elec.label,elec_name)),'Dx','ROI');
+roi = roi{1};
 
 stats_filename1 = strcat(SBJ_vars.dirs.proc,SBJ,'_',conditions,'_ROI_',an_id_s,'.mat');
 stats_filename2 = strcat(SBJ_vars.dirs.proc,SBJ,'_',conditions,'_ROI_',an_id_r,'.mat');
@@ -52,7 +44,7 @@ end
 %% Prep Data
 % Trim data to plotting epoch
 cfg_trim = [];
-cfg_trim.channel = elec;
+cfg_trim.channel = elec_name;
 stat{1} = ft_selectdata(cfg_trim,stat{1});
 stat{2} = ft_selectdata(cfg_trim,stat{2});
 cfg_trim.latency = plt_vars.plt_lim_S;
@@ -78,7 +70,7 @@ end
 
 % Create a figure for each channel
 % Plot parameters
-fig_name = strcat(SBJ,'_',conditions,'_SR_',roi,'_',elec);
+fig_name = strcat(SBJ,'_',conditions,'_SR_',roi,'_',elec_name);
 figure('Name',fig_name,'units','normalized',...
     'outerposition',[0 0 0.4 0.5],'Visible',fig_vis); %twice as wide for the double plot
 plot_info.fig        = gcf;
@@ -87,7 +79,7 @@ plot_info.legend_loc = plt_vars.legend_loc;
 plot_info.sig_alpha  = plt_vars.sig_alpha;
 plot_info.sig_color  = plt_vars.sig_color;
 % Condition plotting params
-cond_info.name       = cond_lab;
+cond_info.name       = {'Congruent','Incongruent'};
 cond_info.style      = cond_style;
 cond_info.color      = cond_colors;
 cond_info.alpha      = repmat(plt_vars.errbar_alpha,[1 numel(cond_lab)]);
@@ -95,8 +87,8 @@ cond_info.alpha      = repmat(plt_vars.errbar_alpha,[1 numel(cond_lab)]);
 for set_ix = 1:2
     subplot(1,2,set_ix);
     plot_info.ax     = gca;
-    plot_info.title  = [event_lab{set_ix} '-Locked'];
-    plot_info.title(1) = upper(plot_info.title(1));
+    plot_info.title  = ' ';%[event_lab{set_ix} '-Locked'];
+%     plot_info.title(1) = upper(plot_info.title(1));
         if set_ix==2
             plot_info.legend = 1;
         else
@@ -114,7 +106,7 @@ for set_ix = 1:2
         else
             plot_info.x_lab = plt_vars.plt_lim_R(1):plt_vars.x_step_sz:plt_vars.plt_lim_R(2);
             % Stimulus plotting params
-            event_info.name  = {event_lab{set_ix}};
+            event_info.name  = {'Response'};
             event_info.width = plt_vars.evnt_width;
             event_info.color = {plt_vars.evnt_color};
             event_info.style = {plt_vars.evnt_style};
@@ -143,10 +135,10 @@ for set_ix = 1:2
                 end
             end
             fprintf('%s -- %i SIGNIFICANT CLUSTERS FOUND, plotting with significance shading...\n',...
-                elec,size(sig_chunks,1));
+                elec_name,size(sig_chunks,1));
             fn_plot_ts_error_bar_sig(plot_info,means,var,sig_chunks,event_info,cond_info);
         else
-            fprintf('%s -- NO SIGNIFICANT CLUSTERS FOUND, plotting without significance shading...\n',elec);
+            fprintf('%s -- NO SIGNIFICANT CLUSTERS FOUND, plotting without significance shading...\n',elec_name);
             fn_plot_ts_error_bar(plot_info,means,var,event_info,cond_info);
         end
 end

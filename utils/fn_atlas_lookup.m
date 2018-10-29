@@ -35,11 +35,10 @@ elec_lab = elec;
 elec_lab.atlas_name    = atlas.name;
 elec_lab.atlas_label   = cell(size(elec.label));
 elec_lab.atlas_prob    = zeros(size(elec.label));
-elec_lab.atlas_qryrng  = cell(size(elec.label));
+elec_lab.atlas_qryrng  = zeros(size(elec.label));
 elec_lab.atlas_qrysz   = zeros(size(elec.label));
 elec_lab.atlas_label2  = cell(size(elec.label));
 elec_lab.atlas_prob2   = cell(size(elec.label));
-elec_lab.atlas_qryrng2 = cell(size(elec.label));
 
 cfg = [];
 cfg.atlas              = atlas;
@@ -62,17 +61,15 @@ for e = 1:numel(elec.label);
     if numel(match_cnt)>=1
         elec_lab.atlas_label{e}  = report.name{cnt_idx(1)};
         elec_lab.atlas_prob(e)   = report.count(cnt_idx(1))/sum(report.count);
-        elec_lab.atlas_qryrng{e} = report.usedqueryrange{cnt_idx(1)};
+        elec_lab.atlas_qryrng(e) = report.usedqueryrange{cnt_idx(1)};
         elec_lab.atlas_qrysz(e)  = sum(report.count);
         % add additional labels if needed
         if numel(match_cnt)>1
             elec_lab.atlas_label2{e}  = report.name(cnt_idx(2:numel(match_cnt)));
             elec_lab.atlas_prob2{e}   = report.count(cnt_idx(2:numel(match_cnt)))/sum(report.count);
-            elec_lab.atlas_qryrng2{e} = report.usedqueryrange(cnt_idx(2:numel(match_cnt)));
         else
             elec_lab.atlas_label2{e}  = '';
             elec_lab.atlas_prob2{e}   = NaN;
-            elec_lab.atlas_qryrng2{e} = [];
         end
     else   % No matches found
         error(['No matches found for elec: ' elec.label{e}]);

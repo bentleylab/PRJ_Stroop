@@ -25,7 +25,7 @@ if strcmp(roi_id,'tissue') || strcmp(roi_id,'tissueC')
 else
     tis_suffix = '';
 end
-[roi_list, roi_colors, ~] = fn_roi_label_styles(roi_id);
+[roi_list, roi_colors] = fn_roi_label_styles(roi_id);
 
 %% Load elec struct
 try

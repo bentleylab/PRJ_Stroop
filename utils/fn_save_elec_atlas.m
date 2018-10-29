@@ -41,7 +41,7 @@ end
 atlas.name = atlas_name;
 
 %% Match elecs to atlas ROIs
-elec = fn_atlas_lookup(elec,atlas,'max_qry_rng',5,'min_qry_rng',1);
+elec = fn_atlas_lookup(elec,atlas,'min_qry_rng',1,'max_qry_rng',5);
 
 %% Save elec strcut with atlas labels
 out_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'_',atlas_name,'.mat'];
