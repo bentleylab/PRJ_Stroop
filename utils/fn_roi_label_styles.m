@@ -49,7 +49,7 @@ switch roi_id
     case {'tissue', 'tissueC'}
         labels = {'GM','WM','CSF','OUT'};
         einfo_col = [];
-    case 'ALL'
+    case 'all'
         load('~/PRJ_Stroop/data/full_roi_lists.mat');
         labels = all_rois;
         einfo_col = 2;

@@ -1,4 +1,5 @@
-function SBJ13c_FOOOF_peak_params(SBJ,an_id,atlas_id,roi_id)
+function SBJ13c_FOOOF_peak_params(SBJ,an_id)
+%% Load FOOOF results and plot them
 
 %% Check which root directory
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
@@ -28,17 +29,22 @@ load(elec_fname);
 %% Load FOOOF outputs
 fooof_dir = [SBJ_vars.dirs.preproc an_id '_results/'];
 peak_params = cell(numel(elec.label),1);
+bkgd_params = cell(numel(elec.label),1);
 for e = 1:numel(elec.label)
+    % Loads:
+    %   background_params: [offset, slope]
+    %   peak_params: [CF, Amp, BW] with 1 row per peak
+    %   r_squared: float of model fit
+    %   error: float of root mean squared error
+    %   gaussian_params: [n_peaks x 3]
     tmp = load([fooof_dir SBJ '_' an_id '_fooof_' elec.label{e}]);
     peak_params{e} = tmp.peak_params;
+    bkgd_params{e} = tmp.background_params;
+    
+    elec.roi{e} = fn_atlas2roi_labels(elec.label(e),atlas_id,roi_id);
 end
 
-% Loads:
-%   background_params: [offset, slope]
-%   peak_params: [CF, Amp, BW] with 1 row per peak
-%   r_squared: float of model fit
-%   error: float of root mean squared error
-%   gaussian_params: [n_peaks x 3]
+%% 
 
 
 end

@@ -19,7 +19,7 @@ eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
 eval(['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m']);
 
 if strcmp(pipeline_id,'main_ft')
-    load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
+    load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',data_id,'.mat'));
     % Load elec
     if strcmp(atlas_id,'Yeo7') || strcmp(atlas_id,'Yeo17')
         elec_space = 'mni_v';
@@ -40,11 +40,11 @@ if strcmp(pipeline_id,'main_ft')
     elec = fn_select_elec(cfgs, elec);
     data = ft_selectdata(cfgs,data);
 elseif strcmp(pipeline_id,'1000hz')
-    load(strcat(SBJ_vars.dirs.import,SBJ,'_',pipeline_id,'.mat'));
+    load(strcat(SBJ_vars.dirs.import,SBJ,'_',data_id,'.mat'));
     load(SBJ_vars.recon.elec_pat);
-end
-if ~all(strcmp(data.label,elec.label))
-    error('Mismatch between data and elec labels!');
+    if ~all(strcmp(data.label,elec.label))
+        error('Mismatch between data and elec labels!');
+    end
 end
 % load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'));
 % 
@@ -58,7 +58,7 @@ end
 % end
 
 %% Compute PSDs
-[tmp_psd,freqs] = pwelch(data.trial{1}(1,:),wn_len,[],[],data.fsample);   % as in fooof_mat docs
+[tmp_psd,freqs] = pwelch(data.trial{1}(1,:),window,[],[],data.fsample);   % as in fooof_mat docs
 psds = zeros(numel(elec.label),size(tmp_psd,1));
 psds(1,:) = tmp_psd;
 for ch_ix = 2:numel(data.label)
@@ -67,13 +67,12 @@ for ch_ix = 2:numel(data.label)
     %   window (int) - length of data segment to comptue PSDs
     %   noverlap (int) - # data points overlapping between windows, default is 50% of window
 %    [fft_data,freqs] = pwelch(data.trial{1}(ch_ix,:),2048,0,2048,sample_freq);
-    [psds(ch_ix,:),~] = pwelch(data.trial{1}(ch_ix,:),wn_len,[],[],data.fsample);
+    [psds(ch_ix,:),~] = pwelch(data.trial{1}(ch_ix,:),window,[],[],data.fsample);
 end
 
 %% Save out in python readable format
 labels = data.label;
-rois = elec.roi;
 out_fname = [SBJ_vars.dirs.preproc,SBJ,'_',an_id,'_PSDs.mat'];
-save(out_fname,'freqs','psds','labels','rois','roi_id','atlas_id','foi','pk_bw_lim','mn_pk_amp','max_n_pks');
+save(out_fname,'freqs','psds','labels');
 
 end

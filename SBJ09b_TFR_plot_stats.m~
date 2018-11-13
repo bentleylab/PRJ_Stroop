@@ -1,4 +1,4 @@
-function SBJ09b_TFR_plot_stats(SBJ,conditions,pipeline_id,an_id,plt_id,save_fig,fig_vis)
+function SBJ09b_TFR_plot_stats(SBJ,conditions,an_id,plt_id,save_fig,fig_vis)
 % Plots TFRs computed in SBJ09a_TFR_stats
 %   3 TFRs in a row: (1) con; (2) inc; (3) inc-con with stats
 % clear all; %close all;
@@ -32,11 +32,10 @@ load(stats_filename);
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
 % Compute mean RT per condition
 for cond_ix = 1:numel(cond_lab)
-    if strcmp(event_type,'stim')
-        RT_means{cond_ix} = mean(trial_info.response_time(fn_condition_index([cond_lab{cond_ix}], trial_info.condition_n)==1));
-    else
-        RT_means{cond_ix} = 0;
-    end
+    if strcmp(event_type,'stim');
+    RT_means{cond_ix} = mean(trial_info.response_time(fn_condition_index([cond_lab{cond_ix}], trial_info.condition_n)==1));
+    % Add in the baseline offset to plot correctly
+    RT_means{cond_ix} = 0;
 end
 
 % Load ROI and GM/WM info
@@ -78,7 +77,7 @@ end
 
 % Create a figure per channel
 sig_ch = {};
-for ch_ix = 1:numel(stat.label)
+for ch_ix = 1%:numel(stat.label)
     fig_name = [SBJ '_' conditions '_' an_id '_' ...
         elec.roi{strcmp(elec.label,tfr{cond_ix}.label{ch_ix})} '_' tfr{cond_ix}.label{ch_ix}];
     figure('Name',fig_name,'units','normalized',...
@@ -100,7 +99,7 @@ for ch_ix = 1:numel(stat.label)
         cfgraw.latency  = trial_lim_s;
         cfgraw.baseline = bsln_lim; %should be in sec
         ft_singleplotTFR(cfgraw, tfr_plot);
-        line([RT_means{cond_ix} RT_means{cond_ix}],ylim,'Color','k','LineStyle','--','LineWidth',2);
+        line([RT_means{cond_ix} RT_means{cond_ix}],ylim,'LineStyle','--','LineWidth',2);
         
         ax = gca;
         ax.YTick = 1:tick_step:numel(freqs);
@@ -121,23 +120,16 @@ for ch_ix = 1:numel(stat.label)
     ax.YTickLabel = round(freqs(1:tick_step:end));
     title([cond_lab{2} '-' cond_lab{1}]);
     
+    if sum(squeeze(stat.mask(ch_ix,:,:)))>0
+        sig_ch = {sig_ch{:} stat.label{ch_ix}};
+    end
+    
     % Save figure
     if save_fig
         fig_filename = [fig_dir fig_name '.' fig_filetype];
         fprintf('Saving %s\n',fig_filename);
         saveas(gcf,fig_filename);
         %eval(['export_fig ' fig_filename]);
-    end
-    if sum(squeeze(stat.mask(ch_ix,:,:)))>0
-        sig_ch = {sig_ch{:} stat.label{ch_ix}};
-        % Link this figure to sig dir
-        sig_dir = [fig_dir 'sig_ch/'];
-        if ~exist(sig_dir,'dir')
-            mkdir(sig_dir);
-        end
-        cd(sig_dir);
-        link_cmd = ['ln -s ../' fig_name ' .'];
-        system(link_cmd);
     end
 end
 
