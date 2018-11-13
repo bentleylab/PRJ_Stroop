@@ -15,7 +15,7 @@ SBJ="${SGE_TASK}"
 FUNCTION='SBJ09b_TFR_plot_stats'
 
 # set up matlab function call
-func_call="${FUNCTION}('${SBJ}', '${conditions}', '${an_id}', '${plt_id}', '${save_fig}', 'off')"
+func_call="${FUNCTION}('${SBJ}', '${conditions}', '${pipeline_id}', '${an_id}', '${plt_id}', '${save_fig}', 'off')"
 
 # define commands to execute via SGE
 echo ${SBJ}

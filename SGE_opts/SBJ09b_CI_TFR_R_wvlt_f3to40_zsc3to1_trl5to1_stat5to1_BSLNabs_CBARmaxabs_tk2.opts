@@ -1,0 +1,5 @@
+-o /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
+-e /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
+-v conditions="CI",pipeline_id="main_ft",an_id="TFR_R_wvlt_f3to40_zsc3to1_trl5to1_stat5to1",plt_id="tfr_BSLNabs_CBARmaxabs_tk2",save_fig="1"
+-l mem_free=4G
+-N TFRplot
