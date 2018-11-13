@@ -1,4 +1,4 @@
-function SBJ07b_ERP_plot_SR_stats(SBJ,conditions,an_id_s,an_id_r,plt_id,save_fig,fig_vis)
+function SBJ07b_ERP_plot_stats(SBJ,conditions,an_id_s,an_id_r,plt_id,save_fig,fig_vis)
 % Plots ERPs computed in SBJ07a_ERP_stats
 % clear all; %close all;
 

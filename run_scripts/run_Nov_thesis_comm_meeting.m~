@@ -16,14 +16,27 @@ fig_type    = 'svg';
 
 %% TFRs
 conditions  = 'CI';
-an_id = 'TFR_S_wvlt_f3to40_zsc3to1_trl3to15_stat15';
-plt_id = 'tfr_BSLNabs_CBARmaxabs_tk2';
-save_fig = 1;
-fig_vis = 0;
+an_id       = 'TFR_S_wvlt_f3to40_zsc3to1_trl3to15_stat15';
+plt_id      = 'tfr_BSLNabs_CBARmaxabs_tk2';
+save_fig    = 1;
+fig_vis     = 'off';
 for s = 1:numel(SBJs)
-    SBJ09b_TFR_plot_stats(SBJs{s},conditions,an_id,plt_id,save_fig,fig_vis);
+    SBJ09b_TFR_plot_stats(SBJs{s},conditions,pipeline_id,an_id,plt_id,save_fig,fig_vis);
     close all;
 end
+
+%% ERPs
+conditions  = 'CI';
+an_id_s     = 'ERP_stim_trl1000_stat1000';
+an_id_r     = 'ERP_resp_trl1000_stat1000';
+plt_id      = 'ts_S1R1_errbr_evnt';
+save_fig    = 1;
+fig_vis     = 'off';
+for s = 1:numel(SBJs)
+    SBJ07b_ERP_plot_SR_stats_stack(SBJ,conditions,an_id_s,an_id_r,plt_id,save_fig,fig_vis)
+    close all;
+end
+
 %% ================================================================================
 %   BEHAVIOR
 %  =================================================================================
