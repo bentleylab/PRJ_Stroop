@@ -213,7 +213,7 @@ for cond_ix = 1:numel(cond_lab)
                         
     % Adjust plot propeties
     for roi_ix = 1:numel(good_roi_map{cond_ix})
-        if strcmp(plt_vars.violin_colors,'SBJ')
+        if strcmp(plt_vars.violin_scat_colors,'SBJ')
             % Change scatter colors to mark SBJ
             violins(roi_ix).ViolinColor = [0.8 0.8 0.8];
             violins(roi_ix).BoxPlot.FaceColor = roi_colors{good_roi_map{cond_ix}(roi_ix)};

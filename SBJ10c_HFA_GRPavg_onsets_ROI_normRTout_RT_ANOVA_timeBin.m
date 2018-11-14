@@ -1,4 +1,4 @@
-function SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA_clustBin(SBJs,clust_id,stat_id,pipeline_id,an_id,roi_id,...
+function SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA_timeBin(SBJs,tbin_id,stat_id,pipeline_id,an_id,roi_id,...
                                                     atlas_id,gm_thresh,plt_id,save_fig,fig_vis,fig_filetype)
 % Load HFA analysis results for active and condition-differentiating
 %   epochs, plot a summary of those time period per electrode
@@ -21,10 +21,12 @@ addpath([root_dir 'PRJ_Stroop/scripts/']);
 addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
 
 %% Prep variables
-eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
-eval(['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m']);
-eval(['run ' root_dir 'PRJ_Stroop/scripts/clust_vars/' clust_id '_vars.m']);
-eval(['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m']);
+an_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m'];
+eval(an_vars_cmd);
+plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
+eval(plt_vars_cmd);
+stat_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m'];
+eval(stat_vars_cmd);
 
 % Get condition info
 [grp_lab, grp_colors, grp_style] = fn_group_label_styles(model_lab);
@@ -48,15 +50,11 @@ mean_RTs = zeros(size(SBJs));
 if strcmp(an_id(1:5),'HGm_S')
     error('tbin for stim locked needs more thinking!');
     event_lab = 'stim';
-%     peak_bins = [0.3 0.6 1 2];
 elseif strcmp(an_id(1:5),'HGm_R')
     event_lab = 'resp';
-%     peak_bins = [7 14 21 40; 7 14 21 40; 400 800 1200 2000];
 end
-if strcmp(clust_vars.k_method,'roi_match')
+if strcmp(tbin_id,'eqROI')
     n_tbins = numel(roi_list);
-else
-    error('n_tbins undefined for non roi_match');
 end
 
 % Cluster info
@@ -69,8 +67,11 @@ bin_colors = {[0 0 1], [0 1 1], [1 0 1], [1 0 0]};  %garish blue, cyan, magenta,
 
 %% Load Results
 % Set up onset counts
-all_onsets  = cell([numel(SBJs) n_tbins numel(cond_lab)]);
+all_onsets      = cell([numel(SBJs) n_tbins numel(cond_lab)]);
 sig_ch = cell([numel(SBJs) numel(cond_lab)]);
+if strcmp(plt_vars.violin_scat_colors,'ROI')
+    all_onset_rois  = cell([numel(SBJs) numel(roi_list) numel(cond_lab)]);
+end
 for sbj_ix = 1:numel(SBJs)
     SBJ = SBJs{sbj_ix};
     % Load variables
@@ -95,37 +96,23 @@ for sbj_ix = 1:numel(SBJs)
     % Get Time Bin and Sliding Window Parameters
     win_lim    = fn_sliding_window_lim(stat.time,win_len,win_step);
     win_center = round(mean(win_lim,2));
-    % Assume k_method = roi_match for now...
-%     if strcmp(tbin_id,'eqROI')  %!!! check for 1st 2 letters = 'eq'
-    % 4 ROIs = R time bins: -0.5, -0.1, 0.25, 0.6, 1.0
-    %   peak_bins = [7 14 21 40; 7 14 21 40; 400 800 1200 2000];
-    % 4 ROIs = R time bins: [0.3 0.6 1 2]
-    peak_bins = zeros([numel(cond_lab) n_tbins]);
-    for cond_ix = 1:numel(cond_lab)
-        if strcmp(cond_lab{cond_ix},'corr(RT)')
-            n_time = numel(stat.time);
-        else
-            n_time = numel(win_center);
-        end
+    if strcmp(tbin_id,'eqROI')  %!!! check for 1st 2 letters = 'eq'
+        % 4 ROIs = R time bins: -0.5, -0.1, 0.25, 0.6, 1.0
+        %   peak_bins = [7 14 21 40; 7 14 21 40; 400 800 1200 2000];
+        % 4 ROIs = R time bins: [0.3 0.6 1 2]
+        peak_bins = zeros([numel(cond_lab) n_tbins]);
+        for cond_ix = 1:numel(cond_lab)
+            if strcmp(cond_lab{cond_ix},'corr(RT)')
+                n_time = numel(stat.time);
+            else
+                n_time = numel(win_center);
+            end
 %             bin_step = ceil(n_time/n_tbins);% bin_step:bin_step:numel(win_center)
-        edges = linspace(0,n_time,n_tbins+1);   % n_tbins+1 to drop 0
-        peak_bins(cond_ix,:) = edges(2:end);    
-    end
-%     else
-%         error(['Unknown tbin_id: ' tbin_id]);
-%     end
-    
-    %% Load clusters
-    clust_fname = [SBJ_vars.dirs.proc SBJ '_' clust_id '_' stat_id '_' an_id '_' atlas_id '_' roi_id '.mat'];
-    tmp = load(clust_fname);
-    centroids = tmp.centroids; clusters = tmp.clusters;
-    clust_elec = tmp.elec;
-    
-    % Sort clusters by peak time
-    clust_bin = cell([numel(cond_lab) 1]);
-    for cond_ix = 1:numel(cond_lab)
-        [~,peak_time] = max(centroids{cond_ix},[],2);
-        [~,clust_bin{cond_ix}] = histc(peak_time,peak_bins(cond_ix,:));
+            edges = linspace(0,n_time,n_tbins+1);   % n_tbins+1 to drop 0
+            peak_bins(cond_ix,:) = edges(2:end);    
+        end
+    else
+        error(['Unknown tbin_id: ' tbin_id]);
     end
     
     %% Load ROI and GM/WM info
@@ -155,28 +142,26 @@ for sbj_ix = 1:numel(SBJs)
     for ch_ix = 1:numel(stat.label)
         % If elec matches roi_list and is in GM, get stats
         if any(strcmp(elec.roi{ch_ix},roi_list))% && gm_bin(ch_ix)
-            clust_elec_ix = strcmp(elec.label{ch_ix},clust_elec.label);
-            if ~any(clust_elec_ix)
-                error('trying to process elec that isnt in clusters');
-            end
-            
-%             roi_ix = find(strcmp(elec.roi{ch_ix},roi_list));
+            roi_ix = find(strcmp(elec.roi{ch_ix},roi_list));
             % Get ANOVA group onsets
-            for cond_ix = 1:numel(cond_lab)
-                % Assign cluster bin
-                clust_n = clusters(clust_elec_ix,cond_ix);
-                time_bin = clust_bin{cond_ix}(clust_n)+1;
-                
+            for cond_ix = 1:numel(cond_lab)               
                 % ANOVA conditions
                 if any(strcmp(cond_lab{cond_ix},grp_lab)) && any(squeeze(qvals(cond_ix,ch_ix,:))<0.05)
                     sig_ch{sbj_ix,cond_ix} = [sig_ch{sbj_ix,cond_ix} stat.label{ch_ix}];
                     sig_onsets = stat.time(win_lim(squeeze(qvals(cond_ix,ch_ix,:))<0.05,1));
+                    % Assign time bin by first onset
+                    time_bin = find(find(squeeze(qvals(cond_ix,ch_ix,:))<0.05,1)<=peak_bins(cond_ix,:),1);
                     if strcmp(event_lab,'resp')
                         all_onsets{sbj_ix,time_bin,cond_ix} = ...
                             [all_onsets{sbj_ix,time_bin,cond_ix} sig_onsets(1)];
                     elseif strcmp(event_lab,'stim') && (sig_onsets(1)<mean_RTs(sbj_ix))
                         all_onsets{sbj_ix,time_bin,cond_ix} = ...
                             [all_onsets{sbj_ix,time_bin,cond_ix} sig_onsets(1)];
+                    end
+                    % Grab ROI to plot individual scatter colors
+                    if strcmp(plt_vars.violin_scat_colors,'ROI')
+                        all_onset_rois{sbj_ix,time_bin,cond_ix}  = ...
+                            [all_onset_rois{sbj_ix,time_bin,cond_ix} roi_ix];
                     end
                     
                 % Get RT correlation onset
@@ -186,6 +171,8 @@ for sbj_ix = 1:numel(SBJs)
                     mask_chunks(squeeze(stat.mask(ch_ix,1,mask_chunks(:,1)))==0,:) = [];
                     % Convert the first onset of significance to time
                     onset_time = stat.time(mask_chunks(1,1));
+                    % Assign time bin by first onset
+                    time_bin = find(mask_chunks(1,1)<=peak_bins(cond_ix,:),1);
                     % Exclude differences after the mean RT for this SBJ
                     if strcmp(event_lab,'resp')
                         all_onsets{sbj_ix,time_bin,cond_ix} = ...
@@ -193,6 +180,11 @@ for sbj_ix = 1:numel(SBJs)
                     elseif strcmp(event_lab,'stim') && (onset_time<mean_RTs(sbj_ix))
                         all_onsets{sbj_ix,time_bin,cond_ix} = ...
                             [all_onsets{sbj_ix,time_bin,cond_ix} onset_time];
+                    end
+                    % Grab ROI to plot individual scatter colors
+                    if strcmp(plt_vars.violin_scat_colors,'ROI')
+                        all_onset_rois{sbj_ix,time_bin,cond_ix}  = ...
+                            [all_onset_rois{sbj_ix,time_bin,cond_ix} roi_ix];
                     end
                 end
             end
@@ -212,25 +204,30 @@ end
 
 %% Aggregate/Process onsets per gROI
 % Format as struct to fit violinplot
-plot_onsets    = cell([numel(cond_lab) 1]);
-plot_onset_sbj = cell([numel(cond_lab) 1]);
+plot_onsets     = cell([numel(cond_lab) 1]);
+plot_onset_scat = cell([numel(cond_lab) 1]);
 good_tbin_map   = cell([numel(cond_lab) 1]);
 for cond_ix = 1:numel(cond_lab)
     plot_onsets{cond_ix}  = {};
-    plot_onset_sbj{cond_ix}  = {};
+    plot_onset_scat{cond_ix}  = {};
     good_tbin_map{cond_ix} = zeros([1 n_tbins]);
     for time_bin = 1:n_tbins
         if strcmp(plt_vars.grp_metric,'all')
             plot_onsets{cond_ix}{time_bin} = [all_onsets{:,time_bin,cond_ix}]';
-            plot_onset_sbj{cond_ix}{time_bin} = [];
+            plot_onset_scat{cond_ix}{time_bin} = [];
         else
             plot_onsets{cond_ix}{time_bin} = [];
         end
         for sbj_ix = 1:numel(SBJs)
             % Aggregate onsets per ROI within each SBJ
             if strcmp(plt_vars.grp_metric,'all')
-                plot_onset_sbj{cond_ix}{time_bin} = [plot_onset_sbj{cond_ix}{time_bin};...
+                if strcmp(plt_vars.violin_scat_colors,'SBJ')
+                    plot_onset_scat{cond_ix}{time_bin} = [plot_onset_scat{cond_ix}{time_bin};...
                                                     repmat(sbj_ix,size(all_onsets{sbj_ix,time_bin,cond_ix}))'];
+                elseif strcmp(plt_vars.violin_scat_colors,'ROI')
+                    plot_onset_scat{cond_ix}{time_bin} = [plot_onset_scat{cond_ix}{time_bin};...
+                                                    all_onset_rois{sbj_ix,time_bin,cond_ix}'];
+                end
             elseif strcmp(plt_vars.grp_metric,'mdn')
                 plot_onsets{cond_ix}{time_bin} = [plot_onsets{cond_ix}{time_bin}; nanmedian(all_onsets{sbj_ix,time_bin,cond_ix})];
             elseif strcmp(plt_vars.grp_metric,'avg')
@@ -248,15 +245,15 @@ for cond_ix = 1:numel(cond_lab)
     plot_onsets{cond_ix} = padcat(plot_onsets{cond_ix}{:});
     [~,good_tbin_map{cond_ix}] = find(~all(isnan(plot_onsets{cond_ix}),1)==1);
     if strcmp(plt_vars.grp_metric,'all')
-        plot_onset_sbj{cond_ix} = padcat(plot_onset_sbj{cond_ix}{:});
+        plot_onset_scat{cond_ix} = padcat(plot_onset_scat{cond_ix}{:});
     end
 end
-save([root_dir 'PRJ_Stroop/data/tmp_onsets_sig_ch_' clust_id '.mat'],'-v7.3','sig_ch','plot_onsets','all_onsets');
+save([root_dir 'PRJ_Stroop/data/tmp_onsets_sig_ch_' tbin_id '.mat'],'-v7.3','sig_ch','plot_onsets','all_onsets');
 
 %% Plot GROI Results
 for cond_ix = 1:numel(cond_lab)
     % Create and format the plot
-    fig_name = ['GRP' plt_vars.grp_metric '_HFA_onsets_' cond_lab{cond_ix} '_' clust_id '_' roi_id '_' event_lab...
+    fig_name = ['GRP' plt_vars.grp_metric '_HFA_onsets_' cond_lab{cond_ix} '_' tbin_id '_' roi_id '_' event_lab...
         '_GM' num2str(gm_thresh) '_normRTout'];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.6],'Visible',fig_vis);
@@ -267,28 +264,42 @@ for cond_ix = 1:numel(cond_lab)
                             'ViolinAlpha',0.3);
                         
     % Adjust plot propeties
-    for time_bin = 1:numel(good_tbin_map{cond_ix})
-        if strcmp(plt_vars.violin_scat_colors,'SBJ')
-            % Change scatter colors to mark SBJ
-            violins(time_bin).ViolinColor = [0.8 0.8 0.8];
-            violins(time_bin).BoxPlot.FaceColor = bin_colors{good_tbin_map{cond_ix}(time_bin)};
-            violins(time_bin).EdgeColor = bin_colors{good_tbin_map{cond_ix}(time_bin)};
-            if sum(~isnan(plot_onsets{cond_ix}(:,good_tbin_map{cond_ix}(time_bin))))>1
-                scat_colors = zeros([numel(violins(time_bin).ScatterPlot.XData) 3]);
-                for sbj_ix = 1:numel(SBJs)
-                    scat_colors(plot_onset_sbj{cond_ix}(:,good_tbin_map{cond_ix}(time_bin))==sbj_ix,:) = repmat(SBJ_colors(sbj_ix,:),...
-                        sum(plot_onset_sbj{cond_ix}(:,good_tbin_map{cond_ix}(time_bin))==sbj_ix),1);
-                end
-                violins(time_bin).ScatterPlot.MarkerFaceColor = 'flat';   % Necessary for CData to work
-                violins(time_bin).ScatterPlot.MarkerEdgeColor = 'flat';   % Necessary for CData to work
-                violins(time_bin).ScatterPlot.CData = scat_colors;
-            else   % violin.MedianColor is plotted over only ScatterPlot point
-                violins(time_bin).MedianColor = ...
-                    SBJ_colors(plot_onset_sbj{cond_ix}(1,good_tbin_map{cond_ix}(time_bin)),:);
-            end
+    for bin_ix = 1:numel(good_tbin_map{cond_ix})
+        if strcmp(plt_vars.violin_scat_colors,'')
+            % No individual scatter colors, so change violin color to match time bin
+            violins(bin_ix).ViolinColor = bin_colors{good_tbin_map{cond_ix}(bin_ix)};
         else
-            % Change violin color to match ROI
-            violins(time_bin).ViolinColor = bin_colors{good_tbin_map{cond_ix}(time_bin)};
+            % Adjust properties to see individual scatter colors
+            violins(bin_ix).ViolinColor = [0.8 0.8 0.8];  % shaded region
+            violins(bin_ix).BoxPlot.FaceColor = bin_colors{good_tbin_map{cond_ix}(bin_ix)};
+            violins(bin_ix).EdgeColor = bin_colors{good_tbin_map{cond_ix}(bin_ix)};
+            % Plot individual scatter colors
+            if sum(~isnan(plot_onsets{cond_ix}(:,good_tbin_map{cond_ix}(bin_ix))))>1
+                scat_colors = zeros([numel(violins(bin_ix).ScatterPlot.XData) 3]);
+                if strcmp(plt_vars.violin_scat_colors,'SBJ')
+                    for sbj_ix = 1:numel(SBJs)
+                        scat_colors(plot_onset_scat{cond_ix}(:,good_tbin_map{cond_ix}(bin_ix))==sbj_ix,:) = repmat(SBJ_colors(sbj_ix,:),...
+                            sum(plot_onset_scat{cond_ix}(:,good_tbin_map{cond_ix}(bin_ix))==sbj_ix),1);
+                    end
+                elseif strcmp(plt_vars.violin_scat_colors,'ROI')
+                    for roi_ix = 1:numel(roi_list)
+                        scat_colors(plot_onset_scat{cond_ix}(:,good_tbin_map{cond_ix}(bin_ix))==roi_ix,:) = repmat(roi_colors{roi_ix},...
+                            sum(plot_onset_scat{cond_ix}(:,good_tbin_map{cond_ix}(bin_ix))==roi_ix),1);
+                    end
+                end
+                violins(bin_ix).ScatterPlot.MarkerFaceColor = 'flat';   % Necessary for CData to work
+                violins(bin_ix).ScatterPlot.MarkerEdgeColor = 'flat';   % Necessary for CData to work
+                violins(bin_ix).ScatterPlot.CData = scat_colors;
+            else
+                % only 1 point, so violin.MedianColor is plotted over only ScatterPlot point
+                if strcmp(plt_vars.violin_scat_colors,'SBJ')
+                    violins(bin_ix).MedianColor = ...
+                        SBJ_colors(plot_onset_scat{cond_ix}(1,good_tbin_map{cond_ix}(bin_ix)),:);
+                elseif strcmp(plt_vars.violin_scat_colors,'ROI')
+                    violins(bin_ix).MedianColor = ...
+                        roi_colors{plot_onset_scat{cond_ix}(1,good_tbin_map{cond_ix}(bin_ix))};                    
+                end
+            end
         end
     end
     

@@ -1,5 +1,5 @@
-plt_vars.plt_lim    = [-0.5 1];
-plt_vars.x_data     = [-0.5:0.025:1];
+plt_vars.plt_lim    = [0 1.5];
+plt_vars.x_data     = [0:0.025:1.5];
 plt_vars.x_step_sz  = 0.2;
 plt_vars.legend     = 0;
 plt_vars.legend_loc = 'northeast';
@@ -11,8 +11,8 @@ plt_vars.actv_height = 0.5;
 plt_vars.cond_color  = 'k';
 plt_vars.cond_width  = 2.5;
 
-plt_vars.grp_metric    = 'avg';
-plt_vars.violin_colors = 'ROI';
+plt_vars.grp_metric         = 'avg';
+plt_vars.violin_scat_colors = '';
 
 plt_vars.roi_width = 2;
 plt_vars.roi_color = 'k';
