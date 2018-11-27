@@ -29,6 +29,8 @@ end
 
 %% Process stat_id
 eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/clust_vars/' clust_id '_vars.m']);
+
 if strcmp(stat_id,'actv') || strcmp(stat_id,'CSE')
     cond_lab = stat_id;
 elseif strcmp(stat_id,'corrRT_CNI_pcon_WL200_WS50')
@@ -50,15 +52,40 @@ if exist(sig_report_fname)
 end
 sig_report = fopen(sig_report_fname,'a');
 
-% Cluster info
+%% Cluster info
 if strcmp(an_id(1:5),'HGm_S')
     event_lab = 'stim';
-    peak_bins = [0.3 0.6 1 2];
+    error('onsets for stim need more thought!');
 elseif strcmp(an_id(1:5),'HGm_R')
     event_lab = 'resp';
-    peak_bins = [7 14 21 40; 7 14 21 40; 400 800 1200 2000];
 end
 [roi_list, ~] = fn_roi_label_styles(roi_id);
+
+% Get Time Bin and Sliding Window Parameters
+eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJs{1} '_vars.m']);
+load(strcat(SBJ_vars.dirs.proc,SBJs{1},'_ANOVA_ROI_',stat_id,'_',an_id,'.mat'),'stat');
+win_lim    = fn_sliding_window_lim(stat.time,win_len,win_step);
+win_center = round(mean(win_lim,2));
+% 4 ROIs = R time bins: -0.5, -0.1, 0.25, 0.6, 1.0
+%   peak_bins = [7 14 21 40; 7 14 21 40; 400 800 1200 2000];
+% 4 ROIs = R time bins: [0.3 0.6 1 2]
+if strcmp(clust_vars.k_method,'roi_match')
+    n_tbins = numel(roi_list);
+else
+    error('n_tbins undefined for non roi_match');
+end
+peak_bins = zeros([numel(cond_lab) n_tbins]);
+for cond_ix = 1:numel(cond_lab)
+    if strcmp(cond_lab{cond_ix},'corr(RT)')
+        n_time = numel(stat.time);
+    else
+        n_time = numel(win_center);
+    end
+    edges = linspace(0,n_time,n_tbins+1);   % n_tbins+1 to drop 0
+    peak_bins(cond_ix,:) = edges(2:end);
+    peak_bins(cond_ix,end) = peak_bins(cond_ix,end)+1;  % histc will assign data on the edge to another bin
+end
+
 clust_names  = cell([1 numel(roi_list)]);
 for clust_ix = 1:numel(roi_list)
     clust_names{clust_ix} = ['C' num2str(clust_ix)];
@@ -249,7 +276,6 @@ for sbj_ix = 1:numel(SBJs)
     for e_ix = 1:numel(tmp.elec.label)
         tmp.elec.label{e_ix} = [SBJ '_' tmp.elec.label{e_ix}];
     end
-    
     
     % Sort clusters by peak time
     for cond_ix = 1:numel(cond_lab)

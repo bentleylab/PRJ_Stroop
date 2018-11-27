@@ -51,6 +51,7 @@ for sbj_ix = 1:numel(SBJs)
             tmp = load(elec_atlas_fname);
             elec{sbj_ix}.atlas_label = tmp.elec.atlas_label;
             elec{sbj_ix}.atlas_name = tmp.elec.atlas_name;
+            elec{sbj_ix}.hemi = tmp.elec.hemi;%!!! fix this! why IR32 is different?
         else
             elec_atlas_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,...
                 '_',view_space,reg_suffix,'_',atlas_id,tis_suffix,'.mat'];

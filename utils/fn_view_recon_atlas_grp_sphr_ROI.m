@@ -122,30 +122,29 @@ elec.roi       = all_roi_labels;    % appendsens strips that field
 elec.roi_color = all_roi_colors;    % appendsens strips that field
 
 %% Load brain recon
-% Load atlas to get mesh ROIs
-fprintf('Using atlas: %s\n',atlas_name);
-if strcmp(atlas_name,'DK')
-    atlas      = ft_read_atlas(SBJ_vars.recon.fs_DK); % Desikan-Killiany (+volumetric)
-    atlas.coordsys = 'acpc';
-elseif strcmp(atlas_name,'Dx')
-    atlas      = ft_read_atlas(SBJ_vars.recon.fs_Dx); % Destrieux (+volumetric)
-    atlas.coordsys = 'acpc';
-elseif strcmp(atlas_name,'Yeo7')
-    atlas = fn_read_atlas(atlas_name);
-    atlas.coordsys = 'mni';
-elseif strcmp(atlas_name,'Yeo17')
-    atlas = fn_read_atlas(atlas_name);
-    atlas.coordsys = 'mni';
-else
-    error(['atlas_name unknown: ' atlas_name]);
-end
-atlas.name = atlas_name;
+% % Load atlas to get mesh ROIs
+% fprintf('Using atlas: %s\n',atlas_name);
+% fsavg_dir = [root_dir 'PRJ_Stroop/data/atlases/freesurfer/fsaverage/'];
+% if strcmp(atlas_name,'DK')
+%     atlas      = ft_read_atlas([fsavg_dir 'fsaverage_aparc+aseg.mgz']); % Desikan-Killiany (+volumetric)
+%     atlas.coordsys = 'mni';
+% elseif strcmp(atlas_name,'Dx')
+%     atlas      = ft_read_atlas([fsavg_dir 'fsaverage_aparc.a2009s+aseg.mgz']); % Destrieux (+volumetric)
+%     atlas.coordsys = 'mni';
+% elseif strcmp(atlas_name,'Yeo7')
+%     atlas = fn_read_atlas(atlas_name);
+%     atlas.coordsys = 'mni';
+% elseif strcmp(atlas_name,'Yeo17')
+%     atlas = fn_read_atlas(atlas_name);
+%     atlas.coordsys = 'mni';
+% else
+%     error(['atlas_name unknown: ' atlas_name]);
+% end
+% atlas.name = atlas_name;
 
-% % Create volumetric mask of ROIs from fs parcellation/segmentation
-% atlas = ft_read_atlas([SBJ_dir 'freesurfer/mri/aparc+aseg.mgz']);
-% atlas.coordsys = 'acpc';
+% Create volumetric mask of ROIs from fs parcellation/segmentation
 % cfg = [];
-% cfg.inputcoord = 'acpc';
+% cfg.inputcoord = atlas.coordsys;
 % cfg.atlas = atlas;
 % cfg.roi = {'Right-Hippocampus', 'Right-Amygdala'};
 % mask_rha = ft_volumelookup(cfg, atlas);

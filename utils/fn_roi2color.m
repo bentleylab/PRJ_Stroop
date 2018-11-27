@@ -76,9 +76,9 @@ for r = 1:n_rois
             
             % OFC Subregions - yellows
         case 'mOFC'
-            RGB(r,:) = [255 215 0]./256;
+            RGB(r,:) = [56 108 176]./256;
         case 'lOFC'
-            RGB(r,:) = [255 255 0]./256;
+            RGB(r,:) = [56 108 176]./256;
             
             % Parietal - purples
         case 'IPL'

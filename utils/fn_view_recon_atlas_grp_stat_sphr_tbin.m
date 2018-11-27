@@ -29,6 +29,7 @@ end
 
 %% Process stat_id
 eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
+
 if strcmp(stat_id,'actv') || strcmp(stat_id,'CSE')
     cond_lab = stat_id;
 elseif strcmp(stat_id,'corrRT_CNI_pcon_WL200_WS50')
@@ -50,15 +51,40 @@ if exist(sig_report_fname)
 end
 sig_report = fopen(sig_report_fname,'a');
 
-% Cluster info
+%% Cluster info
 if strcmp(an_id(1:5),'HGm_S')
     event_lab = 'stim';
-    peak_bins = [0.3 0.6 1 2];
+    error('onsets for stim need more thought!');
 elseif strcmp(an_id(1:5),'HGm_R')
     event_lab = 'resp';
-    peak_bins = [7 14 21 40; 7 14 21 40; 400 800 1200 2000];
 end
 [roi_list, ~] = fn_roi_label_styles(roi_id);
+
+% Get Time Bin and Sliding Window Parameters
+eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJs{1} '_vars.m']);
+load(strcat(SBJ_vars.dirs.proc,SBJs{1},'_ANOVA_ROI_',stat_id,'_',an_id,'.mat'),'stat');
+win_lim    = fn_sliding_window_lim(stat.time,win_len,win_step);
+win_center = round(mean(win_lim,2));
+% 4 ROIs = R time bins: -0.5, -0.1, 0.25, 0.6, 1.0
+%   peak_bins = [7 14 21 40; 7 14 21 40; 400 800 1200 2000];
+% 4 ROIs = R time bins: [0.3 0.6 1 2]
+if strcmp(tbin_id,'eqROI')
+    n_tbins = numel(roi_list);
+else
+    error('unknown tbin_id');
+end
+peak_bins = zeros([numel(cond_lab) n_tbins]);
+for cond_ix = 1:numel(cond_lab)
+    if strcmp(cond_lab{cond_ix},'corr(RT)')
+        n_time = numel(stat.time);
+    else
+        n_time = numel(win_center);
+    end
+    edges = linspace(0,n_time,n_tbins+1);   % n_tbins+1 to drop 0
+    peak_bins(cond_ix,:) = edges(2:end);
+    peak_bins(cond_ix,end) = peak_bins(cond_ix,end)+1;  % histc will assign data on the edge to another bin
+end
+
 clust_names  = cell([1 numel(roi_list)]);
 for clust_ix = 1:numel(roi_list)
     clust_names{clust_ix} = ['C' num2str(clust_ix)];
@@ -84,6 +110,21 @@ elseif strcmp(atlas_id,'Yeo17')
 end
 atlas.name = atlas_id;
 % elec.elecpos_fs   = elec.elecpos;
+
+%% Load Onset Time Bins
+onsets_dir = [root_dir 'PRJ_Stroop/data/HFA_onsets/' stat_id '/' an_id '/'];
+onset_SBJs = load([onsets_dir 'onsets_' tbin_id '.mat'],'SBJs');
+if ~all(strcmp(onset_SBJs.SBJs,SBJs))
+    error('Mismatch in SBJs input and tbin onset list!');
+end
+load([onsets_dir 'onsets_' tbin_id '.mat'],'sig_ch','sig_ch_tbin');
+for sbj_ix = 1:numel(SBJs)
+    for cond_ix = 1:numel(cond_lab)
+        for ch_ix = 1:numel(sig_ch{sbj_ix,cond_ix})
+            sig_ch{sbj_ix,cond_ix}{ch_ix} = [SBJs{sbj_ix} '_' sig_ch{sbj_ix,cond_ix}{ch_ix}];
+        end
+    end
+end
 
 %% Load elec struct
 elec_sbj = cell([numel(SBJs) numel(cond_lab)]);
@@ -155,43 +196,6 @@ for sbj_ix = 1:numel(SBJs)
         elec_sbj{sbj_ix,cond_ix} = elec_sbj{sbj_ix,1};
     end
     
-    % Load Stats
-    % Determine options: {'actv','CI','RT','CNI','pcon'}
-    sig_ch = cell(size(cond_lab));
-    if strcmp(stat_id,'actv')
-        load([SBJ_vars.dirs.proc SBJ '_actv_ROI_' an_id '.mat'],'actv_ch');
-        sig_ch{1} = actv_ch;
-        clear actv_ch
-    elseif strcmp(stat_id,'CSE')
-        load([SBJ_vars.dirs.proc,SBJ,'_',stat_id,'_ROI_',an_id,'.mat'],'stat');
-        for ch_ix = 1:numel(stat.label)
-            if any(stat.mask(ch_ix,1,:))
-                sig_ch{1} = [sig_ch{1} stat.label(ch_ix)];
-            end
-        end
-        clear stat
-    else    % ANOVA
-        eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);        
-        f_name = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id '.mat'];
-        load(f_name,'stat','w2');
-        
-        % FDR correct pvalues for ANOVA
-        for ch_ix = 1:numel(stat.label)
-            pvals = squeeze(w2.pval(:,ch_ix,:));
-            [~, ~, ~, qvals] = fdr_bh(pvals);%,0.05,'pdep','yes');
-            
-            % Consolidate to binary sig/non-sig
-            for cond_ix = 1:numel(cond_lab)
-                if strcmp(cond_lab{cond_ix},'RT') && any(stat.mask(ch_ix,1,:))
-                    sig_ch{cond_ix} = [sig_ch{cond_ix} {[SBJs{sbj_ix} '_' stat.label{ch_ix}]}];
-                elseif any(strcmp(cond_lab{cond_ix},{'CNI','pcon'})) && any(qvals(cond_ix,:)<0.05,2)
-                    sig_ch{cond_ix} = [sig_ch{cond_ix} {[SBJs{sbj_ix} '_' w2.label{ch_ix}]}];
-                end
-            end
-        end
-        clear stat w2
-    end
-    
     % Select elecs in atlas ROIs and hemisphere to plot
     if ~plot_out
         atlas_in_elecs = {};
@@ -212,17 +216,17 @@ for sbj_ix = 1:numel(SBJs)
     fprintf(sig_report,'===============================================================\n');
     for cond_ix = 1:numel(cond_lab)
         fprintf(sig_report,'\t%s - %s  = %i / %i (%.02f) sig elecs:\n',SBJs{sbj_ix},cond_lab{cond_ix},...
-            numel(sig_ch{cond_ix}),numel(elec_sbj{sbj_ix,cond_ix}.label),...
-            100*numel(sig_ch{cond_ix})/numel(elec_sbj{sbj_ix,cond_ix}.label));
-        for sig_ix = 1:numel(sig_ch{cond_ix})
-            e_ix = find(strcmp(elec_sbj{sbj_ix,cond_ix}.label,sig_ch{cond_ix}{sig_ix}));
-            fprintf(sig_report,'%s - %s (%s)\n',sig_ch{cond_ix}{sig_ix},elec_sbj{sbj_ix,cond_ix}.atlas_label{e_ix},...
-                elec_sbj{sbj_ix,cond_ix}.hemi{e_ix});
+            numel(sig_ch{sbj_ix,cond_ix}),numel(elec_sbj{sbj_ix,cond_ix}.label),...
+            100*numel(sig_ch{sbj_ix,cond_ix})/numel(elec_sbj{sbj_ix,cond_ix}.label));
+        for sig_ix = 1:numel(sig_ch{sbj_ix,cond_ix})
+            e_ix = find(strcmp(elec_sbj{sbj_ix,cond_ix}.label,sig_ch{sbj_ix,cond_ix}{sig_ix}));
+            fprintf(sig_report,'%s - %s (%s), tbin = %i\n',sig_ch{sbj_ix,cond_ix}{sig_ix},elec_sbj{sbj_ix,cond_ix}.atlas_label{e_ix},...
+                elec_sbj{sbj_ix,cond_ix}.hemi{e_ix},sig_ch_tbin{sbj_ix,cond_ix}(sig_ix));
         end
         
         % Select sig elecs && elecs matching atlas
         % fn_select_elec messes up if you try to toss all elecs
-        good_elecs = intersect(intersect(atlas_in_elecs, hemi_in_elecs), sig_ch{cond_ix});
+        good_elecs = intersect(intersect(atlas_in_elecs, hemi_in_elecs), sig_ch{sbj_ix,cond_ix});
         if numel(intersect(elec_sbj{sbj_ix,cond_ix}.label,good_elecs))==0
             elec_sbj{sbj_ix,cond_ix} = {};
             good_sbj(sbj_ix,cond_ix) = false;
@@ -240,30 +244,16 @@ for sbj_ix = 1:numel(SBJs)
     end
     fprintf(sig_report,'===============================================================\n');
     
-    %% Load clusters and match
-    % contains: 'clust_data','clusters','centroids','dist_sums','distances','elec'
-    %   and maybe 'eva' if nCH criterion
-    clust_fname = [SBJ_vars.dirs.proc SBJ '_' clust_id '_' stat_id '_' an_id '_' atlas_id '_' roi_id '.mat'];
-    tmp = load(clust_fname);
-    % Update labels with SBJ name
-    for e_ix = 1:numel(tmp.elec.label)
-        tmp.elec.label{e_ix} = [SBJ '_' tmp.elec.label{e_ix}];
-    end
-    
-    
-    % Sort clusters by peak time
+    %% Match to tbin
     for cond_ix = 1:numel(cond_lab)
         if ~isempty(elec_sbj{sbj_ix,cond_ix})
             elec_sbj{sbj_ix,cond_ix}.tbin = zeros([numel(elec_sbj{sbj_ix,cond_ix}.label) 1]);
             for ch_ix = 1:numel(elec_sbj{sbj_ix,cond_ix}.label)
-                clust_e_ix = strcmp(elec_sbj{sbj_ix,cond_ix}.label{ch_ix},tmp.elec.label);
-                if ~any(clust_e_ix)
-                    error(['sig elec not foudn in clust elec! ' SBJ '-' elec_sbj{sbj_ix,cond_ix}.label{ch_ix}]);
+                sig_e_ix = strcmp(elec_sbj{sbj_ix,cond_ix}.label{ch_ix},sig_ch{sbj_ix,cond_ix});
+                if ~any(sig_e_ix)
+                    error(['sig elec not foudn in sig_ch! ' SBJ '-' elec_sbj{sbj_ix,cond_ix}.label{ch_ix}]);
                 end
-                [~,peak_time] = max(tmp.centroids{cond_ix},[],2);
-                [~,clust_bin] = histc(peak_time,peak_bins(cond_ix,:));
-                clust_n = tmp.clusters(clust_e_ix,cond_ix);
-                elec_sbj{sbj_ix,cond_ix}.tbin(ch_ix) = clust_bin(clust_n)+1;
+                elec_sbj{sbj_ix,cond_ix}.tbin(ch_ix) = sig_ch_tbin{sbj_ix,cond_ix}(sig_e_ix);
             end
             all_tbins{cond_ix} = [all_tbins{cond_ix}; elec_sbj{sbj_ix,cond_ix}.tbin];
         end
@@ -273,7 +263,7 @@ end
 
 % Combine elec structs
 elec = cell([numel(cond_lab) 1]);
-for cond_ix = 1:numel(cond_lab)
+for cond_ix = 1%:numel(cond_lab)
     elec{cond_ix} = ft_appendsens([],elec_sbj{good_sbj(:,cond_ix),cond_ix});
     elec{cond_ix}.roi       = all_roi_labels{cond_ix};    % appendsens strips that field
     elec{cond_ix}.roi_color = all_roi_colors{cond_ix};    % appendsens strips that field
@@ -316,9 +306,9 @@ end
 f = cell(size(cond_lab));
 for cond_ix = 1%:numel(cond_lab)
     if strcmp(stat_id,'actv') || strcmp(stat_id,'CSE')
-        plot_name = ['GRP_' stat_id '_' an_id];
+        plot_name = ['GRP_' tbin_id '_' stat_id '_' an_id];
     else
-        plot_name = ['GRP_ANOVA_' cond_lab{cond_ix} '_' stat_id '_' an_id];
+        plot_name = ['GRP_ANOVA_' cond_lab{cond_ix} '_' tbin_id '_' stat_id '_' an_id];
     end
     f{cond_ix} = figure('Name',plot_name);
     

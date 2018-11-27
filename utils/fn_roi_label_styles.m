@@ -33,15 +33,17 @@ switch roi_id
         labels = {'DLPFC','VLPFC','PM','aMCC','preSMA','SMA','daINS','vaINS','FO'};
         einfo_col = 2;
     case 'PAR'
-        labels = {'S1','SPL','IPL'};
+        labels = {'S1','SPL','IPL','Precuneus'};
+    case 'TMP'
+        labels = {'STS'};
     case 'LPFC'
         labels = {'FPC','DLPFC','VLPFC','PM','M1'};
         einfo_col = 2;
     case 'MPFC'
-        labels = {'ACC','preSMA','aMCC','SMA','pMCC','Precuneus'};
+        labels = {'ACC','preSMA','aMCC','SMA','pMCC'};
         einfo_col = 2;
     case 'INS'
-        labels = {'vaINS','daINS','FO','mINS','pINS','STS'};
+        labels = {'vaINS','daINS','FO','mINS','pINS'};
         einfo_col = 2;
     case 'OFC'
         labels = {'mOFC','lOFC'};

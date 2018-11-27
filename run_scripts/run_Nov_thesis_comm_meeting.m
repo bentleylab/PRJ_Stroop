@@ -34,12 +34,12 @@ for roi_ix = 1%:numel(roi_opts)
 %         for plt_ix = 1:numel(plt_opts{1})
             fprintf('roi: %s; an: %s; plt: %s\n',roi_opts{roi_ix},an_opts{an_ix},plt_opts{plt_ix}{plt_ix});
 %             % Violin Plots
-%             SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA_timeBin(SBJs,tbin_id,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
-%                                                     atlas_opts{roi_ix},gm_thresh,plt_opts{plt_ix}{plt_ix},1,'on',fig_filetype)
+            SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA_timeBin(SBJs,tbin_id,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
+                                                    atlas_opts{roi_ix},gm_thresh,plt_opts{plt_ix}{plt_ix},1,'on',fig_filetype)
 %             SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
 %                                                     atlas_opts{roi_ix},gm_thresh,plt_opts{an_ix}{plt_ix},1,'on',fig_filetype)
-            SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA_clustBin(SBJs,clust_id,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
-                                                    atlas_opts{roi_ix},gm_thresh,plt_opts{an_ix}{plt_ix},1,'on',fig_filetype)
+%             SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA_clustBin(SBJs,clust_id,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
+%                                                     atlas_opts{roi_ix},gm_thresh,plt_opts{an_ix}{plt_ix},1,'on',fig_filetype)
 %             % Pair differences
 %         SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
 %                                                     atlas_id,0,plt_opts{1}{2},save_fig,fig_vis)
@@ -53,6 +53,9 @@ end
 %% Plot group recon with mgROI
 fn_view_recon_atlas_grp_sphr(SBJs,pipeline_id,'v',0,'l','Dx','mgROI',0);
 fn_view_recon_atlas_grp_sphr(SBJs,pipeline_id,'v',0,'r','Dx','mgROI',0);
+fn_view_recon_atlas_grp_sphr(SBJs,pipeline_id,'v',0,'l','Dx','MPFC',0);
+fn_view_recon_atlas_grp_sphr(SBJs,pipeline_id,'v',0,'r','Dx','MPFC',0);
+% fn_view_recon_atlas_grp_sphr_ROI(SBJs, pipeline_id, 'v', 0, 'l', 'Dx', 'MPFC', '', 0);
 
 %% Plot CNI sig elecs
 stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
@@ -69,6 +72,7 @@ fn_view_recon_atlas_grp_stat_sphr(SBJs,pipeline_id,stat_id,an_opts{an_ix},'v',0,
 
 %% Plot binned clusters with sig CNI
 clust_id = 'kmeans_corr_nROI_itr1k';%'kmeans_corr_nCH_itr1k_srCmb',
+tbin_id     = 'eqROI';
 stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
 an_opts  = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
 hemi_opts = {'r','l'};
@@ -85,10 +89,12 @@ fig_vis  = 'on';
 save_fig = 0;
 an_ix = 2;
 
-fn_view_recon_atlas_grp_stat_sphr_clust(SBJs, pipeline_id, clust_id, stat_id, an_opts{an_ix}, ...
+% fn_view_recon_atlas_grp_stat_sphr_clust(SBJs, pipeline_id, clust_id, stat_id, an_opts{an_ix}, ...
+%                         reg_type, show_labels, 'r', atlas_id, roi_id, plot_out)
+% fn_view_recon_atlas_grp_stat_sphr_clust(SBJs, pipeline_id, clust_id, stat_id, an_opts{an_ix}, ...
+%                         reg_type, show_labels, 'l', atlas_id, roi_id, plot_out)
+fn_view_recon_atlas_grp_stat_sphr_tbin(SBJs, pipeline_id, tbin_id, stat_id, an_opts{an_ix}, ...
                         reg_type, show_labels, 'r', atlas_id, roi_id, plot_out)
-fn_view_recon_atlas_grp_stat_sphr_clust(SBJs, pipeline_id, clust_id, stat_id, an_opts{an_ix}, ...
-                        reg_type, show_labels, 'l', atlas_id, roi_id, plot_out)
 % for sbj_ix = 1:numel(SBJs)
 %     fn_view_recon_clust(SBJs{sbj_ix}, clust_id, stat_id, an_opts{an_ix}, atlas_id, roi_id,...
 %         'pat', '', show_labels, 'b', plot_out, plot_ns, plot_clusters, plot_recon, fig_vis, save_fig);%hemi_opts{hemi_ix}

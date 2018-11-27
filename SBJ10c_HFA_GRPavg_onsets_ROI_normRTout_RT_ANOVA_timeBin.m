@@ -67,8 +67,10 @@ bin_colors = {[0 0 1], [0 1 1], [1 0 1], [1 0 0]};  %garish blue, cyan, magenta,
 
 %% Load Results
 % Set up onset counts
-all_onsets      = cell([numel(SBJs) n_tbins numel(cond_lab)]);
-sig_ch = cell([numel(SBJs) numel(cond_lab)]);
+all_onsets  = cell([numel(SBJs) n_tbins numel(cond_lab)]);
+sig_ch      = cell([numel(SBJs) numel(cond_lab)]);
+sig_ch_tbin = cell([numel(SBJs) numel(cond_lab)]);
+sig_ch_onset = cell([numel(SBJs) numel(cond_lab)]);
 if strcmp(plt_vars.violin_scat_colors,'ROI')
     all_onset_rois  = cell([numel(SBJs) numel(roi_list) numel(cond_lab)]);
 end
@@ -147,10 +149,12 @@ for sbj_ix = 1:numel(SBJs)
             for cond_ix = 1:numel(cond_lab)               
                 % ANOVA conditions
                 if any(strcmp(cond_lab{cond_ix},grp_lab)) && any(squeeze(qvals(cond_ix,ch_ix,:))<0.05)
-                    sig_ch{sbj_ix,cond_ix} = [sig_ch{sbj_ix,cond_ix} stat.label{ch_ix}];
+                    sig_ch{sbj_ix,cond_ix} = [sig_ch{sbj_ix,cond_ix} stat.label(ch_ix)];
                     sig_onsets = stat.time(win_lim(squeeze(qvals(cond_ix,ch_ix,:))<0.05,1));
                     % Assign time bin by first onset
                     time_bin = find(find(squeeze(qvals(cond_ix,ch_ix,:))<0.05,1)<=peak_bins(cond_ix,:),1);
+                    sig_ch_tbin{sbj_ix,cond_ix} = [sig_ch_tbin{sbj_ix,cond_ix} time_bin];
+                    sig_ch_onset{sbj_ix,cond_ix} = [sig_ch_onset{sbj_ix,cond_ix} sig_onsets(1)];
                     if strcmp(event_lab,'resp')
                         all_onsets{sbj_ix,time_bin,cond_ix} = ...
                             [all_onsets{sbj_ix,time_bin,cond_ix} sig_onsets(1)];
@@ -166,13 +170,15 @@ for sbj_ix = 1:numel(SBJs)
                     
                 % Get RT correlation onset
                 elseif strcmp(cond_lab{cond_ix},'corr(RT)') && sum(squeeze(stat.mask(ch_ix,1,:)))>0
-                    sig_ch{sbj_ix,cond_ix} = [sig_ch{sbj_ix,cond_ix} stat.label{ch_ix}];
+                    sig_ch{sbj_ix,cond_ix} = [sig_ch{sbj_ix,cond_ix} stat.label(ch_ix)];
                     mask_chunks = fn_find_chunks(squeeze(stat.mask(ch_ix,1,:)));
                     mask_chunks(squeeze(stat.mask(ch_ix,1,mask_chunks(:,1)))==0,:) = [];
                     % Convert the first onset of significance to time
                     onset_time = stat.time(mask_chunks(1,1));
                     % Assign time bin by first onset
                     time_bin = find(mask_chunks(1,1)<=peak_bins(cond_ix,:),1);
+                    sig_ch_tbin{sbj_ix,cond_ix} = [sig_ch_tbin{sbj_ix,cond_ix} time_bin];
+                    sig_ch_onset{sbj_ix,cond_ix} = [sig_ch_onset{sbj_ix,cond_ix} onset_time];
                     % Exclude differences after the mean RT for this SBJ
                     if strcmp(event_lab,'resp')
                         all_onsets{sbj_ix,time_bin,cond_ix} = ...
@@ -248,7 +254,11 @@ for cond_ix = 1:numel(cond_lab)
         plot_onset_scat{cond_ix} = padcat(plot_onset_scat{cond_ix}{:});
     end
 end
-save([root_dir 'PRJ_Stroop/data/tmp_onsets_sig_ch_' tbin_id '.mat'],'-v7.3','sig_ch','plot_onsets','all_onsets');
+save_dir = [root_dir 'PRJ_Stroop/data/HFA_onsets/' stat_id '/' an_id '/'];
+if ~exist(save_dir,'dir')
+    mkdir(save_dir);
+end
+save([save_dir 'onsets_' tbin_id '.mat'],'-v7.3','SBJs','sig_ch','sig_ch_tbin','sig_ch_onset','plot_onsets','all_onsets');
 
 %% Plot GROI Results
 for cond_ix = 1:numel(cond_lab)

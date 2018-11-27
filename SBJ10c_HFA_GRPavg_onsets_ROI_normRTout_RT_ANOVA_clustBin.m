@@ -109,7 +109,8 @@ for sbj_ix = 1:numel(SBJs)
         end
 %             bin_step = ceil(n_time/n_tbins);% bin_step:bin_step:numel(win_center)
         edges = linspace(0,n_time,n_tbins+1);   % n_tbins+1 to drop 0
-        peak_bins(cond_ix,:) = edges(2:end);    
+        peak_bins(cond_ix,:) = edges(2:end);
+        peak_bins(cond_ix,end) = peak_bins(cond_ix,end)+1;  % histc will assign data on the edge to another bin
     end
 %     else
 %         error(['Unknown tbin_id: ' tbin_id]);
@@ -166,7 +167,7 @@ for sbj_ix = 1:numel(SBJs)
                 % Assign cluster bin
                 clust_n = clusters(clust_elec_ix,cond_ix);
                 time_bin = clust_bin{cond_ix}(clust_n)+1;
-                
+
                 % ANOVA conditions
                 if any(strcmp(cond_lab{cond_ix},grp_lab)) && any(squeeze(qvals(cond_ix,ch_ix,:))<0.05)
                     sig_ch{sbj_ix,cond_ix} = [sig_ch{sbj_ix,cond_ix} stat.label{ch_ix}];
