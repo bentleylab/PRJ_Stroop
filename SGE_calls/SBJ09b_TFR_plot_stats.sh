@@ -21,6 +21,6 @@ func_call="${FUNCTION}('${SBJ}', '${conditions}', '${pipeline_id}', '${an_id}', 
 echo ${SBJ}
 echo ${func_call}
 echo $$
-echo ${func_call} > NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}.m
-time matlab -nodesktop -nosplash -nodisplay < NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}.m
-rm NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}.m
+echo ${func_call} > NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}_${an_id}.m
+time matlab -nodesktop -nosplash -nodisplay < NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}_${an_id}.m
+rm NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}_${an_id}.m
