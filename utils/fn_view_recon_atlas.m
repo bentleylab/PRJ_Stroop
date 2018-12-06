@@ -9,6 +9,12 @@ function fn_view_recon_atlas(SBJ, pipeline_id, view_space, reg_type, show_labels
 %   show_labels [0/1] - plot the electrode labels
 %   hemi [str] - {'l', 'r', 'b'} hemisphere to plot
 %   plot_out [0/1] - exclude electrodes that don't match atlas or aren't in hemisphere
+%   atlas_name [str] - {'DK','Dx','Yeo7','Yeo17'}
+%   roi_style [str] - ROI grouping by which to color the atlas ROIs
+%       'gROI','mgROI','main3' - general ROIs (lobes or broad regions)
+%       'ROI','thryROI','LPFC','MPFC','OFC','INS' - specific ROIs (within these larger regions)
+%       'Yeo7','Yeo17' - colored by Yeo networks
+%       'tissue','tissueC' - colored by tisseu compartment, e.g., GM vs WM vs OUT
 
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
