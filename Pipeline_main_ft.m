@@ -146,7 +146,7 @@ SBJ03_RT_manual_adjustments(SBJ,b_ix,outlier_thresh,save_plot,save_trial_info)
 %  ========================================================================
 SBJ04_preproc(SBJ,pipeline_id)
 
-% Second visual cleaning
+%% Second visual cleaning
 load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
 bad_preclean = load(strcat(SBJ_vars.dirs.events,SBJ,'_bob_bad_epochs_preclean',block_suffix,'.mat'));
 bad_at = fn_convert_epochs_full2at(bad_preclean.bad_epochs,SBJ_vars.analysis_time{b_ix},...
