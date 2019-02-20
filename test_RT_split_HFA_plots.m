@@ -93,7 +93,7 @@ end
 split_cnt(:,end) = [];
 
 %% Plot Results
-fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/' conditions '/RT_split' num2str(RT_split)];
+fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/' conditions '/RT_split' num2str(RT_split) '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
@@ -117,7 +117,7 @@ cond_info.alpha      = repmat(plt_vars.errbar_alpha,[1 numel(cond_lab)]);
 for split_ix = 1:RT_split
     subplot(RT_split,1,split_ix);
     plot_info.ax     = gca;
-    plot_info.title  = ['spilt ix = ' num2str(split_ix) ', rt ratio = ' num2str(split_cnt(1,split_ix)/split_cnt(2,split_ix))];%[event_lab{set_ix} '-Locked'];
+    plot_info.title  = ['rts < ' num2str(split_cut(split_ix)) ', rt ratio = ' num2str(split_cnt(1,split_ix)/split_cnt(2,split_ix))];%[event_lab{set_ix} '-Locked'];
     plot_info.legend = 1;
     plot_info.x_lab  = hfa{1}.time(1):plt_vars.x_step_sz:hfa{1}.time(end);
     % Stimulus plotting params
