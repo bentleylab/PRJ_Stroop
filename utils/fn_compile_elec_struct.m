@@ -1,4 +1,4 @@
-function fn_compile_elec_struct(SBJ,pipeline_id,view_space,reg_type)
+function fn_compile_elec_struct(SBJ,pipeline_id,view_space,reg_type,reref)
 %% Compile ROI info (biggest changes are from single electrodes into bipolar pairs)
 %   Goes from smallest to largest (ELEC1-ELEC2, ELEC2-ELEC3, etc.)
 %   Pairs are drawn from imported data labels, then preprocessing logic is applied
@@ -8,6 +8,7 @@ function fn_compile_elec_struct(SBJ,pipeline_id,view_space,reg_type)
 %   pipeline_id [str] - name of analysis pipeline
 %   view_space [str] - {'pat','mni'} select patient native or mni group space
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
+%   reref [0/1] - apply preprocessing re-referencing?
 
 % Set up paths
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
@@ -43,6 +44,10 @@ elseif strcmp(view_space,'mni')
 else
     error(['Unknown view_space: ' view_space]);
 end
+if ~reref
+    elec_ext = [elec_ext '_orig'];
+end
+
 slash = strfind(elec_name,'/'); elec_suffix = elec_name(slash(end)+numel(SBJ)+2:end-4);
 tmp = load(elec_name);
 elec_var_name = fieldnames(tmp);
@@ -75,7 +80,11 @@ if numel(SBJ_vars.raw_file)>1
 else
     block_suffix = SBJ_vars.block_name{1};   % should just be ''
 end
-import_filename = [SBJ_vars.dirs.import SBJ '_',num2str(proc_vars.resample_freq),'hz',block_suffix,'.mat'];
+if any(SBJ_vars.low_srate)
+    import_filename = [SBJ_vars.dirs.import SBJ '_',num2str(SBJ_vars.low_srate(1)),'hz',block_suffix,'.mat'];
+else
+    import_filename = [SBJ_vars.dirs.import SBJ '_',num2str(proc_vars.resample_freq),'hz',block_suffix,'.mat'];
+end
 load(import_filename);
 
 % % Original (single electrode) labels
@@ -88,6 +97,7 @@ elec = fn_select_elec(cfg,elec);
 
 % Order them to match data.label
 elec = fn_reorder_elec(elec, data.label);
+SBJ_vars.ch_lab.probes = sort(SBJ_vars.ch_lab.probes);  %alphabetical, like preproc
 
 %% Apply montage per probe
 left_out_ch = {};
@@ -98,7 +108,7 @@ name_holder = cell([2 numel(SBJ_vars.ch_lab.probes)]);
 elec_reref  = cell([1 numel(SBJ_vars.ch_lab.probes)]);
 for d = 1:numel(SBJ_vars.ch_lab.probes)
     cfg = [];
-    cfg.channel = ft_channelselection(strcat(SBJ_vars.ch_lab.probes{d},'*'), data.label);
+    cfg.channel = ft_channelselection(strcat(SBJ_vars.ch_lab.probes{d},'*'), elec.label);
     probe_elec  = fn_select_elec(cfg,elec);
     %     probe_data = ft_selectdata(cfg,data);   % Grab data from this probe to plot in PSD comparison
     %     probe_data.elec = fn_elec_ch_select(elec,cfg.channel);
@@ -113,7 +123,7 @@ for d = 1:numel(SBJ_vars.ch_lab.probes)
     end
     
     % Create referencing scheme
-    if strcmp(SBJ_vars.ch_lab.ref_type{d},'BP')
+    if reref && strcmp(SBJ_vars.ch_lab.ref_type{d},'BP')
         cfg.montage.labelold = cfg.channel;
         [cfg.montage.labelnew, cfg.montage.tra, left_out_ch{d}] = fn_create_ref_scheme_bipolar(cfg.channel);
         cfg.updatesens = 'yes';
@@ -131,13 +141,9 @@ for d = 1:numel(SBJ_vars.ch_lab.probes)
     end
 end
 
-%% Recombine
+% Recombine
 cfg = [];
 elec = ft_appendsens(cfg,elec_reref{:});
-elec.type = 'ieeg';
-for e = 1:numel(elec.chantype)
-    elec.chantype{e} = elec_types{strcmp(elec.label{e},elec_labels)};
-end
 
 % Re-label any problematic channel labels
 if any(danger_name)
@@ -146,6 +152,30 @@ if any(danger_name)
             elec.label{strcmp(elec.label,name_holder{2,2}{s_ix})} = name_holder{1,d_ix}{s_ix};
         end
     end
+end
+
+% Remove non-ROI (bad) electrodes (shouldn't do anything if non-reref)
+cfgs = [];
+cfgs.channel = SBJ_vars.ch_lab.ROI;
+elec = fn_select_elec(cfgs,elec);
+
+%% Add Channel Types
+elec.type = 'ieeg';
+for e = 1:numel(elec.chantype)
+    elec.chantype{e} = elec_types{strcmp(elec.label{e},elec_labels)};
+end
+
+%% Add in L/R Hemisphere
+elec.hemi = repmat({'r'},size(elec.label));
+for e = 1:numel(elec.label)
+    if strfind(elec.label{e},'L')
+        elec.hemi{e} = 'l';
+    end
+end
+
+% Fix IR68 (only exception)
+if strcmp(SBJ,'IR68')
+    elec.hemi = repmat({'l'},size(elec.label));
 end
 
 %% Save data

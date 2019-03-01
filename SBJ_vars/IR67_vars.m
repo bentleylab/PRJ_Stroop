@@ -11,6 +11,7 @@ end
 SBJ_vars.SBJ = 'IR67';
 SBJ_vars.raw_file = {};%'IR75_raw_R1.mat'};
 SBJ_vars.block_name = {''};% there's a second block I don't want to process right now, so leaving blank here
+SBJ_vars.low_srate  = [500];
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -50,15 +51,13 @@ SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preo
 %--------------------------------------
 % Channel Selection
 %--------------------------------------
-%hdr = ft_read_header(SBJ_vars.dirs.raw_filename);
-%SBJ_vars.orig_n_ch = length(hdr.label);
-%SBJ_vars.orig_n_samples = hdr.nSamples;
-%SBJ_vars.orig_srate = hdr.Fs;
-%clear hdr;
-
-SBJ_vars.ch_lab.probes     = {'addPeriVentriculr!','RAM','RHH','RTH','LAM','LHH','LTH'};
-SBJ_vars.ch_lab.probe_type = {'blah','seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
-SBJ_vars.ch_lab.ref_type   = {'bs','BP','BP','BP','BP','BP','BP','BP'};
+SBJ_vars.ch_lab.probes     = {'RAM','RHH','RTH','RAC','ROF','RIN','RPC','RPT','RSM',...
+                              'LAM','LHH','LTH','LAC','LOF','LPL'};
+SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg',...
+                              'seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
+SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP',...
+                              'BP','BP','BP','BP','BP','BP','BP'};
+SBJ_vars.ch_lab.nlx        = [0,0,0,1,1,1,1,1,1,0,0,0,0,0,0];
 SBJ_vars.ch_lab.ROI        = {'ROF*','FOA*'};
 SBJ_vars.ch_lab.eeg_ROI    = {};
 SBJ_vars.ch_lab.wires      = {'mram','mrhh','mrth','mlam','mlhh','mlth'};
@@ -67,17 +66,26 @@ SBJ_vars.ch_lab.wire_ref   = {'','','','','','',''};
 SBJ_vars.ch_lab.wire_ROI   = {'all'};
 
 % SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
-SBJ_vars.ch_lab.suffix = '';    % after every channel except 'EDF Annotations'
-% SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
+% SBJ_vars.ch_lab.suffix = '';    % after every channel except 'EDF Annotations'
+SBJ_vars.ch_lab.mislabel = {{'RPC','RPC3'}};
+SBJ_vars.ch_lab.nlx_suffix   = '';
+SBJ_vars.ch_lab.nlx_nk_align = {'RAC8','RAC9'}; % {'RIN4','RIN5'};
+SBJ_vars.nlx_macro_inverted  = 1;
 
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     };
-SBJ_vars.ch_lab.eeg = {};
+% emodim .bad:
+%     'RSMA9','RSMA10','RPT10',...% out of brain
+%     'EKG',...% EKG
+%     'Mark1','Mark2','XREF',...% not real data
+%     'DC01','DC02','DC03','DC04','E','Events','GRND',...% not real data
+SBJ_vars.ch_lab.eeg = {'C3','C4','CZ','FZ','OZ'};
+SBJ_vars.ch_lab.eog = {'RUE','RLE','LLE','LUE'};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};
-SBJ_vars.ch_lab.eog = {};
 SBJ_vars.ch_lab.photod = {'PH_Diode'};
 SBJ_vars.ch_lab.mic    = {'Mic'};
+SBJ_vars.photo_inverted = 1;
 
 %--------------------------------------
 % Line Noise Parameters

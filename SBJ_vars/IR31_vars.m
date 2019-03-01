@@ -11,6 +11,7 @@ end
 SBJ_vars.SBJ = 'IR31';
 SBJ_vars.raw_file = {'2015111117_0005.besa'};
 SBJ_vars.block_name = {''};
+SBJ_vars.low_srate  = [0];
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -49,12 +50,6 @@ SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_post
 %--------------------------------------
 % Channel Selection
 %--------------------------------------
-%hdr = ft_read_header(SBJ_vars.dirs.raw_filename);
-%SBJ_vars.orig_n_ch = length(hdr.label);
-%SBJ_vars.orig_n_samples = hdr.nSamples;
-%SBJ_vars.orig_srate = hdr.Fs;
-%clear hdr;
-
 SBJ_vars.ch_lab.probes     = {'ROF','RAM','RHH','RTH','RAC','LAC','LOF','LIN','LAM','LHH'};
 SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
 SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
@@ -64,6 +59,7 @@ SBJ_vars.ch_lab.eeg_ROI    = {};
 SBJ_vars.ch_lab.prefix = 'POL ';    % only in the mni elec file, but doesn't hurt to add here
 SBJ_vars.ch_lab.suffix = '-Ref';    % only in the mni elec file, but doesn't hurt to add here
 
+SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'RHH7','RTH5','RTH6','RTH7',...%epileptic
     'RAC3',...% Noisy

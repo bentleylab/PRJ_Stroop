@@ -11,6 +11,7 @@ end
 SBJ_vars.SBJ = 'CP24';
 SBJ_vars.raw_file = {'CP24_Dec7_stroop_raw.mat','CP24_Dec9_stroop_R2_raw.mat'};%CP24_Dec7_stroop_raw.mat
 SBJ_vars.block_name = {'R1','R2'};
+SBJ_vars.low_srate  = [0,0];
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -49,15 +50,11 @@ SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preo
 %--------------------------------------
 % Channel Selection
 %--------------------------------------
-%hdr = ft_read_header(SBJ_vars.dirs.raw_filename);
-%SBJ_vars.orig_n_ch = length(hdr.label);
-%SBJ_vars.orig_n_samples = hdr.nSamples;
-%SBJ_vars.orig_srate = hdr.Fs;
-%clear hdr;
-
 SBJ_vars.ch_lab.probes     = {'RMT','RTO','RIHA','RIHP','ROF','RLF','LMT','LTO','LIHA','LIHP','LOF'};%,'LLFP','LLF'};
 SBJ_vars.ch_lab.probe_type = {'ecog','ecog','ecog','ecog','ecog','ecog','ecog','ecog','ecog','ecog','ecog'};
-SBJ_vars.ch_lab.ref_type   = {'CAR','CAR','CAR','CAR','CAR','CAR','CAR','CAR','CAR','CAR','CAR'};%,'CAR','CAR'};
+SBJ_vars.ch_lab.ref_type   = {'CARall','CARall','CARall','CARall','CARall','CARall',...
+                                'CARall','CARall','CARall','CARall','CARall'};
+%SBJ_vars.ch_lab.ref_type   = {'CAR','CAR','CAR','CAR','CAR','CAR','CAR','CAR','CAR','CAR','CAR'};%,'CAR','CAR'};
 SBJ_vars.ch_lab.ROI        = {'RIHA*','RIHP*','ROF*','RLF*','LIHA*','LIHP*','LOF*'};
 SBJ_vars.ch_lab.eeg_ROI    = {};
 
@@ -66,12 +63,23 @@ SBJ_vars.ch_lab.eeg_ROI    = {};
 %SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
 
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
+% emodim ref_exclude:
+%     'RTO3',...% still correlations about like EOG-ish channels
+%     'ROF1','ROF2','ROF3','LOF2','LOF3','LOF4',...% EOG big stuff, weak correlations
+%     'RTO6','RTO7',...% HF noise
+%     'RTO8'...% occassional spikes
+%     }; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'RLF2'...% epileptic
     'LLF*','LLFP*',...% noisy (on second amplifier)
     'DC01','DC04','E','EEG Mark1','EEG Mark2','-','Events/Markers'...% Not real data
     };
 % LLFP and LLF have massive noise, maybe can't save them
+% emodim .bad:
+%    'LTO2',...% spiking
+%    'RLF1','RLF2','RTO4',...% epileptic
+%    'LLF*','LLFP*',...% noisy (on second amplifier)
+%    'RTO1','RTO2',...% flat channels, no signal
 SBJ_vars.ch_lab.eeg = {};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};
 SBJ_vars.ch_lab.eog = {};

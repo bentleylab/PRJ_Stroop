@@ -11,6 +11,7 @@ end
 SBJ_vars.SBJ = 'IR69';
 SBJ_vars.raw_file = {'IR69_raw_R1.mat'};
 SBJ_vars.block_name = {'_R1'};% there's a second block I don't want to process right now, so leaving blank here
+SBJ_vars.low_srate  = [0, 0];
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -56,15 +57,20 @@ SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preo
 %SBJ_vars.orig_srate = hdr.Fs;
 %clear hdr;
 
-SBJ_vars.ch_lab.probes     = {'addPeriVentriculr!','RAM','RHH','RTH','LAM','LHH','LTH'};
-SBJ_vars.ch_lab.probe_type = {'blah','seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
-SBJ_vars.ch_lab.ref_type   = {'bs','BP','BP','BP','BP','BP','BP','BP'};
+SBJ_vars.ch_lab.probes     = {'RHH','RTH','ROF','RIN','FOA','FOP','LES'}; % 'RAM' was all bad
+SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
+SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP'};
 SBJ_vars.ch_lab.ROI        = {'ROF*','FOA*'};
 SBJ_vars.ch_lab.eeg_ROI    = {};
-SBJ_vars.ch_lab.wires      = {'mram','mrhh','mrth','mlam','mlhh','mlth'};
-SBJ_vars.ch_lab.wire_type  = {'su','su','su','su','su','su','su'};
-SBJ_vars.ch_lab.wire_ref   = {'','','','','','',''};
-SBJ_vars.ch_lab.wire_ROI   = {'all'};
+
+SBJ_vars.ch_lab.nlx          = [1,1,1,1,1,1,0,0];
+SBJ_vars.ch_lab.wires        = {'mram','mrhh','mrth','mrof','mfoa'};
+SBJ_vars.ch_lab.wire_type    = {'su','su','su','su','su'};
+SBJ_vars.ch_lab.wire_ref     = {'','','','',''};
+SBJ_vars.ch_lab.wire_ROI     = {'all'};
+SBJ_vars.ch_lab.nlx_suffix   = '_0002';
+SBJ_vars.ch_lab.nlx_nk_align = {'FOA3','FOA4'};
+SBJ_vars.nlx_macro_inverted  = 1;
 
 % SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
 SBJ_vars.ch_lab.suffix = '_0010';    % after every channel except 'EDF Annotations'
@@ -73,11 +79,25 @@ SBJ_vars.ch_lab.suffix = '_0010';    % after every channel except 'EDF Annotatio
 SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     };
-SBJ_vars.ch_lab.eeg = {};
+% emodim .bad:
+%     'RAM*',...%crazy bad
+%     'RHH1','RHH2','RHH3','RHH7',... % crazy bad
+%     'RTH1','RTH2','RTH5','RTH6','RTH7','RTH8',...%crazy bad
+%     'ROF3','ROF4','ROF8',...%crazy bad
+%     'RIN4','RIN5','RIN6','RIN7','RIN10',...% crazy bad
+%     'FOA7',... %crazy bad
+%     'FOP1','FOP2','FOP5','FOP6','FOP7',...% crazy bad
+%     'LES3','LES4','LES5',...%crazy bad
+%     'RHH8','FOA8','FOP8','FOP9','FOP10','LES8','LES9','LES10',... % out of brain
+%     'EKG',...% EKG
+%     'Mark1','Mark2','REF',...% not real data
+%     'DC01','DC02','DC03','DC04','E','GND','Events'...% not real data
+SBJ_vars.ch_lab.eeg = {'C3','C4','CZ','FZ','OZ'};
+SBJ_vars.ch_lab.eog = {'RUC','RLC','LLC','LUC'};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};
-SBJ_vars.ch_lab.eog = {};
 SBJ_vars.ch_lab.photod = {'Photo1'};
 SBJ_vars.ch_lab.mic    = {'Mic1'};
+SBJ_vars.photo_inverted = 1;
 
 %--------------------------------------
 % Line Noise Parameters
