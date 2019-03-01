@@ -91,9 +91,10 @@ for b_ix = 1:numel(SBJ_vars.raw_file)
         fprintf('============== Bandstop filtering %s, %s ==============\n',SBJ,SBJ_vars.raw_file{b_ix});
         cfg_bs = [];
         cfg_bs.continuous = 'yes';
-        cfg_bs.bsfilter = 'yes';
-        cfg_bs.bsfreq = bs_freq_lim;
-        cfg_bs.demean = 'yes';
+        cfg_bs.bsfilter   = 'yes';
+        cfg_bs.bsfreq     = bs_freq_lim;
+        cfg_bs.bsfiltord  = 2;
+        cfg_bs.demean     = 'yes';
         data = ft_preprocessing(cfg_bs, data);
     end
     
@@ -105,12 +106,12 @@ for b_ix = 1:numel(SBJ_vars.raw_file)
     
     % Save data labels
     raw_labels = data.label;
-    label_filename = strcat(SBJ_vars.dirs.import,SBJ,'_raw_labels',block_suffix,'.mat');
+    label_fname = strcat(SBJ_vars.dirs.import,SBJ,'_raw_labels',block_suffix,'.mat');
     % if raw_labels exit, load, compare, save if different
-    if ~exist(label_filename)
-        save(label_filename,'raw_labels');
+    if ~exist(label_fname)
+        save(label_fname,'raw_labels');
     else
-        error(strcat('ERROR: raw_labels filename already exists: ',label_filename));
+        warning(['WARNING: raw_labels filename already exists: ',label_fname,'\n NOT saving a new file...']);
     end
     
 end

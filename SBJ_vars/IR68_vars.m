@@ -11,6 +11,7 @@ end
 SBJ_vars.SBJ = 'IR68';
 SBJ_vars.raw_file = {'2018012413_0045.besa'};
 SBJ_vars.block_name = {''};
+SBJ_vars.low_srate  = [0];
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -49,12 +50,6 @@ SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preo
 %--------------------------------------
 % Channel Selection
 %--------------------------------------
-%hdr = ft_read_header(SBJ_vars.dirs.raw_filename);
-%SBJ_vars.orig_n_ch = length(hdr.label);
-%SBJ_vars.orig_n_samples = hdr.nSamples;
-%SBJ_vars.orig_srate = hdr.Fs;
-%clear hdr;
-
 SBJ_vars.ch_lab.probes     = {'LAM','LHH','LTH','AIN','MIN','PIN','LOF','LAC','LPC'};
 SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
 SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP','BP'};
@@ -65,7 +60,7 @@ SBJ_vars.ch_lab.eeg_ROI    = {'CZ'};
 %SBJ_vars.ch_lab.suffix = '';    % after every channel except 'EDF Annotations'
 %SBJ_vars.ch_lab.mislabel = {};
 
-%SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'LHH8','LHH9','LHH10','LTH8','LTH9','LTH10','LAM7','LAM9','LAM10',...% epileptic
     'AIN5','LPC6','LPC7',...% noisy

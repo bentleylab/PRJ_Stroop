@@ -98,7 +98,12 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     %% ========================================================================
     %   Step 5- Parse Event Traces into Behavioral Data
     %  ========================================================================
-    SBJ02_behav_parse(SBJ,b_ix,pipeline_id,1,1)
+    if proc_vars.resample_freq~=1000
+        error('ERROR!!! SBJ02_behav_parse assumes 1 kHz neural sampling rate!!!\n');
+    end
+    SBJ02_behav_parse(SBJ,b_ix,proc_vars.rt_bounds,1,1)
+    % Be sure to save the two figures coming from this function!
+    %   i.e., SBJ_photodiode_segmentation.fig & SBJ_events.fig
 end
 
 %% ========================================================================

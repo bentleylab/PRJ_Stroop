@@ -29,10 +29,6 @@ trial_info_auto_filename = strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_auto',bl
 load(trial_info_auto_filename);
 man_data = csvread(csv_filename,1,0);
 
-if trial_info.sample_rate~=1000
-    error('ERROR!!! sample_rate ~= 1000, so new trial_info sample idxs will be wrong!')
-end
-
 %% Calculate RTs, Differences
 % Remove ignore_trials to match length of lists
 if ~isempty(trial_info.ignore_trials)
@@ -54,7 +50,7 @@ fprintf('Trials remaining = %i (tossed %i)\n\n',sum(~isnan(resp_onset_man)),leng
 
 % Compute the difference in seconds
 rt_auto     = trial_info.response_time;
-rt_man      = resp_onset_man-trial_info.word_onset./1000;
+rt_man      = resp_onset_man-trial_info.word_onset./trial_info.sample_rate;
 dif         = rt_auto-rt_man;
 dif_mean    = nanmean(dif);
 dif_sd      = nanstd(dif);
@@ -79,8 +75,7 @@ end
 %% Identify worst discrepancies
 % Find worst trials
 % thresh = outlier_sd_thresh*std(dif);
-thresh = outlier_thresh;
-worst_dif_ix = find(abs(dif)>thresh);
+worst_dif_ix = find(abs(dif)>outlier_thresh);
 
 % Build info on worst trials
 worst_trials = NaN([length(worst_dif_ix),4]);       % block_n, trial_n, dif
@@ -97,7 +92,7 @@ worst_trials(:,2) = trial_info.trial_n(worst_dif_ix)-(trial_info.block_n(worst_d
 worst_trials(:,4) = dif(worst_dif_ix);
 %openfig(trigger_plot_filename);
 % disp(strcat('Threshold =',num2str(outlier_sd_thresh),' SDs = ',num2str(thresh),' ms'));
-disp(strcat('Threshold = ',num2str(thresh),' ms'));
+disp(strcat('Threshold = ',num2str(outlier_thresh),' ms'));
 if isempty(worst_trials)
     disp('All trials under threshold!');
 else
@@ -107,8 +102,8 @@ end
 
 %% Update trial_info, save results
 % Add all manual data to trial_info (without NaNs to keep all info for later)
-trial_info.resp_onset    = man_data(:,4).*1000;
-trial_info.response_time = man_data(:,4)-trial_info.word_onset./1000;
+trial_info.resp_onset    = man_data(:,4).*trial_info.sample_rate;
+trial_info.response_time = man_data(:,4)-trial_info.word_onset./trial_info.sample_rate;
 trial_info.error         = man_data(:,3);
 
 % Keep -1 RT info

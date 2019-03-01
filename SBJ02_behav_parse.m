@@ -1,8 +1,8 @@
-function SBJ02_behav_parse(SBJ, block, rt_window, plot_it, save_it)
+function SBJ02_behav_parse(SBJ, block, pipeline_id, plot_it, save_it)
 %
 % SBJ [str] -- uniquely identifies the subject, e.g., 'IR54'
 % block [int] -- index of which block of data should be analyzed
-% rt_window [two element array] -- earliest and latest response onset following the onset of the word presentation
+% pipeline_id [str] - name of the pipeline containing proc_vars struct
 % plot_it [0/1] -- optional. plot_it = 1 to plot detected events
 % save_it [0/1] -- whether to save output
 
@@ -15,6 +15,7 @@ else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtri
 % Import helper functions to Matlab path
 helper_function_dir_name = [root_dir 'PRJ_Stroop/scripts/utils/'];
 addpath(genpath(helper_function_dir_name));
+eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 if numel(SBJ_vars.raw_file)>1
@@ -23,23 +24,22 @@ else
     block_suffix = SBJ_vars.block_name{block};   % should just be ''
 end
 
-evnt_filename = [SBJ_vars.dirs.preproc SBJ '_evnt_clean',block_suffix,'.mat'];
-log_filename = [SBJ_vars.dirs.raw SBJ '_strooptask_log',block_suffix,'.txt'];
-wav_dir = [SBJ_vars.dirs.raw SBJ '_strooptask_wavfiles',block_suffix,'/'];
-%   create directory if needed
-output_dir = [SBJ_vars.dirs.events];
-output_filename = [output_dir SBJ '_trial_info_auto',block_suffix,'.mat'];
+evnt_fname = [SBJ_vars.dirs.preproc SBJ '_evnt_clean',block_suffix,'.mat'];
+log_fname  = [SBJ_vars.dirs.raw SBJ '_strooptask_log',block_suffix,'.txt'];
+wav_dir    = [SBJ_vars.dirs.raw SBJ '_strooptask_wavfiles',block_suffix,'/'];
+output_fname = [SBJ_vars.dirs.events SBJ '_trial_info_auto',block_suffix,'.mat'];
 
 %% Determine event onset sample points
-% Load preprocessing variables to get sampling rate
-% hdr = ft_read_header([SBJ_vars.dirs.import SBJ '_1000hz.mat']);
-% nrl_srate = SBJ_vars.resamp_freq;
-fprintf('WARNING!!! Assuming 1 kHz neural sampling rate!!!\n');
-nrl_srate = 1000;
+if any(SBJ_vars.low_srate)
+    nrl_srate = SBJ_vars.low_srate(b_ix);
+else
+    nrl_srate = proc_vars.resample_freq;
+end
+rt_window = proc_vars.rt_bounds;
 
 % Load input data
-fprintf('Loading %s\n',evnt_filename);
-load(evnt_filename);
+fprintf('Loading %s\n',evnt_fname);
+load(evnt_fname);
 n_channels = hdr.n_channels;
 n_samples = hdr.n_samples;
 s_rate = hdr.sample_rate;
@@ -66,6 +66,10 @@ else
     decimate_v = 1;
 end
 [~, ~, data_shades] = read_photodiode(data_photo_d, min_event_length, 4);  %4 different shades (con, inc, neu, bsln)
+if save_it
+    fig_fname = [SBJ_vars.dirs.events SBJ '_photo_segmentation.fig'];
+    saveas(gcf,fig_fname);
+end
 clear data_photo;
 
 % Diff to get edges which correspond to onsets and offsets
@@ -77,7 +81,7 @@ fprintf('\t\tFound %d trials in photodiode channel\n', length(word_onsets));
 %% Read in log file
 % Open file
 fprintf('\tReading log file\n');
-log_h = fopen(log_filename, 'r');
+log_h = fopen(log_fname, 'r');
 
 % Parse log file
 file_contents = textscan(log_h, '%d %d %s %s %s %s %f %f %f', 'HeaderLines', 5, 'Delimiter', '\t', 'MultipleDelimsAsOne', 1);
@@ -265,15 +269,15 @@ end
 
 %% Save results
 if save_it
-    save(output_filename, 'trial_info');
+    save(output_fname, 'trial_info');
 end
 
 %% Plot results
 if(plot_it ~= 0)
     figure;%('Position', [100 100 1200 800]);
+    hodl on;
     
     % Plot microphone data
-    
     plot_mic = data_mic_orig - mean(data_mic_orig);
     plot_mic = min(plot_mic,5*std(data_mic_orig));
     plot_mic = max(plot_mic,-5*std(data_mic_orig));
@@ -300,6 +304,10 @@ if(plot_it ~= 0)
         plot([trial_info.resp_onset(resp_n)/s_rate_ratio trial_info.resp_onset(resp_n)/s_rate_ratio]/s_rate,[-0.30 0.30],'g','LineWidth',2);
     end
     
+    if save_it
+        fig_fname = [SBJ_vars.dirs.events SBJ '_events.fig'];
+        saveas(gcf,fig_fname);
+    end
 end
 
 end
