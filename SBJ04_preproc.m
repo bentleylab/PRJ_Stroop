@@ -75,7 +75,7 @@ for b_ix = 1:numel(SBJ_vars.block_name)
         % CAR across all channels! (likely for CPMC data)
         cfg = [];
         cfg.reref      = 'yes';
-        cfg.refchannel = setdiff(data.label,SBJ_vars.ref_exclude);
+        cfg.refchannel = setdiff(data.label,SBJ_vars.ch_lab.ref_exclude);
         cfg.refmethod  = 'avg';
         cfg.updatesens = 'yes';
         data_reref = ft_preprocessing(cfg, data);
@@ -105,7 +105,7 @@ for b_ix = 1:numel(SBJ_vars.block_name)
             elseif strcmp(SBJ_vars.ch_lab.ref_type{d},{'CAR','CMR'})
                 left_out_ch{d} = {};    % CAR/CMR is applied to all channels
                 cfg.reref      = 'yes';
-                cfg.refchannel = setdiff(probe_data.label,SBJ_vars.ref_exclude);
+                cfg.refchannel = setdiff(probe_data.label,SBJ_vars.ch_lab.ref_exclude);
                 if strcmp(SBJ_vars.ch_lab.ref_type{d},'CMR')
                     cfg.refmethod  = 'median';
                 else

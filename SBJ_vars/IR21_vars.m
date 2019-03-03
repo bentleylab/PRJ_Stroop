@@ -59,7 +59,7 @@ SBJ_vars.ch_lab.eeg_ROI    = {};
 SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
 SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
 
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'RAH6','RAH7',...%epileptic
     'RC13','RC14','RC15','RC16',...%out of brain
@@ -68,7 +68,9 @@ SBJ_vars.ch_lab.bad = {...
     'E','LSh ','LLE','RSh','V1','V2','V3','V4','V5','V6','REF',...% Not real data
     'EKG','C16','EDF Annotations'...
     };
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
+% bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
+SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
+SBJ_vars.ch_lab.bad_code = [1 1 3 3 3 3 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
 SBJ_vars.ch_lab.eeg = {};
 SBJ_vars.ch_lab.eog = {};
 SBJ_vars.ch_lab.photod = {'DC01'};
