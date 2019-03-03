@@ -72,7 +72,7 @@ SBJ_vars.ch_lab.nlx_suffix   = '';
 SBJ_vars.ch_lab.nlx_nk_align = {'RAC8','RAC9'}; % {'RIN4','RIN5'};
 SBJ_vars.nlx_macro_inverted  = 1;
 
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     };
 % emodim .bad:

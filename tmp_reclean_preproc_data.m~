@@ -1,4 +1,4 @@
-SBJ = 'IR65';
+SBJ = 'IR68';
 pipeline_id = 'main_ft';
 
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
@@ -23,12 +23,7 @@ SBJ00b_view_preclean(SBJ,b_ix,0,'reorder',{},'bad_epochs','load');
 
 %%
 load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
-if exist([SBJ_vars.dirs.events SBJ '_colin_bad_epochs_preproc.mat'],'file')
-    load([SBJ_vars.dirs.events SBJ '_colin_bad_epochs_preproc.mat']);
-    preclean_ep_at = bad_epochs;
-else
-    preclean_ep_at = fn_compile_epochs_full2at(SBJ,pipeline_id);
-end
+preclean_ep_at = fn_compile_epochs_full2at(SBJ,pipeline_id);
 
 %% Plot data with bad_epochs highlighted
 load(strcat(root_dir,'emodim/scripts/utils/cfg_plot.mat'));

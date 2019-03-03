@@ -61,6 +61,7 @@ SBJ_vars.ch_lab.eeg_ROI    = {'CZ','FZ'};
 
 SBJ_vars.ch_lab.mislabel = {{'ROF19','ROF10'}};
 
+SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'RAM1','RAM2','RAM3','LHH1','LHH2','LHH3',...%epileptic
     'RMT1','LPC7','LPC8','LPC9',...%noisy/bad, also watch out for spread from LPC7-9 in LPC6,11
@@ -76,7 +77,6 @@ SBJ_vars.ch_lab.bad = {...
     };
 % edge of cortex: LOF1,ROF1,RMT8,LIN12,RSM8
 %     'LHH4',...%noisy in Kata's data
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.eeg = {'F3','FZ','F4','T3','T4','CZ','O1','O2','OZ','C3','C4'};
 SBJ_vars.ch_lab.CZ_lap_ref = {'C3','C4'};
 SBJ_vars.ch_lab.FZ_lap_ref = {'F3','F4'};

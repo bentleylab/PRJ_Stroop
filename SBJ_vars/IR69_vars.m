@@ -76,7 +76,7 @@ SBJ_vars.nlx_macro_inverted  = 1;
 SBJ_vars.ch_lab.suffix = '_0010';    % after every channel except 'EDF Annotations'
 % SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
 
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     };
 % emodim .bad:

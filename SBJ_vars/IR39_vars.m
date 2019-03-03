@@ -56,6 +56,7 @@ SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'}
 SBJ_vars.ch_lab.ROI        = {'RAC*','ROF*','RIN*','LOF*','LIN*','-RIN6-7'};%RIN6-7 tossed in variance rejection
 SBJ_vars.ch_lab.eeg_ROI    = {'CZ'};
 
+SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'LAM*','LHH1','LHH2','LHH3','LTH1','LTH2','LTH3','LTH10',...%Epileptic
     'RHH1','RHH2','RHH3','RTH2','RTH3','RTH4','RAM1','RAM2','RAM3','RAM6',...% Epileptic
@@ -65,7 +66,6 @@ SBJ_vars.ch_lab.bad = {...
     'E','V1',...% Not real data
     'EKG*'...
     };
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.eeg = {'C3','CZ','C4','FZ','OZ'};
 SBJ_vars.ch_lab.CZ_lap_ref = {'C3','C4'};
 SBJ_vars.ch_lab.eog = {'LSH','LLE','RSH'}; % lower left, upper right, ???

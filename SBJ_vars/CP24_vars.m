@@ -62,7 +62,7 @@ SBJ_vars.ch_lab.eeg_ROI    = {};
 %SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
 %SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
 
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 % emodim ref_exclude:
 %     'RTO3',...% still correlations about like EOG-ish channels
 %     'ROF1','ROF2','ROF3','LOF2','LOF3','LOF4',...% EOG big stuff, weak correlations

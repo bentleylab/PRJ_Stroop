@@ -70,7 +70,7 @@ SBJ_vars.ch_lab.wire_ROI   = {'all'};
 SBJ_vars.ch_lab.suffix = '_0007';    % after every channel except 'EDF Annotations'
 % SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
 
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     };
 SBJ_vars.ch_lab.eeg = {};

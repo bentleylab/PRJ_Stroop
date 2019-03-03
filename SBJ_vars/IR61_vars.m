@@ -57,7 +57,7 @@ SBJ_vars.ch_lab.ROI        = {'LOF*','LAC*','ROF*','RAC*','RAM4-5','RAM5-6',... 
                               'RHH5-6','RHH6-7'}; % RHH5,6 in inf. post. Insula, RHH7 WM nearby
 SBJ_vars.ch_lab.eeg_ROI    = {'CZ','FZ','FPZ'};
 
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'LAM1','LAM2','LHH1','LHH2','LHH3','LTH1','LTH2','RHH3','RHH4','RAM2','RTH2','RTH3',...%epileptic
     'LOF10','LAC10','RAM10','RHH1','RAC10','ROF10',...%out of brain

@@ -60,7 +60,7 @@ SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotatio
 SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
 SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
 
-SBJ_vars.ref_exclude = {'IHR27','IHR28','IHR18'}; %exclude from the CAR
+SBJ_vars.ch_lab.ref_exclude = {'IHR27','IHR28','IHR18'}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'FPG27','FPG28','FPG29','FPG35','FPG36','FPG37','FPG34',...%epileptic
     'FPG7','FPG25','FPG40',...%bad/noisy

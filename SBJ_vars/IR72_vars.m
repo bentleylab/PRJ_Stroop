@@ -62,7 +62,7 @@ SBJ_vars.ch_lab.eeg_ROI    = {'CZ'};
 %SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
 %SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
 
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'RPSM2','RPSM3',...% epileptic
     'LTH5','LTH6','LPT1','LHH2','LHH3','RHH2','RHH3','RHH4',...% noisy

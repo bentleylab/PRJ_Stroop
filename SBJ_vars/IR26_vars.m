@@ -53,24 +53,28 @@ SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_post
 SBJ_vars.ch_lab.probes     = {'RAM','RHP','ROF','RPC','LAM','LHP','LOF','LPC'};
 SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
 SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP'};
-SBJ_vars.ch_lab.ROI        = {'ROF*','RPC*','LOF*','LPC*'};
+SBJ_vars.ch_lab.ROI        = {'all'};%'ROF*','RPC*','LOF*','LPC*'};
 SBJ_vars.ch_lab.eeg_ROI    = {};
 
 SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
 SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
 %SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
 
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'RHP1','RHP2','RHP3',...% epileptic
     'LAM10','LAM11','LAM12','LAM13','LAM14','LPC6','LPC7','LPC8',...% out of brain
     'RPC7','RPC8','RPC9','RPC10','RPC11','RPC12','RPC13','RPC14',...% out of brain
-    'RAM8','RAM9','RAM10','RAM11','RAM12','RAM13','RAM14',...% out of brain
-    'RHP9','RHP9','RHP10','RHP11','RHP12','RHP13','RHP14',...% out of brain
+    'RAM7','RAM8','RAM9','RAM10','RAM11','RAM12',...% out of brain
+    'RHP8','RHP9','RHP10','RHP11','RHP12','RHP13','RHP14',...% out of brain
     'ROF8','ROF9','ROF10',...% out of brain
     'RSH','LSH','LLE','V1','V2','V3','V4','V5','V6',...% not real data
     'EDF Annotations','E','XREF','EKG','DC03','DC04'...% not real data
     };
+% bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
+SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
+SBJ_vars.ch_lab.bad_code = [1 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};
 SBJ_vars.ch_lab.eog = {};

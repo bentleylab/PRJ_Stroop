@@ -56,10 +56,10 @@ SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'}
 SBJ_vars.ch_lab.ROI        = {'RAC*','ROF*','LAC*','LOF*','LIN*'};
 SBJ_vars.ch_lab.eeg_ROI    = {};
 
-SBJ_vars.ch_lab.prefix = 'POL ';    % only in the mni elec file, but doesn't hurt to add here
-SBJ_vars.ch_lab.suffix = '-Ref';    % only in the mni elec file, but doesn't hurt to add here
+%SBJ_vars.ch_lab.prefix = 'POL ';    % only in the mni elec file, but doesn't hurt to add here
+%SBJ_vars.ch_lab.suffix = '-Ref';    % only in the mni elec file, but doesn't hurt to add here
 
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'RHH7','RTH5','RTH6','RTH7',...%epileptic
     'RAC3',...% Noisy
@@ -69,9 +69,12 @@ SBJ_vars.ch_lab.bad = {...
     'LAC6','LAC7','LAC8','LAC9','LAC10','LOF8','LOF9','LOF10','LAM7','LAM8','LAM9','LAM10',...%out of brain
     'DC03','DC04'....% Not real data
     'E','LSh ','LLE','RSh','V1','V2','V3','V4','V5','V6','REF',...% Not real data
-    'EKG*',...
+    'EKG',...
     };
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
+% bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
+SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
+SBJ_vars.ch_lab.bad_code = [1 1 1 1 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {};
 SBJ_vars.ch_lab.eog = {};
 SBJ_vars.ch_lab.photod = {'DC01'};

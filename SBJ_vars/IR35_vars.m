@@ -56,6 +56,7 @@ SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP',
 SBJ_vars.ch_lab.ROI        = {'RIN*','ROF*','LAC*','LOF*','LIN*','LPC*','-LPC6-7'};
 SBJ_vars.ch_lab.eeg_ROI    = {};
 
+SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'LHH1','LHH2','LHH3','RHH1','RHH2','RHH3','LTH3','LTH4',...%epileptic
     'LAC4',...%crazy strong noise
@@ -67,7 +68,6 @@ SBJ_vars.ch_lab.bad = {...
     'E','LSH','LLE','RSH','V1','V2','V3','V4','V5','V6','xREF',...% Not real data
     'EKG*'...
     };
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.eeg = {};
 SBJ_vars.ch_lab.eog = {};
 SBJ_vars.ch_lab.photod = {'DC01'};

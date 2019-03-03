@@ -54,22 +54,29 @@ SBJ_vars.ch_lab.probes     = {'RAM','RHH','RTH','RAC','ROF','LAM','LHH','LTH','L
 SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
 SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
 SBJ_vars.ch_lab.ROI        = {'RAC*','ROF*','LAC*','LOF*',...
-                              '-RAC3-4','-ROF1-2'};% rejected because of epileptic spread in preproc
+                              '-RAC3-4'};% rejected because of epileptic spread in preproc
                               % BEWARE: RAC6-7, LAC1-2, and some other channels like ROF2-3 have small spread...
 SBJ_vars.ch_lab.eeg_ROI    = {'CZ'};
 
-SBJ_vars.ch_lab.prefix = '';    % before every channel except 'EDF Annotations'
-SBJ_vars.ch_lab.suffix = '';    % after every channel except 'EDF Annotations'
-SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
+%SBJ_vars.ch_lab.prefix = '';    % before every channel except 'EDF Annotations'
+%SBJ_vars.ch_lab.suffix = '';    % after every channel except 'EDF Annotations'
+%SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
 
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'RHH1','RHH2','RHH3','RTH1','RTH2','RTH3','RTH4','RAM1','RAM2',...% epileptic
     'LHH4','LHH5','LAM1','LAM2','LAM3','LAM4',...% noisy, big ERP-like jumps
+    'RAM*','RTH5','RTH6','RHH4','RHH5',...%epileptic spread
+    'ROF1','ROF2',...%epileptic spread
+    'LAM10','RHH10',...% out of brain
     'AST*','PST*','AMG*','HH*','TH*',...% Not real data
     'C3-1','C4-1','CZ-1','OZ-1','FPZ','Z','LUE-1','LLE-1','RUE-1','RLE-1','EKG-1',...% Not real data
     'DC01','DC04','REF','EKG','GND','XREF'...% note real data
     };
+% bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
+SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
+SBJ_vars.ch_lab.bad_code = [1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 0 2 2 2 2 2 2 3 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {'FZ','CZ','C3','C4','OZ'};% copies of each of these plus FPZ and Z...
 % SBJ_vars.ch_lab.CZ_lap_ref = {};
 SBJ_vars.ch_lab.eog = {'LUE','LLE','RUE','RLE'};

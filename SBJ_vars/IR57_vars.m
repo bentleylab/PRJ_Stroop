@@ -61,6 +61,7 @@ SBJ_vars.ch_lab.ROI        = {'RSM*','RAC*','ROF*','RIN*','RTI*',...
                               '-LOF1-2','-RTI2-3','-RIN4-5'}; %these are rejected based on variance
 SBJ_vars.ch_lab.eeg_ROI    = {'CZ','FPZ'};
 
+SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'RHH1','RHH2','RHH3','RHH4','ROF1','RAM1','RTH1','RTH2',...%epileptic
     'LHH1','LHH2','LHH3','LHH4','LHH5','LHH6','LHH7','LHH8','LHH9','LHH10',...%epileptic
@@ -72,7 +73,6 @@ SBJ_vars.ch_lab.bad = {...
     'DC01','DC03','XREF','E',...% not real data
     'EKG'...
     };
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.eeg = {'FPZ' 'CZ' 'OZ' 'C3' 'C4' 'FP1' 'FP2' 'O1'};
 SBJ_vars.ch_lab.CZ_lap_ref = {'C3','C4'};
 SBJ_vars.ch_lab.FPZ_lap_ref = {'FP1','FP2'};

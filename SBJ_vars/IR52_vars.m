@@ -60,7 +60,7 @@ SBJ_vars.ch_lab.ROI        = {'RAC*','ROF*','RSMA*','RAIN*','RPIN*','RAM5-6','RA
                               '-LAC9-10'};% tossed after var_rejection
 SBJ_var.ch_lab.eeg_ROI     = {'CZ','FZ'};
 
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'LAM2','LAM3','LAM4','LHH2','LHH3',...%epileptic accoridng to Jack
     'RHH1','RHH2','RHH6','RAM3','RTH4','RTH5','LHH4','LTH3',...%epileptic according to Bob

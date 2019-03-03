@@ -5,7 +5,9 @@ function db_out = SBJ00b_view_preclean(SBJ,block_ix,keep_db_out,varargin)
 %   block_ix [int] - which block to plot
 %   keep_db_out [0/1] - return the output of ft_databrowser to save epochs
 %   varargin:
-%       bad_epochs [str or Nx2 int] - 'oa
+%       bad_epochs [str or Nx2 int] - 'load'; or [start stop] indices
+%       reorder [cell array] - either list of labels or {} for alphabetical
+%       ylim [1x2 int] - [min max] for ft_databrowser ylims
 % OUTPUTS:
 %   db_out [struct] - output of ft_databrowser if keep_db_out==1
 
@@ -113,8 +115,17 @@ load([SBJ_vars.dirs.preproc SBJ '_preclean' block_suffix '.mat']);
 junk_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.bad(SBJ_vars.ch_lab.bad_code==0));
 
 cfg = [];
-cfg.channel = {'all',junk_ch_neg{:},photod_ch_neg{:},mic_ch_neg{:}};
+cfg.channel = {'all','-EDF Annotations',junk_ch_neg{:},photod_ch_neg{:},mic_ch_neg{:}};
 data = ft_selectdata(cfg,data);
+
+% Name EEG/EOG to stick together, move to bottom of sort, add # if necessary for sorting
+for l = 1:numel(data.label)
+    if any(strcmp(data.label{l},SBJ_vars.ch_lab.eeg))
+        data.label{l} = ['zEEG0-' data.label{l}];
+    elseif any(strcmp(data.label{l},SBJ_vars.ch_lab.eog))
+        data.label{l} = ['zEOG0-' data.label{l}];
+    end
+end
 
 %% Reorder
 if exist('new_lab_order','var')
@@ -124,11 +135,10 @@ end
 %% Plotting Set up
 load([root_dir 'PRJ_Stroop/scripts/utils/cfg_plot.mat']);
 if exist('bad_epochs','var')
-    if ischar(bad_epochs) && strcmp(varargin{v+1},'load')
+    if ischar(bad_epochs) && strcmp(bad_epochs,'load')
         load([SBJ_vars.dirs.events SBJ '_bob_bad_epochs_preclean.mat']);
-    elseif size(varargin{v+1},2)==2
-        cfg_plot.artfctdef.visual.artifact = bad_epochs;
     end
+    cfg_plot.artfctdef.visual.artifact = bad_epochs;
 end
 if exist('y_lim','var')
     cfg_plot.ylim = y_lim;

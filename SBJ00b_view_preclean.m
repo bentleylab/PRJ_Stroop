@@ -118,6 +118,21 @@ cfg = [];
 cfg.channel = {'all','-EDF Annotations',junk_ch_neg{:},photod_ch_neg{:},mic_ch_neg{:}};
 data = ft_selectdata(cfg,data);
 
+% Name EEG/EOG to stick together, move to bottom of sort, add # if necessary for sorting
+for l = 1:numel(data.label)
+    if any(strcmp(data.label{l},SBJ_vars.ch_lab.eeg))
+        data.label{l} = ['zEEG0-' data.label{l}];
+    elseif any(strcmp(data.label{l},SBJ_vars.ch_lab.eog))
+        data.label{l} = ['zEOG0-' data.label{l}];
+    end
+end
+for l = 1:numel(SBJ_vars.ch_lab.eeg)
+    SBJ_vars.ch_lab.eeg{l} = ['zEEG0-' SBJ_vars.ch_lab.eeg{l}];
+end
+for l = 1:numel(SBJ_vars.ch_lab.eog)
+    SBJ_vars.ch_lab.eog{l} = ['zEOG0-' SBJ_vars.ch_lab.eog{l}];
+end
+
 %% Reorder
 if exist('new_lab_order','var')
     data = fn_reorder_data(data, new_lab_order);
