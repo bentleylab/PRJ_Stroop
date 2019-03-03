@@ -53,7 +53,7 @@ SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_post
 SBJ_vars.ch_lab.probes     = {'ROF','RAH','RC','LIN','LAH'};
 SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg'};
 SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP'};
-SBJ_vars.ch_lab.ROI        = {'ROF*','RC*','LIN*'};
+SBJ_vars.ch_lab.ROI        = {'all'};%'ROF*','RC*','LIN*'};
 SBJ_vars.ch_lab.eeg_ROI    = {};
 
 SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
@@ -61,16 +61,18 @@ SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotation
 
 SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
-    'RAH6','RAH7',...%epileptic
+    'RAH6','RAH7',...%epileptic source (reversal)
+    'RAH1','RAH2','RAH3','RAH4','RAH5','RAH8','RAH9','RAH10','RAH11','RAH12',...% epileptic spread
     'RC13','RC14','RC15','RC16',...%out of brain
-    'LIN16',...% strongest HF nois bursts; causes excessive variance rejection in derivative data
+    'LIN16',...% out of brain? strongest HF nois bursts; causes excessive variance rejection in derivative data
     'DC02','DC03'....% Not real data
     'E','LSh ','LLE','RSh','V1','V2','V3','V4','V5','V6','REF',...% Not real data
     'EKG','C16','EDF Annotations'...
     };
 % bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
 SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
-SBJ_vars.ch_lab.bad_code = [1 1 3 3 3 3 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+SBJ_vars.ch_lab.bad_code = [1 1 2 2 2 2 2 2 2 2 2 2 3 3 3 3 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {};
 SBJ_vars.ch_lab.eog = {};
 SBJ_vars.ch_lab.photod = {'DC01'};
