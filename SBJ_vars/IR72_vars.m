@@ -64,11 +64,16 @@ SBJ_vars.ch_lab.eeg_ROI    = {'CZ'};
 
 SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
-    'RPSM2','RPSM3',...% epileptic
+    'RPSM1','RPSM2','RPSM3',...% epileptic
     'LTH5','LTH6','LPT1','LHH2','LHH3','RHH2','RHH3','RHH4',...% noisy
+    'LHH8','LHH9','LHH10','LTH10','LAM10','LPC1','LOF1','RTH9',...%noisy and/or out of brain
     'LOF10','LASM9','LASM10','LPSM9','LPSM10','RTH10','RAM1',...% out of brain
     'REF','EKG','E','GRND','DC02','DC04'...% not real data
     };
+% bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
+SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
+SBJ_vars.ch_lab.bad_code = [1 1 2 2 2 2 2 2 2 2 3 3 3 3 3 2 2 3 3 3 3 3 3 3 3 0 0 0 0 0 0];
+if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {'FZ','CZ','OZ','C3','C4'};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};
 SBJ_vars.ch_lab.eog = {'LLC','LUC','RLC','RUC'};

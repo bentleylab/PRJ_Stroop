@@ -1,4 +1,4 @@
-SBJ = 'IR65';
+SBJ = 'IR74';
 pipeline_id = 'main_ft';
 
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
@@ -6,6 +6,14 @@ else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtri
 
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
+
+%%
+% fn_view_recon(SBJ, '', 'ortho', 'pat', '', 1, 'b', 1);
+load(SBJ_vars.recon.elec_pat);
+mri = ft_read_mri(SBJ_vars.recon.fs_T1);
+cfge = [];
+cfge.elec = elec_acpc_f;
+ft_electrodeplacement(cfge,mri);
 
 %%
 b_ix = 1;
