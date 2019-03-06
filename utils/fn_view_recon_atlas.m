@@ -99,22 +99,22 @@ end
 
 %% Load Atlas
 fprintf('Using atlas: %s\n',atlas_name);
-if strcmp(atlas_name,'DK')                  
-    atlas      = ft_read_atlas(SBJ_vars.recon.fs_DK); % Desikan-Killiany (+volumetric)
-    atlas.coordsys = 'acpc';
-elseif strcmp(atlas_name,'Dx')
-    atlas      = ft_read_atlas(SBJ_vars.recon.fs_Dx); % Destrieux (+volumetric)
-    atlas.coordsys = 'acpc';
-elseif strcmp(atlas_name,'Yeo7')
-    atlas = fn_read_atlas(atlas_name);
-    atlas.coordsys = 'mni';
-elseif strcmp(atlas_name,'Yeo17')
-    atlas = fn_read_atlas(atlas_name);
-    atlas.coordsys = 'mni';
-else
-    error(['atlas_name unknown: ' atlas_name]);
-end
-atlas.name = atlas_name;
+% if strcmp(atlas_name,'DK')                  
+%     atlas      = ft_read_atlas(SBJ_vars.recon.fs_DK); % Desikan-Killiany (+volumetric)
+%     atlas.coordsys = 'acpc';
+% elseif strcmp(atlas_name,'Dx')
+%     atlas      = ft_read_atlas(SBJ_vars.recon.fs_Dx); % Destrieux (+volumetric)
+%     atlas.coordsys = 'acpc';
+% elseif strcmp(atlas_name,'Yeo7')
+%     atlas = fn_read_atlas(atlas_name);
+%     atlas.coordsys = 'mni';
+% elseif strcmp(atlas_name,'Yeo17')
+%     atlas = fn_read_atlas(atlas_name);
+%     atlas.coordsys = 'mni';
+% else
+%     error(['atlas_name unknown: ' atlas_name]);
+% end
+% atlas.name = atlas_name;
 % elec.elecpos_fs   = elec.elecpos;
 
 %% Match elecs to atlas ROIs
@@ -123,13 +123,13 @@ if any(strcmp(atlas_name,{'DK','Dx','Yeo7'}))
     if strcmp(roi_style,'tissueC')
         elec.roi_color = fn_tissue2color(elec);
     elseif strcmp(atlas_name,'Yeo7')
-        elec.roi_color = fn_atlas2color(atlas.name,elec.roi);
+        elec.roi_color = fn_atlas2color(atlas_name,elec.roi);
     else
         elec.roi_color = fn_roi2color(elec.roi);
     end
 elseif any(strcmp(atlas_name,{'Yeo17'}))
     elec.roi       = elec.atlas_label;
-    elec.roi_color = fn_atlas2color(atlas.name,elec.roi);
+    elec.roi_color = fn_atlas2color(atlas_name,elec.roi);
 end
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)

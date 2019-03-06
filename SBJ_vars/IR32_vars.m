@@ -60,16 +60,23 @@ SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotatio
 SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
 SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
 
-SBJ_vars.ch_lab.ref_exclude = {'IHR27','IHR28','IHR18'}; %exclude from the CAR
+SBJ_vars.ch_lab.ref_exclude = {'FPG11','FPG12','FPG19','FPG30','FPG34','IHR20','IHR21','IHR28'}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
-    'FPG27','FPG28','FPG29','FPG35','FPG36','FPG37','FPG34',...%epileptic
+    'FPG27','FPG28','FPG29','FPG35','FPG36','FPG37',...%epileptic
     'FPG7','FPG25','FPG40',...%bad/noisy
-    'IHR20','IHR21','IHR30','IHR31',...% noisy
+    'AG5',...% bad channel, mirrors AG6 and negative corr with all others
     'DC03','DC04'....% Not real data
     'E','LSH','LLE','RSH','V1','V2','V3','V4','V5','V6','REF',...% Not real data
     'EDF Annotations','---(1)','---(2)','---(3)','---(4)','---(5)','---(6)',... % Not real data
-    'EKG*',...
+    'EKG*'
     };
+% shifted to ref_exclude:
+%     'FPG19','FPG34',...% epileptic spread
+%     'IHR20','IHR21','IHR30','IHR31',...% noisy
+% bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
+SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
+SBJ_vars.ch_lab.bad_code = [1 1 1 1 1 1 2 2 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {};
 SBJ_vars.ch_lab.eog = {};
 SBJ_vars.ch_lab.photod = {'DC01'};

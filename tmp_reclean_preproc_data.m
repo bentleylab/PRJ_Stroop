@@ -1,8 +1,12 @@
-SBJ = 'IR74';
+SBJ = 'IR32';
 pipeline_id = 'main_ft';
 
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+% addpath([root_dir 'PRJ_Stroop/scripts/']);
+% addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+% addpath(ft_dir);
+% ft_defaults
 
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
@@ -14,6 +18,9 @@ mri = ft_read_mri(SBJ_vars.recon.fs_T1);
 cfge = [];
 cfge.elec = elec_acpc_f;
 ft_electrodeplacement(cfge,mri);
+
+%%
+fn_view_recon_atlas(SBJ,'main_ft','pat','',1,'r','Dx','gROI',1);
 
 %%
 b_ix = 1;

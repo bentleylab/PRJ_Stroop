@@ -74,6 +74,9 @@ if isfield(SBJ_vars.ch_lab,'prefix')
     for bad_ix = 1:numel(SBJ_vars.ch_lab.bad)        
         SBJ_vars.ch_lab.bad{bad_ix} = [SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.bad{bad_ix}];
     end
+    for ref_ix = 1:numel(SBJ_vars.ch_lab.ref_exclude)
+        SBJ_vars.ch_lab.ref_exclude{ref_ix} = [SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.ref_exclude{ref_ix}];
+    end
     for eeg_ix = 1:numel(SBJ_vars.ch_lab.eeg)
         SBJ_vars.ch_lab.eeg{eeg_ix} = [SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.eeg{eeg_ix}];
     end
@@ -86,6 +89,9 @@ end
 if isfield(SBJ_vars.ch_lab,'suffix')
     for bad_ix = 1:numel(SBJ_vars.ch_lab.bad)
         SBJ_vars.ch_lab.bad{bad_ix} = [SBJ_vars.ch_lab.bad{bad_ix} SBJ_vars.ch_lab.suffix];
+    end
+    for ref_ix = 1:numel(SBJ_vars.ch_lab.ref_exclude)
+        SBJ_vars.ch_lab.ref_exclude{ref_ix} = [SBJ_vars.ch_lab.ref_exclude{ref_ix} SBJ_vars.ch_lab.suffix];
     end
     for eeg_ix = 1:numel(SBJ_vars.ch_lab.eeg)
         SBJ_vars.ch_lab.eeg{eeg_ix} = [SBJ_vars.ch_lab.eeg{eeg_ix} SBJ_vars.ch_lab.suffix];
