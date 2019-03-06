@@ -60,7 +60,10 @@ SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotatio
 SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
 SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
 
-SBJ_vars.ch_lab.ref_exclude = {'FPG11','FPG12','FPG19','FPG30','FPG34','IHR20','IHR21','IHR28'}; %exclude from the CAR
+SBJ_vars.ch_lab.ref_exclude = {
+    'FPG11','FPG12','FPG19','FPG30','FPG34','IHR20','IHR21','IHR28',...%siking spread
+    'FPG2','FPG3','FPG4','FPG20','FPG21','FPG22'...% mu rhythm
+    }; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'FPG27','FPG28','FPG29','FPG35','FPG36','FPG37',...%epileptic
     'FPG7','FPG25','FPG40',...%bad/noisy
