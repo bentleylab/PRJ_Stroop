@@ -1,11 +1,10 @@
-function SBJ08b_HFA_plot_SR_stack_cond_saved(SBJ,conditions,an_id_s,an_id_r,actv_win,...
+function SBJ08b_HFA_plot_SR_stack_cond_saved(SBJ,conditions,an_id_s,an_id_r,...
                                         plt_id,save_fig,fig_vis,fig_filetype)
 % Plots single trial stack for both stimulus- and response-locked HFA computed in SBJ08a_HFA_actv
 %   sorts by condition, then by RT; scatter for RTs in stim-locked
 % clear all; %close all;
 
 if ischar(save_fig); save_fig = str2num(save_fig); end
-if isnumeric(actv_win); actv_win = num2str(actv_win); end
 
 %% Data Preparation
 % Set up paths
