@@ -31,7 +31,7 @@ for t = 1:numel(filt_s.trial)
     filt_r.time{t} = new_time;
     [~, beg_ix] = min(abs(filt_s.time{t}-(rt(t)+trial_lim_sec(1))));
     [~, end_ix] = min(abs(filt_s.time{t}-(rt(t)+trial_lim_sec(2))));
-    filt_r.trial{t} = filt_s.trial{1}(:,beg_ix:end_ix);
+    filt_r.trial{t} = filt_s.trial{t}(:,beg_ix:end_ix);
 end
 
 end

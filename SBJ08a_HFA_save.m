@@ -42,32 +42,34 @@ elseif any(strcmp(HFA_type,{'broadband','hilbert'}))
     % add 250 ms as a rule of thumb, or onger if necessary
     pad_len = 0.5*max([1/min(fois)*3 0.25]);
 end
-% Add extra 10 ms just because trimming back down to trial_lim_s exactly leave
+% Cut data to bsln_lim to be consistent across S and R locked (confirmed below)
+%   Add extra 10 ms just because trimming back down to trial_lim_s exactly leave
 %   one NaN on the end (smoothing that will NaN out everything)
-trial_lim_s_pad = [trial_lim_s(1)-pad_len trial_lim_s(2)+pad_len+0.01];
-%!!! BEWARE: This is suboptimal for R-locked because trial_lim_s(1)=-0.5,
-%which adds 250ms to the time series that isn't necessary; the realign_tfr
-%function should still cut to the desired data, but it'll take longer.
+trial_lim_s_pad = [min(bsln_lim)-pad_len trial_lim_s(2)+pad_len+0.01];
 
 % Always normalize to pre-stimulus baseline for HFA
 bsln_events = trial_info.word_onset;
 if strcmp(event_type,'stim')
+    % Check that baseline will be included in data cut to trial_lim_s
+    if trial_lim_s(1) < bsln_lim(1)
+        error(['ERROR: trial_lim_s does not include bsln_lim for an_id = ' an_id]);
+    end
     % Cut to desired trial_lim_s
     roi_trl = fn_ft_cut_trials_equal_len(roi,bsln_events,trial_info.condition_n',...
         round(trial_lim_s_pad*roi_fsample));
 elseif strcmp(event_type,'resp')
-    % Check that baseline will be included in trial_lim_s
-    if trial_lim_s(1)>bsln_lim(1)
+    % Check that baseline will be included in data cut to trial_lim_s
+    if trial_lim_s(1)+min(trial_info.response_time) < bsln_lim(1)
         error(['ERROR: trial_lim_s does not include bsln_lim for an_id = ' an_id]);
     end
-    % Cut out to max_RT+trial_lim_s(2)+max(cfg_hfa.t_ftimwin)
+    % Cut to max_RT+trial_lim_s(2) to include S baseline + full R-locked trial_lim_s
     max_RT  = max(trial_info.response_time);
     roi_trl = fn_ft_cut_trials_equal_len(roi,bsln_events,trial_info.condition_n',...
         round([trial_lim_s_pad(1) max_RT+trial_lim_s_pad(2)]*roi_fsample));
 else
     error(['Unknown event_type: ' event_type]);
 end
-clear roi;
+% clear roi;
 
 %% Compute HFA
 fprintf('===================================================\n');
@@ -82,6 +84,7 @@ elseif strcmp(HFA_type,'hilbert')
     orig_lab = roi_trl.label;
     for f_ix = 1:numel(fois)
         cfg_hfa.bpfreq = bp_lim(f_ix,:);
+        cfg_hfa.hilbert = 'abs';
         fprintf('\n------> %s filtering: %.03f - %.03f\n', HFA_type, bp_lim(f_ix,1), bp_lim(f_ix,2));
         hfas{f_ix} = ft_preprocessing(cfg_hfa,roi_trl);
         hfas{f_ix}.label = strcat(hfas{f_ix}.label,[':' num2str(fois(f_ix),4)]);
@@ -100,9 +103,12 @@ end
 
 % Trim back down to original trial_lim_s to exclude NaNs
 cfg_trim = [];
-cfg_trim.latency = trial_lim_s;
-if strcmp(event_type,'resp')
-    cfg_trim.latency(2) = max_RT+trial_lim_s(2);
+if strcmp(event_type,'stim')
+    cfg_trim.latency = trial_lim_s;
+elseif strcmp(event_type,'resp') && strcmp(bsln_evnt,'stim')
+    cfg_trim.latency = [bsln_lim(1) max_RT+trial_lim_s(2)];
+else
+    error('mismatched R-locked without S-locked baseline!');
 end
 hfa = ft_selectdata(cfg_trim,hfa);
 hfa_tmp = ft_selectdata(cfg_trim,hfa_tmp);
@@ -177,15 +183,15 @@ if strcmp(HFA_type,'multiband')
     hfa = ft_selectdata(cfg_avg,hfa);
 elseif strcmp(HFA_type,'hilbert')
     hfa_tmp.label = orig_lab;
-    lab_ix = 1;
-    ch_check = zeros(size(hfa.label));
+%     lab_ix = 1;
+%     ch_check = zeros(size(hfa.label));
     for ch_ix = 1:numel(hfa_tmp.label)
         ch_lab_ix = find(~cellfun(@isempty,strfind(hfa.label,hfa_tmp.label{ch_ix})));
-        ch_check(ch_lab_ix) = ch_check(ch_lab_ix)+ch_ix;
+%         ch_check(ch_lab_ix) = ch_check(ch_lab_ix)+ch_ix;
         for t_ix = 1:numel(hfa_tmp.trial)
             hfa_tmp.trial{t_ix}(ch_ix,:) = mean(hfa.trial{t_ix}(ch_lab_ix,:),1);
         end
-        lab_ix = ch_lab_ix(end)+1;
+%         lab_ix = ch_lab_ix(end)+1;
     end
     hfa = hfa_tmp; clear hfa_tmp;
 end
