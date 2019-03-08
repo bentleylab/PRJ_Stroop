@@ -59,15 +59,23 @@ SBJ_vars.ch_lab.eeg_ROI    = {};
 SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'LHH1','LHH2','LHH3','RHH1','RHH2','RHH3','LTH3','LTH4',...%epileptic
+    'LAM1','LAM2','LAM3','LAM4','LHH4',...%epileptic spread
+    'RAM1','RAM2','RAM3','RAM4','RAM5','RHH4','RTH1','RTH2','RTH3','RTH4',...% epileptic spread
     'LAC4',...%crazy strong noise
     'RIN10','LAM8','LAM9','LAM10','LPC9','LPC10','LHH9','LHH10',...%out of brain
-    'LTH1','LTH10','ROF8','ROF9','ROF10','RTH8','RTH9','RTH10',...%out of brain
+    'LTH1','LTH10','ROF9','ROF10','RTH8','RTH9','RTH10',...%out of brain
     'RHH7','RHH8','RHH9','RHH10','RAM9','RAM10','LIN10',...%out of brain
-    'LOF1','LOF8','LOF9','LOF10','LAC11','LAC12',...%out of brain
+    'LOF9','LOF10','LAC12',...%out of brain
     'NULL','NULL-1','NILL','NULL-2','DC03','DC04'....% Not real data
     'E','LSH','LLE','RSH','V1','V2','V3','V4','V5','V6','xREF',...% Not real data
     'EKG*'...
     };
+    %   'LOF1','LAC11','LOF8','ROF8','LIN9' used to be "out of brain" but are edge cases I'm bringing back
+% bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
+SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
+SBJ_vars.ch_lab.bad_code = [1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 ...
+        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {};
 SBJ_vars.ch_lab.eog = {};
 SBJ_vars.ch_lab.photod = {'DC01'};

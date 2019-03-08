@@ -58,14 +58,29 @@ SBJ_vars.ch_lab.eeg_ROI    = {'CZ'};
 
 SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
-    'LAM*','LHH1','LHH2','LHH3','LTH1','LTH2','LTH3','LTH10',...%Epileptic
-    'RHH1','RHH2','RHH3','RTH2','RTH3','RTH4','RAM1','RAM2','RAM3','RAM6',...% Epileptic
-    'RIN10','ROF10','LIN3','LOF1','LOF10','LIN10','ROF10','LHH10',...%noisy or out of brain
+    'LAM1','LAM2','LAM3','LAM4','LAM5','LAM6','LAM7',...%epileptic + spread
+    'LHH1','LHH2','LHH3','LHH4','LHH5','LHH6',...%epileptic + spread
+    'LTH1','LTH2','LTH3','LTH4','LTH5','LTH6',...%Epileptic + spread
+    'RHH1','RHH2','RHH3','RHH4','RHH5',...% epileptic + spread
+    'RTH2','RTH3','RTH4','RTH5',...% epileptic + spread
+    'RAM1','RAM2','RAM3','RAM4','RAM5',...% Epileptic + spread
+    'LIN3','RIN9',...%noisy/loose
+    'LAM10','LTH10','RHH10',...%noisy and close but not quite out of brain
+    'RAC9','ROF9','RTH10',...% in dura pretty much out
+    'RAC10','RIN10','ROF10','LOF10','LIN8','LIN9','LIN10','LHH10',...%noisy AND out of brain
     'PMF*','AMF*','OF*','AT*','PT*','AD*','HD*','DC03','DC04',....% Not real data
     'LT1','LT2','LT3','LT4','LT5','LT6',...% Not real data, using 'LT*' tosses LTH elecs too
     'E','V1',...% Not real data
     'EKG*'...
     };
+% original notes:
+%   LOF1 was tossed because original notes said out (it's very clearly in)
+%   LAM8, LAM9 were tossed indiscriminately with LAM* before
+% bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
+SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
+SBJ_vars.ch_lab.bad_code = [1 1 1 2 2 2 2 1 1 1 2 2 2 1 1 1 2 2 2 1 1 1 2 2 1 1 1 2 1 1 1 2 2 2 2 2 2 2 2 2 2 ...
+            3 3 3 3 3 3 3 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {'C3','CZ','C4','FZ','OZ'};
 SBJ_vars.ch_lab.CZ_lap_ref = {'C3','C4'};
 SBJ_vars.ch_lab.eog = {'LSH','LLE','RSH'}; % lower left, upper right, ???

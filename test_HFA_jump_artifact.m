@@ -1,6 +1,6 @@
 %% test filtering interactions for the jump in HFA
 SBJ = 'IR31';
-eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
 import = load([SBJ_vars.dirs.import SBJ '_1000hz.mat']);
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
 

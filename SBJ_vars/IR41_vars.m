@@ -67,16 +67,21 @@ SBJ_vars.ch_lab.bad = {...
     'RMT1','LPC7','LPC8','LPC9',...%noisy/bad, also watch out for spread from LPC7-9 in LPC6,11
     'LES1',...%removing because huge variance in LES1-2!
     'RAM9','RAM10','LHH10','LOF9','LOF10',...%out of brain
-    'ROF11','ROF12','ROF13','ROF14','ROF15','LAC8','LAC9','LAC10',...%out of brain
+    'ROF11','ROF12','ROF13','ROF14','LAC8','LAC9','LAC10',...%out of brain
     'RAC8','RAC9','RAC10','RAC11','RAC12','RMT9','RMT10',...%out of brain
-    'LPC12','LPC13','LPC14','LPC15','LES8','LES9','LES10',...%out of brain
-    'LIN13','LIN14','LIN15','LSM10','RSM9','RSM10','RIN12','RIN13','RIN14',...%out of brain
+    'LPC12','LPC13','LPC14','LES8','LES9','LES10',...%out of brain
+    'LIN13','LIN14','LSM10','RSM9','RSM10','RIN12','RIN13','RIN14',...%out of brain
     'DC03','DC04','EYE1','EYE2','EYE3','EYE4',....% Not real data
     'E','V1','V2','V3','V4','V5','V6',...% Not real data
     'EKG*'...
     };
 % edge of cortex: LOF1,ROF1,RMT8,LIN12,RSM8
 %     'LHH4',...%noisy in Kata's data
+% bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
+SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
+SBJ_vars.ch_lab.bad_code = [1 1 1 1 1 1 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 ...
+            0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {'F3','FZ','F4','T3','T4','CZ','O1','O2','OZ','C3','C4'};
 SBJ_vars.ch_lab.CZ_lap_ref = {'C3','C4'};
 SBJ_vars.ch_lab.FZ_lap_ref = {'F3','F4'};
