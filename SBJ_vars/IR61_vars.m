@@ -53,20 +53,36 @@ SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preo
 SBJ_vars.ch_lab.probes     = {'LAM','LHH','LTH','LOF','LAC','RAM','RHH','RTH','ROF','RAC'};
 SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
 SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
-SBJ_vars.ch_lab.ROI        = {'LOF*','LAC*','ROF*','RAC*','RAM4-5','RAM5-6',... % RAM5,6 inf. ant. Insula, RAM4 is WM nearby
-                              'RHH5-6','RHH6-7'}; % RHH5,6 in inf. post. Insula, RHH7 WM nearby
+SBJ_vars.ch_lab.ROI        = {'all'}; %nothing else left, just LOF, LAC, ROF, RAC + RAM6-7
+                              %'LOF*','LAC*','ROF*','RAC*','RAM4-5','RAM5-6',... % RAM5,6 inf. ant. Insula, RAM4 is WM nearby
+                              %'RHH5-6','RHH6-7'}; % RHH5,6 in inf. post. Insula, RHH7 WM nearby
 SBJ_vars.ch_lab.eeg_ROI    = {'CZ','FZ','FPZ'};
 
 SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
-    'LAM1','LAM2','LHH1','LHH2','LHH3','LTH1','LTH2','RHH3','RHH4','RAM2','RTH2','RTH3',...%epileptic
-    'LOF10','LAC10','RAM10','RHH1','RAC10','ROF10',...%out of brain
-    'LAM3','LHH7',...%loose
+    'LAM1','LAM2','LAM3','LAM4','LAM5','LAM6','LAM7','LAM8','LAM9','LAM10',... %epileptic and sprtead and slowing
+    'LHH1','LHH2','LHH3','LHH4','LHH5','LHH6','LHH7','LHH8','LHH9','LHH10',...%epileptic and spread and slowing
+    'LTH1','LTH2','LTH3','LTH4','LTH5','LTH6','LTH7','LTH8','LTH9','LTH10',...%epileptic and spread and slowing
+    'RAM1','RAM2','RAM3','RAM4','RAM5','RAM8','RAM9',...%epileptic and spread and slowing
+    'RHH2','RHH3','RHH4','RHH5','RHH6','RHH7','RHH8','RHH9','RHH10',...%epileptic and spread and slowing
+    'RTH1','RTH2','RTH3','RTH4','RTH5','RTH6','RTH7','RTH8','RTH9','RTH10',...%epileptic and spread and slowing
+    'LOF1','LOF10','LAC10','RAM10','RHH1','RAC10','ROF10',...%out of brain
     'Z','---(13)','---(14)','---(17)','---(18)',...% not real?
     'REF','EKG','DC01','DC04'...%non-neural
     };
     % BEWARE: LTH4 (ventricle), LHH1+RAM9 (border)
+    % 'LAM3','LHH7',...%loose
     % watch out for FZ, Janna said it was bad
+% bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
+SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
+SBJ_vars.ch_lab.bad_code = [1 1 1 1 1 1 1 1 1 1 ...
+                            1 1 1 1 1 1 1 1 1 1 ...
+                            1 1 1 1 1 1 1 1 1 1 ...
+                            1 1 1 1 1 1 1       ...
+                            1 1 1 1 1 1 1 1 1   ...
+                            1 1 1 1 1 1 1 1 1 1 ...
+                            3 3 3 3 3 3 3 0 0 0 0 0 0 0 0 0];
+if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {'FZ','FPZ','CZ','OZ','C3','C4'};
 SBJ_vars.ch_lab.CZ_lap_ref = {'C3','C4'};
 SBJ_vars.ch_lab.FZ_lap_ref = {'C3','C4'};

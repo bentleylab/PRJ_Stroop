@@ -59,27 +59,29 @@ SBJ_vars.ch_lab.ROI        = {'LAC*','LES*','LOF*','LSM*','LPC*','LIN*',...
                               'RAC*','ROF*','RIN*','RMT*','RSM*'};
 SBJ_vars.ch_lab.eeg_ROI    = {'CZ','FZ'};
 
-SBJ_vars.ch_lab.mislabel = {{'ROF19','ROF10'}};
+SBJ_vars.ch_lab.mislabel = {{'ROF19','ROF10'},{'RMS6','RSM6'}};
 
 SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
-    'RAM1','RAM2','RAM3','LHH1','LHH2','LHH3',...%epileptic
-    'RMT1','LPC7','LPC8','LPC9',...%noisy/bad, also watch out for spread from LPC7-9 in LPC6,11
-    'LES1',...%removing because huge variance in LES1-2!
-    'RAM9','RAM10','LHH10','LOF9','LOF10',...%out of brain
+    'RAM1','RAM2','RAM3','RAM4','RAM5',...%epileptic + spread
+    'LHH1','LHH2','LHH3','LHH4',...%epileptic + spread
+    'LES1','LES2','LPC1','LPC2',...%spiking + spread
+    'RMT1','RMT2','RMT3',...%spiking + spread
+    'RAM10','LHH10','LOF8','LOF9','LOF10',...%out of brain
     'ROF11','ROF12','ROF13','ROF14','LAC8','LAC9','LAC10',...%out of brain
     'RAC8','RAC9','RAC10','RAC11','RAC12','RMT9','RMT10',...%out of brain
     'LPC12','LPC13','LPC14','LES8','LES9','LES10',...%out of brain
-    'LIN13','LIN14','LSM10','RSM9','RSM10','RIN12','RIN13','RIN14',...%out of brain
+    'LIN12','LIN13','LIN14','LSM9','LSM10','RSM9','RSM10','RIN12','RIN13','RIN14',...%out of brain
     'DC03','DC04','EYE1','EYE2','EYE3','EYE4',....% Not real data
     'E','V1','V2','V3','V4','V5','V6',...% Not real data
     'EKG*'...
     };
+% LAC7,8,9 were originally tosse,d but it's just very strong mu rhythm
 % edge of cortex: LOF1,ROF1,RMT8,LIN12,RSM8
 %     'LHH4',...%noisy in Kata's data
 % bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
 SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
-SBJ_vars.ch_lab.bad_code = [1 1 1 1 1 1 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 ...
+SBJ_vars.ch_lab.bad_code = [1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 ...
             0 0 0 0 0 0 0 0 0 0 0 0 0 0];
 if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {'F3','FZ','F4','T3','T4','CZ','O1','O2','OZ','C3','C4'};

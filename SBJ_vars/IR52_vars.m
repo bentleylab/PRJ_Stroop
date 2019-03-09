@@ -63,10 +63,18 @@ SBJ_var.ch_lab.eeg_ROI     = {'CZ','FZ'};
 SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'LAM2','LAM3','LAM4','LHH2','LHH3',...%epileptic accoridng to Jack
-    'RHH1','RHH2','RHH6','RAM3','RTH4','RTH5','LHH4','LTH3',...%epileptic according to Bob
-    'RAM1','RHH10','RTH1','RTH2','RAC10','LAM10','RAIN10'...%out of brain
+    'LAM1','LAM5','LHH1','LHH4','LHH5','LTH1','LTH2','LTH3','LTH4','LTH5',...% epileptic spread
+    'RHH1','RHH2','RHH3','RHH4','RAM2','RAM3','RAM4','RTH3','RTH4','RTH5','RTH6',...%epileptic spread
+    'RBT1','RBT2','RBT3','RBT4','RBT5',...%epileptic spread
+    'LOF1','LOF2','LOF3',...%spread pattern after L MTL spikes
+    'RHH6',...% loose and noisy
+    'RAM1','RHH9','RHH10','RTH1','RTH2','RAC10','LAM10','RAIN10','RPIN10',...%out of brain
     'DC01','DC04','EKG','REF'...%not real data
     };
+% bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
+SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
+SBJ_vars.ch_lab.bad_code = [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 0 0 0 0];
+if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {'FZ','CZ','OZ','C3','C4','O1','O2','T3','T4','F3','F4'};
 SBJ_vars.ch_lab.CZ_lap_ref = {'C3','C4'};
 SBJ_vars.ch_lab.FZ_lap_ref = {'F3','F4'};

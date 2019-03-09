@@ -58,15 +58,24 @@ SBJ_vars.ch_lab.eeg_ROI    = {'CZ'};
 
 SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
-    'RAM1','RAM2','RAM8','RAM9','RAM10','RHH1','RHH2','RHH3','RHH4',...% epileptic
+    'RAM1','RAM2','RHH1','RHH2','RHH3','RHH4',...% epileptic
+    'RAM3','RAM4','RHH5','RTH1','RTH2','RTH3','RTH4',...% epileptic spread
+    'RAM7','RAM8','RAM9','RAM10',...%slowing and spread
+    'LAC1',...% interesting HF phase coupled to slowing, but triggered from epileptic spiking
+    'ROF2','ROF3','ROF4','ROF5','ROF6',...%slowing and spread
+    'LOF2','LOF3','LOF4','LOF5','LOF6',...%slowing, spiking of it's own, spread
     'ROF1','LAM10',...% bad- both are loose
-    'ROF10','LTH10','LAC10','LOF1',...% out of brain
+    'ROF9','ROF10','LTH10','LAC10','LOF1','LHH10',...% out of brain
     'RSMA*','RBT*','RAIN*','RPIN*',...% Not real data (left overs from previous SBJ?)
     'DC01','DC04'....% Not real data
     'REF',...% Not real data
     'EKG'...
     };
 % watch out for prominent slowing in LAC5+ and LOF5+, sometimes upper ROF,RAC too
+% bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
+SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
+SBJ_vars.ch_lab.bad_code = [1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 2 3 3 3 3 3 3 0 0 0 0 0 0 0 0];
+if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {'FZ' 'CZ' 'OZ' 'C3' 'C4'};
 SBJ_vars.ch_lab.CZ_lap_ref = {'C3','C4'};
 SBJ_vars.ch_lab.eog = {'LUE','LLE','RUE','RLE'};

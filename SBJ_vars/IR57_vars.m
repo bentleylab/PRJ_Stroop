@@ -66,13 +66,23 @@ SBJ_vars.ch_lab.bad = {...
     'RHH1','RHH2','RHH3','RHH4','ROF1','RAM1','RTH1','RTH2',...%epileptic
     'LHH1','LHH2','LHH3','LHH4','LHH5','LHH6','LHH7','LHH8','LHH9','LHH10',...%epileptic
     'LTH1','LTH2','LTH3','LAM1','LAM2','LAM3',...%epileptic
-    'RSM2','RSM3','RIN9','RIN10','LTI2','LTI3','RHH6','LHH1','LHH2','LHH4','LHH6',...%bad line noise
+    'LTH4','LTH5','LTH6','LAM4','LAM5','LAM6','LAM7','LAM8','LAM9',...% epileptic spread
+    'RAM4','RAM5','RAM6','RAM7','RAM8','RAM9','RTH4','RTH5',...%epileptic spread
+    'RHH8','RHH9',...%spike trigger slowing
+    'RSM2','RSM3','RIN9','RIN10','LTI2','LTI3','RHH6',...%bad line noise
     'RSM9','RSM10','RAC10','RAM10','RTH9','RTH10','LOF10','LAM10',...%out of brain
+    'LTH10','RTH8','RHH10','RTI10',...% added to out of brain
     'RHH7',...%marked as bad in visual for some reason?
     'Z','T4','O2','T3',...%bad eeg channels
     'DC01','DC03','XREF','E',...% not real data
     'EKG'...
     };
+% LHH1,2,4,6 also have bad line noise
+% bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
+SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
+SBJ_vars.ch_lab.bad_code = [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 ...
+                            3 3 3 3 3 3 3 3 3 3 3 3 2 0 0 0 0 0 0 0 0 0];
+if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {'FPZ' 'CZ' 'OZ' 'C3' 'C4' 'FP1' 'FP2' 'O1'};
 SBJ_vars.ch_lab.CZ_lap_ref = {'C3','C4'};
 SBJ_vars.ch_lab.FPZ_lap_ref = {'FP1','FP2'};

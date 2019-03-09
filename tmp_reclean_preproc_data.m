@@ -1,4 +1,4 @@
-SBJ = 'IR41';
+SBJ = 'IR61';
 pipeline_id = 'main_ft';
 
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
@@ -60,3 +60,4 @@ out = ft_databrowser(cfgpp,data);
 
 %% View correlations of data
 fn_view_correlations(data);
+
