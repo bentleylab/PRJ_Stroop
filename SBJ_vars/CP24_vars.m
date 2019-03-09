@@ -9,9 +9,9 @@ end
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'CP24';
-SBJ_vars.raw_file = {'CP24_Dec7_stroop_raw.mat','CP24_Dec9_stroop_R2_raw.mat'};%CP24_Dec7_stroop_raw.mat
-SBJ_vars.block_name = {'R1','R2'};
-SBJ_vars.low_srate  = [0,0];
+SBJ_vars.raw_file = {'CP24_Dec7_stroop_raw.mat','CP24_Dec9_stroop_R2_raw.mat','CP24_Dec9_stroop_R3_raw.mat'};
+SBJ_vars.block_name = {'R1','R2','R3'};
+SBJ_vars.low_srate  = [0,0,0];
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -95,7 +95,8 @@ SBJ_vars.bs_width    = 2;
 %--------------------------------------
 % Time Parameters
 %--------------------------------------
-SBJ_vars.analysis_time = {{[5 1053]},{[7 342]}};
+% see cut scripts for timing info
+SBJ_vars.analysis_time = {{[5 1053]},{[7 342]},{[1 689]}};
 
 %--------------------------------------
 % Artifact Rejection Parameters

@@ -1,4 +1,4 @@
-%% IR26 Processing Variables
+%% CP26 Processing Variables
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 if isempty(strfind(path,'fieldtrip'))
     addpath(ft_dir);
@@ -8,8 +8,8 @@ end
 %--------------------------------------
 % Basics
 %--------------------------------------
-SBJ_vars.SBJ = 'IR26';
-SBJ_vars.raw_file = {'2015082020_0002.edf'};
+SBJ_vars.SBJ = 'CP26';
+SBJ_vars.raw_file = {'CP26_stroop_raw.mat'};
 SBJ_vars.block_name = {''};
 SBJ_vars.low_srate  = [0];
 
@@ -40,47 +40,33 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw,SBJ_vars.raw_file);
 
 SBJ_vars.recon.surf_l     = [SBJ_vars.dirs.recon 'Surfaces/' SBJ_vars.SBJ '_cortex_lh.mat'];
 SBJ_vars.recon.surf_r     = [SBJ_vars.dirs.recon 'Surfaces/' SBJ_vars.SBJ '_cortex_rh.mat'];
-SBJ_vars.recon.elec_pat   = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_acpc_f.mat'];
+SBJ_vars.recon.elec_pat   = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_acpc_....mat'];
 SBJ_vars.recon.elec_mni_v = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_mni_v.mat'];
-SBJ_vars.recon.elec_mni_s = [];
-SBJ_vars.recon.fs_T1      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_postop_T1.mgz'];
-SBJ_vars.recon.fs_DK      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_postop_aparc+aseg.mgz'];
-SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_postop_aparc.a2009s+aseg.mgz'];
+SBJ_vars.recon.elec_mni_s = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_mni_s.mat'];
+SBJ_vars.recon.fs_T1      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preop_T1.mgz'];
+SBJ_vars.recon.fs_DK      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preop_aparc+aseg.mgz'];
+SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preop_aparc.a2009s+aseg.mgz'];
 
 %--------------------------------------
 % Channel Selection
 %--------------------------------------
-SBJ_vars.ch_lab.probes     = {'RAM','RHP','ROF','RPC','LAM','LHP','LOF','LPC'};
-SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
-SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP'};
-SBJ_vars.ch_lab.ROI        = {'all'};%'ROF*','RPC*','LOF*','LPC*'};
+SBJ_vars.ch_lab.probes     = {'LIHA','LIH','LIHP','RIHA','RIH','RIHP','LOF','ROF','A','LG','RG'};
+SBJ_vars.ch_lab.probe_type = {'ecog','ecog','ecog','ecog','ecog','ecog','ecog','ecog','ecog','ecog'};
+SBJ_vars.ch_lab.ref_type   = {};
+SBJ_vars.ch_lab.ROI        = {};
 SBJ_vars.ch_lab.eeg_ROI    = {};
 
-SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
-SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
+%SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
+%SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
 %SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
 
 SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
-    'RHP1','RHP2','RHP3',...% epileptic
-    'LAM10','LAM11','LAM12','LAM13','LAM14','LPC14','LPC15','LPC16',...% out of brain
-    'RPC7','RPC8','RPC9','RPC10','RPC11','RPC12','RPC13','RPC14',...% out of brain
-    'RAM7','RAM8','RAM9','RAM10','RAM11','RAM12',...% out of brain
-    'RHP8','RHP9','RHP10','RHP11','RHP12','RHP13','RHP14',...% out of brain
-    'ROF8','ROF9','ROF10',...% out of brain
-    'LHP1','LHP2','LHP3','LHP4','LHP5','LHP6','LHP7','LHP8',...% microwires, bad signal
-    'LOF1','LOF2','LOF3','LOF4','LOF5','LOF6','LOF7','LOF8',...% microwires
-    'LPC1','LOC2','LPC3','LPC4','LPC5','LPC6','LPC7','LPC8',...% microwires
-    'RSH','LSH','LLE','V1','V2','V3','V4','V5','V6',...% not real data
-    'EDF Annotations','E','XREF','EKG','DC03','DC04'...% not real data
+    'DC03','DC04','E','Mark1','Mark2','Events'...%not real data
     };
 % bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
 SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
-SBJ_vars.ch_lab.bad_code = [1 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 ...
-                            0 0 0 0 0 0 0 0 ...
-                            0 0 0 0 0 0 0 0 ...
-                            0 0 0 0 0 0 0 0 ...
-                            0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+SBJ_vars.ch_lab.bad_code = [];
 if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};
@@ -97,7 +83,7 @@ SBJ_vars.bs_width    = 2;
 %--------------------------------------
 % Time Parameters
 %--------------------------------------
-SBJ_vars.analysis_time = {{[22 805], [910 1136]}};% long gap with no trials after B8T2
+SBJ_vars.analysis_time = {{[1 990]}};
 
 %--------------------------------------
 % Artifact Rejection Parameters

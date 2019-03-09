@@ -50,20 +50,20 @@ SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preo
 %--------------------------------------
 % Channel Selection
 %--------------------------------------
-SBJ_vars.ch_lab.probes     = {'RSM','RAC','ROF','RIN','RTI','RAM','RHH','RTH',...
-                              'LSMA','LAC','LOF','LIN','LTI','LAM','LTH'};%'LHH' doesn't count because all elecs are bad
-SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg',...
+SBJ_vars.ch_lab.probes     = {'RSM','RAC','ROF','RIN','RTI','RHH','RTH',... % NOTE: RHH essentially gone since 5 is only non-bad
+                              'LSMA','LAC','LOF','LIN','LTI','LTH'};%'LHH' 'LAM' 'RAM' don't count because all elecs are bad
+SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg',...
                               'seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
-SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP',...
+SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP',...
                               'BP','BP','BP','BP','BP','BP','BP'};
 SBJ_vars.ch_lab.ROI        = {'RSM*','RAC*','ROF*','RIN*','RTI*',...
-                              'LAM4-5','LAM5-6','LAC*','LOF*',...%LAM4,5 are inferior anterior insula
+                              'LAC*','LOF*',...%LAM4,5 are inferior anterior insula, so this used to have LAM4-5 and 5-6
                               '-LOF1-2','-RTI2-3','-RIN4-5'}; %these are rejected based on variance
 SBJ_vars.ch_lab.eeg_ROI    = {'CZ','FPZ'};
 
 SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
-    'RHH1','RHH2','RHH3','RHH4','ROF1','RAM1','RTH1','RTH2',...%epileptic
+    'RHH1','RHH2','RHH3','RHH4','ROF1','RAM1','RAM2','RAM3','RTH1','RTH2','RTH3',...%epileptic
     'LHH1','LHH2','LHH3','LHH4','LHH5','LHH6','LHH7','LHH8','LHH9','LHH10',...%epileptic
     'LTH1','LTH2','LTH3','LAM1','LAM2','LAM3',...%epileptic
     'LTH4','LTH5','LTH6','LAM4','LAM5','LAM6','LAM7','LAM8','LAM9',...% epileptic spread
@@ -80,7 +80,7 @@ SBJ_vars.ch_lab.bad = {...
 % LHH1,2,4,6 also have bad line noise
 % bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
 SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
-SBJ_vars.ch_lab.bad_code = [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 ...
+SBJ_vars.ch_lab.bad_code = [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 ...
                             3 3 3 3 3 3 3 3 3 3 3 3 2 0 0 0 0 0 0 0 0 0];
 if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {'FPZ' 'CZ' 'OZ' 'C3' 'C4' 'FP1' 'FP2' 'O1'};

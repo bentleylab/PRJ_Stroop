@@ -50,9 +50,9 @@ SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preo
 %--------------------------------------
 % Channel Selection
 %--------------------------------------
-SBJ_vars.ch_lab.probes     = {'LAM','LHH','LTH','LOF','LAC','RAM','RHH','RTH','ROF','RAC'};
-SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
-SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
+SBJ_vars.ch_lab.probes     = {'LOF','LAC','RAM','ROF','RAC'};%tossed all of LAM, LHH, LTH, RHH, RTH
+SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg'};
+SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP'};
 SBJ_vars.ch_lab.ROI        = {'all'}; %nothing else left, just LOF, LAC, ROF, RAC + RAM6-7
                               %'LOF*','LAC*','ROF*','RAC*','RAM4-5','RAM5-6',... % RAM5,6 inf. ant. Insula, RAM4 is WM nearby
                               %'RHH5-6','RHH6-7'}; % RHH5,6 in inf. post. Insula, RHH7 WM nearby
