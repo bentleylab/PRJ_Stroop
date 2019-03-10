@@ -23,7 +23,7 @@ ft_electrodeplacement(cfge,mri);
 fn_view_recon_atlas(SBJ,'main_ft','pat','',1,'r','Dx','gROI',1);
 
 %%
-b_ix = 1;
+b_ix = 3;
 if numel(SBJ_vars.raw_file)==1 || isfield(SBJ_vars.dirs,'nlx')
     block_suffix = '';
 else
@@ -31,6 +31,7 @@ else
 end
 
 SBJ00b_view_preclean(SBJ,b_ix,0,'reorder',{},'bad_epochs','load');
+% out = SBJ00b_view_preclean(SBJ,b_ix,1,'reorder',{},'ylim',[-0.0001 0.0001]);%,'bad_epochs','load');
 % load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preclean',block_suffix,'.mat'));
 % raw = data;
 % 

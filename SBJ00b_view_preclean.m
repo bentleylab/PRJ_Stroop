@@ -148,7 +148,7 @@ end
 load([root_dir 'PRJ_Stroop/scripts/utils/cfg_plot.mat']);
 if exist('bad_epochs','var')
     if ischar(bad_epochs) && strcmp(bad_epochs,'load')
-        load([SBJ_vars.dirs.events SBJ '_bob_bad_epochs_preclean.mat']);
+        load([SBJ_vars.dirs.events SBJ '_bob_bad_epochs_preclean' block_suffix '.mat']);
     end
     cfg_plot.artfctdef.visual.artifact = bad_epochs;
 end
