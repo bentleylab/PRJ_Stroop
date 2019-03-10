@@ -67,7 +67,7 @@ SBJ_vars.ch_lab.bad = {...
     'RPC7','RPC8','RPC9','RPC10','RPC11','RPC12','RPC13','RPC14',...% out of brain
     'RAM7','RAM8','RAM9','RAM10','RAM11','RAM12',...% out of brain
     'RHP8','RHP9','RHP10','RHP11','RHP12','RHP13','RHP14',...% out of brain
-    'ROF8','ROF9','ROF10',...% out of brain
+    'ROF7','ROF8','ROF9','ROF10',...% out of brain
     'LHP1','LHP2','LHP3','LHP4','LHP5','LHP6','LHP7','LHP8',...% microwires, bad signal
     'LOF1','LOF2','LOF3','LOF4','LOF5','LOF6','LOF7','LOF8',...% microwires
     'LPC1','LOC2','LPC3','LPC4','LPC5','LPC6','LPC7','LPC8',...% microwires
