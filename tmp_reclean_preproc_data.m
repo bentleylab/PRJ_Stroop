@@ -1,4 +1,4 @@
-SBJ = 'IR61';
+SBJ = 'CP24';
 pipeline_id = 'main_ft';
 
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
@@ -23,7 +23,7 @@ ft_electrodeplacement(cfge,mri);
 fn_view_recon_atlas(SBJ,'main_ft','pat','',1,'r','Dx','gROI',1);
 
 %%
-b_ix = 1;
+b_ix = 3;
 if numel(SBJ_vars.raw_file)==1 || isfield(SBJ_vars.dirs,'nlx')
     block_suffix = '';
 else
