@@ -20,7 +20,7 @@ cfge.elec = elec_acpc_f;
 ft_electrodeplacement(cfge,mri);
 
 %%
-fn_view_recon_atlas(SBJ,'main_ft','pat','',1,'r','Dx','gROI',1);
+fn_view_recon_atlas(SBJ,'main_ft','pat','',1,'b','Dx','gROI',1);
 
 %%
 b_ix = 3;

@@ -61,7 +61,7 @@ if s_rate > 1000
     min_event_length = floor(min_event_length/decimate_v);
 else
     fprintf('================================================\n');
-    fprintf('WARNING: evnt sample rate is 1000 or less!!\n');
+    fprintf('WARNING: evnt sample rate is 1000 or less!! s_rate = %f\n',s_rate);
     data_photo_d = data_photo;
     decimate_v = 1;
 end
@@ -111,6 +111,7 @@ fprintf('\t\tIgnoring %d trials\n', length(ignore_trials));
 % If log and photodiode have different n_trials, plot and error out
 if(length(trial_info.trial_n) ~= length(word_onsets))
     % Plot photodiode data
+    figure;
     plot_photo = data_photo_orig - min(data_photo_orig);
     plot_photo = plot_photo / (max(plot_photo)-min(plot_photo));
     plot_photo = plot_photo + 0.25;
@@ -275,7 +276,7 @@ end
 %% Plot results
 if(plot_it ~= 0)
     figure;%('Position', [100 100 1200 800]);
-    hodl on;
+    hold on;
     
     % Plot microphone data
     plot_mic = data_mic_orig - mean(data_mic_orig);
