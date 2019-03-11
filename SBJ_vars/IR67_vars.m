@@ -15,7 +15,7 @@ SBJ_vars.low_srate  = [500];
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
-SBJ_vars.dirs.SU      = [SBJ_vars.dirs.raw 'SU_2018-01-25_11-36-05/'];
+SBJ_vars.dirs.nlx     = [SBJ_vars.dirs.raw 'nlx_2018-01-25_11-36-05/'];
 SBJ_vars.dirs.import  = [SBJ_vars.dirs.SBJ '01_import/'];
 SBJ_vars.dirs.preproc = [SBJ_vars.dirs.SBJ '02_preproc/'];
 SBJ_vars.dirs.events  = [SBJ_vars.dirs.SBJ '03_events/'];
@@ -69,7 +69,7 @@ SBJ_vars.ch_lab.wire_ROI   = {'all'};
 % SBJ_vars.ch_lab.suffix = '';    % after every channel except 'EDF Annotations'
 SBJ_vars.ch_lab.mislabel = {{'RPC','RPC3'}};
 SBJ_vars.ch_lab.nlx_suffix   = '';
-SBJ_vars.ch_lab.nlx_nk_align = {'RAC8','RAC9'}; % {'RIN4','RIN5'};
+SBJ_vars.ch_lab.nlx_nk_align = {'ROF3','ROF4'}; % tried RPC8,9 I think, maybe emodim: {'RIN4','RIN5'};
 SBJ_vars.nlx_macro_inverted  = 1;
 
 SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR

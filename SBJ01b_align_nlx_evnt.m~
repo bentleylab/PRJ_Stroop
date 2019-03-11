@@ -42,7 +42,7 @@ macro_orig  = macro;
 % Nihon Kohden clinical channel
 if ~save_it
     clin_fname = SBJ_vars.dirs.raw_filename{block_ix};
-    load(clin_fname);
+    load(
 else
     if any(SBJ_vars.low_srate)
         srate_str = num2str(SBJ_vars.low_srate(block_ix));
@@ -53,12 +53,12 @@ else
         error('only ready for single block SBJ');
 %         data_blocks = {};
 %         for block_ix = 1:numel(SBJ_vars.block_name)
-%             load([SBJ_vars.dirs.import SBJ '_' srate_str 'hz_' SBJ_vars.block_name{block_ix} '.mat']);
-%             data_blocks{block_ix} = data;
+%             load([SBJ_vars.dirs.import SBJ '_' srate_str 'hz_' SBJ_vars.block_name{b_ix} '.mat']);
+%             data_blocks{b_ix} = data;
 %         end
 %         data = fn_concat_blocks(data_blocks);
     else
-        block_suffix = SBJ_vars.block_name{block_ix};   % should just be ''
+        block_suffix = SBJ_vars.block_name{b_ix};   % should just be ''
         clin_fname = [SBJ_vars.dirs.import SBJ '_' srate_str 'hz' block_suffix '.mat'];
         load(clin_fname);
     end
@@ -105,12 +105,12 @@ if numel(SBJ_vars.ch_lab.nlx_nk_align)>1
 end
 
 % % Cut clincial macro to analysis time
-% if numel(SBJ_vars.analysis_time{block_ix})>1
+% if numel(SBJ_vars.analysis_time{b_ix})>1
 %     error('havent set up processing for multi block concat!');
 % end
-% cfgs = []; cfgs.latency = SBJ_vars.analysis_time{block_ix}{1};
+% cfgs = []; cfgs.latency = SBJ_vars.analysis_time{b_ix}{1};
 % clin = ft_selectdata(cfgs,clin);
-% clin.time{1} = clin.time{1}-SBJ_vars.analysis_time{block_ix}{1}(1);
+% clin.time{1} = clin.time{1}-SBJ_vars.analysis_time{b_ix}{1}(1);
 
 % Match sampling rates
 if macro.fsample > clin.fsample
