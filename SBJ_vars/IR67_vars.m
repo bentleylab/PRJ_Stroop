@@ -9,7 +9,7 @@ end
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'IR67';
-SBJ_vars.raw_file = {};%'IR75_raw_R1.mat'};
+SBJ_vars.raw_file = {'IR67_stroop_raw_clinical.mat'};
 SBJ_vars.block_name = {''};% there's a second block I don't want to process right now, so leaving blank here
 SBJ_vars.low_srate  = [500];
 
@@ -58,7 +58,7 @@ SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg','seeg','
 SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP',...
                               'BP','BP','BP','BP','BP','BP','BP'};
 SBJ_vars.ch_lab.nlx        = [0,0,0,1,1,1,1,1,1,0,0,0,0,0,0];
-SBJ_vars.ch_lab.ROI        = {'ROF*','FOA*'};
+SBJ_vars.ch_lab.ROI        = {};
 SBJ_vars.ch_lab.eeg_ROI    = {};
 SBJ_vars.ch_lab.wires      = {'mram','mrhh','mrth','mlam','mlhh','mlth'};
 SBJ_vars.ch_lab.wire_type  = {'su','su','su','su','su','su','su'};
@@ -74,12 +74,16 @@ SBJ_vars.nlx_macro_inverted  = 1;
 
 SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
+    'RSMA9','RSMA10','RPT10',...% out of brain
+    'RHH9','RHH10',...% mistaken for normal probe when actually BF microwires with only 8 contacts?
+    'EKG',...% EKG
+    'Mark1','Mark2','XREF',...% not real data
+    'DC01','DC02','DC03','DC04','E','Events','GRND',...% not real data
     };
-% emodim .bad:
-%     'RSMA9','RSMA10','RPT10',...% out of brain
-%     'EKG',...% EKG
-%     'Mark1','Mark2','XREF',...% not real data
-%     'DC01','DC02','DC03','DC04','E','Events','GRND',...% not real data
+% bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
+SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
+SBJ_vars.ch_lab.bad_code = [3 3 3 3 3 0 0 0 0 0 0 0 0 0 0 0];
+if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {'C3','C4','CZ','FZ','OZ'};
 SBJ_vars.ch_lab.eog = {'RUE','RLE','LLE','LUE'};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};

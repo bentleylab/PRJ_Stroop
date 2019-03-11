@@ -92,6 +92,7 @@ for b_ix = 1:numel(SBJ_vars.raw_file)
         cfg_bs = [];
         cfg_bs.continuous = 'yes';
         cfg_bs.bsfilter   = 'yes';
+        bs_freq_lim(bs_freq_lim(:,2) > data.fsample/2, :) = [];
         cfg_bs.bsfreq     = bs_freq_lim;
         cfg_bs.bsfiltord  = 2;
         cfg_bs.demean     = 'yes';
