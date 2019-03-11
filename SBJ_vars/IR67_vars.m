@@ -74,6 +74,9 @@ SBJ_vars.nlx_macro_inverted  = 1;
 
 SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
+    'RTH1','RTH2',...% epileptic
+    'LHH1','LTH2',...%spread or just similar slowing?
+    'RPC1',...%spikes too
     'RSMA9','RSMA10','RPT10',...% out of brain
     'RHH9','RHH10',...% mistaken for normal probe when actually BF microwires with only 8 contacts?
     'EKG',...% EKG
@@ -82,7 +85,7 @@ SBJ_vars.ch_lab.bad = {...
     };
 % bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
 SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
-SBJ_vars.ch_lab.bad_code = [3 3 3 3 3 0 0 0 0 0 0 0 0 0 0 0];
+SBJ_vars.ch_lab.bad_code = [1 1 2 2 2 3 3 3 3 3 0 0 0 0 0 0 0 0 0 0 0];
 if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {'C3','C4','CZ','FZ','OZ'};
 SBJ_vars.ch_lab.eog = {'RUE','RLE','LLE','LUE'};

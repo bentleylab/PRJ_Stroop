@@ -1,4 +1,4 @@
-SBJ = 'CP24';
+SBJ = 'IR67';
 pipeline_id = 'main_ft';
 
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
@@ -23,15 +23,15 @@ ft_electrodeplacement(cfge,mri);
 fn_view_recon_atlas(SBJ,'main_ft','pat','',1,'b','Dx','gROI',1);
 
 %%
-b_ix = 3;
+b_ix = 1;
 if numel(SBJ_vars.raw_file)==1 || isfield(SBJ_vars.dirs,'nlx')
     block_suffix = '';
 else
     block_suffix = strcat('_',SBJ_vars.block_name{b_ix});
 end
 
-% SBJ00b_view_preclean(SBJ,b_ix,0,'reorder',{},'bad_epochs','load');
-out = SBJ00b_view_preclean(SBJ,b_ix,1,'reorder',{},'ylim',[-0.0001 0.0001]);%,'bad_epochs','load');
+out = SBJ00b_view_preclean(SBJ,b_ix,1,'reorder',{},'ylim',[-0.0001 0.0001]);%'bad_epochs','load',
+% out = SBJ00b_view_preclean(SBJ,b_ix,1,'reorder',{},'ylim',[-0.0001 0.0001]);%,'bad_epochs','load');
 % load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preclean',block_suffix,'.mat'));
 % raw = data;
 % 

@@ -58,15 +58,20 @@ SBJ_vars.ch_lab.eeg_ROI    = {};
 
 %SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
 %SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
-%SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
+SBJ_vars.ch_lab.mislabel = {{'LTHP1','LIHP1'},{'LTHP2','LIHP2'},{'LTHP3','LIHP3'},{'LTHP4','LIHP4'}};
 
-SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ch_lab.ref_exclude = {
+    'RIHP1','RIHP2',...%flat mirrors
+    'ROF2','LOF3','LOF4','LIHA4','LIHP4','RIHA1','RIHA3','RIHA4','RG39','RG64'...%spikes?
+    }; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
-    'DC03','DC04','E','Mark1','Mark2','Events'...%not real data
+    'LG1','LG2',...% HF noise
+    'RG49',...% loose
+    'A*','DC03','DC04','E','Mark1','Mark2','Events'...%not real data
     };
 % bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
 SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
-SBJ_vars.ch_lab.bad_code = [0 0 0 0 0 0];
+SBJ_vars.ch_lab.bad_code = [2 2 2 0 0 0 0 0 0 0];
 if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};
