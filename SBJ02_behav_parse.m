@@ -67,7 +67,7 @@ else
 end
 [~, ~, data_shades] = read_photodiode(data_photo_d, min_event_length, 4);  %4 different shades (con, inc, neu, bsln)
 if save_it
-    fig_fname = [SBJ_vars.dirs.events SBJ '_photo_segmentation.fig'];
+    fig_fname = [SBJ_vars.dirs.events SBJ '_photo_segmentation' block_suffix '.fig'];
     saveas(gcf,fig_fname);
 end
 clear data_photo;
@@ -306,7 +306,7 @@ if(plot_it ~= 0)
     end
     
     if save_it
-        fig_fname = [SBJ_vars.dirs.events SBJ '_events.fig'];
+        fig_fname = [SBJ_vars.dirs.events SBJ '_events' block_suffix '.fig'];
         saveas(gcf,fig_fname);
     end
 end
