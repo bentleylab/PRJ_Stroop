@@ -63,6 +63,7 @@ SBJ_vars.ch_lab.eeg_ROI    = {};
 %SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
 
 SBJ_vars.ch_lab.ref_exclude = {... %exclude from the CAR
+     'RLF1',...% a litle spread from RLF2 sometimes
      'RTO3',...% still correlations about like EOG-ish channels
      'ROF1','ROF2','ROF3','LOF2','LOF3','LOF4',...% EOG big stuff, weak correlations
      'RTO6','RTO7',...% HF noise
@@ -76,11 +77,11 @@ SBJ_vars.ch_lab.ref_exclude = {... %exclude from the CAR
 %     }; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'LTO2',...% spiking
-    'RLF1','RLF2','RTO4',...% epileptic
+    'RLF2','RTO4',...% epileptic
     'RTO1','RTO2',...% flat channels, no signal
     'LLF*','LLFP*',...% noisy (on second amplifier)
     'DC01','DC04','E','EEG Mark1','EEG Mark2','-','Events/Markers',...%not real data
-    'Mark1','Mark2','X54','Events'...% Not real data
+    'Events_Markers','Mark1','Mark2','X54','Events'...% Not real data
     };
 % only bad channel in original bad: 'RLF2'...% epileptic
 % LLFP and LLF have massive noise, maybe can't save them
@@ -91,7 +92,7 @@ SBJ_vars.ch_lab.bad = {...
 %    'RTO1','RTO2',...% flat channels, no signal
 % bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
 SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
-SBJ_vars.ch_lab.bad_code = [2 1 1 1 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0];
+SBJ_vars.ch_lab.bad_code = [1 1 1 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
 if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};

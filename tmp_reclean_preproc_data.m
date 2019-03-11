@@ -1,4 +1,4 @@
-SBJ = 'IR26';
+SBJ = 'CP24';
 pipeline_id = 'main_ft';
 
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
@@ -30,8 +30,8 @@ else
     block_suffix = strcat('_',SBJ_vars.block_name{b_ix});
 end
 
-SBJ00b_view_preclean(SBJ,b_ix,0,'reorder',{},'bad_epochs','load');
-% out = SBJ00b_view_preclean(SBJ,b_ix,1,'reorder',{},'ylim',[-0.0001 0.0001]);%,'bad_epochs','load');
+% SBJ00b_view_preclean(SBJ,b_ix,0,'reorder',{},'bad_epochs','load');
+out = SBJ00b_view_preclean(SBJ,b_ix,1,'reorder',{},'ylim',[-0.0001 0.0001]);%,'bad_epochs','load');
 % load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preclean',block_suffix,'.mat'));
 % raw = data;
 % 
