@@ -70,7 +70,7 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     %   Step 4c- Manually Clean Photodiode Trace: Apply Corrections
     %  ========================================================================
     photod_ix = strmatch(SBJ_vars.ch_lab.photod,hdr.channel_labels);
-    mic_ix = strmatch(SBJ_vars.ch_lab.mic,hdr.channel_labels);
+    mic_ix    = strmatch(SBJ_vars.ch_lab.mic,hdr.channel_labels);
     % Correct baseline shift
     for shift_ix = 1:length(bsln_shift_times)
         epoch_idx = floor(bsln_shift_times{shift_ix}(1)*hdr.sample_rate):floor(bsln_shift_times{shift_ix}(2)*hdr.sample_rate);

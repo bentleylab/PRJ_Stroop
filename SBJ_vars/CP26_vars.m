@@ -40,9 +40,9 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw,SBJ_vars.raw_file);
 
 SBJ_vars.recon.surf_l     = [SBJ_vars.dirs.recon 'Surfaces/' SBJ_vars.SBJ '_cortex_lh.mat'];
 SBJ_vars.recon.surf_r     = [SBJ_vars.dirs.recon 'Surfaces/' SBJ_vars.SBJ '_cortex_rh.mat'];
-SBJ_vars.recon.elec_pat   = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_acpc_....mat'];
-SBJ_vars.recon.elec_mni_v = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_mni_v.mat'];
-SBJ_vars.recon.elec_mni_s = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_mni_s.mat'];
+SBJ_vars.recon.elec_pat   = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_acpc_fr.mat'];
+SBJ_vars.recon.elec_mni_v = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_mni_frv.mat'];
+SBJ_vars.recon.elec_mni_s = [];%SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_mni_s.mat'];
 SBJ_vars.recon.fs_T1      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preop_T1.mgz'];
 SBJ_vars.recon.fs_DK      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preop_aparc+aseg.mgz'];
 SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preop_aparc.a2009s+aseg.mgz'];
@@ -58,20 +58,21 @@ SBJ_vars.ch_lab.eeg_ROI    = {};
 
 %SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
 %SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
-SBJ_vars.ch_lab.mislabel = {{'LTHP1','LIHP1'},{'LTHP2','LIHP2'},{'LTHP3','LIHP3'},{'LTHP4','LIHP4'}};
+SBJ_vars.ch_lab.mislabel = {{'LTHP1','LIHP1'},{'LTHP2','LIHP2'},{'LTHP3','LIHP3'}};%,{'LTHP4','LIHP4'}}; (bad)
 
 SBJ_vars.ch_lab.ref_exclude = {
     'RIHP1','RIHP2',...%flat mirrors
-    'ROF2','LOF3','LOF4','LIHA4','LIHP4','RIHA1','RIHA3','RIHA4','RG39','RG64'...%spikes?
+    'LG24','ROF2','LOF3','LOF4','LIHA4','LIHP4','RIHA1','RIHA3','RIHA4','RG39','RG64'...%spikes?
     }; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
+    'LTHP4',...%spiking
     'LG1','LG2',...% HF noise
     'RG49',...% loose
     'A*','DC03','DC04','E','Mark1','Mark2','Events'...%not real data
     };
 % bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
 SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
-SBJ_vars.ch_lab.bad_code = [2 2 2 0 0 0 0 0 0 0];
+SBJ_vars.ch_lab.bad_code = [1 2 2 2 0 0 0 0 0 0 0];
 if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};

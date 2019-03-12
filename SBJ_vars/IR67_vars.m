@@ -68,6 +68,7 @@ SBJ_vars.ch_lab.wire_ROI   = {'all'};
 % SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
 % SBJ_vars.ch_lab.suffix = '';    % after every channel except 'EDF Annotations'
 SBJ_vars.ch_lab.mislabel = {{'RPC','RPC3'}};
+
 SBJ_vars.ch_lab.nlx_suffix   = '';
 SBJ_vars.ch_lab.nlx_nk_align = {'ROF3','ROF4'}; % tried RPC8,9 I think, maybe emodim: {'RIN4','RIN5'};
 SBJ_vars.nlx_macro_inverted  = 1;
@@ -75,9 +76,9 @@ SBJ_vars.nlx_macro_inverted  = 1;
 SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'RTH1','RTH2',...% epileptic
-    'LHH1','LTH2',...%spread or just similar slowing?
+    'LHH1','LTH1','RHH1',...% similar HF+slowing pattern
     'RPC1',...%spikes too
-    'RSMA9','RSMA10','RPT10',...% out of brain
+    'LPL10','RSM9','RSM10','RPT10',...% out of brain
     'RHH9','RHH10',...% mistaken for normal probe when actually BF microwires with only 8 contacts?
     'EKG',...% EKG
     'Mark1','Mark2','XREF',...% not real data
@@ -85,7 +86,7 @@ SBJ_vars.ch_lab.bad = {...
     };
 % bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
 SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
-SBJ_vars.ch_lab.bad_code = [1 1 2 2 2 3 3 3 3 3 0 0 0 0 0 0 0 0 0 0 0];
+SBJ_vars.ch_lab.bad_code = [1 1 2 2 2 2 3 3 3 3 3 3 0 0 0 0 0 0 0 0 0 0 0];
 if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {'C3','C4','CZ','FZ','OZ'};
 SBJ_vars.ch_lab.eog = {'RUE','RLE','LLE','LUE'};
@@ -103,9 +104,10 @@ SBJ_vars.bs_width    = 2;
 %--------------------------------------
 % Time Parameters
 %--------------------------------------
-% ~138 to ~1257
-% big gap (but don't have cod to cut it out yet): ~782 to ~930
-SBJ_vars.analysis_time = {{[128.0 1267.0]}};
+% NLX photodiode = ~138 to ~1257
+%   NLX big gap (but don't have cod to cut it out yet): ~782 to ~930
+SBJ_vars.nlx_analysis_time = {{[128.0 1267.0]}};
+SBJ_vars.analysis_time = {{[358.0 1500.0]}};
 
 %--------------------------------------
 % Artifact Rejection Parameters

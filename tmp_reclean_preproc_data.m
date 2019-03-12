@@ -30,8 +30,9 @@ else
     block_suffix = strcat('_',SBJ_vars.block_name{b_ix});
 end
 
-out = SBJ00b_view_preclean(SBJ,b_ix,1,'reorder',{},'ylim',[-0.0001 0.0001]);%'bad_epochs','load',
-% out = SBJ00b_view_preclean(SBJ,b_ix,1,'reorder',{},'ylim',[-0.0001 0.0001]);%,'bad_epochs','load');
+% SBJ00b_view_preclean(SBJ,b_ix,0,'reorder',{},'ylim',[-0.0001 0.0001]);
+% out = SBJ00b_view_preclean(SBJ,b_ix,1,'reorder',{},'ylim',[-0.0001 0.0001]);%'bad_epochs','load',
+out = SBJ00b_view_preclean(SBJ,b_ix,1,'reorder',{},'ylim',[-0.0001 0.0001]);%,'bad_epochs','load');
 % load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preclean',block_suffix,'.mat'));
 % raw = data;
 % 

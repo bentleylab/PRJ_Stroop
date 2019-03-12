@@ -31,7 +31,7 @@ output_fname = [SBJ_vars.dirs.events SBJ '_trial_info_auto',block_suffix,'.mat']
 
 %% Determine event onset sample points
 if any(SBJ_vars.low_srate)
-    nrl_srate = SBJ_vars.low_srate(b_ix);
+    nrl_srate = SBJ_vars.low_srate(block);
 else
     nrl_srate = proc_vars.resample_freq;
 end
