@@ -62,7 +62,8 @@ SBJ_vars.ch_lab.mislabel = {{'LTHP1','LIHP1'},{'LTHP2','LIHP2'},{'LTHP3','LIHP3'
 
 SBJ_vars.ch_lab.ref_exclude = {
     'RIHP1','RIHP2',...%flat mirrors
-    'LG24','ROF2','LOF3','LOF4','LIHA4','LIHP4','RIHA1','RIHA3','RIHA4','RG39','RG64'...%spikes?
+    'RIH1','RIH3','ROF8',...%Christina said loose? I think they're fine, will likely keep
+    'LG24','ROF2','LOF3','LOF4','LIHA4','LIHP4','RIHA1','RIHA3','RIHA4','RG39','RG56','RG63','RG64'...%spikes?
     }; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
     'LTHP4',...%spiking
