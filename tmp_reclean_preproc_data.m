@@ -1,4 +1,4 @@
-SBJ = 'CP26';
+SBJ = 'IR67';
 pipeline_id = 'main_ft';
 
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
@@ -30,7 +30,7 @@ else
     block_suffix = strcat('_',SBJ_vars.block_name{b_ix});
 end
 
-SBJ00b_view_preclean(SBJ,b_ix,0,'reorder',{},'ylim',[-0.0001 0.0001]);
+out = SBJ00b_view_preclean(SBJ,b_ix,1,'reorder',{},'bad_epochs','load','ylim',[-0.0001 0.0001]);
 % out = SBJ00b_view_preclean(SBJ,b_ix,1,'reorder',{},'ylim',[-0.0001 0.0001]);%'bad_epochs','load',
 % out = SBJ00b_view_preclean(SBJ,b_ix,1,'reorder',{},'ylim',[-0.0001 0.0001]);%,'bad_epochs','load');
 % load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preclean',block_suffix,'.mat'));
@@ -52,9 +52,10 @@ load(strcat(root_dir,'emodim/scripts/utils/cfg_plot.mat'));
 
 cfgpp = cfg_plot;
 cfgpp.artfctdef.visual.artifact = preclean_ep_at;
-% if isfield(data,'sampleinfo')
-%     data = rmfield(data,'sampleinfo');
-% end
+cfgpp.ylim = [-0.0001 0.0001];
+if isfield(data,'sampleinfo')
+    data = rmfield(data,'sampleinfo');
+end
 out = ft_databrowser(cfgpp,data);
 
 % bad_at = fn_convert_epochs_full2at(bad_preclean.bad_epochs,SBJ_vars.analysis_time{b_ix},...

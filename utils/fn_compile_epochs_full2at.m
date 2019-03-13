@@ -37,7 +37,11 @@ end
 
 % Adjust for block combinations
 for b_ix = 2:numel(SBJ_vars.block_name)
-    at_epochs{b_ix} = at_epochs{b_ix}+block_len(1:b_ix-1)*proc_vars.resample_freq;
+    if SBJ_vars.low_srate(b_ix)~=0
+        at_epochs{b_ix} = at_epochs{b_ix}+block_len(1:b_ix-1)*SBJ_vars.low_srate(b_ix);
+    else
+        at_epochs{b_ix} = at_epochs{b_ix}+block_len(1:b_ix-1)*proc_vars.resample_freq;
+    end
 end
 at_epochs = vertcat(at_epochs{:});
 
