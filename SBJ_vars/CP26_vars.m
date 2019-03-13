@@ -80,7 +80,7 @@ SBJ_vars.ch_lab.bad = {...
     };
 % bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
 SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
-SBJ_vars.ch_lab.bad_code = [1 2 2 2 0 0 0 0 0 0 0];
+SBJ_vars.ch_lab.bad_code = [1 2 2 2 3 3 0 0 0 0 0 0 0];
 if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};
