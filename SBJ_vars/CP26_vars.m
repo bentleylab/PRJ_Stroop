@@ -50,7 +50,7 @@ SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preo
 %--------------------------------------
 % Channel Selection
 %--------------------------------------
-SBJ_vars.ch_lab.probes     = {'LIHA','LIH','LIHP','RIHA','RIH','RIHP','LOF','ROF','LG','RG'};%'A' is noise
+SBJ_vars.ch_lab.probes     = {'LIHA','LIHM','LIHP','RIHA','RIHM','RIHP','LOF','ROF','LG','RG'};%'A' is noise
 SBJ_vars.ch_lab.probe_type = {'ecog','ecog','ecog','ecog','ecog','ecog','ecog','ecog','ecog','ecog'};
 SBJ_vars.ch_lab.ref_type   = {'CAR','CAR','CAR','CAR','CAR','CAR','CAR','CAR','CAR','CAR'};
 if ~all(numel(SBJ_vars.ch_lab.probes)==[numel(SBJ_vars.ch_lab.probe_type) numel(SBJ_vars.ch_lab.ref_type)]); error('probes ~= type+ref');end;
@@ -59,7 +59,11 @@ SBJ_vars.ch_lab.eeg_ROI    = {};
 
 %SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
 %SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
-SBJ_vars.ch_lab.mislabel = {{'LTHP1','LIHP1'},{'LTHP2','LIHP2'},{'LTHP3','LIHP3'}};%,{'LTHP4','LIHP4'}}; (bad)
+SBJ_vars.ch_lab.mislabel = {...
+    {'LTHP1','LIHP1'},{'LTHP2','LIHP2'},{'LTHP3','LIHP3'},...%,{'LTHP4','LIHP4'}}; (bad)
+    {'LIH1','LIHM1'},{'LIH2','LIHM2'},{'LIH3','LIHM3'},{'LIH4','LIHM4'},...%otherwise LIH selects LIHA+LIHP
+    {'RIH1','RIHM1'},{'RIH2','RIHM2'},{'RIH3','RIHM3'},{'RIH4','RIHM4'}...%otherwise RIH selects RIHA+RIHP
+    };
 
 SBJ_vars.ch_lab.ref_exclude = {
     'LOF3','LOF4',...%main leaders of network
