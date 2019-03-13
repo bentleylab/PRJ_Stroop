@@ -55,6 +55,7 @@ SBJ_vars.ch_lab.probes     = {'LAM','LHH','LTH','LOF','LASM','LPSM','LAC','LPC',
 SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg',...
                               'seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
 SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
+if ~all(numel(SBJ_vars.ch_lab.probes)==[numel(SBJ_vars.ch_lab.probe_type) numel(SBJ_vars.ch_lab.ref_type)]); error('probes ~= type+ref');end;
 SBJ_vars.ch_lab.ROI        = {'LOF*','LASM*','LPSM*','LAC*','LPC*','ROF*','RAC*','RPC*','RASM*','RPSM*'};
 SBJ_vars.ch_lab.eeg_ROI    = {'CZ'};
 

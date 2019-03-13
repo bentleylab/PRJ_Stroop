@@ -53,6 +53,7 @@ SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preo
 SBJ_vars.ch_lab.probes     = {'FPG','IHL','IHR','AG'};
 SBJ_vars.ch_lab.probe_type = {'ecog','ecog','ecog','ecog'};
 SBJ_vars.ch_lab.ref_type   = {'CAR','CAR','CAR','CAR'};
+if ~all(numel(SBJ_vars.ch_lab.probes)==[numel(SBJ_vars.ch_lab.probe_type) numel(SBJ_vars.ch_lab.ref_type)]); error('probes ~= type+ref');end;
 SBJ_vars.ch_lab.ROI        = {'IHL*','IHR*','AG*','FPG*'};
 SBJ_vars.ch_lab.eeg_ROI    = {};
 

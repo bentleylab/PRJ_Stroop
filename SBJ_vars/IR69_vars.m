@@ -60,6 +60,7 @@ SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preo
 SBJ_vars.ch_lab.probes     = {'RHH','RTH','ROF','RIN','FOA','FOP','LES'}; % 'RAM' was all bad
 SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
 SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP'};
+if ~all(numel(SBJ_vars.ch_lab.probes)==[numel(SBJ_vars.ch_lab.probe_type) numel(SBJ_vars.ch_lab.ref_type)]); error('probes ~= type+ref');end;
 SBJ_vars.ch_lab.ROI        = {'ROF*','FOA*'};
 SBJ_vars.ch_lab.eeg_ROI    = {};
 
