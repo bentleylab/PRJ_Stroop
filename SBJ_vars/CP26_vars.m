@@ -61,14 +61,21 @@ SBJ_vars.ch_lab.eeg_ROI    = {};
 SBJ_vars.ch_lab.mislabel = {{'LTHP1','LIHP1'},{'LTHP2','LIHP2'},{'LTHP3','LIHP3'}};%,{'LTHP4','LIHP4'}}; (bad)
 
 SBJ_vars.ch_lab.ref_exclude = {
-    'RIHP1','RIHP2',...%flat mirrors
-    'RIH1','RIH3','ROF8',...%Christina said loose? I think they're fine, will likely keep
-    'LG24','ROF2','LOF3','LOF4','LIHA4','LIHP4','RIHA1','RIHA3','RIHA4','RG39','RG56','RG63','RG64'...%spikes?
+    'LOF3','LOF4',...%main leaders of network
+    'LG9','LG17','LG25','LG26','LG28','LG20',...%anterior network of spike + slow
+    'LG12','LG11','LG14',... % middle slowing network
+    'LG8','LG16','LG24','LG32',...%posterior spiking network
+    'ROF2','ROF4','RIHA1','RIHA2','RG33','RG34','RG35','RG36','RG37','RG41','RG43','RG44','RG59','RG60',...%anterior network
+    'RG39','RG40','RG48','RG64','RG55','RG63'...%posterior network
     }; %exclude from the CAR
+% old cleaning notes from others (first pass):
+%     'RIH1','RIH3','ROF8',...%Christina said loose? I think they're fine, will likely keep
+%     'LG24','ROF2','LOF3','LOF4','LIHA4','LIHP4','RIHA1','RIHA3','RIHA4','RG39','RG56','RG63','RG64'...%spikes?
 SBJ_vars.ch_lab.bad = {...
     'LTHP4',...%spiking
     'LG1','LG2',...% HF noise
     'RG49',...% loose
+    'RIHP1','RIHP2',... % empty channels, negative mirrors w/ perfect anticorrelation
     'A*','DC03','DC04','E','Mark1','Mark2','Events'...%not real data
     };
 % bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk

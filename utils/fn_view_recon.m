@@ -1,4 +1,4 @@
-function fn_view_recon(SBJ, pipeline_id, plot_type, view_space, reg_type, show_labels, hemi)%, view_angle)
+function fn_view_recon(SBJ, pipeline_id, plot_type, view_space, reg_type, show_labels, hemi, plot_out, varargin)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJ [str] - subject ID to plot
@@ -10,18 +10,69 @@ function fn_view_recon(SBJ, pipeline_id, plot_type, view_space, reg_type, show_l
 %   hemi [str] - {'l', 'r', 'b'} hemisphere to plot
 
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
+
+%% Variable Handline
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 
-view_angle = [-90 0];
+% Handle variable inputs
+if ~isempty(varargin)
+    for v = 1:2:numel(varargin)
+        if strcmp(varargin{v},'view_angle')
+            view_angle = varargin{v+1};
+        elseif strcmp(varargin{v},'mesh_alpha') && varargin{v+1}>0 && varargin{v+1}<=1
+            mesh_alpha = varargin{v+1};
+        else
+            error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
+        end
+    end
+end
+
+% Define default options
+if ~exist('view_angle','var')
+    view_angle     = [-90 0];
+end
+if ~exist('mesh_alpha','var')
+    if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
+        mesh_alpha = 0.4;
+    else
+        mesh_alpha     = 0.8;
+    end
+end
+
 if strcmp(reg_type,'v') || strcmp(reg_type,'s')
+    % MNI space
     reg_suffix = ['_' reg_type];
 else
+    % Patient space
     reg_suffix = '';
 end
 
 %% Load elec struct
-load([SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'.mat']);
+if isempty(pipeline_id)
+    % Original elec files
+    elec_fname = eval(['SBJ_vars.recon.elec_' view_space reg_suffix]);
+    slash = strfind(elec_fname,'/'); elec_suffix = elec_fname(slash(end)+numel(SBJ)+2:end-4);
+    
+    tmp = load(elec_fname);
+    elec_var_name = fieldnames(tmp);
+    if ~strcmp(elec_var_name,elec_suffix)
+        warning(['\t!!!! ' SBJ ' elec names in variable and file names do not match! file=' elec_suffix '; var=' elec_var_name{1}]);
+    end
+    eval(['elec = tmp.' elec_var_name{1} ';']); clear tmp;
+else
+    % Preprocessed (bipolar) elec files
+    load([SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'.mat']);
+end
+
+%% Remove electrodes that aren't in hemisphere
+if ~plot_out
+    if ~strcmp(hemi,'b')
+        hemi_out_elecs = elec.label(~strcmp(elec.hemi,hemi));
+    end
+    cfgs = []; cfgs.channel = [{'all'} fn_ch_lab_negate(hemi_out_elecs)];
+    elec = fn_select_elec(cfgs, elec);
+end
 
 %% Load brain recon
 if strcmp(view_space,'pat')
@@ -91,6 +142,8 @@ if strcmp(plot_type,'ortho')
     cfg = [];
     cfg.elec = elec;
     ft_electrodeplacement(cfg, mri);
+% These are somehow impoverished versions of ft_electrodeplacement
+%   (can't click around, elecs aren't plotted on all 3 slices
 %     ft_plot_ortho(mri.anatomy, 'transform', mri.transform);%, 'style', 'intersect');
 %     if show_labels
 %         ft_plot_sens(elec, 'label', 'on', 'fontcolor', 'w');
@@ -104,10 +157,6 @@ if strcmp(plot_type,'3d')
     h = figure;
     
     % Plot 3D mesh
-    mesh_alpha = 0.8;
-    if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
-        mesh_alpha = 0.4;
-    end
     ft_plot_mesh(mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
     
     % Plot electrodes on top

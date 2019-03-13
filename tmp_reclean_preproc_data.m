@@ -1,12 +1,12 @@
-SBJ = 'IR67';
+SBJ = 'CP26';
 pipeline_id = 'main_ft';
 
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
-% addpath([root_dir 'PRJ_Stroop/scripts/']);
-% addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
-% addpath(ft_dir);
-% ft_defaults
+addpath([root_dir 'PRJ_Stroop/scripts/']);
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+addpath(ft_dir);
+ft_defaults
 
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
@@ -48,7 +48,7 @@ else
 end
 
 %% Plot data with bad_epochs highlighted
-load(strcat(root_dir,'emodim/scripts/utils/cfg_plot.mat'));
+load(strcat(root_dir,'PRJ_Stroop/scripts/utils/cfg_plot.mat'));
 
 cfgpp = cfg_plot;
 cfgpp.artfctdef.visual.artifact = preclean_ep_at;

@@ -151,7 +151,7 @@ load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
 preclean_ep_at = fn_compile_epochs_full2at(SBJ,pipeline_id);
 
 % Plot data with bad_epochs highlighted
-load(strcat(root_dir,'emodim/scripts/utils/cfg_plot.mat'));
+load(strcat(root_dir,'PRJ_Stroop/scripts/utils/cfg_plot.mat'));
 % If you want to see preclean bad_epochs:
 cfg_plot.artfctdef.visual.artifact = preclean_ep_at;
 % if isfield(data,'sampleinfo')

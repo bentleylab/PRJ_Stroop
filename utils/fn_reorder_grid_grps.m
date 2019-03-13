@@ -48,7 +48,7 @@ for grp_ix = 1:n_grps
     grp_id = grp_order(grp_ix);
     grp_nums = grid_pos(grid_grp==grp_id);
     for ch_ix = 1:numel(grp_nums)
-        ch_n = grp_nums(ch_ix);
+        ch_n = grp_nums(ch_ix)+min(lab_n)-1;
         if any(lab_n==ch_n)
             grid_lab{lab_ix} = labels{lab_n==ch_n};
             lab_ix = lab_ix+1;
