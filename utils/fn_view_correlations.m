@@ -1,4 +1,4 @@
-function fn_view_correlations(data)
+function fn_view_correlations(data,clim)
 %% Check correlations across channels to find CAR inclusion
 % load(import_data);
 corr_mat = corrcoef(data.trial{1}');
@@ -12,7 +12,11 @@ chan_corr = nanmean(corr_mat_nan,1);
 
 % plot the correlation matrix
 figure;
-imagesc(corr_mat_nan);
+if isempty(clim)
+    imagesc(corr_mat_nan);
+else
+    imagesc(corr_mat_nan,clim);
+end
 colorbar;
 
 % Plot the correlations by row, with mean and std

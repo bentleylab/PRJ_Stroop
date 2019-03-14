@@ -29,12 +29,28 @@ trial_info_auto_filename = strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_auto',bl
 load(trial_info_auto_filename);
 man_data = csvread(csv_filename,1,0);
 
-%% Calculate RTs, Differences
+%% Plot event fig comparison
+openfig([SBJ_vars.dirs.events SBJ '_events' block_suffix '.fig']);
+hold on;
+
 % Remove ignore_trials to match length of lists
 if ~isempty(trial_info.ignore_trials)
     man_data(trial_info.ignore_trials,:) = [];
     fprintf('Ignoring %i trials\n',length(trial_info.ignore_trials));
 end
+plot_resp_onsets = man_data(:,4);
+
+% Add manual resp onsets
+for resp_n = 1:length(plot_resp_onsets)
+    plot([plot_resp_onsets(resp_n) plot_resp_onsets(resp_n)],[1.35 1.45],'r','LineWidth',2);
+    plot([plot_resp_onsets(resp_n) plot_resp_onsets(resp_n)],[-0.30 0.30],'r','LineWidth',2);
+end
+
+if save_plot
+    saveas(gcf, strcat(SBJ_vars.dirs.events,SBJ,'_events_manual',block_suffix,'.fig'));
+end
+
+%% Calculate RTs, Differences
 % Remove trials with artifacts, bad RTs, or errors (keeping list length equal)
 skip_bad = find(man_data(:,3)==-1);
 skip_err = find(man_data(:,3)==1);

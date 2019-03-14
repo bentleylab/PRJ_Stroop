@@ -1,6 +1,7 @@
 %% IR26 Processing Variables
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 if isempty(strfind(path,'fieldtrip'))
+SBJs = {'IR21','IR31','IR32','IR35','IR39','IR41','IR52','IR54','IR57','IR61','IR65','IR68','IR72','IR74'};%ALMOST: 'CP24','IR26',  %NEVER: 'IR27','IR37','IR48',
     addpath(ft_dir);
     ft_defaults
 end
@@ -108,13 +109,13 @@ SBJ_vars.analysis_time = {{[22 805], [910 1136]}};% long gap with no trials afte
 %--------------------------------------
 % Artifact Rejection Parameters
 %--------------------------------------
-% SBJ_vars.artifact_params.std_limit_raw = 7;
-% SBJ_vars.artifact_params.hard_threshold_raw = 1000;
+SBJ_vars.artifact_params.std_limit_raw = 7;
+SBJ_vars.artifact_params.hard_threshold_raw = 1000;
 
-% SBJ_vars.artifact_params.std_limit_diff = 7;
-% SBJ_vars.artifact_params.hard_threshold_diff = 100;
+SBJ_vars.artifact_params.std_limit_diff = 7;
+SBJ_vars.artifact_params.hard_threshold_diff = 100;
 
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
-% SBJ_vars.trial_reject_n = [];
+SBJ_vars.trial_reject_n = [];

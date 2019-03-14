@@ -15,7 +15,7 @@ eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m'
 eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
 
 % Load bad_epochs from preclean data and adjust to analysis_time
-at_epochs = {};
+at_epochs = cell([numel(SBJ_vars.block_name) 1]);
 block_len = zeros(size(SBJ_vars.block_name));
 for b_ix = 1:numel(SBJ_vars.block_name)
     if numel(SBJ_vars.raw_file)>1
@@ -37,10 +37,12 @@ end
 
 % Adjust for block combinations
 for b_ix = 2:numel(SBJ_vars.block_name)
-    if SBJ_vars.low_srate(b_ix)~=0
-        at_epochs{b_ix} = at_epochs{b_ix}+block_len(1:b_ix-1)*SBJ_vars.low_srate(b_ix);
-    else
-        at_epochs{b_ix} = at_epochs{b_ix}+block_len(1:b_ix-1)*proc_vars.resample_freq;
+    if ~isempty(at_epochs{b_ix})
+        if SBJ_vars.low_srate(b_ix)~=0
+            at_epochs{b_ix} = at_epochs{b_ix}+block_len(1:b_ix-1)*SBJ_vars.low_srate(b_ix);
+        else
+            at_epochs{b_ix} = at_epochs{b_ix}+block_len(1:b_ix-1)*proc_vars.resample_freq;
+        end
     end
 end
 at_epochs = vertcat(at_epochs{:});
