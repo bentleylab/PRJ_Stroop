@@ -1,5 +1,3 @@
-%% CP26 Processing Variables
-[root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 if isempty(strfind(path,'fieldtrip'))
     addpath(ft_dir);
     ft_defaults
@@ -82,11 +80,12 @@ SBJ_vars.ch_lab.bad = {...
     'LG1','LG2',...% HF noise
     'RG49',...% loose
     'RIHP1','RIHP2',... % empty channels, negative mirrors w/ perfect anticorrelation
+    'LOF5','LOF6','LOF7','LOF8','ROF5','ROF6','ROF7','ROF8',...%on top of grid, no signal
     'A*','DC03','DC04','E','Mark1','Mark2','Events'...%not real data
     };
 % bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
 SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
-SBJ_vars.ch_lab.bad_code = [1 2 2 2 3 3 0 0 0 0 0 0 0];
+SBJ_vars.ch_lab.bad_code = [1 2 2 2 3 3 3 3 3 3 3 3 3 3 0 0 0 0 0 0 0];
 if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};
@@ -108,13 +107,13 @@ SBJ_vars.analysis_time = {{[1 990]}};
 %--------------------------------------
 % Artifact Rejection Parameters
 %--------------------------------------
-% SBJ_vars.artifact_params.std_limit_raw = 7;
-% SBJ_vars.artifact_params.hard_threshold_raw = 1000;
+SBJ_vars.artifact_params.std_limit_raw = 10;
+SBJ_vars.artifact_params.hard_threshold_raw = 1000;
 
-% SBJ_vars.artifact_params.std_limit_diff = 7;
-% SBJ_vars.artifact_params.hard_threshold_diff = 100;
+SBJ_vars.artifact_params.std_limit_diff = 10;
+SBJ_vars.artifact_params.hard_threshold_diff = 100;
 
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
-% SBJ_vars.trial_reject_n = [];
+SBJ_vars.trial_reject_n = [];

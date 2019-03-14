@@ -1,12 +1,12 @@
-SBJ = 'CP26';
+SBJ = 'CP24';
 pipeline_id = 'main_ft';
 
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
-addpath([root_dir 'PRJ_Stroop/scripts/']);
-addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
-addpath(ft_dir);
-ft_defaults
+% addpath([root_dir 'PRJ_Stroop/scripts/']);
+% addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+% addpath(ft_dir);
+% ft_defaults
 
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
@@ -53,14 +53,14 @@ load(strcat(root_dir,'PRJ_Stroop/scripts/utils/cfg_plot.mat'));
 cfgpp = cfg_plot;
 cfgpp.artfctdef.visual.artifact = preclean_ep_at;
 cfgpp.ylim = [-0.0001 0.0001];
-if isfield(data,'sampleinfo')
-    data = rmfield(data,'sampleinfo');
-end
+% if isfield(data,'sampleinfo')
+%     data = rmfield(data,'sampleinfo');
+% end
 out = ft_databrowser(cfgpp,data);
 
 % bad_at = fn_convert_epochs_full2at(bad_preclean.bad_epochs,SBJ_vars.analysis_time{b_ix},...
 %                                             strcat(SBJ_vars.dirs.preproc,SBJ,'_preclean',block_suffix,'.mat'),1);
 
 %% View correlations of data
-fn_view_correlations(data);
+fn_view_correlations(data,[]);
 
