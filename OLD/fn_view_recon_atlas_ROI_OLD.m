@@ -1,5 +1,7 @@
-function fn_view_recon_atlas_ROI(SBJ, pipeline_id, view_space, reg_type, show_labels, hemi, atlas_name, roi_id)%, view_angle)
-%% Plot a reconstruction with electrodes
+function fn_view_recon_atlas_ROI(SBJ, pipeline_id, view_space, reg_type,...
+                                    show_labels, hemi, atlas_name, roi_id)%, view_angle)
+error('not used anymore')
+                                    %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJ [str] - subject ID to plot
 %   pipeline_id [str] - name of analysis pipeline, used to pick elec file
@@ -7,17 +9,7 @@ function fn_view_recon_atlas_ROI(SBJ, pipeline_id, view_space, reg_type, show_la
 %   view_space [str] - {'pat', 'mni'}
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
 %   show_labels [0/1] - plot the electrode labels
-%   hemi [str] - {'l', 'r'} hemisphere to plot (can't be both, that's a shitty plot)
-%   atlas_name [str] - {'DK','Dx','Yeo7','Yeo17'}
-%   roi_id [str] - ROI grouping by which to color the atlas ROIs
-%       'gROI','mgROI','main3' - general ROIs (lobes or broad regions)
-%       'ROI','thryROI','LPFC','MPFC','OFC','INS' - specific ROIs (within these larger regions)
-%       'Yeo7','Yeo17' - colored by Yeo networks
-%       'tissue','tissueC' - colored by tisseu compartment, e.g., GM vs WM vs OUT
-
-if ~any(strcmp(hemi,{'r','l'}))
-    error('hemi must be l or r');
-end
+%   hemi [str] - {'l', 'r', 'b'} hemisphere to plot
 
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
@@ -34,6 +26,7 @@ if strcmp(roi_id,'tissue') || strcmp(roi_id,'tissueC')
 else
     tis_suffix = '';
 end
+[roi_list, roi_colors] = fn_roi_label_styles(roi_id);
 
 %% Load elec struct
 try
@@ -42,151 +35,88 @@ try
 catch
     answer = input(['Could not load requested file: ' elec_atlas_fname ...
         '\nDo you want to run the atlas matching now? "y" or "n"\n'],'s');
-    if strcmp(answer,'y')
+    if strtcmp(answer,'y')
         fn_save_elec_atlas(SBJ,pipeline_id,view_space,reg_type,atlas_name);
     else
         error('not running atlas assignment, exiting...');
     end
 end
 
-%% Match elecs to atlas ROIs
-[roi_list, ~] = fn_roi_label_styles(roi_id);
+%% Load brain recon
+if strcmp(view_space,'pat')
+    if strcmp(hemi,'r') || strcmp(hemi,'l')
+        mesh = ft_read_headshape([SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_' hemi 'h.mat']);
+    elseif strcmp(hemi,'b')
+        mesh = ft_read_headshape({[SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_rh.mat'],...
+                                    [SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_lh.mat']});
+    else
+        error(['Unknown hemisphere selected: ' hemi]);
+    end
+    mesh.coordsys = 'acpc';
+elseif strcmp(view_space,'mni')
+    if strcmp(reg_type,'v')
+        if strcmp(hemi,'r')
+            load([ft_dir 'template/anatomy/surface_pial_right.mat']);
+        elseif strcmp(hemi,'l')
+            load([ft_dir 'template/anatomy/surface_pial_left.mat']);
+        elseif strcmp(hemi,'b')
+            load([ft_dir 'template/anatomy/surface_pial_both.mat']);
+        else
+            error(['Unknown hemisphere option: ' hemi]);
+        end
+%         mesh.coordsys = 'mni';
+    elseif strcmp(reg_type,'s')
+        if strcmp(hemi,'r') || strcmp(hemi,'l')
+            mesh = ft_read_headshape([root_dir 'PRJ_Stroop/data/atlases/freesurfer/fsaverage/' hemi 'h.pial']);
+        elseif strcmp(hemi,'b')
+            error('hemisphere "b" not yet implemented for reg_type: "srf"!');
+            mesh = ft_read_headshape([ft_dir 'subjects/fsaverage/surf/' hemi 'h.pial']);
+        else
+            error(['Unknown hemisphere option: ' hemi]);
+        end
+        mesh.coordsys = 'fsaverage';
+    else
+        error(['Unknown registration type (reg_type): ' reg_type]);
+    end
+else
+    error(['Unknown view_space: ' view_space]);
+end
 
-if any(strcmp(atlas_name,{'DK','Dx','Yeo7'}))
+% %% Load Atlas
+% fprintf('Using atlas: %s\n',atlas_name);
+% if strcmp(atlas_name,'DK')                  
+%     atlas      = ft_read_atlas(SBJ_vars.recon.fs_DK); % Desikan-Killiany (+volumetric)
+%     atlas.coordsys = 'acpc';
+% elseif strcmp(atlas_name,'Dx')
+%     atlas      = ft_read_atlas(SBJ_vars.recon.fs_Dx); % Destrieux (+volumetric)
+%     atlas.coordsys = 'acpc';
+% else
+%     error(['atlas_name unknown: ' atlas_name]);
+% end
+% atlas.name = atlas_name;
+% % elec.elecpos_fs   = elec.elecpos;
+
+%% Match elecs to atlas ROIs
+if any(strcmp(atlas_name,{'DK','Dx'}))
     elec.roi       = fn_atlas2roi_labels(elec.atlas_label,atlas_name,roi_id);
     if strcmp(roi_id,'tissueC')
         elec.roi_color = fn_tissue2color(elec);
-    elseif strcmp(atlas_name,'Yeo7')
-        elec.roi_color = fn_atlas2color(atlas_name,elec.roi);
     else
         elec.roi_color = fn_roi2color(elec.roi);
     end
-elseif any(strcmp(atlas_name,{'Yeo17'}))
+elseif any(strcmp(atlas_name,{'Yeo7','Yeo17'}))
     elec.roi       = elec.atlas_label;
-    elec.roi_color = fn_atlas2color(atlas_name,elec.roi);
+    elec.roi_color = fn_atlas2color(atlas.name,elec.roi);
 end
 
-% Find elecs matching ROI
+% Select only ROIs in roi_id
 roi_match = false([numel(elec.label) numel(roi_list)]);
 for roi_ix = 1:numel(roi_list)
     roi_match(:,roi_ix) = strcmp(elec.roi,roi_list{roi_ix});
 end
-% Exclude other hemisphere
-hemi_out_elecs = elec.label(~strcmp(elec.hemi,hemi));
-
-% Select relevant elecs
 cfgs = [];
-cfgs.channel = [elec.label(any(roi_match,2)); fn_ch_lab_negate(hemi_out_elecs)'];
+cfgs.channel = elec.label(any(roi_match,2));
 elec = fn_select_elec(cfgs,elec);
-
-% %% Load brain recon
-% if strcmp(view_space,'pat')
-%     if strcmp(hemi,'r') || strcmp(hemi,'l')
-%         mesh = ft_read_headshape([SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_' hemi 'h.mat']);
-%     elseif strcmp(hemi,'b')
-%         mesh = ft_read_headshape({[SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_rh.mat'],...
-%                                     [SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_lh.mat']});
-%     else
-%         error(['Unknown hemisphere selected: ' hemi]);
-%     end
-%     mesh.coordsys = 'acpc';
-% elseif strcmp(view_space,'mni')
-%     if strcmp(reg_type,'v')
-%         if strcmp(hemi,'r')
-%             load([ft_dir 'template/anatomy/surface_pial_right.mat']);
-%         elseif strcmp(hemi,'l')
-%             load([ft_dir 'template/anatomy/surface_pial_left.mat']);
-%         elseif strcmp(hemi,'b')
-%             load([ft_dir 'template/anatomy/surface_pial_both.mat']);
-%         else
-%             error(['Unknown hemisphere option: ' hemi]);
-%         end
-% %         mesh.coordsys = 'mni';
-%     elseif strcmp(reg_type,'s')
-%         if strcmp(hemi,'r') || strcmp(hemi,'l')
-%             mesh = ft_read_headshape([root_dir 'PRJ_Stroop/data/atlases/freesurfer/fsaverage/' hemi 'h.pial']);
-%         elseif strcmp(hemi,'b')
-%             error('hemisphere "b" not yet implemented for reg_type: "srf"!');
-%             mesh = ft_read_headshape([ft_dir 'subjects/fsaverage/surf/' hemi 'h.pial']);
-%         else
-%             error(['Unknown hemisphere option: ' hemi]);
-%         end
-%         mesh.coordsys = 'fsaverage';
-%     else
-%         error(['Unknown registration type (reg_type): ' reg_type]);
-%     end
-% else
-%     error(['Unknown view_space: ' view_space]);
-% end
-
-%% Load Atlas
-fprintf('Using atlas: %s\n',atlas_name);
-if strcmp(atlas_name,'DK')                  
-    atlas      = ft_read_atlas(SBJ_vars.recon.fs_DK); % Desikan-Killiany (+volumetric)
-    atlas.coordsys = 'acpc';
-elseif strcmp(atlas_name,'Dx')
-    atlas      = ft_read_atlas(SBJ_vars.recon.fs_Dx); % Destrieux (+volumetric)
-    atlas.coordsys = 'acpc';
-elseif strcmp(atlas_name,'Yeo7')
-    atlas = fn_read_atlas(atlas_name);
-    atlas.coordsys = 'mni';
-elseif strcmp(atlas_name,'Yeo17')
-    atlas = fn_read_atlas(atlas_name);
-    atlas.coordsys = 'mni';
-else
-    error(['atlas_name unknown: ' atlas_name]);
-end
-atlas.name = atlas_name;
-elec.elecpos_fs   = elec.elecpos;
-
-%% Get Atlas-ROI mapping
-tsv_filename = [root_dir 'PRJ_Stroop/data/atlases/atlas_mappings/atlas_ROI_mappings_' atlas_name '.tsv'];
-fprintf('\tReading roi csv file: %s\n', tsv_filename);
-roi_file = fopen(tsv_filename, 'r');
-% roi.csv contents:
-%   atlas_label, gROI_label, ROI_label, Notes (not read in)
-roi_map = textscan(roi_file, '%s %s %s %s', 'HeaderLines', 1,...
-    'Delimiter', '\t', 'MultipleDelimsAsOne', 0);
-fclose(roi_file);
-
-switch roi_id
-    case {'Yeo7','Yeo17'}
-        map_ix = 2;
-    case {'mgROI','gROI','main3'}
-        map_ix = 2;
-    case {'ROI','thryROI','LPFC','MPFC','OFC','INS'}
-        map_ix = 3;
-    case {'tissue', 'tissueC'}
-        map_ix = 4;
-    otherwise
-        error(['roi_style unknown: ' roi_style]);
-end
-
-atlas_labels = {};
-for roi_ix = 1:numel(roi_list)
-    atlas_labels = [atlas_labels; roi_map{1}(strcmp(roi_map{map_ix},roi_list{roi_ix}))];
-end
-% Select hemisphere
-atlas_labels = atlas_labels(~cellfun(@isempty,strfind(atlas_labels,['_' hemi 'h_'])));
-
-%% Select ROI mesh
-cfg = [];
-cfg.inputcoord = atlas.coordsys;
-cfg.atlas = atlas;
-cfg.roi = atlas_labels;
-roi_mask = ft_volumelookup(cfg,atlas);
-
-seg = keepfields(atlas, {'dim', 'unit','coordsys','transform'});
-seg.brain = roi_mask;
-
-cfg = [];
-cfg.method      = 'iso2mesh';
-cfg.radbound    = 2;            % scalar indicating the radius of the target surface mesh element bounding sphere
-cfg.maxsurf     = 0;
-cfg.tissue      = 'brain';
-cfg.numvertices = 100000;
-cfg.smooth      = 3;
-roi_mesh = ft_prepare_mesh(cfg, seg);
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
 h = figure;
@@ -196,7 +126,7 @@ mesh_alpha = 0.8;
 if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
     mesh_alpha = 0.2;
 end
-ft_plot_mesh(roi_mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
+ft_plot_mesh(mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
 
 % Plot electrodes on top
 cfgs = [];
