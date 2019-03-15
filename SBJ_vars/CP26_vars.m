@@ -68,10 +68,10 @@ SBJ_vars.ch_lab.mislabel = {...
 
 SBJ_vars.ch_lab.ref_exclude = {
     'LOF3','LOF4',...%main leaders of network
-    'LG9','LG17','LG25','LG26','LG28','LG20',...%anterior network of spike + slow
+    'LG9','LG17','LG26','LG28','LG20',...%anterior network of spike + slow
     'LG12','LG11','LG14',... % middle slowing network
     'LG8','LG16','LG24','LG32',...%posterior spiking network
-    'ROF2','ROF4','RIHA1','RIHA2','RG33','RG34','RG35','RG36','RG37','RG41','RG43','RG44','RG59','RG60',...%anterior network
+    'ROF2','ROF4','RIHA1','RIHA2','RG33','RG34','RG36','RG37','RG41','RG43','RG44','RG59','RG60',...%anterior network
     'RG39','RG40','RG48','RG64','RG55','RG63'...%posterior network
     }; %exclude from the CAR
 % old cleaning notes from others (first pass):
@@ -79,6 +79,7 @@ SBJ_vars.ch_lab.ref_exclude = {
 %     'LG24','ROF2','LOF3','LOF4','LIHA4','LIHP4','RIHA1','RIHA3','RIHA4','RG39','RG56','RG63','RG64'...%spikes?
 SBJ_vars.ch_lab.bad = {...
     'LTHP4',...%spiking
+    'LG25','RG35',...% most egregious spikers/slowers
     'LG1','LG2',...% HF noise
     'RG49',...% loose
     'RIHP1','RIHP2',... % empty channels, negative mirrors w/ perfect anticorrelation
@@ -87,7 +88,7 @@ SBJ_vars.ch_lab.bad = {...
     };
 % bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
 SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
-SBJ_vars.ch_lab.bad_code = [1 2 2 2 3 3 3 3 3 3 3 3 3 3 0 0 0 0 0 0 0];
+SBJ_vars.ch_lab.bad_code = [1 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 0 0 0 0 0 0 0];
 if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};
