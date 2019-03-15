@@ -9,21 +9,31 @@ function fn_view_recon_atlas_ROI(SBJ, pipeline_id, view_space, reg_type, show_la
 %   show_labels [0/1] - plot the electrode labels
 %   hemi [str] - {'l', 'r'} hemisphere to plot (can't be both, that's a shitty plot)
 %   atlas_name [str] - {'DK','Dx','Yeo7','Yeo17'}
-%   roi_id [str] - ROI grouping by which to color the atlas ROIs
-%       'gROI','mgROI','main3' - general ROIs (lobes or broad regions)
-%       'ROI','thryROI','LPFC','MPFC','OFC','INS' - specific ROIs (within these larger regions)
-%       'Yeo7','Yeo17' - colored by Yeo networks
-%       'tissue','tissueC' - colored by tisseu compartment, e.g., GM vs WM vs OUT
+%   roi_id [str] - gROI grouping to pick mesh and color specific ROIs
+%       'LPFC','MPFC','OFC','INS','TMP','PAR'
 
-if ~any(strcmp(hemi,{'r','l'}))
-    error('hemi must be l or r');
+%% Process Inputs
+% Error cases
+if strcmp(hemi,'b') && ~strcmp(roi_id,'OFC')
+    error('hemi must be l or r for all non-OFC plots');
+end
+if ~any(strcmp(roi_id,{'LPFC','MPFC','INS','OFC','TMP','PAR'}))
+    error('roi_id needs to be a lobe (not OCC either)');
 end
 
-[root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
-SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
-eval(SBJ_vars_cmd);
+% View angle
+if strcmp(roi_id,'OFC')
+    view_angle = [0 -90];   % from the bottom
+elseif strcmp(hemi,'l') && any([strcmp(roi_id,{'LPFC','INS','TMP','PAR','MTL'}) ~strcmp(roi_id,'MPFC')])
+    view_angle = [-90 0];    % from the left
+elseif strcmp(hemi,'r') && any([strcmp(roi_id,{'LPFC','INS','TMP','PAR','MTL'}) ~strcmp(roi_id,'MPFC')])
+    view_angle = [90 0];    % from the right
+else
+    error(['Bad combo of hemi (' hemi ') and roi_id (' roi_id ')']);
+%     view_angle = [0 0]; %straight on
+end
 
-view_angle = [-90 0];
+% Suffixes
 if strcmp(reg_type,'v') || strcmp(reg_type,'s')
     reg_suffix = ['_' reg_type];
 else
@@ -36,6 +46,10 @@ else
 end
 
 %% Load elec struct
+[root_dir, ~] = fn_get_root_dir();
+SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+eval(SBJ_vars_cmd);
+
 try
     elec_atlas_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'_',atlas_name,tis_suffix,'.mat'];
     load(elec_atlas_fname);
@@ -72,52 +86,16 @@ for roi_ix = 1:numel(roi_list)
     roi_match(:,roi_ix) = strcmp(elec.roi,roi_list{roi_ix});
 end
 % Exclude other hemisphere
-hemi_out_elecs = elec.label(~strcmp(elec.hemi,hemi));
+if ~strcmp(hemi,'b')
+    hemi_out_elecs = elec.label(~strcmp(elec.hemi,hemi));
+else
+    hemi_out_elecs = {};
+end
 
 % Select relevant elecs
 cfgs = [];
 cfgs.channel = [elec.label(any(roi_match,2)); fn_ch_lab_negate(hemi_out_elecs)'];
 elec = fn_select_elec(cfgs,elec);
-
-% %% Load brain recon
-% if strcmp(view_space,'pat')
-%     if strcmp(hemi,'r') || strcmp(hemi,'l')
-%         mesh = ft_read_headshape([SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_' hemi 'h.mat']);
-%     elseif strcmp(hemi,'b')
-%         mesh = ft_read_headshape({[SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_rh.mat'],...
-%                                     [SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_lh.mat']});
-%     else
-%         error(['Unknown hemisphere selected: ' hemi]);
-%     end
-%     mesh.coordsys = 'acpc';
-% elseif strcmp(view_space,'mni')
-%     if strcmp(reg_type,'v')
-%         if strcmp(hemi,'r')
-%             load([ft_dir 'template/anatomy/surface_pial_right.mat']);
-%         elseif strcmp(hemi,'l')
-%             load([ft_dir 'template/anatomy/surface_pial_left.mat']);
-%         elseif strcmp(hemi,'b')
-%             load([ft_dir 'template/anatomy/surface_pial_both.mat']);
-%         else
-%             error(['Unknown hemisphere option: ' hemi]);
-%         end
-% %         mesh.coordsys = 'mni';
-%     elseif strcmp(reg_type,'s')
-%         if strcmp(hemi,'r') || strcmp(hemi,'l')
-%             mesh = ft_read_headshape([root_dir 'PRJ_Stroop/data/atlases/freesurfer/fsaverage/' hemi 'h.pial']);
-%         elseif strcmp(hemi,'b')
-%             error('hemisphere "b" not yet implemented for reg_type: "srf"!');
-%             mesh = ft_read_headshape([ft_dir 'subjects/fsaverage/surf/' hemi 'h.pial']);
-%         else
-%             error(['Unknown hemisphere option: ' hemi]);
-%         end
-%         mesh.coordsys = 'fsaverage';
-%     else
-%         error(['Unknown registration type (reg_type): ' reg_type]);
-%     end
-% else
-%     error(['Unknown view_space: ' view_space]);
-% end
 
 %% Load Atlas
 fprintf('Using atlas: %s\n',atlas_name);
@@ -140,34 +118,7 @@ atlas.name = atlas_name;
 elec.elecpos_fs   = elec.elecpos;
 
 %% Get Atlas-ROI mapping
-tsv_filename = [root_dir 'PRJ_Stroop/data/atlases/atlas_mappings/atlas_ROI_mappings_' atlas_name '.tsv'];
-fprintf('\tReading roi csv file: %s\n', tsv_filename);
-roi_file = fopen(tsv_filename, 'r');
-% roi.csv contents:
-%   atlas_label, gROI_label, ROI_label, Notes (not read in)
-roi_map = textscan(roi_file, '%s %s %s %s', 'HeaderLines', 1,...
-    'Delimiter', '\t', 'MultipleDelimsAsOne', 0);
-fclose(roi_file);
-
-switch roi_id
-    case {'Yeo7','Yeo17'}
-        map_ix = 2;
-    case {'mgROI','gROI','main3'}
-        map_ix = 2;
-    case {'ROI','thryROI','LPFC','MPFC','OFC','INS'}
-        map_ix = 3;
-    case {'tissue', 'tissueC'}
-        map_ix = 4;
-    otherwise
-        error(['roi_style unknown: ' roi_style]);
-end
-
-atlas_labels = {};
-for roi_ix = 1:numel(roi_list)
-    atlas_labels = [atlas_labels; roi_map{1}(strcmp(roi_map{map_ix},roi_list{roi_ix}))];
-end
-% Select hemisphere
-atlas_labels = atlas_labels(~cellfun(@isempty,strfind(atlas_labels,['_' hemi 'h_'])));
+atlas_labels = fn_atlas_roi_select_mesh(atlas_name, roi_id, hemi);
 
 %% Select ROI mesh
 cfg = [];
@@ -194,7 +145,7 @@ h = figure;
 % Plot 3D mesh
 mesh_alpha = 0.8;
 if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
-    mesh_alpha = 0.2;
+    mesh_alpha = 0.3;
 end
 ft_plot_mesh(roi_mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
 
