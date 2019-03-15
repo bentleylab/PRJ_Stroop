@@ -56,8 +56,8 @@ SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg','seeg','
                               'seeg','seeg','seeg','seeg','seeg'};
 SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
 if ~all(numel(SBJ_vars.ch_lab.probes)==[numel(SBJ_vars.ch_lab.probe_type) numel(SBJ_vars.ch_lab.ref_type)]); error('probes ~= type+ref');end;
-SBJ_vars.ch_lab.ROI        = {'LAC*','LES*','LOF*','LSM*','LPC*','LIN*',...
-                              'RAC*','ROF*','RIN*','RMT*','RSM*'};
+SBJ_vars.ch_lab.ROI        = {'all'};%'LAC*','LES*','LOF*','LSM*','LPC*','LIN*',...
+%                              'RAC*','ROF*','RIN*','RMT*','RSM*'};
 SBJ_vars.ch_lab.eeg_ROI    = {'CZ','FZ'};
 
 SBJ_vars.ch_lab.mislabel = {{'ROF19','ROF10'},{'RMS6','RSM6'}};

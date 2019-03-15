@@ -54,7 +54,7 @@ SBJ_vars.ch_lab.probes     = {'LAM','LHH','LTH','AIN','MIN','PIN','LOF','LAC','L
 SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
 SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP','BP'};
 if ~all(numel(SBJ_vars.ch_lab.probes)==[numel(SBJ_vars.ch_lab.probe_type) numel(SBJ_vars.ch_lab.ref_type)]); error('probes ~= type+ref');end;
-SBJ_vars.ch_lab.ROI        = {'AIN*','MIN*','PIN*','LOF*','LAC*','LPC*'};
+SBJ_vars.ch_lab.ROI        = {'all'};%'AIN*','MIN*','PIN*','LOF*','LAC*','LPC*'};
 SBJ_vars.ch_lab.eeg_ROI    = {'CZ'};
 
 %SBJ_vars.ch_lab.prefix = '';    % before every channel except 'EDF Annotations'

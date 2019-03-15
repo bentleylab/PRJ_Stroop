@@ -54,7 +54,7 @@ SBJ_vars.ch_lab.probes     = {};
 SBJ_vars.ch_lab.probe_type = {};
 SBJ_vars.ch_lab.ref_type   = {};
 if ~all(numel(SBJ_vars.ch_lab.probes)==[numel(SBJ_vars.ch_lab.probe_type) numel(SBJ_vars.ch_lab.ref_type)]); error('probes ~= type+ref');end;
-SBJ_vars.ch_lab.ROI        = {};
+SBJ_vars.ch_lab.ROI        = {'all'};
 SBJ_vars.ch_lab.eeg_ROI    = {};
 
 %SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'

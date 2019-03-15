@@ -54,7 +54,7 @@ SBJ_vars.ch_lab.probes     = {'RAM','RHH','RTH','RIN','ROF','LAM','LHH','LTH','L
 SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
 SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP','BP'};
 if ~all(numel(SBJ_vars.ch_lab.probes)==[numel(SBJ_vars.ch_lab.probe_type) numel(SBJ_vars.ch_lab.ref_type)]); error('probes ~= type+ref');end;
-SBJ_vars.ch_lab.ROI        = {'RIN*','ROF*','LAC*','LOF*','LIN*','LPC*','-LPC6-7'};
+SBJ_vars.ch_lab.ROI        = {'all'};%'RIN*','ROF*','LAC*','LOF*','LIN*','LPC*','-LPC6-7'};
 SBJ_vars.ch_lab.eeg_ROI    = {};
 
 SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR

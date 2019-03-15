@@ -60,7 +60,7 @@ SBJ_vars.ch_lab.probes     = {'addPeriVentriculr!','RAM','RHH','RTH','LAM','LHH'
 SBJ_vars.ch_lab.probe_type = {'blah','seeg','seeg','seeg','seeg','seeg','seeg','seeg'};
 SBJ_vars.ch_lab.ref_type   = {'bs','BP','BP','BP','BP','BP','BP','BP'};
 if ~all(numel(SBJ_vars.ch_lab.probes)==[numel(SBJ_vars.ch_lab.probe_type) numel(SBJ_vars.ch_lab.ref_type)]); error('probes ~= type+ref');end;
-SBJ_vars.ch_lab.ROI        = {'ROF*','FOA*'};
+SBJ_vars.ch_lab.ROI        = {'all'};%'ROF*','FOA*'};
 SBJ_vars.ch_lab.eeg_ROI    = {};
 SBJ_vars.ch_lab.wires      = {'mram','mrhh','mrth','mlam','mlhh','mlth'};
 SBJ_vars.ch_lab.wire_type  = {'su','su','su','su','su','su','su'};

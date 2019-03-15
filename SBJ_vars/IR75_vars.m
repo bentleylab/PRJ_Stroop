@@ -64,7 +64,7 @@ SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg',...
 SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP','BP',...
                               'BP','BP','BP','BP','BP','BP'};
 if ~all(numel(SBJ_vars.ch_lab.probes)==[numel(SBJ_vars.ch_lab.probe_type) numel(SBJ_vars.ch_lab.ref_type)]); error('probes ~= type+ref');end;
-SBJ_vars.ch_lab.ROI        = {'ROF*','FOA*'};
+SBJ_vars.ch_lab.ROI        = {'all'};%'ROF*','FOA*'};
 SBJ_vars.ch_lab.eeg_ROI    = {};
 
 SBJ_vars.ch_lab.nlx          = [1,1,1,0,0,0,1,1,1,1,0,0];

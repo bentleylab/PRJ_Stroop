@@ -154,9 +154,9 @@ preclean_ep_at = fn_compile_epochs_full2at(SBJ,pipeline_id);
 load(strcat(root_dir,'PRJ_Stroop/scripts/utils/cfg_plot.mat'));
 % If you want to see preclean bad_epochs:
 cfg_plot.artfctdef.visual.artifact = preclean_ep_at;
-% if isfield(data,'sampleinfo')
-%     data = rmfield(data,'sampleinfo');
-% end
+if isfield(data,'sampleinfo')
+    data = rmfield(data,'sampleinfo');
+end
 out = ft_databrowser(cfg_plot,data);
 
 % bad_preclean = load(strcat(SBJ_vars.dirs.events,SBJ,'_bob_bad_epochs_preclean',block_suffix,'.mat'));
@@ -221,9 +221,9 @@ else
         trial_info.response_time = vertcat(trial_info.response_time,ti{b_ix}.trial_info.response_time);
         trial_info.marker_time   = vertcat(trial_info.marker_time,ti{b_ix}.trial_info.marker_time);
         trial_info.onset_time    = vertcat(trial_info.onset_time,ti{b_ix}.trial_info.onset_time);
-        trial_info.condition_n   = vertcat(trial_info.condition_n,ti{b_ix}.trial_info.condition_n);
         trial_info.error         = vertcat(trial_info.error,ti{b_ix}.trial_info.error);
         trial_info.run_n         = vertcat(trial_info.run_n,ti{b_ix}.trial_info.run_n);
+        trial_info.condition_n   = horzcat(trial_info.condition_n,ti{b_ix}.trial_info.condition_n);
         
         % Modify then concatenate counts and indices
         trial_info.block_n = vertcat(trial_info.block_n,ti{b_ix}.trial_info.block_n+sum(block_blkcnt(1:b_ix-1)));
