@@ -1,4 +1,5 @@
-function fn_view_recon_atlas_grp_sphr(SBJs, pipeline_id, reg_type, show_labels, hemi, atlas_id, roi_id, plot_out)%, view_angle)
+function fn_view_recon_atlas_grp(SBJs, pipeline_id, reg_type, show_labels,...
+                                 hemi, atlas_id, roi_id, plot_out, varargin)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJ [str] - subject ID to plot
@@ -7,18 +8,47 @@ function fn_view_recon_atlas_grp_sphr(SBJs, pipeline_id, reg_type, show_labels, 
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
 %   show_labels [0/1] - plot the electrode labels
 %   hemi [str] - {'l', 'r', 'b'} hemisphere to plot
-%   altas_id
-%   roi_id
-%   plot_out [0/1] - include electrodes that don't have an atlas label?
+%   atlas_id [str] - {'DK','Dx','Yeo7','Yeo17'}
+%   roi_id [str] - ROI grouping by which to color the atlas ROIs
+%       'gROI','mgROI','main3' - general ROIs (lobes or broad regions)
+%       'ROI','thryROI','LPFC','MPFC','OFC','INS' - specific ROIs (within these larger regions)
+%       'Yeo7','Yeo17' - colored by Yeo networks
+%       'tissue','tissueC' - colored by tisseu compartment, e.g., GM vs WM vs OUT
+%   plot_out [0/1] - include electrodes that don't have an atlas label or in hemi?
 
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
-view_space = 'mni';
 
-view_angle = [-90 0];
+%% Handle variables
+% Handle variable inputs
+if ~isempty(varargin)
+    for v = 1:2:numel(varargin)
+        if strcmp(varargin{v},'view_angle')
+            view_angle = varargin{v+1};
+        elseif strcmp(varargin{v},'mesh_alpha') && varargin{v+1}>0 && varargin{v+1}<=1
+            mesh_alpha = varargin{v+1};
+        else
+            error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
+        end
+    end
+end
+
+% Define default options
+view_space = 'mni';
+if ~exist('view_angle','var')
+    view_angle     = [-90 0];
+end
+if ~exist('mesh_alpha','var')
+    if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
+        mesh_alpha = 0.4;
+    else
+        mesh_alpha = 0.8;
+    end
+end
+
 if strcmp(reg_type,'v') || strcmp(reg_type,'s')
-    reg_suffix = ['_' reg_type];
+    reg_suffix = ['_' reg_type];    % MNI space
 else
-    reg_suffix = '';
+    reg_suffix = '';                % Patient space
 end
 if strcmp(roi_id,'tissue') || strcmp(roi_id,'tissueC')
     tis_suffix = '_tis';
@@ -31,7 +61,7 @@ end
 fprintf('Using atlas: %s\n',atlas_id);
 
 %% Load elec struct
-elec = cell([numel(SBJs) 1]);
+elec     = cell([numel(SBJs) 1]);
 good_sbj = true(size(SBJs));
 all_roi_labels = {};
 all_roi_colors = [];
@@ -42,6 +72,7 @@ for sbj_ix = 1:numel(SBJs)
     
     try
         if strcmp(atlas_id,'Dx') || strcmp(atlas_id,'DK')   % Cover atlases defined on SBJ surfaces
+            error('why 2 step process here? what was IR32 problem?');
             elec_atlas_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,...
                 '_',view_space,reg_suffix,'.mat'];
             tmp = load(elec_atlas_fname); elec{sbj_ix} = tmp.elec;
@@ -58,13 +89,7 @@ for sbj_ix = 1:numel(SBJs)
             tmp = load(elec_atlas_fname); elec_sbj{sbj_ix} = tmp.elec;
         end
     catch
-%         answer = input(['Could not load requested file: ' elec_atlas_fname ...
-%             '\nDo you want to run the atlas matching now? "y" or "n"\n'],'s');
-%         if strcmp(answer,'y')
-%             fn_save_elec_atlas(SBJ,pipeline_id,view_space,reg_type,atlas_id);
-%         else
             error([elec_atlas_fname 'doesnt exist, exiting...']);
-%         end
     end
     
     % Append SBJ name to labels
@@ -122,6 +147,7 @@ elec.roi       = all_roi_labels;    % appendsens strips that field
 elec.roi_color = all_roi_colors;    % appendsens strips that field
 
 %% Load brain recon
+mesh = fn_load_recon_mesh(SBJ,view_space,reg_type,hemi);
 if strcmp(view_space,'pat')
     error('This is a group plot, not a patient plot!');
 elseif strcmp(view_space,'mni')

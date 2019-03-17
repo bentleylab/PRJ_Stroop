@@ -23,6 +23,11 @@ eval(SBJ_vars_cmd);
 
 ns_color = [0 0 0];
 view_angle = [-90 0];
+if show_labels
+    lab_arg = 'label';
+else
+    lab_arg = 'off';
+end
 if strcmp(reg_type,'v') || strcmp(reg_type,'s')
     reg_suffix = ['_' reg_type];
 else
@@ -206,11 +211,6 @@ for grp_ix = 1:numel(grp_lab)+1
     for e = 1:numel(elec.label)
         cfgs.channel = elec.label{e};
         elec_tmp = fn_select_elec(cfgs, elec);
-        if show_labels
-            lab_arg = 'label';
-        else
-            lab_arg = 'off';
-        end
         ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', elec_colors{e,grp_ix}, 'label', lab_arg);
     end
     

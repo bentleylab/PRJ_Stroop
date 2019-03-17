@@ -18,3 +18,5 @@ if strcmp(key, 'l') % reset the light position
   delete(findall(h,'Type','light')) % shut out the lights
   camlight; lighting gouraud; % add a new light from the current camera position
 end
+
+end

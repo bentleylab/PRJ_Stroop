@@ -186,14 +186,14 @@ end
 % fn_view_recon_atlas_grp_sphr(SBJs,pipeline_id,'v',0,'l','Dx','mgROI',0);
 % fn_view_recon_atlas_grp_sphr(SBJs,pipeline_id,'v',0,'r','Dx','mgROI',0);
 % 
-% %% Plot CNI sig elecs
-% stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
-% an_opts  = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
-% hemi_opts = {'r','l'};
-% roi_id   = 'mgROI';
-% atlas_id = 'Dx';
-% plot_out = 0;
-% show_labels = 0;
+%% Plot CNI sig elecs
+stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
+an_opts  = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
+hemi_opts = {'r','l'};
+roi_id   = 'mgROI';
+atlas_id = 'Dx';
+plot_out = 0;
+show_labels = 0;
 % 
 % an_ix = 2;
 % fn_view_recon_atlas_grp_stat_sphr(SBJs,pipeline_id,stat_id,an_opts{an_ix},'v',0,'r',atlas_id,roi_id,plot_out);

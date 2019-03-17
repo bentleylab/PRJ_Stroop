@@ -1,11 +1,11 @@
-function fn_save_elec_atlas(SBJ, pipeline_id, view_space, reg_type, atlas_name, reref)
+function fn_save_elec_atlas(SBJ, pipeline_id, view_space, reg_type, atlas_id, reref)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJ [str] - subject ID to plot
 %   pipeline_id [str] - name of analysis pipeline, used to pick elec file
 %   view_space [str] - {'pat', 'mni'}
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
-%   atlas_name [str] - {'DK','Dx','Yeo7','Yeo17'} are the only ones implemented so far
+%   atlas_id [str] - {'DK','Dx','Yeo7','Yeo17'} are the only ones implemented so far
 %   reref [0/1] - rereferenced positions (1) or original (0)
 
 [root_dir, ~] = fn_get_root_dir();
@@ -27,29 +27,29 @@ end
 load([SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,reref_suffix,'.mat']);
 
 %% Load Atlas
-fprintf('Using atlas: %s\n',atlas_name);
-if strcmp(atlas_name,'DK')                  
+fprintf('Using atlas: %s\n',atlas_id);
+if strcmp(atlas_id,'DK')                  
     atlas      = ft_read_atlas(SBJ_vars.recon.fs_DK); % Desikan-Killiany (+volumetric)
     atlas.coordsys = 'acpc';
-elseif strcmp(atlas_name,'Dx')
+elseif strcmp(atlas_id,'Dx')
     atlas      = ft_read_atlas(SBJ_vars.recon.fs_Dx); % Destrieux (+volumetric)
     atlas.coordsys = 'acpc';
-elseif strcmp(atlas_name,'Yeo7')
-    atlas = fn_read_atlas(atlas_name);
+elseif strcmp(atlas_id,'Yeo7')
+    atlas = fn_read_atlas(atlas_id);
     atlas.coordsys = 'mni';
-elseif strcmp(atlas_name,'Yeo17')
-    atlas = fn_read_atlas(atlas_name);
+elseif strcmp(atlas_id,'Yeo17')
+    atlas = fn_read_atlas(atlas_id);
     atlas.coordsys = 'mni';
 else
-    error(['atlas_name unknown: ' atlas_name]);
+    error(['atlas_id unknown: ' atlas_id]);
 end
-atlas.name = atlas_name;
+atlas.name = atlas_id;
 
 %% Match elecs to atlas ROIs
 elec = fn_atlas_lookup(elec,atlas,'min_qry_rng',1,'max_qry_rng',5);
 
 %% Save elec strcut with atlas labels
-out_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,reref_suffix,'_',atlas_name,'.mat'];
+out_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,reref_suffix,'_',atlas_id,'.mat'];
 fprintf('Saving %s\n',out_fname);
 fprintf('==================================================================\n');
 save(out_fname,'-v7.3','elec');

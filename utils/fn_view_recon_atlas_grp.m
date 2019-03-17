@@ -1,24 +1,58 @@
-function fn_view_recon_atlas_grp(SBJs, pipeline_id, view_space, reg_type, show_labels, hemi, atlas_id, roi_id, plot_out)%, view_angle)
+function fn_view_recon_atlas_grp(SBJs, pipeline_id, reg_type, show_labels,...
+                                 hemi, atlas_id, roi_id, plot_out, varargin)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJ [str] - subject ID to plot
 %   pipeline_id [str] - name of analysis pipeline, used to pick elec file
 %   plot_type [str] - {'ortho', '3d'} choose 3 slice orthogonal plot or 3D surface rendering
-%   view_space [str] - {'mni'} ('pat' doesn't make sense)
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
 %   show_labels [0/1] - plot the electrode labels
 %   hemi [str] - {'l', 'r', 'b'} hemisphere to plot
-%   altas_id
-%   roi_id
-%   plot_out [0/1] - include electrodes that don't have an atlas label?
+%   atlas_id [str] - {'DK','Dx','Yeo7','Yeo17'}
+%   roi_id [str] - ROI grouping by which to color the atlas ROIs
+%       'gROI','mgROI','main3' - general ROIs (lobes or broad regions)
+%       'ROI','thryROI','LPFC','MPFC','OFC','INS' - specific ROIs (within these larger regions)
+%       'Yeo7','Yeo17' - colored by Yeo networks
+%       'tissue','tissueC' - colored by tisseu compartment, e.g., GM vs WM vs OUT
+%   plot_out [0/1] - include electrodes that don't have an atlas label or in hemi?
 
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 
-view_angle = [-90 0];
-if strcmp(reg_type,'v') || strcmp(reg_type,'s')
-    reg_suffix = ['_' reg_type];
+%% Handle variables
+% Handle variable inputs
+if ~isempty(varargin)
+    for v = 1:2:numel(varargin)
+        if strcmp(varargin{v},'view_angle')
+            view_angle = varargin{v+1};
+        elseif strcmp(varargin{v},'mesh_alpha') && varargin{v+1}>0 && varargin{v+1}<=1
+            mesh_alpha = varargin{v+1};
+        else
+            error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
+        end
+    end
+end
+
+% Define default options
+view_space = 'mni';
+if ~exist('view_angle','var')
+    view_angle     = [-90 0];
+end
+if ~exist('mesh_alpha','var')
+    if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
+        mesh_alpha = 0.3;
+    else
+        mesh_alpha = 0.8;
+    end
+end
+if show_labels
+    lab_arg = 'label';
 else
-    reg_suffix = '';
+    lab_arg = 'off';
+end
+if strcmp(reg_type,'v') || strcmp(reg_type,'s')
+    reg_suffix = ['_' reg_type];    % MNI space
+else
+    reg_suffix = '';                % Patient space
 end
 if strcmp(roi_id,'tissue') || strcmp(roi_id,'tissueC')
     tis_suffix = '_tis';
@@ -26,129 +60,103 @@ else
     tis_suffix = '';
 end
 
+% ROI info
+[roi_list, ~] = fn_roi_label_styles(roi_id);
+fprintf('Using atlas: %s\n',atlas_id);
+
 %% Load elec struct
-elec = cell([numel(SBJs) 1]);
-all_atlas_labels = {};
+elec     = cell([numel(SBJs) 1]);
+good_sbj = true(size(SBJs));
+all_roi_labels = {};
+all_roi_colors = [];
 for sbj_ix = 1:numel(SBJs)
     SBJ = SBJs{sbj_ix};
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
     eval(SBJ_vars_cmd);
     
     try
-        elec_atlas_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'_',atlas_id,tis_suffix,'.mat'];
-        tmp = load(elec_atlas_fname); elec{sbj_ix} = tmp.elec;
+        if strcmp(atlas_id,'Dx') || strcmp(atlas_id,'DK')   % Cover atlases defined on SBJ surfaces
+            error('why 2 step process here? what was IR32 problem?');
+            elec_atlas_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,...
+                '_',view_space,reg_suffix,'.mat'];
+            tmp = load(elec_atlas_fname); elec{sbj_ix} = tmp.elec;
+            
+            elec_atlas_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,...
+                '_pat_',atlas_id,tis_suffix,'.mat'];
+            tmp = load(elec_atlas_fname);
+            elec{sbj_ix}.atlas_label = tmp.elec.atlas_label;
+            elec{sbj_ix}.atlas_name = tmp.elec.atlas_name;
+            elec{sbj_ix}.hemi = tmp.elec.hemi;%!!! fix this! why IR32 is different?
+        else
+            elec_atlas_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,...
+                '_',view_space,reg_suffix,'_',atlas_id,tis_suffix,'.mat'];
+            tmp = load(elec_atlas_fname); elec_sbj{sbj_ix} = tmp.elec;
+        end
     catch
-%         answer = input(['Could not load requested file: ' elec_atlas_fname ...
-%             '\nDo you want to run the atlas matching now? "y" or "n"\n'],'s');
-%         if strcmp(answer,'y')
-%             fn_save_elec_atlas(SBJ,pipeline_id,view_space,reg_type,atlas_id);
-%         else
             error([elec_atlas_fname 'doesnt exist, exiting...']);
-%         end
     end
+    
+    % Append SBJ name to labels
     for e_ix = 1:numel(elec{sbj_ix}.label)
         elec{sbj_ix}.label{e_ix} = [SBJs{sbj_ix} '_' elec{sbj_ix}.label{e_ix}];
     end
     
-    % Remove electrodes that aren't in atlas ROIs
-    if ~plot_out
-        atlas_out_elecs = elec{sbj_ix}.label(strcmp(elec{sbj_ix}.atlas_label,'no_label_found'));
+    % Match elecs to atlas ROIs
+    if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
+        elec{sbj_ix}.roi       = fn_atlas2roi_labels(elec{sbj_ix}.atlas_label,atlas_id,roi_id);
+        if strcmp(roi_id,'tissueC')
+            elec{sbj_ix}.roi_color = fn_tissue2color(elec{sbj_ix});
+        elseif strcmp(atlas_id,'Yeo7')
+            elec{sbj_ix}.roi_color = fn_atlas2color(atlas_id,elec{sbj_ix}.roi);
+        else
+            elec{sbj_ix}.roi_color = fn_roi2color(elec{sbj_ix}.roi);
+        end
+    elseif any(strcmp(atlas_id,{'Yeo17'}))
+        elec{sbj_ix}.roi       = elec{sbj_ix}.atlas_label;
+        elec{sbj_ix}.roi_color = fn_atlas2color(atlas_id,elec{sbj_ix}.roi);
     end
-    if ~strcmp(hemi,'b')
-        hemi_out_elecs = elec{sbj_ix}.label(~strcmp(elec{sbj_ix}.hemi,hemi));
-    end
-    cfgs = []; cfgs.channel = [{'all'} fn_ch_lab_negate(atlas_out_elecs) fn_ch_lab_negate(hemi_out_elecs)];
-    elec{sbj_ix} = fn_select_elec(cfgs, elec{sbj_ix});
     
-    all_atlas_labels = [all_atlas_labels; elec{sbj_ix}.atlas_label];
+    if ~plot_out
+        % Remove electrodes that aren't in atlas ROIs & hemisphere
+        good_elecs = fn_select_elec_lab_match(elec{sbj_ix}, hemi, atlas_id, roi_id);
+    else
+        % Remove electrodes that aren't in hemisphere
+        good_elecs = fn_select_elec_lab_match(elec{sbj_ix}, hemi, [], []);
+    end
+    % fn_select_elec messes up if you try to toss all elecs
+    if isempty(good_elecs)
+        elec{sbj_ix} = {};
+        good_sbj(sbj_ix) = false;
+    else
+        cfgs = [];
+        cfgs.channel = good_elecs;
+        elec{sbj_ix} = fn_select_elec(cfgs, elec{sbj_ix});
+        all_roi_labels = [all_roi_labels; elec{sbj_ix}.roi];
+        all_roi_colors = [all_roi_colors; elec{sbj_ix}.roi_color];
+    end
     clear SBJ SBJ_vars SBJ_vars_cmd
 end
 
-% Combine elec structs
-elec = ft_appendsens([],elec{:});
-elec.atlas_label = all_atlas_labels;    % appendsens strips that field
+%% Combine elec structs
+elec = ft_appendsens([],elec{good_sbj});
+elec.roi       = all_roi_labels;    % appendsens strips that field
+elec.roi_color = all_roi_colors;    % appendsens strips that field
 
 %% Load brain recon
-if strcmp(view_space,'pat')
-    error('This is a group plot, not a patient plot!');
-elseif strcmp(view_space,'mni')
-    if strcmp(reg_type,'v')
-        if strcmp(hemi,'r')
-            load([ft_dir 'template/anatomy/surface_pial_right.mat']);
-        elseif strcmp(hemi,'l')
-            load([ft_dir 'template/anatomy/surface_pial_left.mat']);
-        elseif strcmp(hemi,'b')
-            load([ft_dir 'template/anatomy/surface_pial_both.mat']);
-        else
-            error(['Unknown hemisphere option: ' hemi]);
-        end
-%         mesh.coordsys = 'mni';
-    elseif strcmp(reg_type,'s')
-        if strcmp(hemi,'r') || strcmp(hemi,'l')
-            mesh = ft_read_headshape([root_dir 'PRJ_Stroop/data/atlases/freesurfer/fsaverage/' hemi 'h.pial']);
-        elseif strcmp(hemi,'b')
-            error('hemisphere "b" not yet implemented for reg_type: "srf"!');
-            mesh = ft_read_headshape([ft_dir 'subjects/fsaverage/surf/' hemi 'h.pial']);
-        else
-            error(['Unknown hemisphere option: ' hemi]);
-        end
-        mesh.coordsys = 'fsaverage';
-    else
-        error(['Unknown registration type (reg_type): ' reg_type]);
-    end
-else
-    error(['Unknown view_space: ' view_space]);
-end
-
-%% Load Atlas
-fprintf('Using atlas: %s\n',atlas_id);
-if strcmp(atlas_id,'DK')                  
-    atlas      = ft_read_atlas(SBJ_vars.recon.fs_DK); % Desikan-Killiany (+volumetric)
-    atlas.coordsys = 'acpc';
-elseif strcmp(atlas_id,'Dx')
-    atlas      = ft_read_atlas(SBJ_vars.recon.fs_Dx); % Destrieux (+volumetric)
-    atlas.coordsys = 'acpc';
-elseif strcmp(atlas_id,'Yeo7')
-    atlas = fn_read_atlas(atlas_id);
-    atlas.coordsys = 'mni';
-elseif strcmp(atlas_id,'Yeo17')
-    atlas = fn_read_atlas(atlas_id);
-    atlas.coordsys = 'mni';
-else
-    error(['atlas_name unknown: ' atlas_id]);
-end
-atlas.name = atlas_id;
-% elec.elecpos_fs   = elec.elecpos;
-
-%% Match elecs to atlas ROIs
-if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
-    elec.roi       = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
-    if strcmp(roi_id,'tissueC')
-        elec.roi_color = fn_tissue2color(elec);
-    elseif strcmp(atlas_id,'Yeo7')
-        elec.roi_color = fn_atlas2color(atlas.name,elec.roi);
-    else
-        elec.roi_color = fn_roi2color(elec.roi);
-    end
-elseif any(strcmp(atlas_id,{'Yeo17'}))
-    elec.roi       = elec.atlas_label;
-    elec.roi_color = fn_atlas2color(atlas.name,elec.roi);
-end
+mesh = fn_load_recon_mesh(SBJ,view_space,reg_type,hemi);
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
 h = figure;
 
 % Plot 3D mesh
-mesh_alpha = 0.2;
 ft_plot_mesh(mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
 
 % Plot electrodes on top
-if show_labels
-    ft_plot_sens(elec, 'elecshape', 'point', 'marker', '.',...
-        'facecolor', elec.roi_color, 'elecsize', 10, 'label', 'label');
-else
-    ft_plot_sens(elec, 'elecshape', 'point', 'marker', '.',...
-        'facecolor', elec.roi_color, 'elecsize', 10);
+for e = 1:numel(elec.label)
+    cfgs = []; cfgs.channel = elec.label(e);
+    elec_tmp = fn_select_elec(cfgs,elec);
+    ft_plot_sens(elec_tmp, 'elecshape', 'sphere',...
+                 'facecolor', elec_tmp.roi_color, 'label', lab_arg);
 end
 
 view(view_angle); material dull; lighting gouraud;
