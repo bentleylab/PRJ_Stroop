@@ -1,4 +1,4 @@
-function fn_view_recon_stat_movie(SBJ, pipeline_id, stat_id, an_id, view_space, reg_type, show_labels, hemi)
+function fn_view_recon_stat_movie(SBJ, pipeline_id, stat_id, an_id, view_space, reg_type, hemi, plt_id, varargin)
 %% Plot a reconstruction with electrodes colored according to statistics
 %   FUTURE 2: add option for stat_var to be a cell with 2nd stat for edge
 % INPUTS:
@@ -15,90 +15,62 @@ function fn_view_recon_stat_movie(SBJ, pipeline_id, stat_id, an_id, view_space, 
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
 %   show_labels [0/1] - plot the electrode labels
 %   hemi [str] - {'l', 'r', 'b'} hemisphere to plot
+%   plt_id [str] - which set of plotting params
 
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
+plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
+eval(plt_vars_cmd);
 
 %% Process plotting params
-if strcmp(hemi,'r')
-    view_angle = [60 30];
-elseif strcmp(hemi,'l')
-    view_angle = [-60 30];
-else
+% Handle variable inputs
+if ~isempty(varargin)
+    for v = 1:2:numel(varargin)
+        if strcmp(varargin{v},'view_angle')
+            view_angle = varargin{v+1};
+        elseif strcmp(varargin{v},'mesh_alpha') && varargin{v+1}>0 && varargin{v+1}<=1
+            mesh_alpha = varargin{v+1};
+        else
+            error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
+        end
+    end
+end
+
+% Implement the default options
+if ~exist('view_angle','var')
+    if strcmp(hemi,'r')
+        view_angle = [60 30];
+    elseif strcmp(hemi,'l')
+        view_angle = [-60 30];
+    else
+        error(['unknown hemi: ' hemi]);
+    end
+elseif strcmp(hemi,'b')
     error('no sense in making a both hemi movie!');
 end
-ns_color = [0 0 0];
+if ~exist('mesh_alpha','var')
+    if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
+        mesh_alpha = 0.3;
+    else
+        mesh_alpha = 0.8;
+    end
+end
 if strcmp(reg_type,'v') || strcmp(reg_type,'s')
     reg_suffix = ['_' reg_type];
 else
     reg_suffix = '';
 end
 
+ns_color = [0 0 0];
 vid_ext = '.mp4';
 vid_encoding = 'MPEG-4';
-
-%% Load timing info
-evnt_times = cell(size(plt_vars.evnt_type));
-for evnt_ix = 1:numel(plt_vars.evnt_type)
-    if strcmp(plt_vars.evnt_type{evnt_ix},'stim')
-        evnt_times{evnt_ix} = 0:1/sample_rate:plt_vars.evnt_len;
-    elseif strcmp(plt_vars.event_type{evnt_ix},'resp')
-        load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
-        evnt_times{evnt_ix} = mean(trial_info.response_time):1/sample_rate:mean(trial_info.response_time)+plt_vars.evnt_len;
-        %     % Compile cond_type, RT, trial_n
-        %     [cond_lab, cond_colors, ~] = fn_condition_label_styles('CI');
-        %     cond_RTs = zeros(size(cond_lab));
-        %     for cond_ix = 1:length(cond_lab)
-        %         cond_RTs(cond_ix) = mean(trial_info.response_time(logical(fn_condition_index(cond_lab{cond_ix},...
-        %             trial_info.condition_n))));
-        %     end
-        %     n_
-    end
-end
 
 %% Load elec struct
 load([SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'.mat']);
 
 %% Load brain recon
-if strcmp(view_space,'pat')
-    if strcmp(hemi,'r') || strcmp(hemi,'l')
-        mesh = ft_read_headshape([SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_' hemi 'h.mat']);
-    elseif strcmp(hemi,'b')
-        mesh = ft_read_headshape({[SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_rh.mat'],...
-                                    [SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_lh.mat']});
-    else
-        error(['Unknown hemisphere selected: ' hemi]);
-    end
-    mesh.coordsys = 'acpc';
-elseif strcmp(view_space,'mni')
-    if strcmp(reg_type,'vol')
-        if strcmp(hemi,'r')
-            load([ft_dir 'template/anatomy/surface_pial_right.mat']);
-        elseif strcmp(hemi,'l')
-            load([ft_dir 'template/anatomy/surface_pial_left.mat']);
-        elseif strcmp(hemi,'b')
-            load([ft_dir 'template/anatomy/surface_pial_both.mat']);
-        else
-            error(['Unknown hemisphere option: ' hemi]);
-        end
-%         mesh.coordsys = 'mni';
-    elseif strcmp(reg_type,'srf')
-        if strcmp(hemi,'r') || strcmp(hemi,'l')
-            mesh = ft_read_headshape([root_dir 'PRJ_Stroop/data/atlases/freesurfer/fsaverage/' hemi 'h.pial']);
-        elseif strcmp(hemi,'b')
-            error('hemisphere "b" not yet implemented for reg_type: "srf"!');
-            mesh = ft_read_headshape([ft_dir 'subjects/fsaverage/surf/' hemi 'h.pial']);
-        else
-            error(['Unknown hemisphere option: ' hemi]);
-        end
-        mesh.coordsys = 'fsaverage';
-    else
-        error(['Unknown registration type (reg_type): ' reg_type]);
-    end
-else
-    error(['Unknown view_space: ' view_space]);
-end
+mesh = fn_load_recon_mesh(SBJ,view_space,reg_type,hemi);
 
 %% Load Stats
 % Determine options: {'actv','CI','RT','CNI','pcon'}
@@ -194,6 +166,25 @@ else    % ANOVA
 %     stat = ft_selectdata(cfg_trim,stat);
 end
 
+%% Load timing info
+evnt_times = cell(size(plt_vars.evnt_type));
+for evnt_ix = 1:numel(plt_vars.evnt_type)
+    if strcmp(plt_vars.evnt_type{evnt_ix},'stim')
+        evnt_times{evnt_ix} = 0:1/sample_rate:plt_vars.evnt_len;
+    elseif strcmp(plt_vars.event_type{evnt_ix},'resp')
+        load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
+        evnt_times{evnt_ix} = mean(trial_info.response_time):1/sample_rate:mean(trial_info.response_time)+plt_vars.evnt_len;
+        %     % Compile cond_type, RT, trial_n
+        %     [cond_lab, cond_colors, ~] = fn_condition_label_styles('CI');
+        %     cond_RTs = zeros(size(cond_lab));
+        %     for cond_ix = 1:length(cond_lab)
+        %         cond_RTs(cond_ix) = mean(trial_info.response_time(logical(fn_condition_index(cond_lab{cond_ix},...
+        %             trial_info.condition_n))));
+        %     end
+        %     n_
+    end
+end
+
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
 if strcmp(stat_id,'actv')
     plot_name = [SBJ '_actv_HFA_' an_id];
@@ -209,10 +200,6 @@ end
 f = figure('Name',plot_name); hold on;
 
 % Plot 3D mesh
-mesh_alpha = 0.8;
-if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
-    mesh_alpha = 0.2;
-end
 mesh_obj = ft_plot_mesh(mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
 view(view_angle); material dull; lighting gouraud;
 
@@ -220,23 +207,27 @@ view(view_angle); material dull; lighting gouraud;
 % Sphere settings
 [xsp, ysp, zsp] = sphere(100);
 reg_sz = 0.5;   % radius (in mm) of non-sig sphere
-sig_sz = 2;     % radius (in mm) of non-sig sphere
+neg_sz = 1;     % radius (in mm) of negative significant
+pos_sz = 2;     % radius (in mm) of positive significant
 e_sphr_ns = cell(size(elec.label));
-e_sphr    = cell(size(elec.label));
+e_sphr_p    = cell(size(elec.label));
+e_sphr_n    = cell(size(elec.label));
 for e = 1:numel(elec.label)
     % Create non-sig sphere
     e_sphr_ns{e} = surf(reg_sz*xsp+elec.chanpos(e,1), reg_sz*ysp+elec.chanpos(e,2), reg_sz*zsp+elec.chanpos(e,3));
     set(e_sphr_ns{e}, 'EdgeColor', ns_color);%, 'FaceColor', ns_color, 'EdgeAlpha', edgealpha, 'FaceAlpha', facealpha);
     
     % Create sig sphere to turn on/off
-    e_sphr{e} = surf(sig_sz*xsp+elec.chanpos(e,1), sig_sz*ysp+elec.chanpos(e,2), sig_sz*zsp+elec.chanpos(e,3));
-    set(e_sphr{e},'Visible','off');
+    e_sphr_p{e} = surf(pos_sz*xsp+elec.chanpos(e,1), pos_sz*ysp+elec.chanpos(e,2), pos_sz*zsp+elec.chanpos(e,3));
+    e_sphr_n{e} = surf(neg_sz*xsp+elec.chanpos(e,1), neg_sz*ysp+elec.chanpos(e,2), neg_sz*zsp+elec.chanpos(e,3));
+    set(e_sphr_p{e},'Visible','off');
+    set(e_sphr_n{e},'Visible','off');
 end
 
 % Plot Timing info
 % Text for time in sec (X,Y,Z in mm)
 time_str = text(plt_vars.time_str_pos(1), plt_vars.time_str_pos(2), plt_vars.time_str_pos(3),...
-    [num2str(hfa.time(1)) ' s'], 'color', plt_vars.time_str_color,...
+    [num2str(hfa.time(1),'%.2f') ' s'], 'color', plt_vars.time_str_color,...
     'fontsize', plt_vars.time_str_size, 'horizontalalignment', plt_vars.time_str_horzalign);
 evnt_str = text(plt_vars.evnt_str_pos(1), plt_vars.evnt_str_pos(2), plt_vars.evnt_str_pos(3),...
     plt_vars.event_type{1}, 'color', plt_vars.evnt_str_color,...
@@ -259,10 +250,13 @@ for t_ix = 1:numel(hfa.time)
     for e = 1:numel(elec.label)
         if any(sig_times{e}==t_ix)
             [~,cmap_ix] = min(abs(plot_dat(e,t_ix)-elec_cmap));
-            set(e_sphr{e},'Visible','on', 'EdgeColor', cmap(cmap_ix,:));
+            if neg
+                set(e_sphr_p{e},'Visible','on', 'EdgeColor', cmap(cmap_ix,:));
+            else
+            end
             %                 sphr = ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', cmap(cmap_ix,:), 'label', lab_arg);
         else
-            set(e_sphr{e},'Visible','off');
+            set(e_sphr_p{e},'Visible','off');
         end
     end
     % Update time
@@ -290,54 +284,4 @@ open(vid_out);
 writeVideo(vid_out,frames);
 close(vid_out);
 
-%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SUBFUNCTION
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function cb_keyboard(h, eventdata)
-
-if isempty(eventdata)
-    % determine the key that corresponds to the uicontrol element that was activated
-    key = get(h, 'userdata');
-else
-    % determine the key that was pressed on the keyboard
-    key = parseKeyboardEvent(eventdata);
-end
-% get focus back to figure
-if ~strcmp(get(h, 'type'), 'figure')
-    set(h, 'enable', 'off');
-    drawnow;
-    set(h, 'enable', 'on');
-end
-
-if strcmp(key, 'l') % reset the light position
-    delete(findall(h,'Type','light')) % shut out the lights
-    camlight; lighting gouraud; % add a new light from the current camera position
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SUBFUNCTION
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function key = parseKeyboardEvent(eventdata)
-
-key = eventdata.Key;
-% handle possible numpad events (different for Windows and UNIX systems)
-% NOTE: shift+numpad number does not work on UNIX, since the shift
-% modifier is always sent for numpad events
-if isunix()
-  shiftInd = match_str(eventdata.Modifier, 'shift');
-  if ~isnan(str2double(eventdata.Character)) && ~isempty(shiftInd)
-    % now we now it was a numpad keystroke (numeric character sent AND
-    % shift modifier present)
-    key = eventdata.Character;
-    eventdata.Modifier(shiftInd) = []; % strip the shift modifier
-  end
-elseif ispc()
-  if strfind(eventdata.Key, 'numpad')
-    key = eventdata.Character;d
-  end
-end
-
-if ~isempty(eventdata.Modifier)
-  key = [eventdata.Modifier{1} '+' key];
 end

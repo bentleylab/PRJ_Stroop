@@ -42,16 +42,12 @@ if ~exist('view_angle','var')
 end
 if ~exist('mesh_alpha','var')
     if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
-        mesh_alpha = 0.3;
+        mesh_alpha = 0.4;
     else
-        mesh_alpha = 0.8;
+        mesh_alpha     = 0.8;
     end
 end
-if show_labels
-    lab_arg = 'label';
-else
-    lab_arg = 'off';
-end
+
 if strcmp(reg_type,'v') || strcmp(reg_type,'s')
     reg_suffix = ['_' reg_type];    % MNI space
 else
@@ -79,8 +75,11 @@ end
 
 %% Remove electrodes that aren't in atlas ROIs
 if ~plot_out
-    cfgs = [];
-    cfgs.channel = fn_select_elec_lab_match(elec, hemi, atlas_id, []);
+    atlas_out_elecs = elec.label(strcmp(elec.atlas_label,'no_label_found'));
+    if ~strcmp(hemi,'b')
+        hemi_out_elecs = elec.label(~strcmp(elec.hemi,hemi));
+    end
+    cfgs = []; cfgs.channel = [{'all'} fn_ch_lab_negate(atlas_out_elecs) fn_ch_lab_negate(hemi_out_elecs)];
     elec = fn_select_elec(cfgs, elec);
 end
 
@@ -118,8 +117,11 @@ cfgs = [];
 for e = 1:numel(elec.label)
     cfgs.channel = elec.label{e};
     elec_tmp = fn_select_elec(cfgs, elec);
-    ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', elec_tmp.roi_color,...
-                 'label', lab_arg);
+    if show_labels
+        ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', elec_tmp.roi_color, 'label', 'label');
+    else
+        ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', elec_tmp.roi_color);
+    end
 end
 
 view(view_angle); material dull; lighting gouraud;

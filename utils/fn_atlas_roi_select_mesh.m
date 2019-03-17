@@ -1,8 +1,8 @@
-function roi_lab = fn_atlas_roi_select_mesh(atlas_name, roi_id, hemi)
+function roi_lab = fn_atlas_roi_select_mesh(atlas_id, roi_id, hemi)
 %% Returns ROI labels for plotting that ROI's mesh in a given atlas
 
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
-tsv_filename = [root_dir 'PRJ_Stroop/data/atlases/atlas_mappings/atlas_ROI_mappings_' atlas_name '_both_hemi.tsv'];
+tsv_filename = [root_dir 'PRJ_Stroop/data/atlases/atlas_mappings/atlas_ROI_mappings_' atlas_id '_both_hemi.tsv'];
 fprintf('\tReading roi csv file: %s\n', tsv_filename);
 roi_file = fopen(tsv_filename, 'r');
 % roi.csv contents:

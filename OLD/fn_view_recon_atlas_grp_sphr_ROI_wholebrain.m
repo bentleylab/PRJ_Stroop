@@ -1,4 +1,4 @@
-function fn_view_recon_atlas_grp_sphr_ROI(SBJs, pipeline_id, reg_type, show_labels, hemi, atlas_id, roi_id, roi_mesh_id, plot_out)%, view_angle)
+function fn_view_recon_atlas_grp_sphr_ROI_wholebrain(SBJs, pipeline_id, reg_type, show_labels, hemi, atlas_id, roi_id, roi_mesh_id, plot_out)%, view_angle)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJ [str] - subject ID to plot

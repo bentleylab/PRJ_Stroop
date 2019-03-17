@@ -1,4 +1,4 @@
-function [atlas] = fn_read_atlas(atlas_name)
+function [atlas] = fn_read_atlas(atlas_id)
 %% Custom version of ft_read_atlas to work with Yeo atlas
 %   modeled after lines 1722:1746 from ft_read_atlas
 
@@ -6,7 +6,7 @@ function [atlas] = fn_read_atlas(atlas_name)
 
 %% Load Atlas
 % Select atlas filename
-switch atlas_name
+switch atlas_id
     case 'Yeo7'
         atlas_fname = [root_dir 'PRJ_Stroop/data/atlases/Yeo/Yeo_JNeurophysiol11_MNI152/'...
             'Yeo2011_7Networks_MNI152_FreeSurferConformed1mm_LiberalMask_colin27.nii'];
