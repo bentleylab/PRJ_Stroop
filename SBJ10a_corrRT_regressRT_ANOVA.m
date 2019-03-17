@@ -14,7 +14,7 @@ eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/an_vars/' an_id '_vars.m']);
 eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
 
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'));
-load(strcat(SBJ_vars.dirs.proc,SBJ,'_HFA_ROI_',an_id,'.mat'));
+load(strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'.mat'));
 
 % Select data in stat window
 cfg_trim = [];
