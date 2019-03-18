@@ -79,19 +79,23 @@ if strcmp(HFA_type,'multiband')
     cfg_hfa.trials = 'all';
     hfa = ft_freqanalysis(cfg_hfa, roi_trl);
 elseif strcmp(HFA_type,'hilbert')
-    % Hilbert method to extract power
-    hfas = cell(size(fois));
-    orig_lab = roi_trl.label;
+    % Create fake ft_freqanalysis struct
+    hfa.label = roi_trl.label;
+    hfa.freq  = fois;
+    hfa.time  = roi_trl.time{1};
+    hfa.powspctrm = zeros([numel(roi_trl.trial) numel(roi_trl.label) numel(fois) numel(roi_trl.time{1})]);
+    hfa.dimord = 'rpt_chan_freq_time';
+    hfa.trialinfo = roi_trl.trialinfo;
     for f_ix = 1:numel(fois)
         cfg_hfa.bpfreq = bp_lim(f_ix,:);
         cfg_hfa.hilbert = 'abs';
         fprintf('\n------> %s filtering: %.03f - %.03f\n', HFA_type, bp_lim(f_ix,1), bp_lim(f_ix,2));
-        hfas{f_ix} = ft_preprocessing(cfg_hfa,roi_trl);
-        hfas{f_ix}.label = strcat(hfas{f_ix}.label,[':' num2str(fois(f_ix),4)]);
+        hfa_tmp = ft_preprocessing(cfg_hfa,roi_trl);
+        for t_ix = 1:numel(roi_trl.trial)
+            hfa.powspctrm(t_ix,:,f_ix,:) = hfa_tmp.trial{t_ix};
+        end
     end
-    % Treat different freqs as channels
-    hfa_tmp = hfas{1};      % Save to plug in averaged data
-    hfa = ft_appenddata([], hfas{:}); clear hfas;
+    clear hfa_tmp;
 elseif strcmp(HFA_type,'broadband')
     error('Stop using broadband and use filter-hilbert or multitapers you dummy!');
     %         % Filter to single HFA band
@@ -111,7 +115,6 @@ else
     error('mismatched R-locked without S-locked baseline!');
 end
 hfa = ft_selectdata(cfg_trim,hfa);
-hfa_tmp = ft_selectdata(cfg_trim,hfa_tmp);
 
 %% Baseline Correction
 fprintf('===================================================\n');
@@ -119,13 +122,7 @@ fprintf('---------------- Baseline Correction --------------\n');
 fprintf('===================================================\n');
 switch bsln_type
     case {'zboot', 'zscore'}
-        if strcmp(HFA_type,'multiband')
-            hfa = fn_bsln_ft_tfr(hfa,bsln_lim,bsln_type,n_boots);
-        elseif any(strcmp(HFA_type,{'broadband','hilbert'}))
-            hfa = fn_bsln_ft_filtered(hfa,bsln_lim,bsln_type,n_boots);
-        else
-            error('Unknown HFA_type provided');
-        end
+        hfa = fn_bsln_ft_tfr(hfa,bsln_lim,bsln_type,n_boots);
     case {'relchange', 'demean', 'my_relchange'}
         error(['bsln_type ' bsln_type ' is not compatible with one-sample t test bsln activation stats']);
 %         cfgbsln = [];
@@ -150,59 +147,30 @@ if smooth_pow_ts
     fprintf('===================================================\n');
     fprintf('----------------- Filtering Power -----------------\n');
     fprintf('===================================================\n');
-    if isfield(hfa,'powspctrm')
-        for ch_ix = 1:numel(hfa.label)
-            for f_ix = 1:numel(hfa.freq)
-                if strcmp(lp_yn,'yes') && strcmp(hp_yn,'yes')
-                    hfa.powspctrm(:,ch_ix,f_ix,:) = fn_EEGlab_bandpass(...
-                        hfa.powspctrm(:,ch_ix,f_ix,:), roi_fsample, hp_freq, lp_freq);
-                elseif strcmp(lp_yn,'yes')
-                    hfa.powspctrm(:,ch_ix,f_ix,:) = fn_EEGlab_lowpass(...
-                        hfa.powspctrm(:,ch_ix,f_ix,:), roi_fsample, lp_freq);
-                else
-                    error('weird non-Y/N filtering options!');
-                end
+    for ch_ix = 1:numel(hfa.label)
+        for f_ix = 1:numel(hfa.freq)
+            if strcmp(lp_yn,'yes') && strcmp(hp_yn,'yes')
+                hfa.powspctrm(:,ch_ix,f_ix,:) = fn_EEGlab_bandpass(...
+                    hfa.powspctrm(:,ch_ix,f_ix,:), roi_fsample, hp_freq, lp_freq);
+            elseif strcmp(lp_yn,'yes')
+                hfa.powspctrm(:,ch_ix,f_ix,:) = fn_EEGlab_lowpass(...
+                    hfa.powspctrm(:,ch_ix,f_ix,:), roi_fsample, lp_freq);
+            else
+                error('weird non-Y/N filtering options!');
             end
-        end
-    else
-        if strcmp(lp_yn,'yes') && strcmp(hp_yn,'yes')
-            hfa.trial{1} = fn_EEGlab_bandpass(hfa.trial{1}, roi_fsample, hp_freq, lp_freq);
-        elseif strcmp(lp_yn,'yes')
-            hfa.trial{1} = fn_EEGlab_lowpass(hfa.trial{1}, roi_fsample, lp_freq);
-        else
-            error('weird non-Y/N filtering options!');
         end
     end
 end
 
 %% Merge multiple bands
-if strcmp(HFA_type,'multiband')
-    cfg_avg = [];
-    cfg_avg.freq = 'all';
-    cfg_avg.avgoverfreq = 'yes';
-    hfa = ft_selectdata(cfg_avg,hfa);
-elseif strcmp(HFA_type,'hilbert')
-    hfa_tmp.label = orig_lab;
-%     lab_ix = 1;
-%     ch_check = zeros(size(hfa.label));
-    for ch_ix = 1:numel(hfa_tmp.label)
-        ch_lab_ix = find(~cellfun(@isempty,strfind(hfa.label,hfa_tmp.label{ch_ix})));
-%         ch_check(ch_lab_ix) = ch_check(ch_lab_ix)+ch_ix;
-        for t_ix = 1:numel(hfa_tmp.trial)
-            hfa_tmp.trial{t_ix}(ch_ix,:) = mean(hfa.trial{t_ix}(ch_lab_ix,:),1);
-        end
-%         lab_ix = ch_lab_ix(end)+1;
-    end
-    hfa = hfa_tmp; clear hfa_tmp;
-end
+cfg_avg = [];
+cfg_avg.freq = 'all';
+cfg_avg.avgoverfreq = 'yes';
+hfa = ft_selectdata(cfg_avg,hfa);
 
 %% Re-align to event of interest if necessary (e.g., response)
 if strcmp(event_type,'resp')
-    if strcmp(HFA_type,'multiband')
-        hfa = fn_realign_tfr_s2r(hfa,trial_info.response_time,trial_lim_s);
-    elseif any(strcmp(HFA_type,{'broadband','hilbert'}))
-        hfa = fn_realign_filt_s2r(hfa,trial_info.response_time,trial_lim_s);
-    end
+    hfa = fn_realign_tfr_s2r(hfa,trial_info.response_time,trial_lim_s);
 elseif ~strcmp(event_type,'stim')
     error(['ERROR: unknown event_type ' event_type]);
 end
