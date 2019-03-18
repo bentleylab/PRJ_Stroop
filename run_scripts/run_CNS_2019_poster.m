@@ -183,9 +183,9 @@ end
 % %   RECONS with EFFECTS
 % %  =================================================================================
 % %% Plot group recon with mgROI
-% fn_view_recon_atlas_grp_sphr(SBJs,pipeline_id,'v',0,'l','Dx','mgROI',0);
-% fn_view_recon_atlas_grp_sphr(SBJs,pipeline_id,'v',0,'r','Dx','mgROI',0);
-% 
+fn_view_recon_atlas_grp(SBJs,pipeline_id,'v',0,'l','Dx','mgROI',0);
+fn_view_recon_atlas_grp(SBJs,pipeline_id,'v',0,'r','Dx','mgROI',0);
+
 %% Plot CNI sig elecs
 stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
 an_opts  = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};

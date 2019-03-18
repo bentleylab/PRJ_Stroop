@@ -4,7 +4,6 @@ function fn_view_recon_atlas(SBJ, pipeline_id, view_space, reg_type, show_labels
 % INPUTS:
 %   SBJ [str] - subject ID to plot
 %   pipeline_id [str] - name of analysis pipeline, used to pick elec file
-%   plot_type [str] - {'ortho', '3d'} choose 3 slice orthogonal plot or 3D surface rendering
 %   view_space [str] - {'pat', 'mni'}
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
 %   show_labels [0/1] - plot the electrode labels
@@ -85,11 +84,7 @@ if ~plot_out
 end
 
 %% Load brain recon
-if strcmp(plot_type,'3d')
-    mesh = fn_load_recon_mesh(SBJ,view_space,reg_type,hemi);
-else
-    error(['atlas plotting only on meshes, use 3d plot_type, not ' plot_type]);
-end
+mesh = fn_load_recon_mesh(SBJ,view_space,reg_type,hemi);
 
 %% Match elecs to atlas ROIs
 fprintf('Using atlas: %s\n',atlas_id);

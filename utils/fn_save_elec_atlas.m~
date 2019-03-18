@@ -82,15 +82,13 @@ if any(strcmp(atlas_id,{'DK','Dx'}))
         
         % Check for secondary matches and add to total
         if ~isempty(tiss.atlas_label2{e})
-            tiss.tissue2{e} = fn_atlas2roi_labels(tiss.atlas_label2{e},atlas_name,'tissue');
-            for roi = 1:numel(tiss.tissue2{e})
-                tiss.tissue_prob(e,strcmp(tiss.tissue2{e}{roi},tiss.tissue_labels)) = ...
-                    tiss.tissue_prob(e,strcmp(tiss.tissue2{e}{roi},tiss.tissue_labels)) + tiss.atlas_prob2{e}(roi);
+            tiss.tissue2{e} = fn_atlas2roi_labels(elec.atlas_label2{e},atlas_name,'tissue');
+            for roi = 1:numel(elec.tissue2{e})
+                elec.tissue_prob(e,strcmp(elec.tissue2{e}{roi},elec.tissue_labels)) = ...
+                    elec.tissue_prob(e,strcmp(elec.tissue2{e}{roi},elec.tissue_labels)) + elec.atlas_prob2{e}(roi);
             end
         end
     end
-    
-    %% Add tissue info to atlas ROI elec struct
     
 end
 %% Save elec strcut with atlas labels

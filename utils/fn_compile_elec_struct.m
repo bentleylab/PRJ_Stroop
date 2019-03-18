@@ -173,9 +173,12 @@ for e = 1:numel(elec.label)
     end
 end
 
-% Fix IR68 (only exception)
-if strcmp(SBJ,'IR68')
+% Fix Exceptions
+if strcmp(SBJ,'IR68')                                       % IR68- All probes in L
     elec.hemi = repmat({'l'},size(elec.label));
+elseif strcmp(SBJ,'CP24')                                   % CP24- RLF has L in it
+    rlf_ix = ~cellfun(@isempty,strfind(elec.label,'RLF'));
+    elec.hemi(rlf_ix) = repmat({'r'},size(elec.label(rlf_ix)));
 end
 
 %% Save data
