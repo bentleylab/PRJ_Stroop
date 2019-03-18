@@ -84,8 +84,8 @@ for sbj_ix = 1:numel(SBJs)
             elec_atlas_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,...
                 '_pat_',atlas_id,tis_suffix,'.mat'];
             tmp = load(elec_atlas_fname);
-            elec{sbj_ix}.atlas_label = tmp.elec.atlas_label;
-            elec{sbj_ix}.atlas_name = tmp.elec.atlas_name;
+            elec{sbj_ix}.atlas_lab = tmp.elec.atlas_lab;
+            elec{sbj_ix}.atlas_id    = tmp.elec.atlas_id;
             elec{sbj_ix}.hemi = tmp.elec.hemi;%!!! fix this! why IR32 is different?
         else
             elec_atlas_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,...
@@ -103,7 +103,7 @@ for sbj_ix = 1:numel(SBJs)
     
     % Match elecs to atlas ROIs
     if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
-        elec{sbj_ix}.roi       = fn_atlas2roi_labels(elec{sbj_ix}.atlas_label,atlas_id,roi_id);
+        elec{sbj_ix}.roi       = fn_atlas2roi_labels(elec{sbj_ix}.atlas_lab,atlas_id,roi_id);
         if strcmp(roi_id,'tissueC')
             elec{sbj_ix}.roi_color = fn_tissue2color(elec{sbj_ix});
         elseif strcmp(atlas_id,'Yeo7')
@@ -112,7 +112,7 @@ for sbj_ix = 1:numel(SBJs)
             elec{sbj_ix}.roi_color = fn_roi2color(elec{sbj_ix}.roi);
         end
     elseif any(strcmp(atlas_id,{'Yeo17'}))
-        elec{sbj_ix}.roi       = elec{sbj_ix}.atlas_label;
+        elec{sbj_ix}.roi       = elec{sbj_ix}.atlas_lab;
         elec{sbj_ix}.roi_color = fn_atlas2color(atlas_id,elec{sbj_ix}.roi);
     end
     

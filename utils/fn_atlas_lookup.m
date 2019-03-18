@@ -32,13 +32,13 @@ end
 %% Find ROI Labels of electrodes (Create elec table)
 % Initialize the new fields
 elec_lab = elec;
-elec_lab.atlas_name    = atlas.name;
-elec_lab.atlas_label   = cell(size(elec.label));
-elec_lab.atlas_prob    = zeros(size(elec.label));
-elec_lab.atlas_qryrng  = zeros(size(elec.label));
-elec_lab.atlas_qrysz   = zeros(size(elec.label));
-elec_lab.atlas_label2  = cell(size(elec.label));
-elec_lab.atlas_prob2   = cell(size(elec.label));
+elec_lab.atlas_id     = atlas.name;
+elec_lab.atlas_lab    = cell(size(elec.label));
+elec_lab.atlas_prob   = zeros(size(elec.label));
+elec_lab.atlas_qryrng = zeros(size(elec.label));
+elec_lab.atlas_qrysz  = zeros(size(elec.label));
+elec_lab.atlas_lab2   = cell(size(elec.label));
+elec_lab.atlas_prob2  = cell(size(elec.label));
 
 cfg = [];
 cfg.atlas              = atlas;
@@ -59,17 +59,28 @@ for e = 1:numel(elec.label);
     
     % Assign highest match as label
     if numel(match_cnt)>=1
-        elec_lab.atlas_label{e}  = report.name{cnt_idx(1)};
-        elec_lab.atlas_prob(e)   = report.count(cnt_idx(1))/sum(report.count);
-        elec_lab.atlas_qryrng(e) = report.usedqueryrange{cnt_idx(1)};
-        elec_lab.atlas_qrysz(e)  = sum(report.count);
+        elec_lab.atlas_lab{e}  = report.name{cnt_idx(1)};
+        elec_lab.atlas_prob(e) = report.count(cnt_idx(1))/sum(report.count);
+        % report.usedqueryrange bug work around:
+        %   ft_volumelookup only assigns usedQR to last ROI in list
+        %   if best match isn't last, usedQR is empty --> error assigning to elec_lab
+        %   instead: grab whatever the usedQR for that iteration was (should be the same)
+        if numel(report.usedqueryrange{cnt_idx(1)})~=1
+            if numel([report.usedqueryrange{:}])>1      % check that there was only one usedQR
+                error('work around for missing usedQR didnt work!');
+            end
+            elec_lab.atlas_qryrng(e) = [report.usedqueryrange{:}];
+        else
+            elec_lab.atlas_qryrng(e) = report.usedqueryrange{cnt_idx(1)};
+        end
+        elec_lab.atlas_qrysz(e) = sum(report.count);
         % add additional labels if needed
         if numel(match_cnt)>1
-            elec_lab.atlas_label2{e}  = report.name(cnt_idx(2:numel(match_cnt)));
-            elec_lab.atlas_prob2{e}   = report.count(cnt_idx(2:numel(match_cnt)))/sum(report.count);
+            elec_lab.atlas_lab2{e}  = report.name(cnt_idx(2:numel(match_cnt)));
+            elec_lab.atlas_prob2{e} = report.count(cnt_idx(2:numel(match_cnt)))/sum(report.count);
         else
-            elec_lab.atlas_label2{e}  = '';
-            elec_lab.atlas_prob2{e}   = NaN;
+            elec_lab.atlas_lab2{e}  = '';
+            elec_lab.atlas_prob2{e} = NaN;
         end
     else   % No matches found
         error(['No matches found for elec: ' elec.label{e}]);
@@ -93,6 +104,13 @@ end
 % [~, indx] = max(labels.count);
 % labels.name(indx)
 
+%% Check that all atlas_prob add to 1
+for e = 1:numel(elec_lab.label)
+    if elec_lab.atlas_prob(e)+sum(elec_lab.atlas_prob2{e})<0.99999  % sometimes it's 0.99999999999999988898
+        error(['Electrode ' elec_lab.label{e} ' has atlas_prob = '...
+            num2str(elec_lab.atlas_prob(e)+sum(elec_lab.atlas_prob2{e}))]);
+    end
+end
 
 end
 

@@ -17,8 +17,10 @@ if strcmp(reg_type,'v') || strcmp(reg_type,'s')
 else
     reg_suffix = '';
 end
+if ischar(reref); reref = str2num(reref); end
 if reref
-    reref_suffix = '';
+    error('WHY??? This should be run on orig positions then combined');
+    % reref_suffix = '';
 else
     reref_suffix = '_orig';
 end
@@ -27,46 +29,14 @@ end
 load([SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,reref_suffix,'.mat']);
 
 %% Load Atlas
-fprintf('Using atlas: %s\n',atlas_id);
-if strcmp(atlas_id,'DK')                  
-    atlas      = ft_read_atlas(SBJ_vars.recon.fs_DK); % Desikan-Killiany (+volumetric)
-    atlas.coordsys = 'acpc';
-elseif strcmp(atlas_id,'Dx')
-    atlas      = ft_read_atlas(SBJ_vars.recon.fs_Dx); % Destrieux (+volumetric)
-    atlas.coordsys = 'acpc';
-elseif strcmp(atlas_id,'Yeo7')
-    atlas = fn_read_atlas(atlas_id);
-    atlas.coordsys = 'mni';
-elseif strcmp(atlas_id,'Yeo17')
-    atlas = fn_read_atlas(atlas_id);
-    atlas.coordsys = 'mni';
-else
-    error(['atlas_id unknown: ' atlas_id]);
-end
-atlas.name = atlas_id;
+atlas = fn_load_recon_atlas(SBJ,atlas_id);
 
 %% Match elecs to atlas ROIs
 elec = fn_atlas_lookup(elec,atlas,'min_qry_rng',1,'max_qry_rng',5);
 
-% Check that all atlas_prob add to 1
-for e = 1:numel(elec.label)
-    if elec.atlas_prob(e)+sum(elec.atlas_prob2{e})<0.99999  % sometimes it's 0.99999999999999988898
-        error(['Electrode ' elec.label{e} ' has atlas_prob = '...
-            num2str(elec.atlas_prob(e)+sum(elec.atlas_prob2{e}))]);
-    end
-end
-
 %% Match elecs to atlas tissue compartments
 if any(strcmp(atlas_id,{'DK','Dx'}))
-    tiss = fn_atlas_lookup(elec,atlas,'min_qry_rng',1,'max_qry_rng',5);
-    
-    % Check that all atlas_prob add to 1
-    for e = 1:numel(tiss.label)
-        if tiss.atlas_prob(e)+sum(tiss.atlas_prob2{e})<0.99999  % sometimes it's 0.99999999999999988898
-            error(['Electrode ' tiss.label{e} ' has atlas_prob = '...
-                num2str(tiss.atlas_prob(e)+sum(tiss.atlas_prob2{e}))]);
-        end
-    end
+    tiss = fn_atlas_lookup(elec,atlas,'min_qry_rng',5,'max_qry_rng',5);
     
     %% Convert atlas labels and probabilities to GM probability
     % usedqueryrange search sizes: 1 = 1; 3 = 7; 5 = 33
@@ -74,15 +44,16 @@ if any(strcmp(atlas_id,{'DK','Dx'}))
     tiss.tissue_prob = zeros([numel(tiss.label) numel(tiss.tissue_labels)]);
     
     % Assign atlas labels to tissue type
-    tiss.tissue       = fn_atlas2roi_labels(tiss.atlas_label,atlas_name,'tissue');
+    tiss.tissue  = fn_atlas2roi_labels(tiss.atlas_lab,atlas_id,'tissue');
+    tiss.tissue2 = cell(size(tiss.tissue));
     for e = 1:numel(tiss.label)
         % Compute Probability of Tissue Types {GM, WM, CSF, OUT}
         tiss.tissue_prob(e,strcmp(tiss.tissue{e},tiss.tissue_labels)) = ...
             tiss.tissue_prob(e,strcmp(tiss.tissue{e},tiss.tissue_labels)) + tiss.atlas_prob(e);
         
         % Check for secondary matches and add to total
-        if ~isempty(tiss.atlas_label2{e})
-            tiss.tissue2{e} = fn_atlas2roi_labels(tiss.atlas_label2{e},atlas_name,'tissue');
+        if ~isempty(tiss.atlas_lab2{e})
+            tiss.tissue2{e} = fn_atlas2roi_labels(tiss.atlas_lab2{e},atlas_id,'tissue');
             for roi = 1:numel(tiss.tissue2{e})
                 tiss.tissue_prob(e,strcmp(tiss.tissue2{e}{roi},tiss.tissue_labels)) = ...
                     tiss.tissue_prob(e,strcmp(tiss.tissue2{e}{roi},tiss.tissue_labels)) + tiss.atlas_prob2{e}(roi);
@@ -91,8 +62,12 @@ if any(strcmp(atlas_id,{'DK','Dx'}))
     end
     
     %% Add tissue info to atlas ROI elec struct
-    
+    elec.tissue_labels = tiss.tissue_labels;
+    elec.tissue        = tiss.tissue;
+    elec.tissue2       = tiss.tissue2;
+    elec.tissue_prob   = tiss.tissue_prob;
 end
+
 %% Save elec strcut with atlas labels
 out_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,reref_suffix,'_',atlas_id,'.mat'];
 fprintf('Saving %s\n',out_fname);

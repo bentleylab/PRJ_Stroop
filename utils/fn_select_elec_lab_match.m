@@ -29,7 +29,7 @@ if ~isempty(atlas_id)
         end
         lab_match = all([lab_match any(roi_match,2)],2);
     else
-        lab_match = all([lab_match ~strcmp(elec.atlas_label,'no_label_found')],2);
+        lab_match = all([lab_match ~strcmp(elec.atlas_lab,'no_label_found')],2);
     end
 end
 

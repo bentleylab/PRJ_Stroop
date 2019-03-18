@@ -67,7 +67,7 @@ end
 [roi_list, ~] = fn_roi_label_styles(roi_id);
 
 if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
-    elec.roi       = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
+    elec.roi       = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,roi_id);
     if strcmp(roi_id,'tissueC')
         elec.roi_color = fn_tissue2color(elec);
     elseif strcmp(atlas_id,'Yeo7')
@@ -76,7 +76,7 @@ if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
         elec.roi_color = fn_roi2color(elec.roi);
     end
 elseif any(strcmp(atlas_id,{'Yeo17'}))
-    elec.roi       = elec.atlas_label;
+    elec.roi       = elec.atlas_lab;
     elec.roi_color = fn_atlas2color(atlas_id,elec.roi);
 end
 
