@@ -8,7 +8,13 @@ function fn_save_elec_atlas(SBJ, pipeline_id, view_space, reg_type, atlas_id, re
 %   atlas_id [str] - {'DK','Dx','Yeo7','Yeo17'} are the only ones implemented so far
 %   reref [0/1] - rereferenced positions (1) or original (0)
 
-[root_dir, ~] = fn_get_root_dir();
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+addpath([root_dir 'PRJ_Stroop/scripts/']);
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+addpath(ft_dir);
+ft_defaults
+
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 

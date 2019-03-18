@@ -16,6 +16,6 @@ func_call="${FUNCTION}('${SBJ}','${pipeline_id}','${view_space}','${reg_type}','
 echo ${DATASET}
 echo ${func_call}
 echo $$
-echo ${func_call} > NotBackedUp/tmpSGE/fn_save_elec_atlas_${SBJ}.m
-time matlab -nodesktop -nosplash -nodisplay < NotBackedUp/tmpSGE/fn_save_elec_atlas_${SBJ}.m
-rm NotBackedUp/tmpSGE/fn_save_elec_atlas_${SBJ}.m
+echo ${func_call} > ../NotBackedUp/tmpSGE/fn_save_elec_atlas_${SBJ}.m
+time matlab -nodesktop -nosplash -nodisplay < ../NotBackedUp/tmpSGE/fn_save_elec_atlas_${SBJ}.m
+rm ../NotBackedUp/tmpSGE/fn_save_elec_atlas_${SBJ}.m
