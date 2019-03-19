@@ -105,3 +105,6 @@ end
 if isfield(elec_og, 'tra')
   elec = rmfield(elec, 'tra');
 end
+
+% Sort output by cfg.channel
+elec = fn_reorder_elec(elec,cfg.channel);

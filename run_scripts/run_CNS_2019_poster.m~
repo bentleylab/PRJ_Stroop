@@ -23,11 +23,11 @@ an_id_r     = 'HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1';
 plt_id      = 'stack_S2to15_R5to10_evnt_c5';
 save_fig    = 1;
 fig_vis     = 'off';
-fig_ftype= 'png';
+fig_filetype= 'png';
 for s = 1:numel(SBJs)
     % need to fix this to work with filtered vs. powspctrm data 
     SBJ08b_HFA_plot_SR_stack_cond_saved(SBJs{s},conditions,an_id_s,an_id_r,...
-                                        plt_id,save_fig,fig_vis,fig_ftype);
+                                        plt_id,save_fig,fig_vis,fig_filetype);
     close all;
 end
 
@@ -76,10 +76,10 @@ roi_id      = 'gROI';%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
 gm_thresh   = 0;
 plot_out    = 0;
 fig_vis     = 'on';
-fig_ftype= 'svg';
+fig_filetype= 'svg';
 for an_ix = 1:2
     SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_CSE_RT_ANOVA_ROI(SBJs,stat_id,pipeline_id,...
-        an_opts{an_ix},roi_id,atlas_id,gm_thresh,plt_id,plot_out,save_fig,fig_vis,fig_ftype);
+        an_opts{an_ix},roi_id,atlas_id,gm_thresh,plt_id,plot_out,save_fig,fig_vis,fig_filetype);
 end
 
 %% Plot onsets of ANOVA+RT
@@ -95,7 +95,7 @@ atlas_opts  = {'Dx'};
 % plt_opts    = {{'onsets_trl5to1_evnt_roi'}};%{'onsets_trl0to15_evnt_roi'},
 plt_opts    = {{'onsets_trl0to15_violin_allROI','onsets_trl5to1_violin_all'}};%{{'onsets_trl0to15_violin_allSBJ','onsets_trl0to15_violin_allROI','onsets_trl0to15_violin_avgROI'},...
 %                {'onsets_trl5to1_violin_allSBJ','onsets_trl5to1_violin_allROI','onsets_trl5to1_violin_avgROI'}};
-fig_ftype = 'png';%'svg'
+fig_filetype = 'png';%'svg'
 an_ix = 1;
 for roi_ix = 1%:numel(roi_opts)
     for plt_ix = 1:numel(plt_opts)
@@ -103,13 +103,13 @@ for roi_ix = 1%:numel(roi_opts)
             fprintf('roi: %s; an: %s; plt: %s\n',roi_opts{roi_ix},an_opts{an_ix},plt_opts{plt_ix}{plt_ix});
 %             % Violin Plots
             SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA_timeBin(SBJs,tbin_id,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
-                                                    atlas_opts{roi_ix},gm_thresh,plt_opts{plt_ix}{plt_ix},1,'on',fig_ftype)
+                                                    atlas_opts{roi_ix},gm_thresh,plt_opts{plt_ix}{plt_ix},1,'on',fig_filetype)
             SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
                                                     atlas_opts{roi_ix},gm_thresh,plt_opts{an_ix}{plt_ix},1,'on',fig_filetype)
 %             SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA_clustBin(SBJs,clust_id,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
 %                                                     atlas_opts{roi_ix},gm_thresh,plt_opts{an_ix}{plt_ix},1,'on',fig_filetype)
             % Pair differences
-            SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
+        SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
                                                     atlas_id,0,plt_opts{1}{2},save_fig,fig_vis)
 %         end
     end
