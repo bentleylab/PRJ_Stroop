@@ -1,7 +1,7 @@
 function SBJ01b_align_nlx_evnt(SBJ, pipeline_id, block_ix, save_it)
 % save_it == 0: don't save plots, compare to raw data
 %         == 1: save plots and data, compare to import
-
+error('fix mic alignment for saving .wav!');
 if block_ix~=1
     error('SBJ01b not ready for multi-block runs yet!');
 end

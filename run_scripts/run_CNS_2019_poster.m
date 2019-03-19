@@ -8,7 +8,7 @@ ft_defaults
 
 %% Set up variables to enter function
 SBJs = {'CP24','CP26','IR21','IR26','IR31','IR32','IR35','IR39','IR41',...
-        'IR52','IR54','IR57','IR61','IR65','IR68','IR72','IR74'};%ALMOST: 'IR67'
+        'IR52','IR54','IR57','IR61','IR65','IR67','IR68','IR72','IR74'};
 pipeline_id = 'main_ft';
 actv_win    = '100';
 save_fig    = 1;
