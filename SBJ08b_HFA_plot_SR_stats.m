@@ -28,8 +28,8 @@ hfa_fname1 = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id_s,'.mat');
 hfa_fname2 = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id_r,'.mat');
 tmp = load(hfa_fname1,'hfa'); hfa{1} = tmp.hfa;
 tmp = load(hfa_fname2,'hfa'); hfa{2} = tmp.hfa;
-stats_filename1 = strcat(SBJ_vars.dirs.proc,SBJ,'_',conditions,'_ROI_',an_id_s,'.mat');
-stats_filename2 = strcat(SBJ_vars.dirs.proc,SBJ,'_',conditions,'_ROI_',an_id_r,'.mat');
+stats_filename1 = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id_s,'_',conditions,'.mat');
+stats_filename2 = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id_r,'_',conditions,'.mat');
 tmp = load(stats_filename1,'stat'); stat{1} = tmp.stat;
 tmp = load(stats_filename2,'stat'); stat{2} = tmp.stat;
 clear tmp
@@ -167,7 +167,7 @@ for ch_ix = 1:numel(stat{1}.label)
     
     % Save figure
     if save_fig
-        fig_filename = [fig_dir fig_name '.' fig_filetype];
+        fig_filename = [fig_dir fig_name '.' fig_ftype];
         fprintf('Saving %s\n',fig_filename);
         saveas(gcf,fig_filename);
         %eval(['export_fig ' fig_filename]);
