@@ -11,11 +11,10 @@ addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
 addpath(ft_dir);
 ft_defaults
 
-
 %% Data Preparation
-SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
-an_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/an_vars/' an_id '_vars.m'];
+an_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
 % eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
 
@@ -61,10 +60,10 @@ for ch_ix = 1:numel(hfa_stat.label)
 end
 
 %% Save Results
-data_out_filename = strcat(hfa_fname(1:end-4),'_actv_mn',num2str(actv_win),'.mat');
+out_fname = strcat(hfa_fname(1:end-4),'_actv_mn',num2str(actv_win),'.mat');
 fprintf('===================================================\n');
-fprintf('--- Saving %s ------------------\n',data_out_filename);
+fprintf('--- Saving %s ------------------\n',out_fname);
 fprintf('===================================================\n');
-save(data_out_filename,'-v7.3','actv_ch','actv_ch_epochs','pvals','qvals');
+save(out_fname,'-v7.3','actv_ch','actv_ch_epochs','pvals','qvals');
 
 end

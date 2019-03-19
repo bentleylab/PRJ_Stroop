@@ -2,7 +2,7 @@ function fn_view_recon_atlas_grp(SBJs, pipeline_id, reg_type, show_labels,...
                                  hemi, atlas_id, roi_id, plot_out, varargin)
 %% Plot a reconstruction with electrodes
 % INPUTS:
-%   SBJ [str] - subject ID to plot
+%   SBJs [cell array str] - subject IDs to plot
 %   pipeline_id [str] - name of analysis pipeline, used to pick elec file
 %   plot_type [str] - {'ortho', '3d'} choose 3 slice orthogonal plot or 3D surface rendering
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
@@ -38,11 +38,8 @@ if ~exist('view_angle','var')
     view_angle     = [-90 0];
 end
 if ~exist('mesh_alpha','var')
-    if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
-        mesh_alpha = 0.3;
-    else
-        mesh_alpha = 0.8;
-    end
+    % assume SEEG
+    mesh_alpha = 0.3;
 end
 if show_labels
     lab_arg = 'label';

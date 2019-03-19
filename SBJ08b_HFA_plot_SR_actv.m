@@ -1,36 +1,40 @@
 function SBJ08b_HFA_plot_SR_actv(SBJ,an_id_s,an_id_r,actv_win,plt_id,save_fig,fig_vis)
-% Plots both stimulus- and response-locked HFA computed in SBJ08a_HFA_actv
+% Plots both stimulus- and response-locked HFA computed in SBJ08ab_HFA_actv
 % clear all; %close all;
 
 fig_filetype = 'png';
 if ischar(save_fig); save_fig = str2num(save_fig); end
 if isnumeric(actv_win); actv_win = num2str(actv_win); end
 
-%% Data Preparation
-% Set up paths
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/');
-addpath('/home/knight/hoycw/PRJ_Stroop/scripts/utils/');
-addpath('/home/knight/hoycw/Apps/fieldtrip/');
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+
+%% Set up paths
+addpath([root_dir 'PRJ_Stroop/scripts/']);
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+addpath(ft_dir);
 ft_defaults
 
 %% Load Results
-SBJ_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
-plt_vars_cmd = ['run /home/knight/hoycw/PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
+plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 
 event_lab = {'stim', 'resp'};
 % Load RTs
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
 
-hfa_filename1 = strcat(SBJ_vars.dirs.proc,SBJ,'_actv_ROI_',an_id_s,'_mn',actv_win,'.mat');
-hfa_filename2 = strcat(SBJ_vars.dirs.proc,SBJ,'_actv_ROI_',an_id_r,'_mn',actv_win,'.mat');
-tmp = load(hfa_filename1,'hfa'); hfa{1} = tmp.hfa;
-tmp = load(hfa_filename2,'hfa'); hfa{2} = tmp.hfa;
-tmp = load(hfa_filename1,'actv_ch'); actv_ch{1} = tmp.actv_ch;
-tmp = load(hfa_filename2,'actv_ch'); actv_ch{2} = tmp.actv_ch;
-tmp = load(hfa_filename1,'actv_ch_epochs'); actv_ch_epochs{1} = tmp.actv_ch_epochs;
-tmp = load(hfa_filename2,'actv_ch_epochs'); actv_ch_epochs{2} = tmp.actv_ch_epochs;
+hfa_fname1 = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id_s,'.mat');
+hfa_fname2 = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id_r,'.mat');
+tmp = load(hfa_fname1,'hfa'); hfa{1} = tmp.hfa;
+tmp = load(hfa_fname2,'hfa'); hfa{2} = tmp.hfa;
+stat_fname1 = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id_s,'_actv_mn',actv_win,'.mat');
+stat_fname2 = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id_r,'_actv_mn',actv_win,'.mat');
+tmp = load(stat_fname1,'actv_ch'); actv_ch{1} = tmp.actv_ch;
+tmp = load(stat_fname2,'actv_ch'); actv_ch{2} = tmp.actv_ch;
+tmp = load(stat_fname1,'actv_ch_epochs'); actv_ch_epochs{1} = tmp.actv_ch_epochs;
+tmp = load(stat_fname2,'actv_ch_epochs'); actv_ch_epochs{2} = tmp.actv_ch_epochs;
 clear tmp
 
 %!!! is this the best way to do this??? Maybe not...
@@ -55,7 +59,7 @@ RT_mean = RT_mean-plt_vars.plt_lim_S(1)*1000;
 %% Plot Results
 fig_dir = ['/home/knight/hoycw/PRJ_Stroop/results/HFA/' SBJ '/actv/SR/' an_id_s '-' an_id_r '/'];
 if ~exist(fig_dir,'dir')
-    mkdir(fig_dir);
+    [~,~] = mkdir(fig_dir);
 end
 
 % Create a figure for each channel
@@ -100,7 +104,7 @@ for ch_ix = 1:numel(hfa{1}.label)
         
         % Compute means and variance
         avg = squeeze(mean(hfa{ep_ix}.powspctrm(:,ch_ix,:,:),1))';
-        var   = squeeze(std(hfa{ep_ix}.powspctrm(:,ch_ix,:,:),[],1)./sqrt(size(hfa{ep_ix}.powspctrm,1)))';
+        var = squeeze(std(hfa{ep_ix}.powspctrm(:,ch_ix,:,:),[],1)./sqrt(size(hfa{ep_ix}.powspctrm,1)))';
         % Find significant time periods
         if ~isempty(strmatch(hfa{ep_ix}.label{ch_ix},actv_ch{ep_ix},'exact'))
             % Find significant epoch indices
