@@ -34,8 +34,10 @@ end
 elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'_orig_',atlas_id,'.mat'];
 out_fname  = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'_',atlas_id,'_full.mat'];
 if ~any(strcmp(SBJ_vars.ch_lab.ref_type,'BP'))
-    % Keep orig file, just make a link
-    link_cmd = ['ln -s ' elec_fname ' ' out_fname];
+    % Keep orig file, just make a link (with relative path)
+    cd(SBJ_vars.dirs.recon);
+    link_cmd = ['ln -s ' SBJ '_elec_' pipeline_id '_' view_space reg_suffix '_orig_' atlas_id '.mat ' ...
+                SBJ '_elec_' pipeline_id '_' view_space reg_suffix '_' atlas_id '_full.mat'];
     fprintf('===========================================\n');
     fprintf('\t%s has no bipolar reref, no new elec computed!\n',SBJ);
     fprintf('\tCreating symbolic link with command:\n\t%s\n',link_cmd);

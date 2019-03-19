@@ -12,10 +12,10 @@ cd /home/knight/hoycw/PRJ_Stroop/scripts/
 SBJ="${SGE_TASK}"
 
 # define function
-FUNCTION='SBJ08a_HFA_stats'
+FUNCTION='SBJ08ab_HFA_actv'
 
 # set up matlab function call
-func_call="${FUNCTION}('${SBJ}', '${conditions}', '${pipeline_id}', '${an_id}')"
+func_call="${FUNCTION}('${SBJ}', '${an_id}', '${actv_win}')"
 
 # define commands to execute via SGE
 echo ${SBJ}

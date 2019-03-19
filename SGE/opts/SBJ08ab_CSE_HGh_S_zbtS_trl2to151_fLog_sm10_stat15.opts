@@ -1,0 +1,5 @@
+-o /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
+-e /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
+-v conditions="CSE",an_id="HGh_S_zbtS_trl2to151_fLog_sm10_stat15"
+-l mem_free=8G
+-N HFAstat

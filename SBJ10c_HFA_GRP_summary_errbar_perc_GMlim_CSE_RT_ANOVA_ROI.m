@@ -40,13 +40,6 @@ cse_an_id = strrep(an_id,'_sm0_','_sm10_');
 % Load all ROI info
 [roi_list, roi_colors] = fn_roi_label_styles(roi_id);
 
-% Get event timing
-if strcmp(an_id(1:5),'HGm_S')
-    event = 'stim';
-elseif strcmp(an_id(1:5),'HGm_R')
-    event = 'resp';
-end
-
 % Set up electrode counts
 cse_cnt  = zeros([numel(SBJs) numel(roi_list)]);
 rt_cnt    = zeros([numel(SBJs) numel(roi_list)]);
@@ -64,39 +57,30 @@ for sbj_ix = 1:numel(SBJs)
     eval(SBJ_vars_cmd);
     
     % Compute mean RT
-    if strcmp(event,'stim')
+    if strcmp(event_type,'stim')
         load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
         mean_RTs(sbj_ix) = mean(trial_info.response_time); % converts sec to ms
     end
     % Load data
     load(strcat(SBJ_vars.dirs.proc,SBJ,'_ANOVA_ROI_',stat_id,'_',an_id,'.mat'));
-    CSE_filename = strcat(SBJ_vars.dirs.proc,SBJ,'_', conditions, '_ROI_',cse_an_id,'.mat');
+    CSE_filename = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'_',conditions,'.mat');%cse_an_id
     tmp = load(CSE_filename,'stat'); cse = tmp.stat;
     
     %% Load ROI and GM/WM info
-    if gm_thresh>0
-        elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_' atlas_id '_tis.mat'];
+    if strcmp(atlas_id,'Yeo7')
+        elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_mni_v_' atlas_id '.mat'];
     else
-        if strcmp(atlas_id,'Yeo7')
-            elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_mni_v_' atlas_id '.mat'];
-        else
-            elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_' atlas_id '.mat'];
-        end
+        elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_' atlas_id '_full.mat'];
     end
     load(elec_fname);
     
     % Sort elecs by stat labels
-    cfgs = []; cfgs.channel = stat.label;
-    elec   = fn_select_elec(cfgs,elec);
-    elec.roi    = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
+    elec = fn_reorder_elec(elec,stat.label);
+    elec.roi = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,roi_id);
     
     % Exclude elecs not in atlas ROIs
     if ~plot_out
-        atlas_in_elecs = {};
-        for roi_ix = 1:numel(roi_list)
-            atlas_in_elecs = [atlas_in_elecs; elec.label(strcmp(elec.roi,roi_list{roi_ix}))];
-        end
-        cfgs = []; cfgs.channel = atlas_in_elecs;
+        cfgs = []; cfgs.channel = fn_select_elec_lab_match(elec, 'b', atlas_id, []);
         elec = fn_select_elec(cfgs, elec);
         stat = ft_selectdata(cfgs,stat);
         w2 = ft_selectdata(cfgs,w2);
@@ -217,7 +201,7 @@ end
 
 %% Plot Percentage of Electrodes Active, Deactive, and Condition Sensitive
 % Create and format the plot
-fig_name = ['GRP_HFA_errbar_perc_GMlim' num2str(gm_thresh*100) '_CSE_' stat_id '_' roi_id '_' event];
+fig_name = ['GRP_HFA_errbar_perc_GMlim' num2str(gm_thresh*100) '_CSE_' stat_id '_' roi_id '_' event_type];
 figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.6],'Visible',fig_vis);
 hold on;
@@ -264,7 +248,7 @@ for cond_ix = 1:2+numel(grp_lab)
 %             scat_vars{cond_ix}(has_elecs,roi_ix)./elec_cnt(has_elecs,roi_ix),50,'k*');
     end
 end
-if strcmp(event,'stim')
+if strcmp(event_type,'stim')
     legend(b{1},roi_list{:},'Location','northwest');
 else
     legend(b{1},roi_list{:},'Location','northeast');

@@ -12,15 +12,15 @@ cd /home/knight/hoycw/PRJ_Stroop/scripts/
 SBJ="${SGE_TASK}"
 
 # define function
-FUNCTION='SBJ08a_HFA_actv'
+FUNCTION='SBJ08ab_HFA_stats'
 
 # set up matlab function call
-func_call="${FUNCTION}('${SBJ}', '${pipeline_id}', '${an_id}', '${actv_win}')"
+func_call="${FUNCTION}('${SBJ}', '${conditions}', '${an_id}')"
 
 # define commands to execute via SGE
 echo ${SBJ}
 echo ${func_call}
 echo $$
-echo ${func_call} > NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}_${an_id}.m
-time matlab -nodesktop -nosplash -nodisplay < NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}_${an_id}.m
-rm NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}_${an_id}.m
+echo ${func_call} > NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}_${an_id}_${conditions}.m
+time matlab -nodesktop -nosplash -nodisplay < NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}_${an_id}_${conditions}.m
+rm NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}_${an_id}_${conditions}.m

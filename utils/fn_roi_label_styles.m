@@ -24,7 +24,7 @@ switch roi_id
         labels = {'LPFC','MPFC','INS','OFC'};
         einfo_col = 3;
     case 'gROI'
-        labels = {'LPFC','MPFC','INS','OFC','PAR','TMP'};
+        labels = {'LPFC','MPFC','INS','OFC','PAR','TMP','AMG','HPC'};
         einfo_col = 3;
     case 'mnLPFC'
         labels = {'DLPFC','VLPFC','PM','aMCC','preSMA','SMA'};
@@ -48,6 +48,8 @@ switch roi_id
     case 'OFC'
         labels = {'mOFC','lOFC'};
         einfo_col = 2;
+    case 'MTL'
+        labels = {'AMG','HPC'};
     case {'tissue', 'tissueC'}
         labels = {'GM','WM','CSF','OUT'};
         einfo_col = [];
