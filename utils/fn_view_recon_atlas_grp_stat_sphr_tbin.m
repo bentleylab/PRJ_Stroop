@@ -89,7 +89,11 @@ clust_names  = cell([1 numel(roi_list)]);
 for clust_ix = 1:numel(roi_list)
     clust_names{clust_ix} = ['C' num2str(clust_ix)];
 end
-bin_colors = [0 0 1; 0 1 1; 1 0 1; 1 0 0];  %garish blue, cyan, magenta, red
+if n_tbins==4
+    bin_colors = [0 0 1; 0 1 1; 1 0 1; 1 0 0];  %garish blue, cyan, magenta, red
+else
+    bin_colors = parula(n_tbins);
+end
 
 %% Load Atlas
 fprintf('Using atlas: %s\n',atlas_id);

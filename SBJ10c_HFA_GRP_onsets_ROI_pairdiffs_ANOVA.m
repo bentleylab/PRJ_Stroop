@@ -1,5 +1,5 @@
 function SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,pipeline_id,an_id,roi_id,...
-                                                    atlas_id,gm_thresh,plt_id,save_fig,fig_vis)%,fig_filetype)
+                                                    atlas_id,gm_thresh,plt_id,save_fig,fig_vis) %,fig_filetype)
 % Load HFA analysis results for active and condition-differentiating
 %   epochs, plot a summary of those time period per electrode
 % clear all; %close all;
@@ -31,11 +31,6 @@ cond_lab = [grp_lab, {'corr(RT)'}];
 
 % Get event timing
 mean_RTs = zeros(size(SBJs));
-if strcmp(an_id(1:5),'HGm_S')
-    event_lab = 'stim';
-elseif strcmp(an_id(1:5),'HGm_R')
-    event_lab = 'resp';
-end
 
 % Load all ROI info
 [roi_list, roi_colors] = fn_roi_label_styles(roi_id);
@@ -51,7 +46,7 @@ for sbj_ix = 1:numel(SBJs)
     eval(SBJ_vars_cmd);
     
     % Compute mean RT
-    if strcmp(event_lab,'stim')
+    if strcmp(event_type,'stim')
         load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
         % Compute mean RT
         mean_RTs(sbj_ix) = mean(trial_info.response_time);
@@ -70,13 +65,13 @@ for sbj_ix = 1:numel(SBJs)
     win_center = round(mean(win_lim,2));
     
     %% Load ROI and GM/WM info
-    elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_' atlas_id '.mat'];%_tis
+    elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_' atlas_id '_full.mat'];
     load(elec_tis_fname);
     
     % Sort elecs by stat labels
     cfgs = []; cfgs.channel = stat.label;
-    elec    = fn_select_elec(cfgs,elec);
-    elec.roi = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
+    elec = fn_select_elec(cfgs,elec);
+    elec.roi = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,roi_id);
     
 %     % Get GM probability from tissue labels {'GM','WM','CSF','OUT'}
 %     gm_bin  = elec.tissue_prob(:,1)>gm_thresh;
@@ -90,10 +85,10 @@ for sbj_ix = 1:numel(SBJs)
             for grp_ix = 1:numel(grp_lab)
                 if any(squeeze(qvals(grp_ix,ch_ix,:))<0.05)
                     sig_onsets = stat.time(win_lim(squeeze(qvals(grp_ix,ch_ix,:))<0.05,1));
-                    if strcmp(event_lab,'resp')% && (sig_onsets(1)<0)
+                    if strcmp(event_type,'resp')% && (sig_onsets(1)<0)
                         all_onsets{sbj_ix,roi_ix,grp_ix} = [all_onsets{sbj_ix,roi_ix,grp_ix} sig_onsets(1)];
                         all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} = [all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} stat.label(ch_ix)];
-                    elseif strcmp(event_lab,'stim') && (sig_onsets(1)<mean_RTs(sbj_ix))
+                    elseif strcmp(event_type,'stim') && (sig_onsets(1)<mean_RTs(sbj_ix))
                         all_onsets{sbj_ix,roi_ix,grp_ix} = [all_onsets{sbj_ix,roi_ix,grp_ix} sig_onsets(1)];
                         all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} = [all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} stat.label(ch_ix)];
                     end
@@ -107,12 +102,12 @@ for sbj_ix = 1:numel(SBJs)
                 % Convert the first onset of significance to time
                 onset_time = stat.time(mask_chunks(1,1));
                 % Exclude differences after the mean RT for this SBJ
-                if strcmp(event_lab,'resp') && (onset_time<0)
+                if strcmp(event_type,'resp') && (onset_time<0)
                     all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} = ...
                         [all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} onset_time];
                     all_onset_elec_lab{sbj_ix,roi_ix,numel(grp_lab)+1} = ...
                         [all_onset_elec_lab{sbj_ix,roi_ix,numel(grp_lab)+1} stat.label(ch_ix)];
-                elseif strcmp(event_lab,'stim') && (onset_time<mean_RTs(sbj_ix))
+                elseif strcmp(event_type,'stim') && (onset_time<mean_RTs(sbj_ix))
                     all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} = ...
                         [all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} onset_time];
                     all_onset_elec_lab{sbj_ix,roi_ix,numel(grp_lab)+1} = ...

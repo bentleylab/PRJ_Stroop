@@ -34,11 +34,6 @@ cond_lab = [grp_lab, {'corr(RT)'}];
 
 % Get event timing
 mean_RTs = zeros(size(SBJs));
-if strcmp(an_id(1:5),'HGm_S')
-    event_lab = 'stim';
-elseif strcmp(an_id(1:5),'HGm_R')
-    event_lab = 'resp';
-end
 
 % Load all ROI info
 [roi_list, roi_colors] = fn_roi_label_styles(roi_id);
@@ -64,7 +59,7 @@ for sbj_ix = 1:numel(SBJs)
     eval(SBJ_vars_cmd);
     
     % Compute mean RT
-    if strcmp(event_lab,'stim')
+    if strcmp(event_type,'stim')
         load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
         % Compute mean RT
         mean_RTs(sbj_ix) = mean(trial_info.response_time);
@@ -84,23 +79,23 @@ for sbj_ix = 1:numel(SBJs)
     
     %% Load ROI and GM/WM info
     if any(strcmp(atlas_id,{'DK','Dx'})) % these have tissue probabilities
-% %         elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_' view_space '_' atlas_id '_tis.mat'];
-        elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_' view_space '_' atlas_id '.mat'];
-        load(elec_tis_fname);
-    else
-        % Load tissue prob
-        elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_Dx_tis.mat'];
-        load(elec_tis_fname);
-        tiss_prob = elec.tissue_prob;
-        elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_' view_space '_' atlas_id '.mat'];
+        elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_' view_space '_' atlas_id '_full.mat'];
         load(elec_fname);
-        elec.tissue_prob = tiss_prob;
+    else
+        error('use Dx_full!');
+%         % Load tissue prob
+%         elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_Dx_tis.mat'];
+%         load(elec_fname);
+%         tiss_prob = elec.tissue_prob;
+%         elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_' view_space '_' atlas_id '.mat'];
+%         load(elec_fname);
+%         elec.tissue_prob = tiss_prob;
     end
     
     % Sort elecs by stat labels
     cfgs = []; cfgs.channel = stat.label;
-    elec    = fn_select_elec(cfgs,elec);
-    elec.roi = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
+    elec = fn_select_elec(cfgs,elec);
+    elec.roi = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,roi_id);
     
 %     % Get GM probability from tissue labels {'GM','WM','CSF','OUT'}
 %     gm_bin  = elec.tissue_prob(:,1)>gm_thresh;
@@ -115,10 +110,10 @@ for sbj_ix = 1:numel(SBJs)
                 if any(squeeze(qvals(grp_ix,ch_ix,:))<0.05)
                     sig_ch{sbj_ix,grp_ix} = [sig_ch{sbj_ix,grp_ix} stat.label{ch_ix}];
                     sig_onsets = stat.time(win_lim(squeeze(qvals(grp_ix,ch_ix,:))<0.05,1));
-                    if strcmp(event_lab,'resp')
+                    if strcmp(event_type,'resp')
                         all_onsets{sbj_ix,roi_ix,grp_ix} = ...
                             [all_onsets{sbj_ix,roi_ix,grp_ix} sig_onsets(1)];
-                    elseif strcmp(event_lab,'stim') && (sig_onsets(1)<mean_RTs(sbj_ix))
+                    elseif strcmp(event_type,'stim') && (sig_onsets(1)<mean_RTs(sbj_ix))
                         all_onsets{sbj_ix,roi_ix,grp_ix} = ...
                             [all_onsets{sbj_ix,roi_ix,grp_ix} sig_onsets(1)];
                     end
@@ -133,10 +128,10 @@ for sbj_ix = 1:numel(SBJs)
                 % Convert the first onset of significance to time
                 onset_time = stat.time(mask_chunks(1,1));
                 % Exclude differences after the mean RT for this SBJ
-                if strcmp(event_lab,'resp')
+                if strcmp(event_type,'resp')
                     all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} = ...
                         [all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} onset_time];
-                elseif strcmp(event_lab,'stim') && (onset_time<mean_RTs(sbj_ix))
+                elseif strcmp(event_type,'stim') && (onset_time<mean_RTs(sbj_ix))
                     all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} = ...
                         [all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} onset_time];
                 end
@@ -145,7 +140,7 @@ for sbj_ix = 1:numel(SBJs)
     end
     
     % Normalize all onset times by mean reaction time
-    if strcmp(event_lab,'stim')
+    if strcmp(event_type,'stim')
         for roi_ix = 1:size(all_onsets,2)
             for cond_ix = 1:size(all_onsets,3)
                 all_onsets{sbj_ix,roi_ix,cond_ix} = all_onsets{sbj_ix,roi_ix,cond_ix}./mean_RTs(sbj_ix);
@@ -201,7 +196,7 @@ save([root_dir 'PRJ_Stroop/data/tmp_onsets_sig_ch.mat'],'-v7.3','sig_ch','plot_o
 %% Plot GROI Results
 for cond_ix = 1:numel(cond_lab)
     % Create and format the plot
-    fig_name = ['GRP' plt_vars.grp_metric '_HFA_onsets_' cond_lab{cond_ix} '_' roi_id '_' event_lab...
+    fig_name = ['GRP' plt_vars.grp_metric '_HFA_onsets_' cond_lab{cond_ix} '_' roi_id '_' event_type...
         '_GM' num2str(gm_thresh) '_normRTout'];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.6],'Visible',fig_vis);

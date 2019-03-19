@@ -75,7 +75,8 @@ for sbj_ix = 1:numel(SBJs)
     load(elec_fname);
     
     % Sort elecs by stat labels
-    elec = fn_reorder_elec(elec,stat.label);
+    cfgs = []; cfgs.channel = stat.label;
+    elec = fn_select_elec(cfgs,elec);
     elec.roi = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,roi_id);
     
     % Exclude elecs not in atlas ROIs
