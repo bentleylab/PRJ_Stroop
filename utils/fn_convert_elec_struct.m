@@ -1,4 +1,4 @@
-function fn_compile_elec_struct(SBJ,pipeline_id,view_space,reg_type,reref)
+function fn_convert_elec_struct(SBJ,pipeline_id,view_space,reg_type,reref)
 %% Compile ROI info (biggest changes are from single electrodes into bipolar pairs)
 %   Goes from smallest to largest (ELEC1-ELEC2, ELEC2-ELEC3, etc.)
 %   Pairs are drawn from imported data labels, then preprocessing logic is applied

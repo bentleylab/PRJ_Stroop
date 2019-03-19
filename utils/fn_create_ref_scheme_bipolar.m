@@ -27,7 +27,7 @@ new_labels = {};
 weight_row = 0;
 for lab_ix = 2:numel(labels)
     if lab_num(lab_ix)-lab_num(lab_ix-1)==1
-        new_labels = {new_labels{:} strcat(labels{lab_ix-1},'-',num2str(lab_num(lab_ix)))};
+        new_labels = [new_labels; {strcat(labels{lab_ix-1},'-',num2str(lab_num(lab_ix)))}];
         weight_row = weight_row+1;
         weights(weight_row,lab_ix-1) = 1;
         weights(weight_row,lab_ix)   = -1;

@@ -122,4 +122,4 @@ SBJ_vars.analysis_time = {{[358.0 1500.0]}};
 %--------------------------------------
 % Trials to Reject
 %--------------------------------------
-% SBJ_vars.trial_reject_n = [];
+SBJ_vars.trial_reject_n = [286 287];
