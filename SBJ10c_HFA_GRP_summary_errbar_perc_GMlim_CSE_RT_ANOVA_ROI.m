@@ -63,7 +63,7 @@ for sbj_ix = 1:numel(SBJs)
     end
     % Load data
     load(strcat(SBJ_vars.dirs.proc,SBJ,'_ANOVA_ROI_',stat_id,'_',an_id,'.mat'));
-    CSE_filename = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'_',conditions,'.mat');%cse_an_id
+    CSE_filename = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',cse_an_id,'_',conditions,'.mat');%an_id
     tmp = load(CSE_filename,'stat'); cse = tmp.stat;
     
     %% Load ROI and GM/WM info
