@@ -7,20 +7,18 @@
 % SBJs = {'IR21','IR27','IR31','IR35','IR39','IR41','IR48','IR52','IR54','IR57','IR61','IR68','IR72','IR74'};
 
 % Full SBJ list (completed and ready to run)
-SBJs = {'CP24','IR21','IR27','IR31','IR32','IR35','IR39','IR41','IR48','IR52','IR54','IR57','IR61','IR65','IR68','IR72','IR74'};
-
-SBJs = {'IR32'};
-fn_compile_elec_struct(SBJs{1},'main_ft','pat','');
-fn_compile_elec_struct(SBJs{1},'main_ft','mni','v');
+SBJs = {'CP24','CP26','IR21','IR26','IR31','IR32','IR35','IR39','IR41',...
+        'IR52','IR54','IR57','IR61','IR65','IR67','IR68','IR72','IR74'};
 
 for s = 1:numel(SBJs)
-    fn_save_elec_atlas(SBJs{s},'main_ft','pat','','DK');
-    fn_save_elec_atlas(SBJs{s},'main_ft','pat','','Dx');
-    fn_save_elec_tissue(SBJs{s},'main_ft','pat','','Dx');
-    fn_save_elec_tissue(SBJs{s},'main_ft','pat','','DK');
-    fn_save_elec_atlas(SBJs{s},'main_ft','mni','v','Yeo7');
-    fn_save_elec_atlas(SBJs{s},'main_ft','mni','v','Yeo17');
+    fn_compile_elec_atlas(SBJs{s},'main_ft','pat','','Dx');
 end
+%     fn_save_elec_atlas(SBJs{s},'main_ft','pat','','DK');
+%     fn_save_elec_atlas(SBJs{s},'main_ft','pat','','Dx');
+%     fn_save_elec_tissue(SBJs{s},'main_ft','pat','','Dx');
+%     fn_save_elec_tissue(SBJs{s},'main_ft','pat','','DK');
+%     fn_save_elec_atlas(SBJs{s},'main_ft','mni','v','Yeo7');
+%     fn_save_elec_atlas(SBJs{s},'main_ft','mni','v','Yeo17');
 
 %% MNI Check
 SBJ = 'IR21';

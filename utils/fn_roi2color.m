@@ -29,9 +29,15 @@ for r = 1:n_rois
             RGB(r,:) = [56 108 176]./256;
         case 'PAR'          % Maroon
             RGB(r,:) = [128 0 0]./256;
-        case 'TMP'          % Magenta 
-            RGB(r,:) = [1 0 1];
+        case 'TMP'          % Yellow
+            RGB(r,:) = [1 1 0];%[0.2 0.2 0.2];
+        case 'MTL'          % Cyan
+            RGB(r,:) = [0 1 1];
+        case 'OCC'          % Dark Gray
+            RGB(r,:) = [0.2 0.2 0.2];
         case 'FWM'          % White
+            RGB(r,:) = [1 1 1];
+        case 'TWM'          % White
             RGB(r,:) = [1 1 1];
             
             % LPFC Subregions - reds
@@ -90,16 +96,16 @@ for r = 1:n_rois
         case 'Precuneus'
             RGB(r,:) = [179 205 227]./256;
             
+            % MTL (Medial Temporal Lobe) - bright colors (for now?)
+        case 'HPC'
+            RGB(r,:) = [0 1 1];
+        case 'AMG'
+            RGB(r,:) = [1 0 1];
+        case 'STS'
+            RGB(r,:) = [1 1 0];%[0.2 0.2 0.2];
+
             % Weird Cases
         case ''
-            RGB(r,:) = [0 0 0];
-        case 'OCC'          % Black
-            RGB(r,:) = [0 0 0];
-        case 'HPC'          % Black
-            RGB(r,:) = [0 0 0];
-        case 'AMG'          % Black
-            RGB(r,:) = [0 0 0];
-        case 'STS'
             RGB(r,:) = [0 0 0];
         case 'OUT'          % Black
             warning('WARNING: Why are you trying to plot data mainly out of the brain???');
