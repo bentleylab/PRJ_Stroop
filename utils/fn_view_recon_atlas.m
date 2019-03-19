@@ -113,7 +113,7 @@ ft_plot_mesh(mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facea
 % Plot electrodes on top
 cfgs = [];
 for e = 1:numel(elec.label)
-    cfgs.channel = elec.label{e};
+    cfgs.channel = elec.label(e);
     elec_tmp = fn_select_elec(cfgs, elec);
     ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', elec_tmp.roi_color,...
                  'label', lab_arg);

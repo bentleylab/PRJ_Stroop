@@ -1,4 +1,4 @@
-function fn_view_recon_stat_movie(SBJ, pipeline_id, stat_id, an_id, view_space, reg_type, hemi, plt_id, varargin)
+function fn_view_recon_stat_movie(SBJ, pipeline_id, stat_id, an_id, view_space, reg_type, hemi, plot_out, plt_id, varargin)
 %% Plot a reconstruction with electrodes colored according to statistics
 %   FUTURE 2: add option for stat_var to be a cell with 2nd stat for edge
 % INPUTS:
@@ -69,17 +69,23 @@ vid_encoding = 'MPEG-4';
 %% Load elec struct
 load([SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'.mat']);
 
+%% Remove electrodes that aren't in hemisphere
+if ~plot_out
+    cfgs = [];
+    cfgs.channel = fn_select_elec_lab_match(elec, hemi, [], []);
+    elec = fn_select_elec(cfgs, elec);
+end
+
 %% Load brain recon
 mesh = fn_load_recon_mesh(SBJ,view_space,reg_type,hemi);
 
 %% Load Stats
 % Determine options: {'actv','CI','RT','CNI','pcon'}
 if strcmp(stat_id,'actv')
-    load([SBJ_vars.dirs.proc SBJ '_actv_ROI_' an_id '_mn100.mat']);
+    load([SBJ_vars.dirs.proc SBJ '_ROI_' an_id '_actv_mn100.mat']);
     cfgs = []; cfgs.channel = actv_ch;
     hfa = ft_selectdata(cfgs,hfa);
     elec = fn_select_elec(cfgs,elec);
-    elec = fn_reorder_elec(elec,hfa.label);
     
     plot_dat = squeeze(mean(hfa.powspctrm,1));
     % get clim
