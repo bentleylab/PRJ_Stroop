@@ -1,4 +1,4 @@
-function fn_view_recon_stat(SBJ, pipeline_id, stat_id, an_id, view_space, reg_type, show_labels, hemi)
+function fn_view_recon_stat(SBJ, pipeline_id, stat_id, an_id, view_space, reg_type, show_labels, hemi, plot_out, varargin)
 %% Plot a reconstruction with electrodes colored according to statistics
 %   FUTURE 1: this is a static brain, need to adapt to a movie!
 %   FUTURE 2: add option for stat_var to be a cell with 2nd stat for edge
@@ -21,8 +21,38 @@ function fn_view_recon_stat(SBJ, pipeline_id, stat_id, an_id, view_space, reg_ty
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 
+%% Process plotting params
+% Handle variable inputs
+if ~isempty(varargin)
+    for v = 1:2:numel(varargin)
+        if strcmp(varargin{v},'view_angle')
+            view_angle = varargin{v+1};
+        elseif strcmp(varargin{v},'mesh_alpha') && varargin{v+1}>0 && varargin{v+1}<=1
+            mesh_alpha = varargin{v+1};
+        else
+            error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
+        end
+    end
+end
+
+% Implement the default options
 ns_color = [0 0 0];
-view_angle = [-90 0];
+if ~exist('view_angle','var')
+    if strcmp(hemi,'l')
+        view_angle = [-60 30];
+    elseif any(strcmp(hemi,{'r','b'}))
+        view_angle = [60 30];
+    else
+        error(['unknown hemi: ' hemi]);
+    end
+end
+if ~exist('mesh_alpha','var')
+    if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
+        mesh_alpha = 0.3;
+    else
+        mesh_alpha = 0.8;
+    end
+end
 if show_labels
     lab_arg = 'label';
 else
@@ -37,50 +67,23 @@ end
 %% Load elec struct
 load([SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'.mat']);
 
-%% Load brain recon
-if strcmp(view_space,'pat')
-    if strcmp(hemi,'r') || strcmp(hemi,'l')
-        mesh = ft_read_headshape([SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_' hemi 'h.mat']);
-    elseif strcmp(hemi,'b')
-        mesh = ft_read_headshape({[SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_rh.mat'],...
-                                    [SBJ_vars.dirs.recon 'Surfaces/' SBJ '_cortex_lh.mat']});
-    else
-        error(['Unknown hemisphere selected: ' hemi]);
-    end
-    mesh.coordsys = 'acpc';
-elseif strcmp(view_space,'mni')
-    if strcmp(reg_type,'vol')
-        if strcmp(hemi,'r')
-            load([ft_dir 'template/anatomy/surface_pial_right.mat']);
-        elseif strcmp(hemi,'l')
-            load([ft_dir 'template/anatomy/surface_pial_left.mat']);
-        elseif strcmp(hemi,'b')
-            load([ft_dir 'template/anatomy/surface_pial_both.mat']);
-        else
-            error(['Unknown hemisphere option: ' hemi]);
-        end
-%         mesh.coordsys = 'mni';
-    elseif strcmp(reg_type,'srf')
-        if strcmp(hemi,'r') || strcmp(hemi,'l')
-            mesh = ft_read_headshape([root_dir 'PRJ_Stroop/data/atlases/freesurfer/fsaverage/' hemi 'h.pial']);
-        elseif strcmp(hemi,'b')
-            error('hemisphere "b" not yet implemented for reg_type: "srf"!');
-            mesh = ft_read_headshape([ft_dir 'subjects/fsaverage/surf/' hemi 'h.pial']);
-        else
-            error(['Unknown hemisphere option: ' hemi]);
-        end
-        mesh.coordsys = 'fsaverage';
-    else
-        error(['Unknown registration type (reg_type): ' reg_type]);
-    end
-else
-    error(['Unknown view_space: ' view_space]);
+%% Remove electrodes that aren't in hemisphere
+if ~plot_out
+    cfgs = [];
+    cfgs.channel = fn_select_elec_lab_match(elec, hemi, [], []);
+    elec = fn_select_elec(cfgs, elec);
 end
+
+%% Load brain recon
+mesh = fn_load_recon_mesh(SBJ,view_space,reg_type,hemi);
 
 %% Load Stats
 % Determine options: {'actv','CI','RT','CNI','pcon'}
 if strcmp(stat_id,'actv')
-    load([SBJ_vars.dirs.proc SBJ '_actv_ROI_' an_id '.mat']);
+    % Load HFA to get channel list
+    load([SBJ_vars.dirs.proc SBJ '_ROI_' an_id '.mat']);
+    % Load actv results
+    load([SBJ_vars.dirs.proc SBJ '_ROI_' an_id '_actv_mn100.mat']);
     elec = fn_reorder_elec(elec,hfa.label);
     grp_lab = {};
 %     grp_colors = {'k','r','b'};
@@ -111,7 +114,7 @@ if strcmp(stat_id,'actv')
         end
     end
 elseif strcmp(stat_id,'CSE')
-    load([SBJ_vars.dirs.proc,SBJ,'_',stat_id,'_ROI_',an_id,'.mat']);
+    load([SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'_',stat_id,'.mat']);
     elec = fn_reorder_elec(elec,stat.label);
     grp_lab = {};
 	[~, cond_colors, ~] = fn_condition_label_styles(stat_id);
@@ -166,29 +169,12 @@ else    % ANOVA
             elec_colors{ch_ix,numel(grp_lab)+1} = ns_color;  % non-sig
         end
     end
-    
-%     % Get Sliding Window Parameters
-%     win_lim    = fn_sliding_window_lim(stat.time,win_len,win_step);
-%     win_center = round(mean(win_lim,2));
-    
-%     % Convert % explained variance to 0-100 scale
-%     w2.trial = w2.trial*100;
-    
-    
-%     % Trim data to plotting epoch
-%     %   NOTE: stat should be on stat_lim(1):stat_lim(2)+0.001 time axis
-%     %   w2 should fit within that since it's averaging into a smaller window
-%     cfg_trim = [];
-%     cfg_trim.latency = plt_vars.plt_lim_SR;
-%     stat = ft_selectdata(cfg_trim,stat);
 end
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
 f = {};
 for grp_ix = 1:numel(grp_lab)+1
-    if strcmp(stat_id,'actv')
-        plot_name = [SBJ '_actv_HFA_' an_id];
-    elseif strcmp(stat_id,'CSE')
+    if any(strcmp(stat_id,{'actv','CSE'}))
         plot_name = [SBJ '_' stat_id '_' an_id];
     else
         if grp_ix<=numel(grp_lab)
@@ -198,18 +184,14 @@ for grp_ix = 1:numel(grp_lab)+1
         end
     end
     f{grp_ix} = figure('Name',plot_name);
-        
+    
     % Plot 3D mesh
-    mesh_alpha = 0.8;
-    if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
-        mesh_alpha = 0.2;
-    end
     ft_plot_mesh(mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
     
     % Plot electrodes on top
     cfgs = [];
     for e = 1:numel(elec.label)
-        cfgs.channel = elec.label{e};
+        cfgs.channel = elec.label(e);
         elec_tmp = fn_select_elec(cfgs, elec);
         ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', elec_colors{e,grp_ix}, 'label', lab_arg);
     end
@@ -222,60 +204,8 @@ for grp_ix = 1:numel(grp_lab)+1
     set(f{grp_ix}, 'windowkeypressfcn',   @cb_keyboard);
 end
 
-%% Plot SEEG data in 3D
-% % Create volumetric mask of ROIs from fs parcellation/segmentation
-% atlas = ft_read_atlas([SBJ_dir 'freesurfer/mri/aparc+aseg.mgz']);
-% atlas.coordsys = 'acpc';
-% cfg = [];
-% cfg.inputcoord = 'acpc';
-% cfg.atlas = atlas;
-% cfg.roi = {'Right-Hippocampus', 'Right-Amygdala'};
-% mask_rha = ft_volumelookup(cfg, atlas);
 
-%% EXTRA CRAP:
-% % Plot HFA from bipolar channels via clouds around electrode positions
-% cfg = [];
-% cfg.funparameter = 'powspctrm';
-% cfg.funcolorlim = [-.5 .5];
-% cfg.method = 'cloud';
-% cfg.slice = '3d';
-% cfg.nslices = 2;
-% cfg.facealpha = .25;
-% ft_sourceplot(cfg, freq_sel2, mesh_rha);
-% view([120 40]); lighting gouraud; camlight;
-%
-% % 2D slice version:
-% cfg.slice = '2d';
-% ft_sourceplot(cfg, freq_sel2, mesh_rha);
-%
-% %% View grid activity on cortical mesh
-% cfg = [];
-% cfg.funparameter = 'powspctrm';
-% cfg.funcolorlim = [-.5 .5];
-% cfg.method = 'surface';
-% cfg.interpmethod = 'sphere_weighteddistance';
-% cfg.sphereradius = 8;
-% cfg.camlight = 'no';
-% ft_sourceplot(cfg, freq_sel, pial_lh);
-%
-% %% Prepare and plot 2D layout
-% % Make layout
-% cfg = [];
-% cfg.headshape = pial_lh;
-% cfg.projection = 'orthographic';
-% cfg.channel = {'LPG*', 'LTG*'};
-% cfg.viewpoint = 'left';
-% cfg.mask = 'convex';
-% cfg.boxchannel = {'LTG30', 'LTG31'};
-% lay = ft_prepare_layout(cfg, freq);
-% % Plot interactive
-% cfg = [];
-% cfg.layout = lay;
-% cfg.showoutline = 'yes';
-% ft_multiplotTFR(cfg, freq_blc);
-
-
-
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SUBFUNCTION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

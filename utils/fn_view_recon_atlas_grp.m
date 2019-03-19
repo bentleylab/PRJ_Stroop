@@ -51,11 +51,6 @@ if strcmp(reg_type,'v') || strcmp(reg_type,'s')
 else
     reg_suffix = '';                % Patient space
 end
-if strcmp(roi_id,'tissue') || strcmp(roi_id,'tissueC')
-    tis_suffix = '_tis';
-else
-    tis_suffix = '';
-end
 
 % ROI info
 [roi_list, ~] = fn_roi_label_styles(roi_id);
@@ -75,7 +70,7 @@ for sbj_ix = 1:numel(SBJs)
         elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_mni',reg_suffix,'_',atlas_id,'_full.mat'];
         tmp = load(elec_fname); elec{sbj_ix} = tmp.elec;
     catch
-            error([elec_fname 'doesnt exist, exiting...']);
+        error([elec_fname 'doesnt exist, exiting...']);
     end
     
     % Append SBJ name to labels

@@ -38,6 +38,34 @@ end
 B00_RT_GRP_hist_norm(SBJs,'CNI',save_fig,fig_vis,fig_type);
 
 %% ================================================================================
+%   RECONS with EFFECTS
+%  =================================================================================
+%% Plot group recon with mgROI
+fn_view_recon_atlas_grp(SBJs,pipeline_id,'v',0,'l','Dx','mgROI',0);
+fn_view_recon_atlas_grp(SBJs,pipeline_id,'v',0,'r','Dx','mgROI',0);
+
+%% Plot CNI sig elecs
+stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
+an_opts     = {'HGh_S_zbtS_trl2to151_fLog_sm0_stat15','HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1'};
+% an_opts  = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
+hemi_opts = {'r','l'};
+roi_id   = 'gROI';
+atlas_id = 'Dx';
+plot_out = 0;
+show_labels = 0;
+
+for an_ix = 1:numel(an_opts)
+    for hemi_ix = 1:numel(hemi_opts)
+        fn_view_recon_atlas_grp_stat(SBJs, pipeline_id, stat_id, an_opts{an_ix}, 'v', show_labels,...
+                                 hemi_opts{hemi_ix}, atlas_id, roi_id, plot_out)
+%         fn_view_recon_stat(SBJs{s}, pipeline_id, stat_id, an_opts{an_ix}, 'pat', '', show_labels, hemi_opts{hemi_ix}, plot_out);
+    end
+end
+% an_ix = 2;
+% fn_view_recon_atlas_grp_stat_sphr(SBJs,pipeline_id,stat_id,an_opts{an_ix},'v',0,'r',atlas_id,roi_id,plot_out);
+% fn_view_recon_atlas_grp_stat_sphr(SBJs,pipeline_id,stat_id,an_opts{an_ix},'v',0,'l',atlas_id,roi_id,plot_out);
+
+%% ================================================================================
 %   Effects by ROI
 %  =================================================================================
 % %% HG active examples
@@ -141,7 +169,7 @@ end
 %     end
 % end
 % 
-% %% Plot binned cluster ANOVA ts
+%% Plot binned cluster ANOVA ts
 % SBJ = 'IR74';
 % clust_id = 'kmeans_corr_nROI_itr1k';%'kmeans_corr_nCH_itr1k_srCmb',
 % stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
@@ -172,7 +200,7 @@ end
 % SBJ12b_clust_ANOVA_ts_GRP_peaks(SBJs,pipeline_id,stat_id,clust_id,an_opts{an_ix},...
 %     roi_id,atlas_id,plt_id,fig_vis,save_fig,plot_out)
 % 
-% %% Plot onsets of ANOVA+RT
+%% Plot onsets of ANOVA+RT
 % pipeline_id = 'main_ft';
 % stat_id     = 'corrRT_CNI_pcon_WL200_WS50';
 % clust_id    = 'kmeans_corr_nROI_itr1k';%'kmeans_corr_nCH_itr1k_srCmb',
@@ -201,27 +229,7 @@ end
 %     end
 % end
 % 
-% %% ================================================================================
-% %   RECONS with EFFECTS
-% %  =================================================================================
-% %% Plot group recon with mgROI
-fn_view_recon_atlas_grp(SBJs,pipeline_id,'v',0,'l','Dx','mgROI',0);
-fn_view_recon_atlas_grp(SBJs,pipeline_id,'v',0,'r','Dx','mgROI',0);
-
-%% Plot CNI sig elecs
-stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
-an_opts  = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
-hemi_opts = {'r','l'};
-roi_id   = 'mgROI';
-atlas_id = 'Dx';
-plot_out = 0;
-show_labels = 0;
-% 
-% an_ix = 2;
-% fn_view_recon_atlas_grp_stat_sphr(SBJs,pipeline_id,stat_id,an_opts{an_ix},'v',0,'r',atlas_id,roi_id,plot_out);
-% fn_view_recon_atlas_grp_stat_sphr(SBJs,pipeline_id,stat_id,an_opts{an_ix},'v',0,'l',atlas_id,roi_id,plot_out);
-% 
-% %% Plot binned clusters with sig CNI
+%% Plot binned clusters with sig CNI
 % clust_id = 'kmeans_corr_nROI_itr1k';%'kmeans_corr_nCH_itr1k_srCmb',
 % stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
 % an_opts  = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
