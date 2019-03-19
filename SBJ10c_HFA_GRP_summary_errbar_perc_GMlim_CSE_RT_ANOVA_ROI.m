@@ -80,7 +80,7 @@ for sbj_ix = 1:numel(SBJs)
     
     % Exclude elecs not in atlas ROIs
     if ~plot_out
-        cfgs = []; cfgs.channel = fn_select_elec_lab_match(elec, 'b', atlas_id, []);
+        cfgs = []; cfgs.channel = fn_select_elec_lab_match(elec, 'b', atlas_id, roi_id);
         elec = fn_select_elec(cfgs, elec);
         stat = ft_selectdata(cfgs,stat);
         w2 = ft_selectdata(cfgs,w2);

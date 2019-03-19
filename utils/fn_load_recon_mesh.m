@@ -1,13 +1,16 @@
 function mesh = fn_load_recon_mesh(SBJ,view_space,reg_type,hemi)
 %% Load the surface mesh of a recon
 %   SBJ [str] - subject ID to plot
+%       '' if view_space = 'mni'
 %   view_space [str] - {'pat', 'mni'}
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
 %   hemi [str] - {'l', 'r', 'b'} hemisphere to plot
 
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
-SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
-eval(SBJ_vars_cmd);
+if ~isempty(SBJ)
+    SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+    eval(SBJ_vars_cmd);
+end
 
 if strcmp(view_space,'pat')
     if strcmp(hemi,'r') || strcmp(hemi,'l')

@@ -83,7 +83,7 @@ if strcmp(stat_id,'actv')
     
     plot_dat = squeeze(mean(hfa.powspctrm,1));
     % get clim
-    clim = [prctile(hfa.powspctrm(:),5) prctile(hfa.powspctrm(:),95)];
+    clim = [prctile(abs(hfa.powspctrm(:)),5) prctile(hfa.powspctrm(:),95)];
     
     sig_t_ix = cell(size(hfa.label));
     for e = 1:numel(hfa.label)
@@ -206,15 +206,20 @@ view(view_angle); material dull; lighting gouraud;
 % Plot elecs
 % Sphere settings
 [xsp, ysp, zsp] = sphere(100);
-reg_sz = 0.5;   % radius (in mm) of non-sig sphere
-neg_sz = 1;     % radius (in mm) of negative significant
-pos_sz = 2;     % radius (in mm) of positive significant
+reg_sz = 0.5;   
+cmap = colormap('parula');
+elec_cmap = linspace(clim(1),clim(2),size(cmap,1));
+
+sz_lim = [0.5 5];       % radius (in mm) of spheres
+sz_map = linspace(sz_lim(1),sz_lim(2)
+% neg_sz = 1;     % radius (in mm) of negative significant
+% pos_sz = 2;     % radius (in mm) of positive significant
 e_sphr_ns = cell(size(elec.label));
-e_sphr_p    = cell(size(elec.label));
-e_sphr_n    = cell(size(elec.label));
+% e_sphr_p    = cell(size(elec.label));
+% e_sphr_n    = cell(size(elec.label));
 for e = 1:numel(elec.label)
     % Create non-sig sphere
-    e_sphr_ns{e} = surf(reg_sz*xsp+elec.chanpos(e,1), reg_sz*ysp+elec.chanpos(e,2), reg_sz*zsp+elec.chanpos(e,3));
+    e_sphr_ns{e} = surf(sz_lim(1)*xsp+elec.chanpos(e,1), sz_lim(1)*ysp+elec.chanpos(e,2), sz_lim(1)*zsp+elec.chanpos(e,3));
     set(e_sphr_ns{e}, 'EdgeColor', ns_color);%, 'FaceColor', ns_color, 'EdgeAlpha', edgealpha, 'FaceAlpha', facealpha);
     
     % Create sig sphere to turn on/off
@@ -239,9 +244,6 @@ set(evnt_str,'Visible','off');
 %     time_ln_ang_x = [1/cos(view_angle(1)) sign(view_angle(1))*90
 %     time_line_beg = [cos(view_angle(1)) sin(view_angle(1)) plt_vars.time_ln_z*sin(view_angle(2))];
 %     time_line = line([
-
-cmap = colormap('parula');
-elec_cmap = linspace(clim(1),clim(2),size(cmap,1));
 
 %% Plot frames
 frames = struct('cdata',[],'colormap',[]);%cell(size(hfa.time));

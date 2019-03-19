@@ -1,17 +1,10 @@
-% previous main list: SBJs = {'IR54','IR57','IR61','IR68','IR72','IR74','IR62'};%'IR52','IR21','IR27','IR31','IR35','IR39','IR41','IR48',
-% tissue not 100%: 
-% need work: SBJs = {'IR67','IR69'};
-%   never! 'IR62',
-
-% SBJs list for CPPC 2018 abstract
-% SBJs = {'IR21','IR27','IR31','IR35','IR39','IR41','IR48','IR52','IR54','IR57','IR61','IR68','IR72','IR74'};
-
 % Full SBJ list (completed and ready to run)
 SBJs = {'CP24','CP26','IR21','IR26','IR31','IR32','IR35','IR39','IR41',...
         'IR52','IR54','IR57','IR61','IR65','IR67','IR68','IR72','IR74'};
 
 for s = 1:numel(SBJs)
-    fn_compile_elec_atlas(SBJs{s},'main_ft','pat','','Dx');
+%     fn_compile_elec_atlas(SBJs{s},'main_ft','pat','','Dx');
+    fn_copy_elec_atlas_pat2mni(SBJs{s},'main_ft','v','Dx');
 end
 %     fn_save_elec_atlas(SBJs{s},'main_ft','pat','','DK');
 %     fn_save_elec_atlas(SBJs{s},'main_ft','pat','','Dx');

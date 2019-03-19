@@ -1,0 +1,62 @@
+function fn_copy_elec_atlas_pat2mni(SBJ,pipeline_id,reg_type,atlas_id)
+%% Copy atlas+tissue info from patient space elec to mni space elec
+% INPUTS:
+%   SBJ [str] - name of subject
+%   pipeline_id [str] - name of analysis pipeline
+%   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
+%   atlas_id [str] - {'DK','Dx','Yeo7','Yeo17'}
+
+% Set up paths
+[root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
+addpath([root_dir 'PRJ_Stroop/scripts/']);
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+addpath(ft_dir);
+ft_defaults
+
+%% Load variables
+eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
+
+%% Load Elec struct
+if strcmp(reg_type,'v') || strcmp(reg_type,'s')
+    reg_suffix = ['_' reg_type];
+else
+    error('reg_type must be selected for mni space');
+end
+
+pat_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_pat','_',atlas_id,'_full.mat'];
+mni_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_mni',reg_suffix,'.mat'];
+out_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_mni',reg_suffix,'_',atlas_id,'_full.mat'];
+load(pat_fname); pat = elec;
+load(mni_fname);
+
+% Check that all elecs are in both structs
+if ~all(strcmp(elec.label,pat.label))
+    elec = fn_reorder_elec(elec,pat.label);
+    if ~all(strcmp(elec.label,pat.label))
+        fprintf(2,'Missing channels in %s:\n',mni_fname);
+        disp(setdiff(elec.label,pat.label));
+        error('Fix these missing channels before copying atlas info');
+    end
+end
+
+%% Add Back Stripped Fields Channel Types
+fields = fieldnames(pat);
+fields = setdiff(fields,fieldnames(elec));
+fields = [fields; {'hemi'}];        % add this back to include any manual edits made to pat_full
+% fields = {'atlas_lab', 'atlas_lab2', 'gm_weight', 'hemi', 'inputs',...
+%             'roi_flag', 'tissue', 'tissue2', 'tissue_prob'};
+for f = 1:numel(fields)
+    elec.(fields{f}) = pat.(fields{f});
+end
+
+%% Save data
+% Check if elec.cfg.previosu got ridiculously large, and keep only first
+var_stats = whos('elec');
+if var_stats.bytes>1000000
+    elec.cfg = rmfield(elec.cfg,'previous');
+end
+fprintf('============== Saving %s ==============\n',out_fname);
+save(out_fname, '-v7.3', 'elec');
+
+end

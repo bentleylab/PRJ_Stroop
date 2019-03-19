@@ -33,21 +33,32 @@ end
 
 elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'_orig_',atlas_id,'.mat'];
 out_fname  = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'_',atlas_id,'_full.mat'];
+load(elec_fname);
+
+%% For grids/strips only, add GM weight and exit
 if ~any(strcmp(SBJ_vars.ch_lab.ref_type,'BP'))
-    % Keep orig file, just make a link (with relative path)
-    cd(SBJ_vars.dirs.recon);
-    link_cmd = ['ln -s ' SBJ '_elec_' pipeline_id '_' view_space reg_suffix '_orig_' atlas_id '.mat ' ...
-                SBJ '_elec_' pipeline_id '_' view_space reg_suffix '_' atlas_id '_full.mat'];
-    fprintf('===========================================\n');
-    fprintf('\t%s has no bipolar reref, no new elec computed!\n',SBJ);
-    fprintf('\tCreating symbolic link with command:\n\t%s\n',link_cmd);
-    fprintf('===========================================\n');
-    system(link_cmd);
+    % Add missing fields
+    elec.reref     = 1;
+    elec.gm_weight = ones(size(elec.label));
+    elec.inputs    = cell(size(elec.label));   % just empty
+    elec.roi_flag  = zeros(size(elec.label));
+    for e = 1:numel(elec.label)
+        if elec.tissue_prob(e,strcmp(elec.tissue_labels,'GM'))~=1
+            elec.roi_flag(e) = 1;
+        end
+    end
+    
+    % Check if elec.cfg.previous got ridiculously large, and keep only first
+    var_stats = whos('elec');
+    if var_stats.bytes>1000000
+        elec.cfg = rmfield(elec.cfg,'previous');
+    end
+    fprintf('============== Saving %s ==============\n',out_fname);
+    save(out_fname, '-v7.3', 'elec');
+    
+    % Exit this function
     return;
 end
-
-% If any bipolar rereferencing, proceed!
-load(elec_fname);
 
 %% Load atlas to resolve any ties
 atlas = fn_load_recon_atlas(SBJ,atlas_id);

@@ -81,7 +81,7 @@ end
 %% Remove electrodes that aren't in atlas ROIs
 if ~plot_out
     cfgs = [];
-    cfgs.channel = fn_select_elec_lab_match(elec, hemi, atlas_id, []);
+    cfgs.channel = fn_select_elec_lab_match(elec, hemi, atlas_id, roi_id);
     elec = fn_select_elec(cfgs, elec);
 end
 

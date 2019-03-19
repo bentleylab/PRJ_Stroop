@@ -33,7 +33,7 @@ if ~isempty(varargin)
 end
 
 % Define default options
-view_space = 'mni';
+% view_space = 'mni';
 if ~exist('view_angle','var')
     view_angle     = [-90 0];
 end
@@ -72,25 +72,10 @@ for sbj_ix = 1:numel(SBJs)
     eval(SBJ_vars_cmd);
     
     try
-        if strcmp(atlas_id,'Dx') || strcmp(atlas_id,'DK')   % Cover atlases defined on SBJ surfaces
-            error('why 2 step process here? what was IR32 problem?');
-            elec_atlas_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,...
-                '_',view_space,reg_suffix,'.mat'];
-            tmp = load(elec_atlas_fname); elec{sbj_ix} = tmp.elec;
-            
-            elec_atlas_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,...
-                '_pat_',atlas_id,tis_suffix,'.mat'];
-            tmp = load(elec_atlas_fname);
-            elec{sbj_ix}.atlas_lab = tmp.elec.atlas_lab;
-            elec{sbj_ix}.atlas_id    = tmp.elec.atlas_id;
-            elec{sbj_ix}.hemi = tmp.elec.hemi;%!!! fix this! why IR32 is different?
-        else
-            elec_atlas_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,...
-                '_',view_space,reg_suffix,'_',atlas_id,tis_suffix,'.mat'];
-            tmp = load(elec_atlas_fname); elec_sbj{sbj_ix} = tmp.elec;
-        end
+        elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_mni',reg_suffix,'_',atlas_id,'_full.mat'];
+        tmp = load(elec_fname); elec{sbj_ix} = tmp.elec;
     catch
-            error([elec_atlas_fname 'doesnt exist, exiting...']);
+            error([elec_fname 'doesnt exist, exiting...']);
     end
     
     % Append SBJ name to labels
@@ -140,7 +125,7 @@ elec.roi       = all_roi_labels;    % appendsens strips that field
 elec.roi_color = all_roi_colors;    % appendsens strips that field
 
 %% Load brain recon
-mesh = fn_load_recon_mesh(SBJ,view_space,reg_type,hemi);
+mesh = fn_load_recon_mesh([],'mni',reg_type,hemi);
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
 h = figure;
@@ -162,59 +147,6 @@ fprintf(['To reset the position of the camera light after rotating the figure,\n
     'make sure none of the figure adjustment tools (e.g., zoom, rotate) are active\n' ...
     '(i.e., uncheck them within the figure), and then hit ''l'' on the keyboard\n'])
 set(h, 'windowkeypressfcn',   @cb_keyboard);
-
-%% Plot SEEG data in 3D
-% % Create volumetric mask of ROIs from fs parcellation/segmentation
-% atlas = ft_read_atlas([SBJ_dir 'freesurfer/mri/aparc+aseg.mgz']);
-% atlas.coordsys = 'acpc';
-% cfg = [];
-% cfg.inputcoord = 'acpc';
-% cfg.atlas = atlas;
-% cfg.roi = {'Right-Hippocampus', 'Right-Amygdala'};
-% mask_rha = ft_volumelookup(cfg, atlas);
-
-%% EXTRA CRAP:
-% % Plot HFA from bipolar channels via clouds around electrode positions
-% cfg = [];
-% cfg.funparameter = 'powspctrm';
-% cfg.funcolorlim = [-.5 .5];
-% cfg.method = 'cloud';
-% cfg.slice = '3d';
-% cfg.nslices = 2;
-% cfg.facealpha = .25;
-% ft_sourceplot(cfg, freq_sel2, mesh_rha);
-% view([120 40]); lighting gouraud; camlight;
-% 
-% % 2D slice version:
-% cfg.slice = '2d';
-% ft_sourceplot(cfg, freq_sel2, mesh_rha);
-% 
-% %% View grid activity on cortical mesh
-% cfg = [];
-% cfg.funparameter = 'powspctrm';
-% cfg.funcolorlim = [-.5 .5];
-% cfg.method = 'surface';
-% cfg.interpmethod = 'sphere_weighteddistance';
-% cfg.sphereradius = 8;
-% cfg.camlight = 'no';
-% ft_sourceplot(cfg, freq_sel, pial_lh);
-% 
-% %% Prepare and plot 2D layout
-% % Make layout
-% cfg = [];
-% cfg.headshape = pial_lh;
-% cfg.projection = 'orthographic';
-% cfg.channel = {'LPG*', 'LTG*'};
-% cfg.viewpoint = 'left';
-% cfg.mask = 'convex';
-% cfg.boxchannel = {'LTG30', 'LTG31'};
-% lay = ft_prepare_layout(cfg, freq);
-% % Plot interactive
-% cfg = [];
-% cfg.layout = lay;
-% cfg.showoutline = 'yes';
-% ft_multiplotTFR(cfg, freq_blc);
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
