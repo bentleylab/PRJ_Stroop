@@ -1,4 +1,4 @@
-function fn_view_recon_atlas_ROI(SBJ, pipeline_id, view_space, reg_type, show_labels, hemi, atlas_id, roi_id)%, view_angle)
+function fn_view_recon_atlas_ROI(SBJ, pipeline_id, view_space, reg_type, show_labels, hemi, atlas_id, roi_id)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJ [str] - subject ID to plot
@@ -102,21 +102,9 @@ elseif any(strcmp(atlas_id,{'Yeo17'}))
     elec.roi_color = fn_atlas2color(atlas_id,elec.roi);
 end
 
-% Find elecs matching ROI
-roi_match = false([numel(elec.label) numel(roi_list)]);
-for roi_ix = 1:numel(roi_list)
-    roi_match(:,roi_ix) = strcmp(elec.roi,roi_list{roi_ix});
-end
-% Exclude other hemisphere
-if ~strcmp(hemi,'b')
-    hemi_out_elecs = elec.label(~strcmp(elec.hemi,hemi));
-else
-    hemi_out_elecs = {};
-end
-
-% Select relevant elecs
+% Select relevant elecs (match ROI and hemi)
 cfgs = [];
-cfgs.channel = [elec.label(any(roi_match,2)); fn_ch_lab_negate(hemi_out_elecs)'];
+cfgs.channel = fn_select_elec_lab_match(elec, hemi, atlas_id, roi_id);
 elec = fn_select_elec(cfgs,elec);
 
 %% Load Atlas
@@ -136,7 +124,7 @@ seg = keepfields(atlas, {'dim', 'unit','coordsys','transform'});
 seg.brain = roi_mask;
 
 cfg = [];
-cfg.method      = 'iso2mesh';
+cfg.method      = 'iso2mesh';   % surface toolbox Arjen found
 cfg.radbound    = 2;            % scalar indicating the radius of the target surface mesh element bounding sphere
 cfg.maxsurf     = 0;
 cfg.tissue      = 'brain';
@@ -165,60 +153,7 @@ fprintf(['To reset the position of the camera light after rotating the figure,\n
     '(i.e., uncheck them within the figure), and then hit ''l'' on the keyboard\n'])
 set(h, 'windowkeypressfcn',   @cb_keyboard);
 
-%% Plot SEEG data in 3D
-% % Create volumetric mask of ROIs from fs parcellation/segmentation
-% atlas = ft_read_atlas([SBJ_dir 'freesurfer/mri/aparc+aseg.mgz']);
-% atlas.coordsys = 'acpc';
-% cfg = [];
-% cfg.inputcoord = 'acpc';
-% cfg.atlas = atlas;
-% cfg.roi = {'Right-Hippocampus', 'Right-Amygdala'};
-% mask_rha = ft_volumelookup(cfg, atlas);
-
-%% EXTRA CRAP:
-% % Plot HFA from bipolar channels via clouds around electrode positions
-% cfg = [];
-% cfg.funparameter = 'powspctrm';
-% cfg.funcolorlim = [-.5 .5];
-% cfg.method = 'cloud';
-% cfg.slice = '3d';
-% cfg.nslices = 2;
-% cfg.facealpha = .25;
-% ft_sourceplot(cfg, freq_sel2, mesh_rha);
-% view([120 40]); lighting gouraud; camlight;
-% 
-% % 2D slice version:
-% cfg.slice = '2d';
-% ft_sourceplot(cfg, freq_sel2, mesh_rha);
-% 
-% %% View grid activity on cortical mesh
-% cfg = [];
-% cfg.funparameter = 'powspctrm';
-% cfg.funcolorlim = [-.5 .5];
-% cfg.method = 'surface';
-% cfg.interpmethod = 'sphere_weighteddistance';
-% cfg.sphereradius = 8;
-% cfg.camlight = 'no';
-% ft_sourceplot(cfg, freq_sel, pial_lh);
-% 
-% %% Prepare and plot 2D layout
-% % Make layout
-% cfg = [];
-% cfg.headshape = pial_lh;
-% cfg.projection = 'orthographic';
-% cfg.channel = {'LPG*', 'LTG*'};
-% cfg.viewpoint = 'left';
-% cfg.mask = 'convex';
-% cfg.boxchannel = {'LTG30', 'LTG31'};
-% lay = ft_prepare_layout(cfg, freq);
-% % Plot interactive
-% cfg = [];
-% cfg.layout = lay;
-% cfg.showoutline = 'yes';
-% ft_multiplotTFR(cfg, freq_blc);
-
-
-
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SUBFUNCTION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

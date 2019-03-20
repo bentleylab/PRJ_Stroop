@@ -1,5 +1,5 @@
 function fn_view_recon_atlas_grp_ROI(SBJs, pipeline_id, reg_type, show_labels,...
-                                 hemi, atlas_id, roi_id, plot_out, varargin)
+                                 hemi, atlas_id, roi_id, varargin)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJs [cell array str] - subject IDs to plot
@@ -11,8 +11,6 @@ function fn_view_recon_atlas_grp_ROI(SBJs, pipeline_id, reg_type, show_labels,..
 %   atlas_id [str] - {'DK','Dx','Yeo7','Yeo17'}
 %   roi_id [str] - gROI grouping to pick mesh and color specific ROIs
 %       'LPFC','MPFC','OFC','INS','TMP','PAR'
-
-[root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 
 %% Handle variables
 % Error cases
@@ -66,7 +64,7 @@ else
     reg_suffix = '';                % Patient space
 end
 
-[roi_list, ~] = fn_roi_label_styles(roi_id);
+[root_dir, ~] = fn_get_root_dir();
 
 %% Load elec struct
 elec     = cell([numel(SBJs) 1]);
@@ -105,13 +103,8 @@ for sbj_ix = 1:numel(SBJs)
         elec{sbj_ix}.roi_color = fn_atlas2color(atlas_id,elec{sbj_ix}.roi);
     end
     
-    if ~plot_out
-        % Remove electrodes that aren't in atlas ROIs & hemisphere
-        good_elecs = fn_select_elec_lab_match(elec{sbj_ix}, hemi, atlas_id, roi_id);
-    else
-        % Remove electrodes that aren't in hemisphere
-        good_elecs = fn_select_elec_lab_match(elec{sbj_ix}, hemi, [], []);
-    end
+    % Remove electrodes that aren't in atlas ROIs & hemisphere
+    good_elecs = fn_select_elec_lab_match(elec{sbj_ix}, hemi, atlas_id, roi_id);
     % fn_select_elec messes up if you try to toss all elecs
     if isempty(good_elecs)
         elec{sbj_ix} = {};
@@ -131,14 +124,36 @@ elec = ft_appendsens([],elec{good_sbj});
 elec.roi       = all_roi_labels;    % appendsens strips that field
 elec.roi_color = all_roi_colors;    % appendsens strips that field
 
-%% Load brain recon
-mesh = fn_load_recon_mesh([],'mni',reg_type,hemi);
+%% Load Atlas
+atlas = fn_load_recon_atlas([],atlas_id);
+
+% Get Atlas-ROI mapping
+atlas_labels = fn_atlas_roi_select_mesh(atlas_id, roi_id, hemi);
+
+%% Select ROI mesh
+cfg = [];
+cfg.inputcoord = atlas.coordsys;
+cfg.atlas = atlas;
+cfg.roi = atlas_labels;
+roi_mask = ft_volumelookup(cfg,atlas);
+
+seg = keepfields(atlas, {'dim', 'unit','coordsys','transform'});
+seg.brain = roi_mask;
+
+cfg = [];
+cfg.method      = 'iso2mesh';   % surface toolbox Arjen found
+cfg.radbound    = 2;            % scalar indicating the radius of the target surface mesh element bounding sphere
+cfg.maxsurf     = 0;
+cfg.tissue      = 'brain';
+cfg.numvertices = 100000;
+cfg.smooth      = 3;
+roi_mesh = ft_prepare_mesh(cfg, seg);
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
 h = figure;
 
 % Plot 3D mesh
-ft_plot_mesh(mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
+ft_plot_mesh(roi_mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
 
 % Plot electrodes on top
 for e = 1:numel(elec.label)
@@ -155,7 +170,7 @@ fprintf(['To reset the position of the camera light after rotating the figure,\n
     '(i.e., uncheck them within the figure), and then hit ''l'' on the keyboard\n'])
 set(h, 'windowkeypressfcn',   @cb_keyboard);
 
-
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SUBFUNCTION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
