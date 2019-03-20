@@ -37,6 +37,10 @@ mean_RTs = zeros(size(SBJs));
 
 % Load all ROI info
 [roi_list, roi_colors] = fn_roi_label_styles(roi_id);
+if any(strcmp(roi_list,'TMP'))
+    % Turn the yellow to gold for visibility
+    roi_colors{strcmp(roi_list,'TMP')}(2) = 0.8;
+end
 if any(strcmp(atlas_id,{'DK','Dx'}))
     view_space = 'pat';
 elseif any(strcmp(atlas_id,{'Yeo7','Yeo17'}))

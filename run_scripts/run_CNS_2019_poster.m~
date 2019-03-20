@@ -104,18 +104,15 @@ plt_id      = 'onsets_trl0to15_evnt_roi';
 roi_id      = 'gROI';%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
 gm_thresh   = 0;
 plot_out    = 0;
-plot_scat   = 0;
+plot_scat   = 1;
 fig_vis     = 'on';
 fig_ftype   = 'svg';
 
 for an_ix = 1:2
-    % with SBJ scatter (for myself to understand)
     SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,stat_id,pipeline_id,...
         an_opts{an_ix},actv_win,roi_id,atlas_id,gm_thresh,plt_id,plot_out,1,save_fig,fig_vis,fig_ftype);
-    % with just errbr (for nice plot)
     SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,stat_id,pipeline_id,...
-        an_opts{an_ix},actv_win,roi_id,atlas_id,gm_thresh,plt_id,plot_out,plot_scat,save_fig,fig_vis,fig_ftype);
-    % with CSE (no results with HGh! try again later with HGm...)
+        an_opts{an_ix},actv_win,roi_id,atlas_id,gm_thresh,plt_id,plot_out,0,save_fig,fig_vis,fig_ftype);
 %     SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_CSE_RT_ANOVA_ROI(SBJs,stat_id,pipeline_id,...
 %         an_opts{an_ix},roi_id,atlas_id,gm_thresh,plt_id,plot_out,plot_scat,save_fig,fig_vis,fig_ftype);
 end
