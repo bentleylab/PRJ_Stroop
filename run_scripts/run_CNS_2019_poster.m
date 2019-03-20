@@ -16,18 +16,18 @@ fig_vis     = 'on';
 fig_type    = 'svg';
 
 %% New tests
-conditions  = 'CNI';
+conditions  = 'CSE';%'CNI';
 pipeline_id = 'main_ft';
-an_id_s     = 'HGh_S_zbtS_trl2to151_fLog_sm0_stat15';
-an_id_r     = 'HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1';
-plt_id      = 'stack_S2to15_R5to10_evnt_c5';
+an_id_s     = 'HGh_S_zbtS_trl2to151_fLog_sm10_stat15';
+an_id_r     = 'HGh_R_zbtS_trl5to101_fLog_sm10_stat5to1';
+plt_id      = 'ts_S15R1_errbr_evnt';%'stack_S2to15_R5to10_evnt_c5';
 save_fig    = 1;
 fig_vis     = 'off';
-fig_ftype= 'png';
+fig_ftype   = 'png';
 for s = 1:numel(SBJs)
-    % need to fix this to work with filtered vs. powspctrm data 
-    SBJ08b_HFA_plot_SR_stack_cond_saved(SBJs{s},conditions,an_id_s,an_id_r,...
-                                        plt_id,save_fig,fig_vis,fig_ftype);
+%     SBJ08b_HFA_plot_SR_stack_cond_saved(SBJs{s},conditions,an_id_s,an_id_r,...
+%                                         plt_id,save_fig,fig_vis,fig_ftype);
+    SBJ08b_HFA_plot_SR_stats(SBJs{s},conditions,an_id_s,an_id_r,plt_id,save_fig,fig_vis,fig_ftype)
     close all;
 end
 

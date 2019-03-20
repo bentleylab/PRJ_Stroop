@@ -76,11 +76,11 @@ hfa{2,1} = ft_selectdata(cfg_trim,hfa{2,1});
 hfa{2,2} = ft_selectdata(cfg_trim,hfa{2,2});
 
 % Compute mean RT per condition
-RTs = round(1000*trial_info.response_time); % converts sec to ms
+RTs = round(sample_rate*trial_info.response_time);
 for cond_ix = 1:numel(cond_lab)
     RT_means{cond_ix} = mean(RTs(fn_condition_index(cond_lab{cond_ix}, trial_info.condition_n)==1));
     % Add in the baseline offset to plot correctly
-    RT_means{cond_ix} = RT_means{cond_ix}-plt_vars.plt_lim_S(1)*1000;
+    RT_means{cond_ix} = RT_means{cond_ix}-plt_vars.plt_lim_S(1)*sample_rate;
 end
 
 %% Plot Results

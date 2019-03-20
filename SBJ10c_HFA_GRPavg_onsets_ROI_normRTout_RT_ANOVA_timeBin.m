@@ -7,8 +7,7 @@ function SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA_timeBin(SBJs,tbin_id,st
 %   plt_vars.grp_metric [str] - {'avg','mdn','all'}
 %       mean/median will compute that metric within each SBJ (variance is across SBJs)
 %       all- all electrode onsets are aggregated as if from the same SBJ
-% clear all; %close all;
-% fig_filetype = 'png';
+
 label_spacer = 0;
 groi_label_spacer = '      ';
 if ischar(save_fig); save_fig = str2num(save_fig); end

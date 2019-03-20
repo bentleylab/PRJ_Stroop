@@ -1,8 +1,7 @@
-function SBJ08b_HFA_plot_SR_actv(SBJ,an_id_s,an_id_r,actv_win,plt_id,save_fig,fig_vis)
+function SBJ08b_HFA_plot_SR_actv(SBJ,an_id_s,an_id_r,actv_win,plt_id,save_fig,fig_vis,fig_ftype)
 % Plots both stimulus- and response-locked HFA computed in SBJ08ab_HFA_actv
 % clear all; %close all;
 
-fig_filetype = 'png';
 if ischar(save_fig); save_fig = str2num(save_fig); end
 if isnumeric(actv_win); actv_win = num2str(actv_win); end
 
@@ -52,9 +51,9 @@ cfg_trim.latency = plt_vars.plt_lim_R;
 hfa{2} = ft_selectdata(cfg_trim,hfa{2});
 
 % Compute mean RT
-RT_mean = mean(round(1000*trial_info.response_time)); % converts sec to ms
+RT_mean = mean(round(sample_rate*trial_info.response_time));
 % Add in the baseline offset to plot correctly
-RT_mean = RT_mean-plt_vars.plt_lim_S(1)*1000;
+RT_mean = RT_mean-plt_vars.plt_lim_S(1)*sample_rate;
 
 %% Plot Results
 fig_dir = ['/home/knight/hoycw/PRJ_Stroop/results/HFA/' SBJ '/actv/SR/' an_id_s '-' an_id_r '/'];
@@ -127,7 +126,7 @@ for ch_ix = 1:numel(hfa{1}.label)
     
     % Save figure
     if save_fig
-        fig_filename = [fig_dir fig_name '.' fig_filetype];
+        fig_filename = [fig_dir fig_name '.' fig_ftype];
         fprintf('Saving %s\n',fig_filename);
         saveas(gcf,fig_filename);
         %eval(['export_fig ' fig_filename]);

@@ -1,5 +1,5 @@
 function SBJ08b_HFA_plot_SR_stack_cond_onset_noLab(SBJ,conditions,an_id_s,an_id_r,pipeline_id,actv_win,...
-                                        plt_id,save_fig,fig_vis,fig_filetype)
+                                        plt_id,save_fig,fig_vis,fig_ftype)
 % Plots single trial stack for both stimulus- and response-locked HFA computed in SBJ08a_HFA_actv
 %   sorts by condition, then by RT; scatter for RTs in stim-locked
 %   onset addition is a dotted line at the (trial-averaged) HFA onset
@@ -162,7 +162,7 @@ for ch_ix = 1:numel(hfa{1}.label)
     
     % Save figure
     if save_fig
-        fig_filename = [fig_dir fig_name '.' fig_filetype];
+        fig_filename = [fig_dir fig_name '.' fig_ftype];
         fprintf('Saving %s\n',fig_filename);
         saveas(gcf,fig_filename);
         %eval(['export_fig ' fig_filename]);

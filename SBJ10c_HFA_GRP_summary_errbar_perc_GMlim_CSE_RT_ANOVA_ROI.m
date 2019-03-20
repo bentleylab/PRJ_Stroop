@@ -1,12 +1,12 @@
 function SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_CSE_RT_ANOVA_ROI(SBJs,stat_id,pipeline_id,an_id,roi_id,...
-                                                            atlas_id,gm_thresh,plt_id,plot_out,save_fig,fig_vis,fig_filetype)
+                                                            atlas_id,gm_thresh,plt_id,plot_out,save_fig,fig_vis,fig_ftype)
 % Load HFA analysis results for active, RT correlation, and ANOVA epochs
 %   RT correlation: any significance in stat_lim
 %   ANOVA factors: any significance in stat_lim, after FDR correction
 % OUTPUTS:
 %   Bar chart with % active, % deactivated, % RT correlations, % ANOVA factors
 % clear all; %close all;
-% fig_filetype = 'png';
+% fig_ftype = 'png';
 label_spacer = 0;
 groi_label_spacer = '      ';
 if ischar(save_fig); save_fig = str2num(save_fig); end
@@ -285,7 +285,7 @@ if save_fig
         [~,~] = mkdir(fig_dir);
     end
     
-    fig_filename = [fig_dir fig_name '.' fig_filetype];
+    fig_filename = [fig_dir fig_name '.' fig_ftype];
     fprintf('Saving %s\n',fig_filename);
     saveas(gcf,fig_filename);
     %eval(['export_fig ' fig_filename]);

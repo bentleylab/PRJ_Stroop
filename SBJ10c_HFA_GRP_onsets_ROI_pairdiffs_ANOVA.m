@@ -1,9 +1,9 @@
 function SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,pipeline_id,an_id,roi_id,...
-                                                    atlas_id,gm_thresh,plt_id,save_fig,fig_vis) %,fig_filetype)
+                                                    atlas_id,gm_thresh,plt_id,save_fig,fig_vis) %,fig_ftype)
 % Load HFA analysis results for active and condition-differentiating
 %   epochs, plot a summary of those time period per electrode
 % clear all; %close all;
-% fig_filetype = 'png';
+% fig_ftype = 'png';
 label_spacer = 0;
 groi_label_spacer = '      ';
 if ischar(save_fig); save_fig = str2num(save_fig); end
@@ -323,7 +323,7 @@ end
 %             mkdir(fig_dir);
 %         end
 %         
-%         fig_filename = [fig_dir fig_name '.' fig_filetype];
+%         fig_filename = [fig_dir fig_name '.' fig_ftype];
 %         fprintf('Saving %s\n',fig_filename);
 %         saveas(gcf,fig_filename);
 %         %eval(['export_fig ' fig_filename]);
