@@ -16,18 +16,18 @@ fig_vis     = 'on';
 fig_type    = 'svg';
 
 %% New tests
-conditions  = 'CSE';%'CNI';
+conditions  = 'CNI';%'CSE';%
 pipeline_id = 'main_ft';
-an_id_s     = 'HGh_S_zbtS_trl2to151_fLog_sm10_stat15';
-an_id_r     = 'HGh_R_zbtS_trl5to101_fLog_sm10_stat5to1';
-plt_id      = 'ts_S15R1_errbr_evnt';%'stack_S2to15_R5to10_evnt_c5';
+an_id_s     = 'HGh_S_zbtS_trl2to151_fLog_sm0_stat15';
+an_id_r     = 'HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1';
+plt_id      = 'stack_S2to15_R5to10_evnt_c5';%'ts_S15R1_errbr_evnt';
 save_fig    = 1;
 fig_vis     = 'off';
 fig_ftype   = 'png';
-for s = 1:numel(SBJs)
-%     SBJ08b_HFA_plot_SR_stack_cond_saved(SBJs{s},conditions,an_id_s,an_id_r,...
-%                                         plt_id,save_fig,fig_vis,fig_ftype);
-    SBJ08b_HFA_plot_SR_stats(SBJs{s},conditions,an_id_s,an_id_r,plt_id,save_fig,fig_vis,fig_ftype)
+for s = 15%:numel(SBJs)
+    SBJ08b_HFA_plot_SR_stack_cond_saved(SBJs{s},conditions,an_id_s,an_id_r,...
+                                        plt_id,save_fig,fig_vis,fig_ftype);
+%     SBJ08b_HFA_plot_SR_stats(SBJs{s},conditions,an_id_s,an_id_r,plt_id,save_fig,fig_vis,fig_ftype)
     close all;
 end
 
@@ -99,15 +99,20 @@ stat_id     = 'corrRT_CNI_pcon_WL200_WS50';
 atlas_id    = 'Dx';
 an_opts     = {'HGh_S_zbtS_trl2to151_fLog_sm0_stat15','HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1'};
 % an_opts     = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
+actv_win    = 100;
 plt_id      = 'onsets_trl0to15_evnt_roi';
 roi_id      = 'gROI';%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
 gm_thresh   = 0;
 plot_out    = 0;
+plot_scat   = 1;
 fig_vis     = 'on';
-fig_ftype= 'svg';
+fig_ftype   = 'svg';
+
 for an_ix = 1:2
-    SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_CSE_RT_ANOVA_ROI(SBJs,stat_id,pipeline_id,...
-        an_opts{an_ix},roi_id,atlas_id,gm_thresh,plt_id,plot_out,save_fig,fig_vis,fig_ftype);
+    SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,stat_id,pipeline_id,...
+        an_opts{an_ix},actv_win,roi_id,atlas_id,gm_thresh,plt_id,plot_out,plot_scat,save_fig,fig_vis,fig_ftype);
+%     SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_CSE_RT_ANOVA_ROI(SBJs,stat_id,pipeline_id,...
+%         an_opts{an_ix},roi_id,atlas_id,gm_thresh,plt_id,plot_out,plot_scat,save_fig,fig_vis,fig_ftype);
 end
 
 %% Plot onsets of ANOVA+RT
