@@ -10,6 +10,7 @@ function SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,stat_id
 label_spacer = 0;
 groi_label_spacer = '      ';
 if ischar(save_fig); save_fig = str2num(save_fig); end
+if ischar(plot_scat); plot_scat = str2num(plot_scat); end
 if isnumeric(actv_win); actv_win = num2str(actv_win); end
 
 %% Data Preparation
@@ -199,8 +200,13 @@ for sbj_ix = 1:numel(SBJs)
 end
 
 %% Plot Percentage of Electrodes Active, Deactive, and Condition Sensitive
+if plot_scat
+    scat_suffix = '_SBJscat';
+else
+    scat_suffix = '';
+end
 % Create and format the plot
-fig_name = ['GRP_HFA_errbar_perc_GMlim' num2str(gm_thresh*100) '_actv_' stat_id '_' roi_id '_' event_type];
+fig_name = ['GRP_HFA_errbar_perc_GMlim' num2str(gm_thresh*100) '_actv_' stat_id '_' roi_id '_' event_type scat_suffix];
 figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.6],'Visible',fig_vis);
 hold on;
@@ -252,11 +258,12 @@ for cond_ix = 1:3+numel(grp_lab)
         end
     end
 end
-if strcmp(event_type,'stim')
-    leg_loc = 'northwest';
-else
-    leg_loc = 'northeast';
-end
+% if strcmp(event_type,'stim')
+%     leg_loc = 'northwest';
+% else
+%     leg_loc = 'northeast';
+% end
+leg_loc = 'northeast';
 if plot_scat
     legend([b{1},s],roi_list{:},'Individuals','Location',leg_loc);
 else
