@@ -66,10 +66,13 @@ end
 
 %% Load elec struct
 try
-    elec_atlas_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'_',atlas_id,elec_suffix,'.mat'];
-    load(elec_atlas_fname);
+    elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'_',atlas_id,elec_suffix,'.mat'];
+    if exist([elec_fname(1:end-4) '_' roi_id '.mat'],'file')
+        elec_fname = [elec_fname(1:end-4) '_' roi_id '.mat'];
+    end
+    load(elec_fname);
 catch
-    answer = input(['Could not load requested file: ' elec_atlas_fname ...
+    answer = input(['Could not load requested file: ' elec_fname ...
         '\nDo you want to run the atlas matching now? "y" or "n"\n'],'s');
     if strcmp(answer,'y')
         fn_save_elec_atlas(SBJ,pipeline_id,view_space,reg_type,atlas_id);
@@ -91,7 +94,9 @@ mesh = fn_load_recon_mesh(SBJ,view_space,reg_type,hemi);
 %% Match elecs to atlas ROIs
 fprintf('Using atlas: %s\n',atlas_id);
 if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
-    elec.roi       = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,roi_id);
+    if ~isfield(elec,'man_adj')
+        elec.roi       = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,roi_id);
+    end
     if strcmp(roi_id,'tissueC')
         elec.roi_color = fn_tissue2color(elec);
     elseif strcmp(atlas_id,'Yeo7')
@@ -100,7 +105,9 @@ if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
         elec.roi_color = fn_roi2color(elec.roi);
     end
 elseif any(strcmp(atlas_id,{'Yeo17'}))
-    elec.roi       = elec.atlas_lab;
+    if ~isfield(elec,'man_adj')
+        elec.roi       = elec.atlas_lab;
+    end
     elec.roi_color = fn_atlas2color(atlas_id,elec.roi);
 end
 
@@ -111,13 +118,21 @@ h = figure;
 ft_plot_mesh(mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
 
 % Plot electrodes on top
+% [roi_list, roi_colors] = fn_roi_label_styles(roi_id);
 cfgs = [];
 for e = 1:numel(elec.label)
     cfgs.channel = elec.label(e);
     elec_tmp = fn_select_elec(cfgs, elec);
-    ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', elec_tmp.roi_color,...
-                 'label', lab_arg);
+    ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', elec_tmp.roi_color, 'label', lab_arg);
 end
+% for roi_ix = 1:numel(roi_list)
+%     if any(strcmp(elec.roi,roi_list{roi_ix}))
+%         cfgs.channel = elec.label(strcmp(elec.roi,roi_list{roi_ix}));
+%         elec_tmp = fn_select_elec(cfgs, elec);
+%         ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', roi_colors{roi_ix},...
+%             'label', lab_arg);
+%     end
+% end
 
 view(view_angle); material dull; lighting gouraud;
 l = camlight;

@@ -2,7 +2,7 @@ function [ordered_elec] = fn_reorder_elec(elec, labels)
 %% Re-order an elec struct to match order of labels provided
 % If labels is empty, sort alphabetically
 if isempty(labels)
-    labels = fn_sort_labels_alphanum(data.label);
+    labels = fn_sort_labels_alphanum(elec.label);
 end
 
 ordered_elec = elec;

@@ -68,6 +68,9 @@ for sbj_ix = 1:numel(SBJs)
     
     try
         elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_mni',reg_suffix,'_',atlas_id,'_full.mat'];
+        if exist([elec_fname(1:end-4) '_' roi_id '.mat'],'file')
+            elec_fname = [elec_fname(1:end-4) '_' roi_id '.mat'];
+        end
         tmp = load(elec_fname); elec{sbj_ix} = tmp.elec;
     catch
         error([elec_fname 'doesnt exist, exiting...']);
@@ -80,7 +83,9 @@ for sbj_ix = 1:numel(SBJs)
     
     % Match elecs to atlas ROIs
     if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
-        elec{sbj_ix}.roi       = fn_atlas2roi_labels(elec{sbj_ix}.atlas_lab,atlas_id,roi_id);
+        if ~isfield(elec{sbj_ix},'man_adj')
+            elec{sbj_ix}.roi       = fn_atlas2roi_labels(elec{sbj_ix}.atlas_lab,atlas_id,roi_id);
+        end
         if strcmp(roi_id,'tissueC')
             elec{sbj_ix}.roi_color = fn_tissue2color(elec{sbj_ix});
         elseif strcmp(atlas_id,'Yeo7')
@@ -89,7 +94,9 @@ for sbj_ix = 1:numel(SBJs)
             elec{sbj_ix}.roi_color = fn_roi2color(elec{sbj_ix}.roi);
         end
     elseif any(strcmp(atlas_id,{'Yeo17'}))
-        elec{sbj_ix}.roi       = elec{sbj_ix}.atlas_lab;
+        if ~isfield(elec{sbj_ix},'man_adj')
+            elec{sbj_ix}.roi       = elec{sbj_ix}.atlas_lab;
+        end
         elec{sbj_ix}.roi_color = fn_atlas2color(atlas_id,elec{sbj_ix}.roi);
     end
     

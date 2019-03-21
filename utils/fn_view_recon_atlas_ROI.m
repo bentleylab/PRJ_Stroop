@@ -74,6 +74,9 @@ eval(SBJ_vars_cmd);
 
 try
     elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'_',atlas_id,'_full.mat'];
+    if exist([elec_fname(1:end-4) '_' roi_id '.mat'],'file')
+        elec_fname = [elec_fname(1:end-4) '_' roi_id '.mat'];
+    end
     load(elec_fname);
 catch
     answer = input(['Could not load requested file: ' elec_fname ...
@@ -86,10 +89,10 @@ catch
 end
 
 %% Match elecs to atlas ROIs
-[roi_list, ~] = fn_roi_label_styles(roi_id);
-
 if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
-    elec.roi       = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,roi_id);
+    if ~isfield(elec,'man_adj')
+        elec.roi       = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,roi_id);
+    end
     if strcmp(roi_id,'tissueC')
         elec.roi_color = fn_tissue2color(elec);
     elseif strcmp(atlas_id,'Yeo7')
@@ -98,7 +101,9 @@ if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
         elec.roi_color = fn_roi2color(elec.roi);
     end
 elseif any(strcmp(atlas_id,{'Yeo17'}))
-    elec.roi       = elec.atlas_lab;
+    if ~isfield(elec,'man_adj')
+        elec.roi       = elec.atlas_lab;
+    end
     elec.roi_color = fn_atlas2color(atlas_id,elec.roi);
 end
 
