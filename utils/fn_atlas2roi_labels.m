@@ -20,7 +20,7 @@ fclose(roi_file);
 switch roi_id
     case {'Yeo7','Yeo17'}
         map_ix = 2;
-    case {'mgROI','gROI','main3'}
+    case {'mgROI','gROI','main3','lat','deep'}
         map_ix = 2;
     case {'ROI','thryROI','LPFC','MPFC','OFC','INS','TMP','PAR','MTL'}
         map_ix = 3;

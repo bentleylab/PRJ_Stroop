@@ -2,9 +2,9 @@ function roi_lab = fn_atlas_roi_select_mesh(atlas_id, roi_id, hemi)
 %% Returns ROI labels for plotting that ROI's mesh in a given atlas
 
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
-tsv_filename = [root_dir 'PRJ_Stroop/data/atlases/atlas_mappings/atlas_ROI_mappings_' atlas_id '_both_hemi.tsv'];
-fprintf('\tReading roi csv file: %s\n', tsv_filename);
-roi_file = fopen(tsv_filename, 'r');
+tsv_fname = [root_dir 'PRJ_Stroop/data/atlases/atlas_mappings/atlas_ROI_mappings_' atlas_id '_both_hemi.tsv'];
+fprintf('\tReading roi csv file: %s\n', tsv_fname);
+roi_file = fopen(tsv_fname, 'r');
 % roi.csv contents:
 %   atlas_label, gROI_label, ROI_label, Notes (not read in)
 roi_map = textscan(roi_file, '%s %s %s %s %s', 'HeaderLines', 1,...
@@ -14,6 +14,19 @@ fclose(roi_file);
 
 roi_lab = {};
 switch roi_id
+    case 'lat'
+        roi_lab = [...
+            roi_map{1}(strcmp(roi_map{2},'LPFC'));
+            roi_map{1}(strcmp(roi_map{2},'OFC'));
+            roi_map{1}(strcmp(roi_map{2},'PAR'));
+            roi_map{1}(strcmp(roi_map{2},'TMP'));
+            roi_map{1}(strcmp(roi_map{2},'OCC'));
+            'G_front_sup'; 'G_and_S_paracentral'];      % MPFC
+    case 'deep'
+        roi_lab = [...
+            roi_map{1}(strcmp(roi_map{2},'INS'));
+            roi_map{1}(strcmp(roi_map{3},'AMG'));
+            roi_map{1}(strcmp(roi_map{3},'HPC'))];
     case 'LPFC'
         roi_lab = [...
             roi_map{1}(strcmp(roi_map{2},'LPFC'));
@@ -43,10 +56,26 @@ if strcmp(hemi,'b')
 end
 for l = 1:size(roi_lab,1)
     if strcmp(hemi,'b')
-        roi_lab{l,1} = ['ctx_lh_' roi_lab{l,1}];
-        roi_lab{l,2} = ['ctx_rh_' roi_lab{l,2}];
+        if any(strcmp(roi_lab(l,:),'Amygdala')) || any(strcmp(roi_lab(l,:),'Hippocampus'))
+            if strcmp(hemi,'l')
+                roi_lab{l,1} = ['Left-' roi_lab{l,1}];
+            else
+                roi_lab{l,2} = ['Right-' roi_lab{l,2}];
+            end
+        else
+            roi_lab{l,1} = ['ctx_lh_' roi_lab{l,1}];
+            roi_lab{l,2} = ['ctx_rh_' roi_lab{l,2}];
+        end
     else
-        roi_lab{l} = ['ctx_' hemi 'h_' roi_lab{l}];
+        if any(strcmp(roi_lab(l,:),'Amygdala')) || any(strcmp(roi_lab(l,:),'Hippocampus'))
+            if strcmp(hemi,'l')
+                roi_lab{l} = ['Left-' roi_lab{l}];
+            else
+                roi_lab{l} = ['Right-' roi_lab{l}];
+            end
+        else
+            roi_lab{l} = ['ctx_' hemi 'h_' roi_lab{l}];
+        end
     end
 end
 if strcmp(hemi,'b')

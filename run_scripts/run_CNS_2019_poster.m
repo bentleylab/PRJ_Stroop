@@ -41,9 +41,16 @@ B00_RT_GRP_hist_norm(SBJs,'CNI',save_fig,fig_vis,fig_type);
 %   RECONS with EFFECTS
 %  =================================================================================
 %% Plot group recon with mgROI
-fn_view_recon_atlas_grp(SBJs,pipeline_id,'v',0,'l','Dx','mgROI',0);
-fn_view_recon_atlas_grp(SBJs,pipeline_id,'v',0,'r','Dx','mgROI',0);
+% fn_view_recon_atlas_grp(SBJs,pipeline_id,'v',0,'l','Dx','mgROI',0);
+% fn_view_recon_atlas_grp(SBJs,pipeline_id,'v',0,'r','Dx','mgROI',0);
 
+fn_view_recon_atlas_grp_ROI(SBJs,pipeline_id,'v',1,'l','Dx','lat')
+fn_view_recon_atlas_grp_ROI(SBJs,pipeline_id,'v',1,'r','Dx','lat')
+fn_view_recon_atlas_grp_ROI(SBJs,pipeline_id,'v',1,'l','Dx','MPFC')
+fn_view_recon_atlas_grp_ROI(SBJs,pipeline_id,'v',1,'r','Dx','MPFC')
+fn_view_recon_atlas_grp_ROI(SBJs,pipeline_id,'v',1,'l','Dx','deep')
+fn_view_recon_atlas_grp_ROI(SBJs,pipeline_id,'v',1,'r','Dx','deep')
+fn_view_recon_atlas_grp_ROI(SBJs,pipeline_id,'v',1,'b','Dx','OFC')
 %% Plot CNI sig elecs
 stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
 an_opts     = {'HGh_S_zbtS_trl2to151_fLog_sm0_stat15','HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1'};

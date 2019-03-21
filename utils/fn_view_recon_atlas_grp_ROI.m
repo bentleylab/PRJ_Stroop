@@ -17,8 +17,8 @@ function fn_view_recon_atlas_grp_ROI(SBJs, pipeline_id, reg_type, show_labels,..
 if strcmp(hemi,'b') && ~strcmp(roi_id,'OFC')
     error('hemi must be l or r for all non-OFC plots');
 end
-if ~any(strcmp(roi_id,{'LPFC','MPFC','INS','OFC','TMP','PAR'}))
-    error('roi_id needs to be a lobe (not OCC either)');
+if ~any(strcmp(roi_id,{'LPFC','MPFC','INS','OFC','TMP','PAR','lat','deep'}))
+    error('roi_id needs to be a lobe, "lat", or "deep"');
 end
 
 % Handle variable inputs
@@ -38,9 +38,9 @@ end
 if ~exist('view_angle','var')
     if strcmp(roi_id,'OFC')
         view_angle = [0 -90];   % from the bottom
-    elseif strcmp(hemi,'l') && any([strcmp(roi_id,{'LPFC','INS','TMP','PAR','MTL'}) ~strcmp(roi_id,'MPFC')])
+    elseif strcmp(hemi,'l') && any([strcmp(roi_id,{'LPFC','INS','TMP','PAR','MTL','lat','deep'}) ~strcmp(roi_id,'MPFC')])
         view_angle = [-90 0];    % from the left
-    elseif strcmp(hemi,'r') && any([strcmp(roi_id,{'LPFC','INS','TMP','PAR','MTL'}) ~strcmp(roi_id,'MPFC')])
+    elseif strcmp(hemi,'r') && any([strcmp(roi_id,{'LPFC','INS','TMP','PAR','MTL','lat','deep'}) ~strcmp(roi_id,'MPFC')])
         view_angle = [90 0];    % from the right
     else
         error(['Bad combo of hemi (' hemi ') and roi_id (' roi_id ')']);
@@ -129,6 +129,12 @@ atlas = fn_load_recon_atlas([],atlas_id);
 
 % Get Atlas-ROI mapping
 atlas_labels = fn_atlas_roi_select_mesh(atlas_id, roi_id, hemi);
+if strcmp(roi_id,'deep')
+    mtl_ix = ~cellfun(@isempty,strfind(atlas_labels,'Hippocampus')) | ...
+             ~cellfun(@isempty,strfind(atlas_labels,'Amygdala'));
+    mtl_labels = atlas_labels(mtl_ix);
+    atlas_labels = atlas_labels(~mtl_ix);
+end
 
 %% Select ROI mesh
 cfg = [];
@@ -136,9 +142,16 @@ cfg.inputcoord = atlas.coordsys;
 cfg.atlas = atlas;
 cfg.roi = atlas_labels;
 roi_mask = ft_volumelookup(cfg,atlas);
-
 seg = keepfields(atlas, {'dim', 'unit','coordsys','transform'});
 seg.brain = roi_mask;
+
+if exist('mtl_labels','var')
+    cfg.roi = mtl_labels;
+    mtl_mask = ft_volumelookup(cfg,atlas);
+    
+    mtl_seg = keepfields(atlas, {'dim', 'unit','coordsys','transform'});
+    mtl_seg.brain = mtl_mask;
+end
 
 cfg = [];
 cfg.method      = 'iso2mesh';   % surface toolbox Arjen found
@@ -148,12 +161,18 @@ cfg.tissue      = 'brain';
 cfg.numvertices = 100000;
 cfg.smooth      = 3;
 roi_mesh = ft_prepare_mesh(cfg, seg);
+if exist('mtl_seg','var')
+    mtl_mesh = ft_prepare_mesh(cfg, mtl_seg);
+end
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
 h = figure;
 
 % Plot 3D mesh
 ft_plot_mesh(roi_mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
+if exist('mtl_mesh','var')
+    ft_plot_mesh(mtl_mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
+end
 
 % Plot electrodes on top
 for e = 1:numel(elec.label)
