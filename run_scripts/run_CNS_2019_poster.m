@@ -69,9 +69,6 @@ for an_ix = 1:numel(an_opts)
 %         fn_view_recon_stat(SBJs{s}, pipeline_id, stat_id, an_opts{an_ix}, 'pat', '', show_labels, hemi_opts{hemi_ix}, plot_out);
     end
 end
-% an_ix = 2;
-% fn_view_recon_atlas_grp_stat_sphr(SBJs,pipeline_id,stat_id,an_opts{an_ix},'v',0,'r',atlas_id,roi_id,plot_out);
-% fn_view_recon_atlas_grp_stat_sphr(SBJs,pipeline_id,stat_id,an_opts{an_ix},'v',0,'l',atlas_id,roi_id,plot_out);
 
 %% ================================================================================
 %   Effects by ROI
@@ -148,12 +145,8 @@ for roi_ix = 1%:numel(roi_opts)
 %         for plt_ix = 1:numel(plt_opts{1})
             fprintf('roi: %s; an: %s; plt: %s\n',roi_opts{roi_ix},an_opts{an_ix},plt_opts{plt_ix}{plt_ix});
 %             % Violin Plots
-            SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA_timeBin(SBJs,tbin_id,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
-                                                    atlas_opts{roi_ix},gm_thresh,plt_opts{plt_ix}{plt_ix},1,'on',fig_ftype)
             SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
                                                     atlas_opts{roi_ix},gm_thresh,plt_opts{an_ix}{plt_ix},1,'on',fig_ftype)
-%             SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA_clustBin(SBJs,clust_id,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
-%                                                     atlas_opts{roi_ix},gm_thresh,plt_opts{an_ix}{plt_ix},1,'on',fig_ftype)
             % Pair differences
             SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
                                                     atlas_id,0,plt_opts{1}{2},save_fig,fig_vis)
@@ -162,116 +155,3 @@ for roi_ix = 1%:numel(roi_opts)
 end
 
 
-%% ================================================================================
-% %   EFFECT ONSETS
-% %  =================================================================================
-% %% Cluster ANOVA time series
-% pipeline_id = 'main_ft';
-% clust_id = 'kmeans_corr_nROI_itr1k';%'kmeans_corr_nCH_itr1k_srCmb',
-% stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
-% an_opts  = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
-% an_id = an_opts{2};
-% roi_id   = 'mgROI';
-% atlas_id = 'Dx';
-% plt_id   = 'ts_S0to15_R5to10_evnt_sigline';
-% plot_out = 0;
-% fig_vis  = 'off';
-% save_fig = 1;
-% for sbj_ix = 1:numel(SBJs)
-%     for an_ix = 1:2%1:numel(clust_opts)
-%         SBJ12a_corr_ANOVA_ts_cluster(SBJs{sbj_ix},pipeline_id,stat_id,clust_id,an_opts{an_ix},...
-%             roi_id,atlas_id,plt_id,fig_vis,save_fig,plot_out);
-% %         fn_view_recon_clust(SBJ, pipeline_id, clust_id, stat_id, an_id, ...
-% %                     view_space, reg_type, show_labels, hemi, plot_out)
-%         close all;
-%     end
-% end
-% 
-%% Plot binned cluster ANOVA ts
-% SBJ = 'IR74';
-% clust_id = 'kmeans_corr_nROI_itr1k';%'kmeans_corr_nCH_itr1k_srCmb',
-% stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
-% an_opts  = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
-% hemi_opts = {'r','l'};
-% roi_id   = 'mgROI';
-% atlas_id = 'Dx';
-% plt_id   = 'ts_S0to15_R5to10_evnt_sigline';
-% plot_ns  = 1;
-% plot_out = 0;
-% plot_clusters = 1;
-% plot_recon = 0;
-% show_labels = 1;
-% fig_vis  = 'on';
-% save_fig = 1;
-% an_ix = 2
-% for sig_ix = 0:1%:2
-%     fn_view_recon_clust(SBJ, clust_id, stat_id, an_opts{an_ix}, atlas_id, roi_id,...
-%         'pat', '', show_labels, 'b', plot_out, sig_ix, plot_clusters, plot_recon, fig_vis, save_fig);%hemi_opts{hemi_ix}
-% end
-% 
-% % Plot clust centroid within SBJ
-% SBJ12a_corr_ANOVA_ts_cluster_plotOnly(SBJ,pipeline_id,stat_id,clust_id,an_opts{an_ix},...
-%                                         roi_id,atlas_id,plt_id,fig_vis,save_fig,plot_out)
-% 
-% % Plot clust centroids across SBJs
-% plt_id   = 'ts_S0to15_R5to10_evnt_sigline';
-% SBJ12b_clust_ANOVA_ts_GRP_peaks(SBJs,pipeline_id,stat_id,clust_id,an_opts{an_ix},...
-%     roi_id,atlas_id,plt_id,fig_vis,save_fig,plot_out)
-% 
-%% Plot onsets of ANOVA+RT
-% pipeline_id = 'main_ft';
-% stat_id     = 'corrRT_CNI_pcon_WL200_WS50';
-% clust_id    = 'kmeans_corr_nROI_itr1k';%'kmeans_corr_nCH_itr1k_srCmb',
-% an_opts     = {'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};%'HGm_S_zbtS_trl2to151_sm0_wn100_stat15',
-% gm_thresh   = 0;
-% median_yn   = 0;
-% roi_opts    = {'mgROI'};%,'Yeo7'};%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
-% atlas_opts  = {'Dx'};%,'Yeo7'};%'Dx';
-% % plt_opts    = {{'onsets_trl5to1_evnt_roi'}};%{'onsets_trl0to15_evnt_roi'},
-% plt_opts    = {{'onsets_trl0to15_violin_allROI','onsets_trl5to1_violin_avgROI'}};%{{'onsets_trl0to15_violin_allSBJ','onsets_trl0to15_violin_allROI','onsets_trl0to15_violin_avgROI'},...
-% %                {'onsets_trl5to1_violin_allSBJ','onsets_trl5to1_violin_allROI','onsets_trl5to1_violin_avgROI'}};
-% fig_ftype = 'png';%'svg'
-% for roi_ix = 1%:numel(roi_opts)
-%     for an_ix = 1:numel(an_opts)
-% %         for plt_ix = 1:numel(plt_opts{1})
-%             fprintf('roi: %s; an: %s; plt: %s\n',roi_opts{roi_ix},an_opts{an_ix},plt_opts{an_ix}{plt_ix});
-% %             % Violin Plots
-% %             SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
-% %                                                     atlas_opts{roi_ix},gm_thresh,plt_opts{an_ix}{plt_ix},1,'on',fig_ftype)
-% %             SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA_clustBin(SBJs,clust_id,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
-% %                                                     atlas_opts{roi_ix},gm_thresh,plt_opts{an_ix}{plt_ix},1,'on',fig_ftype)
-% %             % Pair differences
-%         SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
-%                                                     atlas_id,0,plt_opts{1}{2},save_fig,fig_vis)
-% %         end
-%     end
-% end
-% 
-%% Plot binned clusters with sig CNI
-% clust_id = 'kmeans_corr_nROI_itr1k';%'kmeans_corr_nCH_itr1k_srCmb',
-% stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
-% an_opts  = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
-% hemi_opts = {'r','l'};
-% roi_id   = 'mgROI';
-% atlas_id = 'Dx';
-% % plt_id   = 'ts_S0to15_R5to10_evnt_sigline';
-% plot_ns  = 0;
-% plot_out = 0;
-% plot_clusters = 0;
-% plot_recon = 1;
-% reg_type = 'v';
-% show_labels = 0;
-% fig_vis  = 'on';
-% save_fig = 0;
-% an_ix = 2;
-% 
-% fn_view_recon_atlas_grp_stat_sphr_clust(SBJs, pipeline_id, clust_id, stat_id, an_opts{an_ix}, ...
-%                         reg_type, show_labels, 'r', atlas_id, roi_id, plot_out)
-% fn_view_recon_atlas_grp_stat_sphr_clust(SBJs, pipeline_id, clust_id, stat_id, an_opts{an_ix}, ...
-%                         reg_type, show_labels, 'l', atlas_id, roi_id, plot_out)
-% % for sbj_ix = 1:numel(SBJs)
-% %     fn_view_recon_clust(SBJs{sbj_ix}, clust_id, stat_id, an_opts{an_ix}, atlas_id, roi_id,...
-% %         'pat', '', show_labels, 'b', plot_out, plot_ns, plot_clusters, plot_recon, fig_vis, save_fig);%hemi_opts{hemi_ix}
-% %     close all;
-% % end
-% 

@@ -22,7 +22,7 @@ switch roi_id
     case 'mgROI'
         labels = {'LPFC','MPFC','INS','OFC'};
     case 'gROI'
-        labels = {'LPFC','MPFC','INS','OFC','PAR','TMP','AMG','HPC','OCC'};
+        labels = {'LPFC','MPFC','INS','OFC','PAR','TMP','AMG','HPC'};%,'OCC'};
     case 'lat'
         labels = {'LPFC','PAR','TMP','OCC'};
     case 'deep'
