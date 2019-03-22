@@ -56,16 +56,20 @@ fn_view_recon_atlas_grp_ROI(SBJs,pipeline_id,'v',1,'b','Dx','OFC')
 stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
 an_opts     = {'HGh_S_zbtS_trl2to151_fLog_sm0_stat15','HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1'};
 % an_opts  = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
+tbin_id    = 'cnts';
 hemi_opts = {'r','l'};
 roi_id   = 'gROI';
 atlas_id = 'Dx';
+reg_type = 'v';
 plot_out = 0;
 show_labels = 0;
 
 for an_ix = 1:numel(an_opts)
     for hemi_ix = 1:numel(hemi_opts)
-        fn_view_recon_atlas_grp_stat(SBJs, pipeline_id, stat_id, an_opts{an_ix}, 'v', show_labels,...
+        fn_view_recon_atlas_grp_stat(SBJs, pipeline_id, stat_id, an_opts{an_ix}, reg_type, show_labels,...
                                  hemi_opts{hemi_ix}, atlas_id, roi_id, plot_out)
+        fn_view_recon_atlas_grp_stat_onset(SBJs, pipeline_id, stat_id, an_opts{an_ix}, reg_type, show_labels,...
+                                 hemi_opts{hemi_ix}, atlas_id, roi_id, tbin_id)
 %         fn_view_recon_stat(SBJs{s}, pipeline_id, stat_id, an_opts{an_ix}, 'pat', '', show_labels, hemi_opts{hemi_ix}, plot_out);
     end
 end
@@ -134,23 +138,21 @@ an_opts     = {'HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1'};% stim?
 gm_thresh   = 0;
 median_yn   = 0;
 roi_opts    = {'gROI'};%,'Yeo7'};%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
-atlas_opts  = {'Dx'R};
+atlas_opts  = {'Dx'};
 % plt_opts    = {{'onsets_trl5to1_evnt_roi'}};%{'onsets_trl0to15_evnt_roi'},
 plt_opts    = {{'onsets_trl0to15_violin_allROI','onsets_trl5to1_violin_all'}};%{{'onsets_trl0to15_violin_allSBJ','onsets_trl0to15_violin_allROI','onsets_trl0to15_violin_avgROI'},...
 %                {'onsets_trl5to1_violin_allSBJ','onsets_trl5to1_violin_allROI','onsets_trl5to1_violin_avgROI'}};
-fig_ftype = 'png';%'svg'
+fig_ftype = 'svg';%'png';
 an_ix = 1;
 for roi_ix = 1%:numel(roi_opts)
     for plt_ix = 1:numel(plt_opts)
-%         for plt_ix = 1:numel(plt_opts{1})
             fprintf('roi: %s; an: %s; plt: %s\n',roi_opts{roi_ix},an_opts{an_ix},plt_opts{plt_ix}{plt_ix});
 %             % Violin Plots
             SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
                                                     atlas_opts{roi_ix},gm_thresh,plt_opts{an_ix}{plt_ix},1,'on',fig_ftype)
             % Pair differences
-            SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
-                                                    atlas_id,0,plt_opts{1}{2},save_fig,fig_vis)
-%         end
+%             SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,pipeline_id,an_opts{an_ix},roi_opts{roi_ix},...
+%                                                     atlas_id,0,plt_opts{1}{2},save_fig,fig_vis)
     end
 end
 

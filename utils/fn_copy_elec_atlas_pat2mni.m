@@ -1,4 +1,4 @@
-function fn_copy_elec_atlas_pat2mni(SBJ,pipeline_id,reg_type,atlas_id)
+function fn_copy_elec_atlas_pat2mni(SBJ,pipeline_id,reg_type,atlas_id,varargin)
 %% Copy atlas+tissue info from patient space elec to mni space elec
 % INPUTS:
 %   SBJ [str] - name of subject
@@ -12,6 +12,17 @@ addpath([root_dir 'PRJ_Stroop/scripts/']);
 addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
 addpath(ft_dir);
 ft_defaults
+
+%% Variable input handling
+if ~isempty(varargin)
+    for v = 1:2:numel(varargin)
+        if strcmp(varargin{v},'roi_id')
+            roi_id = varargin{v+1};
+        else
+            error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
+        end
+    end
+end
 
 %% Load variables
 eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
@@ -27,6 +38,12 @@ end
 pat_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_pat','_',atlas_id,'_full.mat'];
 mni_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_mni',reg_suffix,'.mat'];
 out_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_mni',reg_suffix,'_',atlas_id,'_full.mat'];
+if exist('roi_id','var')
+    if exist([pat_fname(1:end-4) '_' roi_id '.mat'],'file')
+        pat_fname = [pat_fname(1:end-4) '_' roi_id '.mat'];
+        out_fname = [out_fname(1:end-4) '_' roi_id '.mat'];
+    end
+end
 load(pat_fname); pat = elec;
 load(mni_fname);
 

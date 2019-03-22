@@ -1,4 +1,4 @@
-function fn_view_recon_atlas_grp_stat_onset(SBJs, pipeline_id, stat_id, an_id, reg_type, show_labels,...
+function fn_view_recon_atlas_grp_ROI_stat_onset(SBJs, pipeline_id, stat_id, an_id, reg_type, show_labels,...
                                  hemi, atlas_id, roi_id, tbin_id, varargin)
 %% Plot a reconstruction with electrodes
 % INPUTS:
@@ -25,6 +25,14 @@ function fn_view_recon_atlas_grp_stat_onset(SBJs, pipeline_id, stat_id, an_id, r
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 
 %% Handle variables
+% Error cases
+if strcmp(hemi,'b') && ~strcmp(roi_id,'OFC')
+    error('hemi must be l or r for all non-OFC plots');
+end
+if ~any(strcmp(roi_id,{'LPFC','MPFC','INS','OFC','TMP','PAR','lat','deep'}))
+    error('roi_id needs to be a lobe, "lat", or "deep"');
+end
+
 % Handle variable inputs
 if ~isempty(varargin)
     for v = 1:2:numel(varargin)
@@ -39,16 +47,18 @@ if ~isempty(varargin)
 end
 
 %% Define default options
-% view_space = 'mni';
 if ~exist('view_angle','var')
-    if strcmp(hemi,'l')
-        view_angle = [-60 -30];
-    elseif any(strcmp(hemi,{'r','b'}))
-        view_angle = [60 -30];
-    else
-        error(['unknown hemi: ' hemi]);
-    end
+    view_angle = fn_get_view_angle(hemi,roi_id);
 end
+% if ~exist('view_angle','var')
+%     if strcmp(hemi,'l')
+%         view_angle = [-60 -30];
+%     elseif any(strcmp(hemi,{'r','b'}))
+%         view_angle = [60 -30];
+%     else
+%         error(['unknown hemi: ' hemi]);
+%     end
+% end
 if ~exist('mesh_alpha','var')
     % assume SEEG
     mesh_alpha = 0.3;
@@ -133,6 +143,7 @@ end
 %% Load Data
 elec_sbj = cell([numel(SBJs) numel(cond_lab)]);
 good_sbj = true([numel(SBJs) numel(cond_lab)]);
+% Allocate fields that appendsens will remove
 all_roi_labels = cell([numel(cond_lab) 1]);
 all_roi_colors = cell([numel(cond_lab) 1]);
 all_onset_ix   = cell([numel(cond_lab) 1]);
@@ -326,8 +337,46 @@ for cond_ix = 1:numel(cond_lab)
     elec{cond_ix}.onset_ix  = all_onset_ix{cond_ix};
 end
 
-%% Load brain recon
-mesh = fn_load_recon_mesh([],'mni',reg_type,hemi);
+%% Load Atlas
+atlas = fn_load_recon_atlas([],atlas_id);
+
+% Get Atlas-ROI mapping
+atlas_labels = fn_atlas_roi_select_mesh(atlas_id, roi_id, hemi);
+if strcmp(roi_id,'deep')
+    mtl_ix = ~cellfun(@isempty,strfind(atlas_labels,'Hippocampus')) | ...
+             ~cellfun(@isempty,strfind(atlas_labels,'Amygdala'));
+    mtl_labels = atlas_labels(mtl_ix);
+    atlas_labels = atlas_labels(~mtl_ix);
+end
+
+%% Select ROI mesh
+cfg = [];
+cfg.inputcoord = atlas.coordsys;
+cfg.atlas = atlas;
+cfg.roi = atlas_labels;
+roi_mask = ft_volumelookup(cfg,atlas);
+seg = keepfields(atlas, {'dim', 'unit','coordsys','transform'});
+seg.brain = roi_mask;
+
+if exist('mtl_labels','var')
+    cfg.roi = mtl_labels;
+    mtl_mask = ft_volumelookup(cfg,atlas);
+    
+    mtl_seg = keepfields(atlas, {'dim', 'unit','coordsys','transform'});
+    mtl_seg.brain = mtl_mask;
+end
+
+cfg = [];
+cfg.method      = 'iso2mesh';   % surface toolbox Arjen found
+cfg.radbound    = 2;            % scalar indicating the radius of the target surface mesh element bounding sphere
+cfg.maxsurf     = 0;
+cfg.tissue      = 'brain';
+cfg.numvertices = 100000;
+cfg.smooth      = 3;
+roi_mesh = ft_prepare_mesh(cfg, seg);
+if exist('mtl_seg','var')
+    mtl_mesh = ft_prepare_mesh(cfg, mtl_seg);
+end
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
 f = cell(size(cond_lab));
