@@ -38,7 +38,7 @@ end
 
 % Define default options
 if ~exist('view_angle','var')
-    view_angle     = [-90 0];
+    view_angle = fn_get_view_angle(hemi,roi_id);
 end
 if ~exist('mesh_alpha','var')
     if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))

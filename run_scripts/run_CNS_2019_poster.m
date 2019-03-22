@@ -129,12 +129,12 @@ end
 pipeline_id = 'main_ft';
 stat_id     = 'corrRT_CNI_pcon_WL200_WS50';
 % clust_id    = 'kmeans_corr_nROI_itr1k';%'kmeans_corr_nCH_itr1k_srCmb',
-tbin_id     = 'eqROI';
+tbin_id     = 'cnts';
 an_opts     = {'HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1'};% stim?
 gm_thresh   = 0;
 median_yn   = 0;
 roi_opts    = {'gROI'};%,'Yeo7'};%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
-atlas_opts  = {'Dx'};
+atlas_opts  = {'Dx'R};
 % plt_opts    = {{'onsets_trl5to1_evnt_roi'}};%{'onsets_trl0to15_evnt_roi'},
 plt_opts    = {{'onsets_trl0to15_violin_allROI','onsets_trl5to1_violin_all'}};%{{'onsets_trl0to15_violin_allSBJ','onsets_trl0to15_violin_allROI','onsets_trl0to15_violin_avgROI'},...
 %                {'onsets_trl5to1_violin_allSBJ','onsets_trl5to1_violin_allROI','onsets_trl5to1_violin_avgROI'}};

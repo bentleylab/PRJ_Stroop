@@ -57,16 +57,22 @@ for r = 1:n_rois
             % MPFC Subregions - blues
         case 'ACC'
             RGB(r,:) = [8 81 156]./256;
+            RGB(r,:) = [190 174 212]./256;
         case 'preSMA'
             RGB(r,:) = [49 130 189]./256;
+            RGB(r,:) = [190 174 212]./256;
         case 'aMCC'
             RGB(r,:) = [107 174 214]./256;
+            RGB(r,:) = [190 174 212]./256;
         case 'SMA'
             RGB(r,:) = [158 202 225]./256;
+            RGB(r,:) = [190 174 212]./256;
         case 'pMCC'
             RGB(r,:) = [198 219 239]./256;
+            RGB(r,:) = [190 174 212]./256;
         case 'PCC'
             RGB(r,:) = [239 243 255]./256;
+            RGB(r,:) = [190 174 212]./256;
             
             % Insula Subregions - greens
         case 'vaINS'

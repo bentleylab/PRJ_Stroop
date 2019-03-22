@@ -1,5 +1,5 @@
 function fn_view_recon_atlas_grp_ROI(SBJs, pipeline_id, reg_type, show_labels,...
-                                 hemi, atlas_id, roi_id, varargin)
+                                 hemi, atlas_id, roi_id, plot_roi, varargin)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJs [cell array str] - subject IDs to plot
@@ -14,11 +14,11 @@ function fn_view_recon_atlas_grp_ROI(SBJs, pipeline_id, reg_type, show_labels,..
 
 %% Handle variables
 % Error cases
-if strcmp(hemi,'b') && ~strcmp(roi_id,'OFC')
+if strcmp(hemi,'b') && ~strcmp(plot_roi,'OFC')
     error('hemi must be l or r for all non-OFC plots');
 end
-if ~any(strcmp(roi_id,{'LPFC','MPFC','INS','OFC','TMP','PAR','lat','deep'}))
-    error('roi_id needs to be a lobe, "lat", or "deep"');
+if ~any(strcmp(plot_roi,{'LPFC','MPFC','INS','OFC','TMP','PAR','lat','deep'}))
+    error('plot_roi needs to be a lobe, "lat", or "deep"');
 end
 
 % Handle variable inputs
@@ -36,7 +36,7 @@ end
 
 % Define default options
 if ~exist('view_angle','var')
-    view_angle = fn_get_view_angle(hemi,roi_id);
+    view_angle = fn_get_view_angle(hemi,plot_roi);
 end
 
 if ~exist('mesh_alpha','var')
@@ -103,7 +103,7 @@ for sbj_ix = 1:numel(SBJs)
     end
     
     % Remove electrodes that aren't in atlas ROIs & hemisphere
-    good_elecs = fn_select_elec_lab_match(elec{sbj_ix}, hemi, atlas_id, roi_id);
+    good_elecs = fn_select_elec_lab_match(elec{sbj_ix}, hemi, atlas_id, plot_roi);
     % fn_select_elec messes up if you try to toss all elecs
     if isempty(good_elecs)
         elec{sbj_ix} = {};

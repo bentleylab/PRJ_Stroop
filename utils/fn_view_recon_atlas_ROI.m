@@ -36,15 +36,7 @@ end
 
 % View angle
 if ~exist('view_angle','var')
-    if strcmp(roi_id,'OFC')
-        view_angle = [0 -90];   % from the bottom
-    elseif strcmp(hemi,'l') && any([strcmp(roi_id,{'LPFC','INS','TMP','PAR','MTL'}) ~strcmp(roi_id,'MPFC')])
-        view_angle = [-90 0];    % from the left
-    elseif strcmp(hemi,'r') && any([strcmp(roi_id,{'LPFC','INS','TMP','PAR','MTL'}) ~strcmp(roi_id,'MPFC')])
-        view_angle = [90 0];    % from the right
-    else
-        error(['Bad combo of hemi (' hemi ') and roi_id (' roi_id ')']);
-    end
+    view_angle = fn_get_view_angle(hemi,roi_id);
 end
 
 if ~exist('mesh_alpha','var')

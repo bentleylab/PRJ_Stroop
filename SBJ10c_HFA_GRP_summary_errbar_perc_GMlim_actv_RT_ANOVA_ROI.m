@@ -224,14 +224,14 @@ var_data  = zeros([3+numel(grp_lab) numel(roi_list)]);
 for roi_ix = 1:numel(roi_list)
 %     bar_vars(1,roi_ix) = sum(cI_cnt(:,roi_ix))/sum(elec_cnt(:,roi_ix));
     bar_data(1,roi_ix) = sum(actv_cnt(:,roi_ix))/sum(elec_cnt(:,roi_ix));
-    var_data(1,roi_ix) = std(actv_cnt(:,roi_ix)./elec_cnt(:,roi_ix))/sqrt(numel(SBJs));
+    var_data(1,roi_ix) = nanstd(actv_cnt(:,roi_ix)./elec_cnt(:,roi_ix))/sqrt(numel(SBJs));
     bar_data(2,roi_ix) = sum(dact_cnt(:,roi_ix))/sum(elec_cnt(:,roi_ix));
-    var_data(2,roi_ix) = std(dact_cnt(:,roi_ix)./elec_cnt(:,roi_ix))/sqrt(numel(SBJs));
+    var_data(2,roi_ix) = nanstd(dact_cnt(:,roi_ix)./elec_cnt(:,roi_ix))/sqrt(numel(SBJs));
     bar_data(3,roi_ix) = sum(rt_cnt(:,roi_ix))/sum(elec_cnt(:,roi_ix));
     var_data(3,roi_ix) = nanstd(rt_cnt(:,roi_ix)./elec_cnt(:,roi_ix))/sqrt(numel(SBJs));
     for grp_ix = 1:numel(grp_lab)
         bar_data(3+grp_ix,roi_ix) = sum(grp_cnt(:,roi_ix,grp_ix))/sum(elec_cnt(:,roi_ix));
-        var_data(3+grp_ix,roi_ix) = std(grp_cnt(:,roi_ix,grp_ix)./elec_cnt(:,roi_ix))/sqrt(numel(SBJs));
+        var_data(3+grp_ix,roi_ix) = nanstd(grp_cnt(:,roi_ix,grp_ix)./elec_cnt(:,roi_ix))/sqrt(numel(SBJs));
         scat_vars{3+grp_ix} = squeeze(grp_cnt(:,:,grp_ix));
     end
 end
