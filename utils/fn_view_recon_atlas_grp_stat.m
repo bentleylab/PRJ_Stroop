@@ -42,9 +42,9 @@ end
 % view_space = 'mni';
 if ~exist('view_angle','var')
     if strcmp(hemi,'l')
-        view_angle = [-60 30];
+        view_angle = [-90 0];
     elseif any(strcmp(hemi,{'r','b'}))
-        view_angle = [60 30];
+        view_angle = [90 0];
     else
         error(['unknown hemi: ' hemi]);
     end
@@ -235,7 +235,7 @@ mesh = fn_load_recon_mesh([],'mni',reg_type,hemi);
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
 f = cell(size(cond_lab));
-for cond_ix = 1%:numel(cond_lab)
+for cond_ix = 1:numel(cond_lab)
     if strcmp(stat_id,'actv') || strcmp(stat_id,'CSE')
         plot_name = ['GRP_' stat_id '_' an_id];
     else

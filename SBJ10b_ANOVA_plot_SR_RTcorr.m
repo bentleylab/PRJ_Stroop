@@ -1,4 +1,4 @@
-function SBJ10b_ANOVA_plot_SR_RTcorr(SBJ,pipeline_id,stat_id,an_id_s,an_id_r,plt_id,save_fig,fig_vis,fig_filetype)
+function SBJ10b_ANOVA_plot_SR_RTcorr(SBJ,stat_id,an_id_s,an_id_r,plt_id,save_fig,fig_vis,fig_ftype)
 % Plots ANOVA results
 % clear all; %close all;
 % fig_filetype = 'png';
@@ -14,7 +14,8 @@ ft_defaults
 
 %% Load Results
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
-eval(SBJ_vars_cmd);plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
+eval(SBJ_vars_cmd);
+plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 stat_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
@@ -242,7 +243,7 @@ for ch_ix = 1:numel(stat{1}.label)
     
     % Save figure
     if save_fig
-        fig_filename = [fig_dir fig_name '.' fig_filetype];
+        fig_filename = [fig_dir fig_name '.' fig_ftype];
         fprintf('Saving %s\n',fig_filename);
         saveas(gcf,fig_filename);
         %eval(['export_fig ' fig_filename]);

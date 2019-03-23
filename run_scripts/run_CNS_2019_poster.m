@@ -44,13 +44,17 @@ B00_RT_GRP_hist_norm(SBJs,'CNI',save_fig,fig_vis,fig_type);
 % fn_view_recon_atlas_grp(SBJs,pipeline_id,'v',0,'l','Dx','mgROI',0);
 % fn_view_recon_atlas_grp(SBJs,pipeline_id,'v',0,'r','Dx','mgROI',0);
 
-fn_view_recon_atlas_grp_ROI(SBJs,pipeline_id,'v',1,'l','Dx','lat')
-fn_view_recon_atlas_grp_ROI(SBJs,pipeline_id,'v',1,'r','Dx','lat')
-fn_view_recon_atlas_grp_ROI(SBJs,pipeline_id,'v',1,'l','Dx','MPFC')
-fn_view_recon_atlas_grp_ROI(SBJs,pipeline_id,'v',1,'r','Dx','MPFC')
-fn_view_recon_atlas_grp_ROI(SBJs,pipeline_id,'v',1,'l','Dx','deep')
-fn_view_recon_atlas_grp_ROI(SBJs,pipeline_id,'v',1,'r','Dx','deep')
-fn_view_recon_atlas_grp_ROI(SBJs,pipeline_id,'v',1,'b','Dx','OFC')
+atlas_id = 'Dx';
+roi_id = 'gROI';
+reg_type = 'v';
+show_lab = 0;
+roi_opts = {{'l','lat'},{'r','lat'},{'l','MPFC'},{'r','MPFC'},{'l','deep'},{'r','deep'},{'b','OFC'}};
+
+for roi_ix = [5 6]%1:numel(roi_opts)
+    fn_view_recon_atlas_grp_ROI(SBJs, pipeline_id, reg_type, show_lab,...
+                                roi_opts{roi_ix}{1}, atlas_id, roi_id, roi_opts{roi_ix}{2},...
+                                'save_fig', 1, 'fig_ftype', 'fig');
+end
 
 %% Plot CNI sig elecs
 stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
@@ -68,26 +72,50 @@ for an_ix = 1:numel(an_opts)
     for hemi_ix = 1:numel(hemi_opts)
         fn_view_recon_atlas_grp_stat(SBJs, pipeline_id, stat_id, an_opts{an_ix}, reg_type, show_labels,...
                                  hemi_opts{hemi_ix}, atlas_id, roi_id, plot_out)
-        fn_view_recon_atlas_grp_stat_onset(SBJs, pipeline_id, stat_id, an_opts{an_ix}, reg_type, show_labels,...
-                                 hemi_opts{hemi_ix}, atlas_id, roi_id, tbin_id)
+%         fn_view_recon_atlas_grp_stat_onset(SBJs, pipeline_id, stat_id, an_opts{an_ix}, reg_type, show_labels,...
+%                                  hemi_opts{hemi_ix}, atlas_id, roi_id, tbin_id)
 %         fn_view_recon_stat(SBJs{s}, pipeline_id, stat_id, an_opts{an_ix}, 'pat', '', show_labels, hemi_opts{hemi_ix}, plot_out);
     end
 end
 
-%% ================================================================================
-%   Effects by ROI
-%  =================================================================================
-% %% HG active examples
-% SBJ         = 'IR74';
-% conditions  = 'CNI';
-% pipeline_id = 'main_ft';
-% actv_win    = '100';
-% an_id_s     = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
-% an_id_r     = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
-% plt_id      = 'stack_S2to15_R5to10_evnt_c5';
-% save_fig    = 1;
-% fig_vis     = 'on';
-% fig_ftype= 'svg';
+%% Plot CNI sig onsets on recon
+stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
+an_id    = 'HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1';
+tbin_id  = 'cnts';
+reg_type = 'v';
+show_labels = 0;
+atlas_id = 'Dx';
+roi_id        = 'gROI';
+plot_roi_opts = {{'l','lat'},{'r','lat'},{'l','MPFC'},{'r','MPFC'},{'l','deep'},{'r','deep'},{'b','OFC'}};
+
+for roi_ix = 1:numel(plot_roi_opts)
+    fn_view_recon_atlas_grp_ROI_stat_onset(SBJs, pipeline_id, stat_id, an_id, reg_type, show_labels,...
+                                        plot_roi_opts{roi_ix}{1}, atlas_id, roi_id, plot_roi_opts{roi_ix}{2}, tbin_id,...
+                                        'save_fig', 1, 'fig_ftype', 'svg');
+end
+
+%% HG active examples
+SBJ         = 'IR74';
+conditions  = 'CNI';
+pipeline_id = 'main_ft';
+actv_win    = '100';
+an_id_s     = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
+an_id_r     = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
+plt_id      = 'stack_S2to15_R5to10_evnt_c5';
+save_fig    = 1;
+fig_vis     = 'on';
+fig_ftype= 'svg';
+
+SBJ10b_ANOVA_plot_SR_RTcorr(SBJ,stat_id,an_id_s,an_id_r,plt_id,save_fig,fig_vis,fig_ftype)
+%% Plot ANOVA with RT correlation
+SBJ = 'IR35';
+stat_id = 'corrRT_CNI_pcon_WL200_WS50';
+an_id_s = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
+an_id_r = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
+plt_id  = 'ts_S0to15_R5to10_evnt_sigline';
+SBJ10b_ANOVA_plot_SR_RTcorr(SBJ,stat_id,an_id_s,an_id_r,plt_id,1,'on','svg');
+
+% OLD SHIT:
 % SBJ08b_HFA_plot_SR_stack_cond_onset_noLab(SBJ,conditions,an_id_s,an_id_r,...
 %     pipeline_id,actv_win,plt_id,save_fig,fig_vis,fig_ftype)
 % 
@@ -102,7 +130,7 @@ end
 % %     an_id_s,an_id_r,plt_id,save_fig,fig_vis);
 % % SBJ08b_HFA_plot_SR_stats_svg('IR74','LIN1-2',conditions,pipeline_id,...
 % %     an_id_s,an_id_r,plt_id,save_fig,fig_vis);
-% 
+
 %% Proportions of significant effects across ROI
 stat_id     = 'corrRT_CNI_pcon_WL200_WS50';
 atlas_id    = 'Dx';

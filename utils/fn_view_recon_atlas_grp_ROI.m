@@ -1,5 +1,5 @@
 function fn_view_recon_atlas_grp_ROI(SBJs, pipeline_id, reg_type, show_labels,...
-                                 hemi, atlas_id, roi_id, varargin)
+                                 hemi, atlas_id, roi_id, plot_roi, varargin)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJs [cell array str] - subject IDs to plot
@@ -11,13 +11,14 @@ function fn_view_recon_atlas_grp_ROI(SBJs, pipeline_id, reg_type, show_labels,..
 %   atlas_id [str] - {'DK','Dx','Yeo7','Yeo17'}
 %   roi_id [str] - gROI grouping to pick mesh and color specific ROIs
 %       'LPFC','MPFC','OFC','INS','TMP','PAR'
+%   plot_roi [str] - which surface mesh to plot
 
 %% Handle variables
 % Error cases
-if strcmp(hemi,'b') && ~strcmp(roi_id,'OFC')
+if strcmp(hemi,'b') && ~strcmp(plot_roi,'OFC')
     error('hemi must be l or r for all non-OFC plots');
 end
-if ~any(strcmp(roi_id,{'LPFC','MPFC','INS','OFC','TMP','PAR','lat','deep'}))
+if ~any(strcmp(plot_roi,{'LPFC','MPFC','INS','OFC','TMP','PAR','lat','deep'}))
     error('roi_id needs to be a lobe, "lat", or "deep"');
 end
 
@@ -28,17 +29,26 @@ if ~isempty(varargin)
             view_angle = varargin{v+1};
         elseif strcmp(varargin{v},'mesh_alpha') && varargin{v+1}>0 && varargin{v+1}<=1
             mesh_alpha = varargin{v+1};
+        elseif strcmp(varargin{v},'fig_ftype')
+            fig_ftype = varargin{v+1};
+        elseif strcmp(varargin{v},'save_fig')
+            save_fig = varargin{v+1};
         else
             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
         end
     end
 end
 
-% Define default options
+%% Define default options
 if ~exist('view_angle','var')
-    view_angle = fn_get_view_angle(hemi,roi_id);
+    view_angle = fn_get_view_angle(hemi,plot_roi);
 end
-
+if ~exist('fig_ftype','var')
+    fig_ftype = 'png';
+end
+if ~exist('save_fig','var')
+    save_fig = 0;
+end
 if ~exist('mesh_alpha','var')
     % assume SEEG
     mesh_alpha = 0.3;
@@ -56,7 +66,14 @@ else
     reg_suffix = '';                % Patient space
 end
 
+if any(strcmp(plot_roi,{'deep','lat'}))
+    [plot_roi_list, ~] = fn_roi_label_styles(plot_roi);
+else
+    plot_roi_list = {plot_roi};
+end
+
 [root_dir, ~] = fn_get_root_dir();
+out_dir = [root_dir 'PRJ_Stroop/results/recons/'];
 
 %% Load elec struct
 elec     = cell([numel(SBJs) 1]);
@@ -102,8 +119,13 @@ for sbj_ix = 1:numel(SBJs)
         elec{sbj_ix}.roi_color = fn_atlas2color(atlas_id,elec{sbj_ix}.roi);
     end
     
-    % Remove electrodes that aren't in atlas ROIs & hemisphere
-    good_elecs = fn_select_elec_lab_match(elec{sbj_ix}, hemi, atlas_id, roi_id);
+    % Select elecs matching hemi, atlas, and plot_roi_list
+    plot_elecs = zeros([numel(elec{sbj_ix}.label) numel(plot_roi_list)]);
+    for roi_ix = 1:numel(plot_roi_list)
+        plot_elecs(:,roi_ix) = strcmp(elec{sbj_ix}.roi,plot_roi_list{roi_ix});
+    end
+    good_elecs = intersect(fn_select_elec_lab_match(elec{sbj_ix}, hemi, atlas_id, roi_id),...
+                             elec{sbj_ix}.label(any(plot_elecs,2)));
     % fn_select_elec messes up if you try to toss all elecs
     if isempty(good_elecs)
         elec{sbj_ix} = {};
@@ -127,8 +149,8 @@ elec.roi_color = all_roi_colors;    % appendsens strips that field
 atlas = fn_load_recon_atlas([],atlas_id);
 
 % Get Atlas-ROI mapping
-atlas_labels = fn_atlas_roi_select_mesh(atlas_id, roi_id, hemi);
-if strcmp(roi_id,'deep')
+atlas_labels = fn_atlas_roi_select_mesh(atlas_id, plot_roi, hemi);
+if strcmp(plot_roi,'deep')
     mtl_ix = ~cellfun(@isempty,strfind(atlas_labels,'Hippocampus')) | ...
              ~cellfun(@isempty,strfind(atlas_labels,'Amygdala'));
     mtl_labels = atlas_labels(mtl_ix);
@@ -165,7 +187,8 @@ if exist('mtl_seg','var')
 end
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
-h = figure;
+fig_name = ['GRP_' atlas_id '_' roi_id '_' plot_roi '_' hemi];
+h = figure('Name',fig_name);
 
 % Plot 3D mesh
 ft_plot_mesh(roi_mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
@@ -188,54 +211,3 @@ fprintf(['To reset the position of the camera light after rotating the figure,\n
     '(i.e., uncheck them within the figure), and then hit ''l'' on the keyboard\n'])
 set(h, 'windowkeypressfcn',   @cb_keyboard);
 
-%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SUBFUNCTION
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function cb_keyboard(h, eventdata)
-
-if isempty(eventdata)
-  % determine the key that corresponds to the uicontrol element that was activated
-  key = get(h, 'userdata');
-else
-  % determine the key that was pressed on the keyboard
-  key = parseKeyboardEvent(eventdata);
-end
-% get focus back to figure
-if ~strcmp(get(h, 'type'), 'figure')
-  set(h, 'enable', 'off');
-  drawnow;
-  set(h, 'enable', 'on');
-end
-
-if strcmp(key, 'l') % reset the light position
-  delete(findall(h,'Type','light')) % shut out the lights
-  camlight; lighting gouraud; % add a new light from the current camera position
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SUBFUNCTION
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function key = parseKeyboardEvent(eventdata)
-
-key = eventdata.Key;
-% handle possible numpad events (different for Windows and UNIX systems)
-% NOTE: shift+numpad number does not work on UNIX, since the shift
-% modifier is always sent for numpad events
-if isunix()
-  shiftInd = match_str(eventdata.Modifier, 'shift');
-  if ~isnan(str2double(eventdata.Character)) && ~isempty(shiftInd)
-    % now we now it was a numpad keystroke (numeric character sent AND
-    % shift modifier present)
-    key = eventdata.Character;
-    eventdata.Modifier(shiftInd) = []; % strip the shift modifier
-  end
-elseif ispc()
-  if strfind(eventdata.Key, 'numpad')
-    key = eventdata.Character;d
-  end
-end
-
-if ~isempty(eventdata.Modifier)
-  key = [eventdata.Modifier{1} '+' key];
-end
