@@ -16,12 +16,10 @@ function fn_view_recon_stat_movie(SBJ, pipeline_id, stat_id, an_id, view_space, 
 %   view_space [str] - {'pat', 'mni'}
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
 %       '' (or anything not v/s) for patient space
-%   hemi [str] - {'r','l','b'} for right, left, or both hemispheres (shouldn't be both here, too hard to see...)
-%   plot_out [0/1] - plot electrodes outside of the hemisphere or ROIs of interest?
+%   hemi [str] - {'r','l','b'} for right, left, or both hemispheres (
+%   show_labels [0/1] - plot the electrode labels
+%   hemi [str] - {'l', 'r', 'b'} hemisphere to plot
 %   plt_id [str] - which set of plotting params
-%   varargin [cell]:
-%       view_angle [int,int] - angle to view the brain from
-%       mesh_alpha [float] - transparency of the surface mesh
 
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
@@ -129,7 +127,7 @@ elseif strcmp(stat_id,'CSE')
         end
     end    
 else    % ANOVA
-    error('no ANOVA yet)');
+    error('no ANOVSA yet)');
     eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
     [grp_lab, grp_colors, ~] = fn_group_label_styles(model_lab);
     [rt_lab, rt_color, ~]    = fn_group_label_styles('RT');
@@ -198,7 +196,9 @@ for evnt_ix = 1:numel(plt_vars.evnt_type)
 end
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
-if any(strcmp(stat_id,{'actv','CSE'}))
+if strcmp(stat_id,'actv')
+    plot_name = [SBJ '_actv_HFA_' an_id];
+elseif strcmp(stat_id,'CSE')
     plot_name = [SBJ '_' stat_id '_' an_id];
 else
     if grp_ix<=numel(grp_lab)
@@ -221,7 +221,7 @@ cmap = colormap('parula');
 elec_cmap = linspace(clim(1),clim(2),size(cmap,1));
 
 sz_lim = [0.5 5];       % radius (in mm) of spheres
-% SHEILA STARTS HERE: sz_map = linspace(sz_lim(1),sz_lim(2), <# steps in colormap>);
+sz_map = linspace(sz_lim(1),sz_lim(2)
 % neg_sz = 1;     % radius (in mm) of negative significant
 % pos_sz = 2;     % radius (in mm) of positive significant
 e_sphr_ns = cell(size(elec.label));
