@@ -68,6 +68,7 @@ else
     reg_suffix = '';
 end
 
+% SHEILA: move these to plt_vars
 ns_color = [0 0 0];
 vid_ext = '.mp4';
 vid_encoding = 'MPEG-4';
@@ -88,6 +89,9 @@ mesh = fn_load_recon_mesh(SBJ,view_space,reg_type,hemi);
 %% Load Stats
 % Determine options: {'actv','CI','RT','CNI','pcon'}
 if strcmp(stat_id,'actv')
+    hfa_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'.mat');
+    load(hfa_fname);
+
     load([SBJ_vars.dirs.proc SBJ '_ROI_' an_id '_actv_mn100.mat']);
     cfgs = []; cfgs.channel = actv_ch;
     hfa = ft_selectdata(cfgs,hfa);
@@ -95,7 +99,7 @@ if strcmp(stat_id,'actv')
     
     plot_dat = squeeze(mean(hfa.powspctrm,1));
     % get clim
-    clim = [prctile(abs(hfa.powspctrm(:)),5) prctile(hfa.powspctrm(:),95)];
+    clim = [prctile(abs(hfa.powspctrm(:)),5) prctile(abs(hfa.powspctrm(:)),95)];
     
     sig_t_ix = cell(size(hfa.label));
     for e = 1:numel(hfa.label)
@@ -103,79 +107,79 @@ if strcmp(stat_id,'actv')
             sig_t_ix{e} = [sig_t_ix{e} find(hfa.time==actv_ch_epochs{e}(ep,1)):find(hfa.time==actv_ch_epochs{e}(ep,2))];
         end
     end
-elseif strcmp(stat_id,'CSE')
-    error('no CSE yet');
-    load([SBJ_vars.dirs.proc,SBJ,'_',stat_id,'_ROI_',an_id,'.mat']);
-    elec = fn_reorder_elec(elec,stat.label);
-    grp_lab = {};
-	[~, cond_colors, ~] = fn_condition_label_styles(stat_id);
-    elec_colors = cell([numel(stat.label) 1]);
-    for ch_ix = 1:numel(stat.label)
-        if any(stat.mask(ch_ix,1,:))
-            sig_epoch = find(stat.mask(ch_ix,1,:));
-            if any(diff(sig_epoch)>1)
-                error([SBJ ' has multiple sig epochs in channel ' stat.label{ch_ix}]);
-            end
-            % Find sign of (de)activation
-            cI_mean = squeeze(mean(mean(hfa{1}.powspctrm(:,ch_ix,1,sig_epoch),1),4));
-            iI_mean = squeeze(mean(mean(hfa{2}.powspctrm(:,ch_ix,1,sig_epoch),1),4));
-            if cI_mean>=iI_mean
-                elec_colors{ch_ix,1} = cond_colors{1};
-            else
-                elec_colors{ch_ix,1} = cond_colors{2};
-            end
-        else
-            elec_colors{ch_ix,1} = ns_color;
-        end
-    end    
-else    % ANOVA
-    error('no ANOVA yet)');
-    eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
-    [grp_lab, grp_colors, ~] = fn_group_label_styles(model_lab);
-    [rt_lab, rt_color, ~]    = fn_group_label_styles('RT');
-    % % Load RTs
-    % load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
-    
-    f_name = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id '.mat'];
-    load(f_name,'stat','w2');
-    elec = fn_reorder_elec(elec,stat.label);
-    
-    % FDR correct pvalues for ANOVA
-%     win_lim = {}; win_center = {};
-    elec_colors = cell([numel(w2.label) numel(grp_lab)+1]);
-    for ch_ix = 1:numel(stat.label)
-        pvals = squeeze(w2.pval(:,ch_ix,:));
-        [~, ~, ~, qvals] = fdr_bh(pvals);%,0.05,'pdep','yes');
-        
-        % Consolidate to binary sig/non-sig
-        for grp_ix = 1:numel(grp_lab)
-            if any(qvals(grp_ix,:)<0.05,2)
-                elec_colors{ch_ix,grp_ix} = grp_colors{grp_ix};  % sig
-            else
-                elec_colors{ch_ix,grp_ix} = ns_color;  % non-sig
-            end
-        end
-        if any(stat.mask(ch_ix,1,:))
-            elec_colors{ch_ix,numel(grp_lab)+1} = rt_color{:};  % sig
-        else
-            elec_colors{ch_ix,numel(grp_lab)+1} = ns_color;  % non-sig
-        end
-    end
-    
-%     % Get Sliding Window Parameters
-%     win_lim    = fn_sliding_window_lim(stat.time,win_len,win_step);
-%     win_center = round(mean(win_lim,2));
-    
-%     % Convert % explained variance to 0-100 scale
-%     w2.trial = w2.trial*100;
-    
-    
-%     % Trim data to plotting epoch
-%     %   NOTE: stat should be on stat_lim(1):stat_lim(2)+0.001 time axis
-%     %   w2 should fit within that since it's averaging into a smaller window
-%     cfg_trim = [];
-%     cfg_trim.latency = plt_vars.plt_lim_SR;
-%     stat = ft_selectdata(cfg_trim,stat);
+% elseif strcmp(stat_id,'CSE')
+%     error('no CSE yet');
+%     load([SBJ_vars.dirs.proc,SBJ,'_',stat_id,'_ROI_',an_id,'.mat']);
+%     elec = fn_reorder_elec(elec,stat.label);
+%     grp_lab = {};
+% 	[~, cond_colors, ~] = fn_condition_label_styles(stat_id);
+%     elec_colors = cell([numel(stat.label) 1]);
+%     for ch_ix = 1:numel(stat.label)
+%         if any(stat.mask(ch_ix,1,:))
+%             sig_epoch = find(stat.mask(ch_ix,1,:));
+%             if any(diff(sig_epoch)>1)
+%                 error([SBJ ' has multiple sig epochs in channel ' stat.label{ch_ix}]);
+%             end
+%             % Find sign of (de)activation
+%             cI_mean = squeeze(mean(mean(hfa{1}.powspctrm(:,ch_ix,1,sig_epoch),1),4));
+%             iI_mean = squeeze(mean(mean(hfa{2}.powspctrm(:,ch_ix,1,sig_epoch),1),4));
+%             if cI_mean>=iI_mean
+%                 elec_colors{ch_ix,1} = cond_colors{1};
+%             else
+%                 elec_colors{ch_ix,1} = cond_colors{2};
+%             end
+%         else
+%             elec_colors{ch_ix,1} = ns_color;
+%         end
+%     end    
+% else    % ANOVA
+%     error('no ANOVA yet)');
+%     eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
+%     [grp_lab, grp_colors, ~] = fn_group_label_styles(model_lab);
+%     [rt_lab, rt_color, ~]    = fn_group_label_styles('RT');
+%     % % Load RTs
+%     % load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
+%     
+%     f_name = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id '.mat'];
+%     load(f_name,'stat','w2');
+%     elec = fn_reorder_elec(elec,stat.label);
+%     
+%     % FDR correct pvalues for ANOVA
+% %     win_lim = {}; win_center = {};
+%     elec_colors = cell([numel(w2.label) numel(grp_lab)+1]);
+%     for ch_ix = 1:numel(stat.label)
+%         pvals = squeeze(w2.pval(:,ch_ix,:));
+%         [~, ~, ~, qvals] = fdr_bh(pvals);%,0.05,'pdep','yes');
+%         
+%         % Consolidate to binary sig/non-sig
+%         for grp_ix = 1:numel(grp_lab)
+%             if any(qvals(grp_ix,:)<0.05,2)
+%                 elec_colors{ch_ix,grp_ix} = grp_colors{grp_ix};  % sig
+%             else
+%                 elec_colors{ch_ix,grp_ix} = ns_color;  % non-sig
+%             end
+%         end
+%         if any(stat.mask(ch_ix,1,:))
+%             elec_colors{ch_ix,numel(grp_lab)+1} = rt_color{:};  % sig
+%         else
+%             elec_colors{ch_ix,numel(grp_lab)+1} = ns_color;  % non-sig
+%         end
+%     end
+%     
+% %     % Get Sliding Window Parameters
+% %     win_lim    = fn_sliding_window_lim(stat.time,win_len,win_step);
+% %     win_center = round(mean(win_lim,2));
+%     
+% %     % Convert % explained variance to 0-100 scale
+% %     w2.trial = w2.trial*100;
+%     
+%     
+% %     % Trim data to plotting epoch
+% %     %   NOTE: stat should be on stat_lim(1):stat_lim(2)+0.001 time axis
+% %     %   w2 should fit within that since it's averaging into a smaller window
+% %     cfg_trim = [];
+% %     cfg_trim.latency = plt_vars.plt_lim_SR;
+% %     stat = ft_selectdata(cfg_trim,stat);
 end
 
 %% Load timing info
@@ -211,33 +215,11 @@ f = figure('Name',plot_name); hold on;
 
 % Plot 3D mesh
 mesh_obj = ft_plot_mesh(mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
+%SHEILA: this would be the first of potentially more than one view_angle
 view(view_angle); material dull; lighting gouraud;
 
-% Plot elecs
-% Sphere settings
 [xsp, ysp, zsp] = sphere(100);
-reg_sz = 0.5;   
-cmap = colormap('parula');
-elec_cmap = linspace(clim(1),clim(2),size(cmap,1));
 
-sz_lim = [0.5 5];       % radius (in mm) of spheres
-% SHEILA STARTS HERE: sz_map = linspace(sz_lim(1),sz_lim(2), <# steps in colormap>);
-% neg_sz = 1;     % radius (in mm) of negative significant
-% pos_sz = 2;     % radius (in mm) of positive significant
-e_sphr_ns = cell(size(elec.label));
-% e_sphr_p    = cell(size(elec.label));
-% e_sphr_n    = cell(size(elec.label));
-for e = 1:numel(elec.label)
-    % Create non-sig sphere
-    e_sphr_ns{e} = surf(sz_lim(1)*xsp+elec.chanpos(e,1), sz_lim(1)*ysp+elec.chanpos(e,2), sz_lim(1)*zsp+elec.chanpos(e,3));
-    set(e_sphr_ns{e}, 'EdgeColor', ns_color);%, 'FaceColor', ns_color, 'EdgeAlpha', edgealpha, 'FaceAlpha', facealpha);
-    
-    % Create sig sphere to turn on/off
-    e_sphr_p{e} = surf(pos_sz*xsp+elec.chanpos(e,1), pos_sz*ysp+elec.chanpos(e,2), pos_sz*zsp+elec.chanpos(e,3));
-    e_sphr_n{e} = surf(neg_sz*xsp+elec.chanpos(e,1), neg_sz*ysp+elec.chanpos(e,2), neg_sz*zsp+elec.chanpos(e,3));
-    set(e_sphr_p{e},'Visible','off');
-    set(e_sphr_n{e},'Visible','off');
-end
 
 % Plot Timing info
 % Text for time in sec (X,Y,Z in mm)
@@ -250,27 +232,39 @@ evnt_str = text(plt_vars.evnt_str_pos(1), plt_vars.evnt_str_pos(2), plt_vars.evn
     'fontweight', plt_vars.evnt_str_weight);
 set(evnt_str,'Visible','off');
 
-% Lines for events
-%     time_ln_ang_x = [1/cos(view_angle(1)) sign(view_angle(1))*90
-%     time_line_beg = [cos(view_angle(1)) sin(view_angle(1)) plt_vars.time_ln_z*sin(view_angle(2))];
-%     time_line = line([
-
 %% Plot frames
 frames = struct('cdata',[],'colormap',[]);%cell(size(hfa.time));
 for t_ix = 1:numel(hfa.time)
     % Plot electrodes on top
     for e = 1:numel(elec.label)
-        if any(sig_times{e}==t_ix)
-            [~,cmap_ix] = min(abs(plot_dat(e,t_ix)-elec_cmap));
-            if neg
-                set(e_sphr_p{e},'Visible','on', 'EdgeColor', cmap(cmap_ix,:));
+        % Sphere settings
+        %!!! SHEILA: move to plt_vars
+        reg_sz = 0.5;
+        cmap = colormap('parula');
+        elec_cmap = linspace(clim(1),clim(2),size(cmap,1));
+        
+        sz_lim = [0.5 5];       % radius (in mm) of spheres
+        % SHEILA STARTS HERE: sz_map = linspace(sz_lim(1),sz_lim(2), size(cmap,1));
+        e_sphr_ns = cell(size(elec.label));
+        % e_sphr_s    = cell(size(elec.label));
+        for e = 1:numel(elec.label)
+            % Create sphere
+            if any(sig_times{e}==t_ix)
+%                 <pick the right size>
             else
+%                 <non-sig size>
             end
-            %                 sphr = ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', cmap(cmap_ix,:), 'label', lab_arg);
-        else
-            set(e_sphr_p{e},'Visible','off');
+            e_sphr_ns{e} = surf(sz_lim(1)*xsp+elec.chanpos(e,1), sz_lim(1)*ysp+elec.chanpos(e,2), sz_lim(1)*zsp+elec.chanpos(e,3));
+            % Color sphere
+            % SHEILA: start from something like this: [~,cmap_ix] = min(abs(plot_dat(e,t_ix)-elec_cmap));
+            set(e_sphr_ns{e}, 'EdgeColor', appropriate_color);%, 'FaceColor', ns_color, 'EdgeAlpha', edgealpha, 'FaceAlpha', facealpha);
         end
     end
+    
+    %SHEILA: update view_angle, potentially lighting too
+    %view(view_angle(t_ix,:)); lighting gouraud;
+
+    
     % Update time
     time_str.String = [num2str(hfa.time(t_ix)) ' s'];
     % Plot events
@@ -285,7 +279,11 @@ for t_ix = 1:numel(hfa.time)
         set(evnt_str,'Visible','off');
     end
     
+    %pause(0.04);
     frames(t_ix) = getframe;
+    
+    % Remove all spheres
+    %for all sphere; delete(e_sphr{e}); end;
 end
 
 %% Save movie
