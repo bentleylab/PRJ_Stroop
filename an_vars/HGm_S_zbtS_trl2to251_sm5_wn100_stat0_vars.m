@@ -40,9 +40,9 @@ cfg_hfa.keeptrials   = 'yes';                               % must be 'yes' for 
 outlier_std_lim = 6;
 
 % Cleaning up power time series for plotting
-smooth_pow_ts = 0;
-lp_yn       = 'no';
-lp_freq     = 10;
+smooth_pow_ts = 1;
+lp_yn       = 'yes';
+lp_freq     = 5;
 hp_yn       = 'no';
 hp_freq     = 0.5;
 
