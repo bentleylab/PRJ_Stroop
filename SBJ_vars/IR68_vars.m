@@ -63,7 +63,7 @@ SBJ_vars.ch_lab.eeg_ROI    = {'CZ'};
 
 SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
-    'LHH8','LHH9','LHH10','LTH8','LTH9','LTH10','LAM7','LAM9','LAM10',...% epileptic
+    'LHH8','LHH9','LHH10','LTH8','LTH9','LTH10','LAM7','LAM8','LAM9','LAM10',...% epileptic
     'AIN5','LPC6','LPC7',...% noisy
     'LAC10',...% added for HF noise, LAC9-10 is flat and terrible
     'AIN8','AIN9','AIN10',...% out of brainm also 'LTH9','LTH10','LHH10','LAM10' but listed above too
@@ -72,7 +72,7 @@ SBJ_vars.ch_lab.bad = {...
 %   LAC8-10 have HF noise that reflects FZ, need to check if low pass and variance rejection help
 % bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
 SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
-SBJ_vars.ch_lab.bad_code = [1 1 1 1 1 1 1 1 1 2 2 2 2 3 3 3 0 0 0 0 0];
+SBJ_vars.ch_lab.bad_code = [1 1 1 1 1 1 1 1 1 1 2 2 2 2 3 3 3 0 0 0 0 0];
 if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {'FZ','CZ','OZ','C3','C4'};
 % SBJ_vars.ch_lab.CZ_lap_ref = {};
