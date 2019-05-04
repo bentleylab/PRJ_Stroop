@@ -1,0 +1,284 @@
+function SBJ08d_HFA_ROL(SBJ, proc_id, an_id, rol_id, plot_qa, plot_stack, fig_vis, fig_ftype)
+% Find single trial onset latencies of HFA
+%   Adapted from code by Eleonora Bartoli and Brett Foster
+% INPUTS:
+%   SBJ
+%   proc_id
+%   an_id
+%   plot_qa [0/1] - plot a random subset of trials for quality assurance
+%   plot_stack [0/1] - plot single trial power stacks with ROL and RT marked
+%   fig_vis
+%   fig_ftype
+% OUTPUTS:
+%   ____ [float mat] - matrix size(n_trl,2) of onsets per trial using
+%       (regression, derivative) methods
+
+%% Set up paths
+if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+addpath([root_dir 'PRJ_Stroop/scripts/']);
+addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
+addpath(ft_dir);
+ft_defaults
+
+%% Data Preparation
+SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+eval(SBJ_vars_cmd);
+an_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m'];
+eval(an_vars_cmd);
+rol_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' rol_id '_vars.m'];
+eval(rol_vars_cmd);
+
+% Load Data
+hfa_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'.mat');
+load(hfa_fname);
+load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'));
+
+% Output prep
+qa_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/ROL/' an_id '/QA/'];
+if ~isdir(qa_dir)
+    mkdir(qa_dir);
+end
+stack_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/ROL/' an_id '/ROL/'];
+if ~isdir(stack_dir)
+    mkdir(stack_dir);
+end
+
+%% Compute parameters for ROLs
+% Power threshold per channel over entire trial
+thresh = quantile(reshape(hfa.powspctrm,[numel(hfa.label) size(hfa.powspctrm,1)*size(hfa.powspctrm,4)]),quant_thresh,2);
+
+% Time threshold
+%!!! fix this naming for the different windows!
+sample_rate = (numel(hfa.time)-1)/(hfa.time(end)-hfa.time(1));
+win_dp = round((rol_lim_s(2)-rol_lim_s(1))*sample_rate);
+
+%% Select time range for onsets
+trial_lim = [0 max(trial_info.response_time)+0.7];
+cfgs = [];
+cfgs.latency = trial_lim;
+hfa = ft_selectdata(cfgs, hfa);
+
+%% Compute ROLs
+% response onset latencies (in sec) per channel and trial for [derivative, linear regression] methods 
+rol_times = nan([numel(hfa.label) size(hfa.powspctrm,1) 2]);
+plt_trls  = randi(size(hfa.powspctrm,1),round(trl_plt_perc*size(hfa.powspctrm,1)),1);
+for ch_ix = 1:numel(hfa.label)
+    % Smooth data
+    ch_data_orig = squeeze(hfa.powspctrm(:,ch_ix,:,:));
+    ch_data = sgolayfilt(ch_data_orig',sgfilt_ord,sgfilt_win)';
+    
+    for trl_ix = 1:size(hfa.powspctrm,1)
+        trl_data = ch_data(trl_ix,:);
+        % Plot this trial if in random subset
+        if any(plt_trls==trl_ix) && plot_qa
+            fig_name = [SBJ '_' hfa.label{ch_ix} '_t' num2str(trl_ix)];
+            figure('Name',fig_name,'Visible',fig_vis);
+            subplot(3,1,1); hold on;
+            title('Full Trial');
+            plot(hfa.time,ch_data_orig(trl_ix,:),'k');
+            plot(hfa.time,trl_data,'r');
+            line([hfa.time(1) hfa.time(end)],[thresh(ch_ix) thresh(ch_ix)],...
+                 'Color','b','LineStyle','--');
+            ax = gca;
+            ax.XLabel.String = 'Time (s)';
+            ax.YLabel.String = 'HFA z-score';
+            ax.XLim = [hfa.time(1) hfa.time(end)];
+        end
+        
+        % Find times above threshold
+%         above_th  = find(trl_data>thresh(trl_ix));
+%!!! convert to (ep,2) column vectors instead of 2 variables!
+        beg_above = find(diff([0 trl_data>thresh(ch_ix) 0])==1);
+        end_above = find(diff([0 trl_data>thresh(ch_ix) 0])==-1)-1;
+        len_above = end_above-beg_above;
+        
+        % Remove epochs shorter than win_len
+        beg_above = beg_above(len_above>win_dp);
+        end_above = end_above(len_above>win_dp);
+        
+        %% Compute ROLs for windows above threshold for at least win_len
+        if any(beg_above)
+            % Take epoch with largest power change
+            if numel(beg_above)>1
+                ep_mean = zeros(size(beg_above));
+                for ep_ix = 1:numel(beg_above)
+                    ep_mean(ep_ix) = mean(trl_data(beg_above(ep_ix):end_above(ep_ix)));
+                end
+                [~, max_ix] = max(ep_mean);
+                ep_idx = beg_above(max_ix):end_above(max_ix);
+            else
+                ep_idx = beg_above:end_above;
+            end
+            
+            % Define start and end of onset search epoch
+            rol_lim = round([ep_idx(1)+rol_lim_s(1)*sample_rate ...
+                             ep_idx(1)+rol_lim_s(2)*sample_rate]);
+            
+            % Check search epoch is within trial limits
+            if rol_lim(1)<=0
+                rol_lim(1) = 1;
+            end
+            if rol_lim(2)>numel(trl_data)
+                rol_lim(2) = numel(trl_data);
+            end
+            
+            % Grab search epoch indices and data
+            search_ep_ix = rol_lim(1):rol_lim(2);
+            search_ep = trl_data(search_ep_ix);
+            
+            % Plot search epoch for ROL
+            if any(plt_trls==trl_ix) && plot_qa
+                ylims = get(gca,'ylim');
+                patch([hfa.time(rol_lim(1)) hfa.time(rol_lim(1)) hfa.time(rol_lim(2)) hfa.time(rol_lim(2))],...
+                    [ylims(1) ylims(2) ylims(2) ylims(1)],...
+                    [0.5 0.5 0.5], 'FaceAlpha', 0.4);
+            end
+            
+            %% DERIVATIVE METHOD: Median of steepest slope and slope onset
+            % Find steepest slope (maximum of derivative)
+            deriv = diff(search_ep,1);
+            [~, max_deriv_ix] = max(deriv);
+            
+            % Find start of upward slope (preceeding local min/zero crossing)
+            local_mins = find(diff(sign(deriv),1));
+            early_local_mins = local_mins(local_mins<max_deriv_ix);
+            if ~isempty(early_local_mins)
+                slope_beg_ix = early_local_mins(end);
+            else
+                % If no local min in rol_lim, take first point of window
+                slope_beg_ix = 1;
+            end
+            
+            % Define ROL as median of [slope_start max(slope)]
+            rol_deriv_ix = round(median([slope_beg_ix max_deriv_ix]));
+            rol_times(ch_ix,trl_ix,1) = hfa.time(search_ep_ix(rol_deriv_ix));
+            
+            %% Plot ROL checks
+            if any(plt_trls==trl_ix) && plot_qa
+                subplot(3,1,2); hold on;
+                title('Derivative Method');
+                
+                % Plot search epoch
+                plot(hfa.time(search_ep_ix),search_ep,'k','LineWidth',2);
+                
+%                 % Plot first order derivative (scale derivative to make it easily visible)
+%                 d = plot(hfa.time(search_ep_ix(1:end-1)),diff(search_ep,1)*deriv_scale,'g');
+                
+                % Plot local min and steepest slope
+                s = line([hfa.time(search_ep_ix(slope_beg_ix)) hfa.time(search_ep_ix(slope_beg_ix))],ylim,...
+                     'LineStyle','--','Color','b');
+                m = line([hfa.time(search_ep_ix(max_deriv_ix)) hfa.time(search_ep_ix(max_deriv_ix))],ylim,...
+                     'LineStyle','--','Color','b');
+                % Plot estimated ROL
+                r = line([hfa.time(search_ep_ix(rol_deriv_ix)) hfa.time(search_ep_ix(rol_deriv_ix))],...
+                         get(gca,'ylim'), 'Color','r');
+                legend([s r m],{'local min','ROL','steepest'},'Location','best');
+                
+                % Set up plot for linear method
+                subplot(3,1,3); hold on;
+                title('Linear Fit Method');
+                plot(hfa.time(search_ep_ix),search_ep,'k','LineWidth',2);
+            end
+            
+            %% LINEAR REGRESSION METHOD:
+            % Compute sliding window parameters
+            win_lim = fn_sliding_window_lim(search_ep,round(reg_win_len_s*sample_rate),...
+                                                round(reg_win_stp_s*sample_rate));
+                        
+            % Linear regression in each window
+            lm_fit = zeros(size(win_lim,1),5);
+            for w_ix = 1:size(win_lim,1)
+                % coeff(1) = slope; coeff(2) = intercept
+                coeff   = polyfit(hfa.time(search_ep_ix(win_lim(w_ix,1):win_lim(w_ix,2))),...
+                                  search_ep(win_lim(w_ix,1):win_lim(w_ix,2)),1);
+                model   = coeff(1)*hfa.time(search_ep_ix(win_lim(w_ix,1):win_lim(w_ix,2)))+coeff(2);
+                abs_err = abs(search_ep(win_lim(w_ix,1):win_lim(w_ix,2))-model);
+                
+                % Outputs: slope, intercept, max error-residual, win onset, win offset
+                lm_fit(w_ix,:) = [coeff max(abs_err) hfa.time(search_ep_ix(win_lim(w_ix,1))) ...
+                                    hfa.time(search_ep_ix(win_lim(w_ix,2)))];
+                % Plot the fits
+                if any(plt_trls==trl_ix) && plot_qa
+                    plot(hfa.time(search_ep_ix(win_lim(w_ix,1):win_lim(w_ix,2))),model,'Color','b');
+                end
+            end
+            
+            % Sort the slopes from biggest to smallest
+            [sorted_slopes, sorted_slope_idx] = sort(lm_fit(:,1), 'descend');
+            
+            % Remove negative slopes
+            sorted_slope_idx = sorted_slope_idx(sorted_slopes>0);
+            sorted_slopes = sorted_slopes(sorted_slopes>0);
+            
+            % Take biggest slopes
+            if numel(sorted_slope_idx)>=n_big_slopes
+                big_slope_ix = sorted_slope_idx(1:n_big_slopes);
+            else
+                big_slope_ix = sorted_slope_idx;
+            end
+            
+            % Sort residual errors of big slopes from smallest to biggest
+            [~, sorted_err_ix] = sort(lm_fit(big_slope_ix,3), 'ascend');
+            %get smallest error data, if any
+            
+            % Take the big slope with smallest error
+            if numel(sorted_slope_idx)>0
+                lm_result = lm_fit(big_slope_ix(sorted_err_ix(1)),:);
+                rol_times(ch_ix,trl_ix,2) = lm_result(4);
+                
+                % Plot lm result (onset of best window)
+                if any(plt_trls==trl_ix) && plot_qa
+                    line([lm_result(4) lm_result(4)],get(gca,'ylim'),'Color','r');
+                    
+                    % Plot both ROLs on original time series
+                    subplot(3,1,1);
+                    line([rol_times(ch_ix,trl_ix,1) rol_times(ch_ix,trl_ix,1)],...
+                         get(gca,'ylim'),'Color','r');
+                    line([rol_times(ch_ix,trl_ix,2) rol_times(ch_ix,trl_ix,2)],...
+                         get(gca,'ylim'),'Color','r');
+                    
+                    % Save QA plot
+                    saveas(gcf,[qa_dir fig_name '.' fig_ftype]);
+                end
+            end
+        end
+    end
+    
+    % Plot single trial stacks with ROLs and RTs
+    if plot_stack
+        fig_name = [SBJ '_' hfa.label{ch_ix} '_ROL_stack'];
+        figure('Name',fig_name,'Visible',fig_vis); hold on;
+        
+        % Get color limits
+        clims = [prctile(ch_data(:),clim_perc(1)) prctile(ch_data(:),clim_perc(2))];
+        % Get RT sorting index
+        [~,rt_sort_idx] = sort(trial_info.response_time);
+        
+        % Plot single trial stack
+        imagesc(hfa.time,1:numel(trial_info.trial_n),ch_data(rt_sort_idx,:));
+        set(gca,'YDir','normal');
+        % Plot stimulus onset
+        line([0 0],ylim,'Color','k');
+        % Plot ROLs
+        d_scat = scatter(rol_times(ch_ix,rt_sort_idx,1),1:size(rol_times,2),deriv_marker,'MarkerEdgeColor','k');
+        l_scat = scatter(rol_times(ch_ix,rt_sort_idx,2),1:size(rol_times,2),lin_marker,'MarkerEdgeColor','k');
+        % Plot RTs
+        rt_scat = scatter(trial_info.response_time(rt_sort_idx),1:numel(trial_info.trial_n),2,...
+            rt_marker,'MarkerEdgeColor','r','MarkerFaceColor','r');
+        
+        % Axis parameters
+        ax = gca;
+        ax.XLim = [hfa.time(1) hfa.time(end)];
+        ax.YLim = [1 numel(trial_info.trial_n)];
+        ax.XLabel.String = 'Time (s)';
+        ax.YLabel.String = 'Trials';
+        colorbar; caxis(clims);
+        legend([d_scat l_scat rt_scat],{'deriv','lin','RT'},'Location','southeast');
+        
+        saveas(gcf,[stack_dir fig_name '.' fig_ftype]);
+    end
+    
+end
+
+end
