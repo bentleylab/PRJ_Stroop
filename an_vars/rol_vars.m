@@ -1,12 +1,12 @@
 % Parameters for single trial response onset latencies using linear method
-rol_trl_lim_s = [0 0.7];        % buffer around stim and RT (stim onset to max(RT)+0.7)
+rol_trl_lim_s = [0 0.4];        % buffer around stim and RT (stim onset to max(RT)+0.7)
 min_actv_s    = 0.1;            % Minimum activation  length (in sec)
 rol_lim_s     = [-0.2 0.1];     % window around peak to find onset latency (Foster 2015 = [-0.2 0.1])
 quant_thresh  = 0.75;           % cut off in distribution of power for initial start point
 
 % Filter settings
-sgfilt_ord = 9;
-sgfilt_win = 501;
+sgfilt_ord = 5;
+sgfilt_win = 201;
 
 % Linear Regression Method Settings
 %   (Foster2015 uses 100ms, Bartoli HBM uses 40ms)
