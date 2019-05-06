@@ -1,22 +1,34 @@
 % Parameters for single trial response onset latencies using linear method
-rol_buff     = [0 0.7]; % buffer around stim and RT (stim onset to max(RT)+0.7)
-quant_thresh = 0.75;    % cut off in distribution of power for initial start point
-rol_lim_s = [-0.2 0.1];   % window around peak to find onset latency (Foster 2015 = [-0.2 0.1])
+rol_trl_lim_s = [0 0.7];        % buffer around stim and RT (stim onset to max(RT)+0.7)
+min_actv_s    = 0.1;            % Minimum activation  length (in sec)
+rol_lim_s     = [-0.2 0.1];     % window around peak to find onset latency (Foster 2015 = [-0.2 0.1])
+quant_thresh  = 0.75;           % cut off in distribution of power for initial start point
 
 % Filter settings
 sgfilt_ord = 9;
 sgfilt_win = 501;
 
+% Linear Regression Method Settings
 %   (Foster2015 uses 100ms, Bartoli HBM uses 40ms)
 reg_win_len_s = 0.05;    % window for regression method in sec
 reg_win_stp_s = 0.01;
 n_big_slopes  = 5;      % number of biggest slopes to examine
+
+% Stimulus/Response modeling
+rol_outlier_std = 2;
+%rol_outlier_s   = 0.5;
 
 % Plotting Parameters:
 trl_plt_perc = 0.05; %
 %deriv_scale  = 20;      % scaling factor for plotting the derivative
 clim_perc    = [5 95];    % percentile of power for color limits
 deriv_marker = '+';
+deriv_color  = [122 1 119]./255;    % dark purple
 lin_marker   = 'o';
+lin_color    = [221 52 151]./255;        % bright pink
+rol_mrkr_sz  = 10;
+
 rt_marker    = '*';
+rt_color     = 'k';
+rt_mrkr_sz   = 2;
 

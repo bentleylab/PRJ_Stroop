@@ -1,4 +1,4 @@
-function SBJ08d_HFA_ROL(SBJ, proc_id, an_id, rol_id, plot_qa, plot_stack, fig_vis, fig_ftype)
+function SBJ08d_HFA_ROL(SBJ, an_id, rol_id, plot_qa, plot_stack, fig_vis, fig_ftype)
 % Find single trial onset latencies of HFA
 %   Adapted from code by Eleonora Bartoli and Brett Foster
 % INPUTS:
@@ -35,14 +35,16 @@ load(hfa_fname);
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'));
 
 % Output prep
-qa_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/ROL/' an_id '/QA/'];
-if ~isdir(qa_dir)
-    mkdir(qa_dir);
-end
-stack_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/ROL/' an_id '/ROL/'];
+qa_main_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/ROL/' an_id '/QA/'];
+stack_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/ROL/' an_id '/stack/'];
 if ~isdir(stack_dir)
     mkdir(stack_dir);
 end
+
+%% Select time range for onsets
+cfgs = [];
+cfgs.latency = [rol_trl_lim_s(1) max(trial_info.response_time)+rol_trl_lim_s(2)];
+hfa = ft_selectdata(cfgs, hfa);
 
 %% Compute parameters for ROLs
 % Power threshold per channel over entire trial
@@ -51,29 +53,39 @@ thresh = quantile(reshape(hfa.powspctrm,[numel(hfa.label) size(hfa.powspctrm,1)*
 % Time threshold
 %!!! fix this naming for the different windows!
 sample_rate = (numel(hfa.time)-1)/(hfa.time(end)-hfa.time(1));
-win_dp = round((rol_lim_s(2)-rol_lim_s(1))*sample_rate);
+min_actv_dp = round(min_actv_s*sample_rate);
 
-%% Select time range for onsets
-trial_lim = [0 max(trial_info.response_time)+0.7];
-cfgs = [];
-cfgs.latency = trial_lim;
-hfa = ft_selectdata(cfgs, hfa);
+% % Create pseudo stimulus distribution
+% %   correlation with all zeros has no variance and is undefined (divide by 0 = NaN)
+% %   therefore, correlation with "stimulus" will be gaussian around 0 but with small variance
+% pseudo_stim_times = normrnd(0,stim_var,size(trial_info.response_time));
 
-%% Compute ROLs
+%% Response Onset Latency Analyses
 % response onset latencies (in sec) per channel and trial for [derivative, linear regression] methods 
-rol_times = nan([numel(hfa.label) size(hfa.powspctrm,1) 2]);
-plt_trls  = randi(size(hfa.powspctrm,1),round(trl_plt_perc*size(hfa.powspctrm,1)),1);
+rol_times  = nan([numel(hfa.label) size(hfa.powspctrm,1) 2]);   % ROL in sec [D/L]
+actv_len   = nan([numel(hfa.label) size(hfa.powspctrm,1)]);     % # dp above threshold in ROL window
+actv_amp   = nan([numel(hfa.label) size(hfa.powspctrm,1)]);     % mean power above threshold in ROL window
+rol_win_sz = nan([numel(hfa.label) size(hfa.powspctrm,1)]);     % ROL window size in dp
+rol_corr   = nan([numel(hfa.label) 2 2]);                       % [ch, D/L, S/R]
+rol_pval   = nan([numel(hfa.label) 2 2]);                       % [ch, D/L, S/R]
+plt_trls   = randi(size(hfa.powspctrm,1),round(trl_plt_perc*size(hfa.powspctrm,1)),1);
 for ch_ix = 1:numel(hfa.label)
-    % Smooth data
+    fprintf('-------------------------- %s (%i/%i) --------------------------\n',hfa.label{ch_ix},ch_ix,numel(hfa.label));
+    %% Smooth data
     ch_data_orig = squeeze(hfa.powspctrm(:,ch_ix,:,:));
-    ch_data = sgolayfilt(ch_data_orig',sgfilt_ord,sgfilt_win)';
+    ch_data = sgolayfilt(ch_data_orig',sgfilt_ord,sgfilt_win)';     % Filters columns, so flip (2x)
     
+    %% Compute ROLs
     for trl_ix = 1:size(hfa.powspctrm,1)
         trl_data = ch_data(trl_ix,:);
         % Plot this trial if in random subset
         if any(plt_trls==trl_ix) && plot_qa
+            qa_dir = [qa_main_dir hfa.label{ch_ix} '/'];
+            if ~isdir(qa_dir)
+                mkdir(qa_dir);
+            end
             fig_name = [SBJ '_' hfa.label{ch_ix} '_t' num2str(trl_ix)];
-            figure('Name',fig_name,'Visible',fig_vis);
+            figure('Name',fig_name,'Visible',fig_vis);%'off');    % always 'off' because too many plots
             subplot(3,1,1); hold on;
             title('Full Trial');
             plot(hfa.time,ch_data_orig(trl_ix,:),'k');
@@ -94,26 +106,26 @@ for ch_ix = 1:numel(hfa.label)
         len_above = end_above-beg_above;
         
         % Remove epochs shorter than win_len
-        beg_above = beg_above(len_above>win_dp);
-        end_above = end_above(len_above>win_dp);
+        beg_above = beg_above(len_above>min_actv_dp);
+        end_above = end_above(len_above>min_actv_dp);
         
         %% Compute ROLs for windows above threshold for at least win_len
         if any(beg_above)
-            % Take epoch with largest power change
+            % Take epoch with highest overall power
             if numel(beg_above)>1
                 ep_mean = zeros(size(beg_above));
                 for ep_ix = 1:numel(beg_above)
                     ep_mean(ep_ix) = mean(trl_data(beg_above(ep_ix):end_above(ep_ix)));
                 end
                 [~, max_ix] = max(ep_mean);
-                ep_idx = beg_above(max_ix):end_above(max_ix);
+                above_idx = beg_above(max_ix):end_above(max_ix);
             else
-                ep_idx = beg_above:end_above;
+                above_idx = beg_above:end_above;
             end
             
             % Define start and end of onset search epoch
-            rol_lim = round([ep_idx(1)+rol_lim_s(1)*sample_rate ...
-                             ep_idx(1)+rol_lim_s(2)*sample_rate]);
+            rol_lim = round([above_idx(1)+rol_lim_s(1)*sample_rate ...
+                             above_idx(1)+rol_lim_s(2)*sample_rate]);
             
             % Check search epoch is within trial limits
             if rol_lim(1)<=0
@@ -126,6 +138,11 @@ for ch_ix = 1:numel(hfa.label)
             % Grab search epoch indices and data
             search_ep_ix = rol_lim(1):rol_lim(2);
             search_ep = trl_data(search_ep_ix);
+            
+            % Record ROL window properties
+            rol_win_sz(ch_ix,trl_ix) = rol_lim(2)-rol_lim(1);
+            actv_len(ch_ix,trl_ix)   = numel(above_idx);
+            actv_amp(ch_ix,trl_ix)   = mean(trl_data(above_idx));
             
             % Plot search epoch for ROL
             if any(plt_trls==trl_ix) && plot_qa
@@ -182,25 +199,35 @@ for ch_ix = 1:numel(hfa.label)
             end
             
             %% LINEAR REGRESSION METHOD:
-            % Compute sliding window parameters
-            win_lim = fn_sliding_window_lim(search_ep,round(reg_win_len_s*sample_rate),...
-                                                round(reg_win_stp_s*sample_rate));
+            % Set up sliding window parameters
+            win_len  = round(reg_win_len_s*sample_rate);
+            win_step = round(reg_win_stp_s*sample_rate);
+            win_lim  = zeros([ceil((numel(search_ep)-win_len-1)/win_step) 2]);           
+%             win_lim = fn_sliding_window_lim(search_ep,round(reg_win_len_s*sample_rate),...
+%                                                 round(reg_win_stp_s*sample_rate));
                         
             % Linear regression in each window
             lm_fit = zeros(size(win_lim,1),5);
-            for w_ix = 1:size(win_lim,1)
+            for win_ix = 1:size(win_lim,1)
+                % Set window parameters
+                if win_ix==1
+                    win_lim(win_ix,:) = [1 win_len];
+                else
+                    win_lim(win_ix,:) = [win_lim(win_ix-1,1)+win_step win_lim(win_ix-1,2)+win_step];
+                end
+                
                 % coeff(1) = slope; coeff(2) = intercept
-                coeff   = polyfit(hfa.time(search_ep_ix(win_lim(w_ix,1):win_lim(w_ix,2))),...
-                                  search_ep(win_lim(w_ix,1):win_lim(w_ix,2)),1);
-                model   = coeff(1)*hfa.time(search_ep_ix(win_lim(w_ix,1):win_lim(w_ix,2)))+coeff(2);
-                abs_err = abs(search_ep(win_lim(w_ix,1):win_lim(w_ix,2))-model);
+                lm_coeff   = polyfit(hfa.time(search_ep_ix(win_lim(win_ix,1):win_lim(win_ix,2))),...
+                                  search_ep(win_lim(win_ix,1):win_lim(win_ix,2)),1);
+                model   = lm_coeff(1)*hfa.time(search_ep_ix(win_lim(win_ix,1):win_lim(win_ix,2)))+lm_coeff(2);
+                abs_err = abs(search_ep(win_lim(win_ix,1):win_lim(win_ix,2))-model);
                 
                 % Outputs: slope, intercept, max error-residual, win onset, win offset
-                lm_fit(w_ix,:) = [coeff max(abs_err) hfa.time(search_ep_ix(win_lim(w_ix,1))) ...
-                                    hfa.time(search_ep_ix(win_lim(w_ix,2)))];
+                lm_fit(win_ix,:) = [lm_coeff max(abs_err) hfa.time(search_ep_ix(win_lim(win_ix,1))) ...
+                                    hfa.time(search_ep_ix(win_lim(win_ix,2)))];
                 % Plot the fits
                 if any(plt_trls==trl_ix) && plot_qa
-                    plot(hfa.time(search_ep_ix(win_lim(w_ix,1):win_lim(w_ix,2))),model,'Color','b');
+                    plot(hfa.time(search_ep_ix(win_lim(win_ix,1):win_lim(win_ix,2))),model,'Color','b');
                 end
             end
             
@@ -240,20 +267,49 @@ for ch_ix = 1:numel(hfa.label)
                     
                     % Save QA plot
                     saveas(gcf,[qa_dir fig_name '.' fig_ftype]);
+                    if strcmp(fig_vis,'off')
+                        close(gcf);
+                    end
                 end
             end
         end
     end
     
-    % Plot single trial stacks with ROLs and RTs
+    %% Stimulus vs. Response Modeling of ROLs
+    % Sort RTs
+    [~,rt_sort_idx] = sort(trial_info.response_time);    
+    
+    stats = cell([2 2]);
+    err_var = nan([2 2]);
+    err     = nan([2 2]);
+    for rol_ix = 1:2
+        % Flag outlier ROLs
+        outlier_idx = abs(rol_times(ch_ix,:,rol_ix)-nanmean(rol_times(ch_ix,:,rol_ix))) > ...
+            rol_outlier_std*nanstd(squeeze(rol_times(ch_ix,:,rol_ix)));
+        for evnt_ix = 1:2
+            if evnt_ix==1
+                % Stimulus model (line)
+                model = ones(size(trial_info.trial_n(~outlier_idx)));
+            else
+                % Response model (RTs)
+                model = [trial_info.response_time(rt_sort_idx(~outlier_idx)) ones(size(trial_info.trial_n(~outlier_idx)))];
+            end
+            % stats: (R^2, Fval, pval, error varaince)
+            [~, ~, resid, ~, stats{rol_ix,evnt_ix}] = regress(...
+                squeeze(rol_times(ch_ix,~outlier_idx,rol_ix))', model);
+            err(rol_ix,evnt_ix) = nansum(abs(resid));
+            err_var(rol_ix,evnt_ix) = stats{rol_ix,evnt_ix}(4);
+        end
+    end
+    
+    %% Plot single trial stacks with ROLs and RTs
     if plot_stack
         fig_name = [SBJ '_' hfa.label{ch_ix} '_ROL_stack'];
-        figure('Name',fig_name,'Visible',fig_vis); hold on;
+        figure('Name',fig_name,'units','normalized',...
+               'outerposition',[0 0 0.5 0.6],'Visible',fig_vis); hold on;
         
         % Get color limits
         clims = [prctile(ch_data(:),clim_perc(1)) prctile(ch_data(:),clim_perc(2))];
-        % Get RT sorting index
-        [~,rt_sort_idx] = sort(trial_info.response_time);
         
         % Plot single trial stack
         imagesc(hfa.time,1:numel(trial_info.trial_n),ch_data(rt_sort_idx,:));
@@ -261,24 +317,53 @@ for ch_ix = 1:numel(hfa.label)
         % Plot stimulus onset
         line([0 0],ylim,'Color','k');
         % Plot ROLs
-        d_scat = scatter(rol_times(ch_ix,rt_sort_idx,1),1:size(rol_times,2),deriv_marker,'MarkerEdgeColor','k');
-        l_scat = scatter(rol_times(ch_ix,rt_sort_idx,2),1:size(rol_times,2),lin_marker,'MarkerEdgeColor','k');
+        d_scat = scatter(rol_times(ch_ix,rt_sort_idx,1),1:size(rol_times,2),rol_mrkr_sz,deriv_marker,'MarkerEdgeColor',deriv_color);
+        l_scat = scatter(rol_times(ch_ix,rt_sort_idx,2),1:size(rol_times,2),rol_mrkr_sz,lin_marker,'MarkerEdgeColor',lin_color);
+        % Plot ROL Means
+        d_med = line([nanmedian(rol_times(ch_ix,:,1)) nanmedian(rol_times(ch_ix,:,1))],[1 size(rol_times,2)],...
+            'Color',deriv_color,'LineStyle','--','LineWidth',2);
+        l_med = line([nanmedian(rol_times(ch_ix,:,2)) nanmedian(rol_times(ch_ix,:,2))],[1 size(rol_times,2)],...
+            'Color',lin_color,'LineStyle',':','LineWidth',2);
         % Plot RTs
-        rt_scat = scatter(trial_info.response_time(rt_sort_idx),1:numel(trial_info.trial_n),2,...
-            rt_marker,'MarkerEdgeColor','r','MarkerFaceColor','r');
+        rt_scat = scatter(trial_info.response_time(rt_sort_idx),1:numel(trial_info.trial_n),rt_mrkr_sz,...
+            rt_marker,'MarkerEdgeColor',rt_color,'MarkerFaceColor',rt_color);
         
         % Axis parameters
         ax = gca;
+        ax.Title.String = [num2str(sum(~isnan(rol_times(ch_ix,:,1)))) ' ROLs (' ...
+                           num2str(100*sum(~isnan(rol_times(ch_ix,:,1)))/size(rol_times,2),'%.01f'),...
+                           '%); Error (S,R): Der = (',num2str(err(1,1),'%.01f'),',',num2str(err(1,2),'%.01f'),...
+                           '); Lin = (',num2str(err(2,1),'%.01f'),',',num2str(err(2,2),'%.01f'),')'];
+%         ax.Title.String = [num2str(sum(~isnan(rol_times(ch_ix,:,1)))) ' ROLs (' ...
+%                            num2str(100*sum(~isnan(rol_times(ch_ix,:,1)))/size(rol_times,2),'%.01f'),...
+%                            '%); [S(r,p),R]: D = [(',...
+%                            num2str(rol_corr(ch_ix,1,1),'%.02f'),',',num2str(rol_pval(ch_ix,1,1),'%.03f'),'),(',...
+%                            num2str(rol_corr(ch_ix,1,2),'%.02f'),',',num2str(rol_pval(ch_ix,1,2),'%.03f'),')]; L = [(',...
+%                            num2str(rol_corr(ch_ix,2,1),'%.02f'),',',num2str(rol_pval(ch_ix,2,1),'%.03f'),'),(',...
+%                            num2str(rol_corr(ch_ix,2,2),'%.02f'),',',num2str(rol_pval(ch_ix,2,2),'%.03f'),')]'];
         ax.XLim = [hfa.time(1) hfa.time(end)];
         ax.YLim = [1 numel(trial_info.trial_n)];
         ax.XLabel.String = 'Time (s)';
         ax.YLabel.String = 'Trials';
         colorbar; caxis(clims);
-        legend([d_scat l_scat rt_scat],{'deriv','lin','RT'},'Location','southeast');
+        legend([d_scat l_scat d_med l_med rt_scat],{'Der','Lin','D avg','L avg','RT'},'Location','southeast');
         
-        saveas(gcf,[stack_dir fig_name '.' fig_ftype]);
+        % Save figure
+%         saveas(gcf,[stack_dir fig_name '.' fig_ftype]);
+        if strcmp(fig_vis,'off')
+            close(gcf);
+        end
+        
+%         % Print if significant
+%         if any(rol_pval(ch_ix,:,:)<0.05)
+%             fprintf(['\tSIGNIFICANT ROL Corr: ' ax.Title.String '\n']);
+%         end
     end
     
 end
+
+%% Save ROL output
+rol_fname = [SBJ_vars.dirs.proc SBJ '_ROI_' an_id '_' rol_id '.mat'];
+save(rol_fname,'-v7.3','rol_times','thresh','err','err_var','actv_len','actv_amp','rol_win_sz');
 
 end
