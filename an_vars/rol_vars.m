@@ -18,9 +18,13 @@ n_big_slopes  = 5;      % number of biggest slopes to examine
 rol_outlier_std = 2;
 %rol_outlier_s   = 0.5;
 
-% Plotting Parameters:
+% PLOTTING:
+% QA settings
 trl_plt_perc = 0.05; %
 %deriv_scale  = 20;      % scaling factor for plotting the derivative
+n_hist_bins  = 30;      % for rol window sizes, activation lengths, and activation amplitudes
+
+% Stack settings
 clim_perc    = [5 95];    % percentile of power for color limits
 deriv_marker = '+';
 deriv_color  = [122 1 119]./255;    % dark purple
