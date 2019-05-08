@@ -34,6 +34,10 @@ hfa_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'.mat');
 load(hfa_fname);
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'));
 
+% Sort RTs
+[~,rt_sort_idx] = sort(trial_info.response_time);
+rt_sort_colors = parula(numel(trial_info.response_time));
+
 % Output prep
 qa_main_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/ROL/' an_id '/QA/'];
 stack_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/ROL/' an_id '/stack/'];
@@ -45,6 +49,8 @@ end
 cfgs = [];
 cfgs.latency = [rol_trl_lim_s(1) max(trial_info.response_time)+rol_trl_lim_s(2)];
 hfa = ft_selectdata(cfgs, hfa);
+
+% Remove post
 
 %% Compute parameters for ROLs
 % Power threshold per channel over entire trial
@@ -62,20 +68,24 @@ min_actv_dp = round(min_actv_s*sample_rate);
 
 %% Response Onset Latency Analyses
 % response onset latencies (in sec) per channel and trial for [derivative, linear regression] methods 
-rol_times  = nan([numel(hfa.label) size(hfa.powspctrm,1) 2]);   % ROL in sec [D/L]
+rol_times  = nan([numel(hfa.label) size(hfa.powspctrm,1) numel(rol_lab)]);   % ROL in sec [D/L]
 actv_len   = nan([numel(hfa.label) size(hfa.powspctrm,1)]);     % # dp above threshold in ROL window
 actv_amp   = nan([numel(hfa.label) size(hfa.powspctrm,1)]);     % mean power above threshold in ROL window
 rol_win_sz = nan([numel(hfa.label) size(hfa.powspctrm,1)]);     % ROL window size in dp
-rol_corr   = nan([numel(hfa.label) 2 2]);                       % [ch, D/L, S/R]
-rol_pval   = nan([numel(hfa.label) 2 2]);                       % [ch, D/L, S/R]
+evnt_lock  = zeros([numel(hfa.label) numel(rol_lab)]);          % event that best explains channel's ROL
 plt_trls   = randi(size(hfa.powspctrm,1),round(trl_plt_perc*size(hfa.powspctrm,1)),1);
-for ch_ix = 1:numel(hfa.label)
+for ch_ix = 1:10:numel(hfa.label)
     fprintf('-------------------------- %s (%i/%i) --------------------------\n',hfa.label{ch_ix},ch_ix,numel(hfa.label));
     %% Smooth data
     ch_data_orig = squeeze(hfa.powspctrm(:,ch_ix,:,:));
     ch_data = sgolayfilt(ch_data_orig',sgfilt_ord,sgfilt_win)';     % Filters columns, so flip (2x)
     
     %% Compute ROLs
+    above_lens = [];
+    above_amps = [];
+    above_kept = [];
+    above_mat  = zeros(size(ch_data));
+    n_ep_above = zeros([size(hfa.powspctrm,1) 1]);
     for trl_ix = 1:size(hfa.powspctrm,1)
         trl_data = ch_data(trl_ix,:);
         % Plot this trial if in random subset
@@ -110,18 +120,37 @@ for ch_ix = 1:numel(hfa.label)
         end_above = end_above(len_above>min_actv_dp);
         
         %% Compute ROLs for windows above threshold for at least win_len
+        n_ep_above(trl_ix) = numel(beg_above);
         if any(beg_above)
             % Take epoch with highest overall power
             if numel(beg_above)>1
                 ep_mean = zeros(size(beg_above));
+                ep_lens = zeros(size(beg_above));
+                ep_kept = zeros(size(beg_above));
                 for ep_ix = 1:numel(beg_above)
                     ep_mean(ep_ix) = mean(trl_data(beg_above(ep_ix):end_above(ep_ix)));
+                    ep_lens(ep_ix) = end_above(ep_ix)-beg_above(ep_ix)+1;
+                    
+                    above_mat(trl_ix,beg_above(ep_ix):end_above(ep_ix)) = ep_mean(ep_ix);
                 end
+                
+                % Select biggest epoch
                 [~, max_ix] = max(ep_mean);
                 above_idx = beg_above(max_ix):end_above(max_ix);
+                ep_kept(max_ix) = 1;
             else
                 above_idx = beg_above:end_above;
+                
+                ep_mean = mean(trl_data(above_idx));
+                ep_lens = numel(above_idx);
+                ep_kept = 1;
+                above_mat(trl_ix,above_idx) = ep_mean;
             end
+            
+            % Keep stats on all epochs above thresh
+            above_amps = [above_amps ep_mean];
+            above_lens = [above_lens ep_lens];
+            above_kept = [above_kept ep_kept];
             
             % Define start and end of onset search epoch
             rol_lim = round([above_idx(1)+rol_lim_s(1)*sample_rate ...
@@ -284,24 +313,51 @@ for ch_ix = 1:numel(hfa.label)
         fig_name = [SBJ '_' hfa.label{ch_ix} '_QA_summary'];
         figure('Name',fig_name,'Visible',fig_vis,'Units','normalized','OuterPosition',[0 0 0.4 0.4]);
         % ROL window sizes
-        subplot(1,2,1); hold on;
+        subplot(1,3,1); hold on;
         small_win_cnt = sum(rol_win_sz(ch_ix,:)/sample_rate < rol_lim_s(2)-rol_lim_s(1)-0.001);
         title(['Full = ' num2str(rol_lim_s(2)-rol_lim_s(1)) '; # smaller win = ' ...
               num2str(small_win_cnt) ' (' num2str(100*small_win_cnt/sum(~isnan(rol_win_sz(ch_ix,:))),'%.01f') '%)']);
         histogram(rol_win_sz(ch_ix,:)/sample_rate, n_hist_bins);
         xlabel('ROL window size (ms)');
-        % ROL activation lengths and amplitudes
-        subplot(1,2,2); hold on;
-        avg_len = nanmean(actv_len(ch_ix,:))/sample_rate;
-        title('Length & Amplitude of Onset Epochs');
-        trl_scat = scatter(actv_len(ch_ix,:)/sample_rate, actv_amp(ch_ix,:),'*','MarkerEdgeColor','k');
-        avg_scat = scatter(avg_len,nanmean(actv_amp(ch_ix,:)),trl_scat.SizeData*2,'o','MarkerEdgeColor','r','MarkerFaceColor','r');
+        
+        % ROL activation lengths vs. amplitudes
+        subplot(1,3,2); hold on;
+        title(['Onset Epochs; ' num2str(mean(n_ep_above)) ' ep/trl']);
+        % Plot Epochs not analyzed
+        above_len_s = above_lens/sample_rate;
+        toss_scat = scatter(above_len_s(~above_kept), above_amps(~above_kept), 'd', 'MarkerEdgeColor',[0.5 0.5 0.5]);
+        % Plot Epochs analyzed
+        kept_len_s = actv_len(ch_ix,:)/sample_rate;
+        kept_scat = scatter(kept_len_s, actv_amp(ch_ix,:),'o','MarkerEdgeColor','b');
+        toss_mean = scatter(nanmean(above_len_s(~above_kept)), nanmean(above_amps(~above_kept)), ...
+                            toss_scat.SizeData*2, 'd', 'MarkerEdgeColor',[0.5 0.5 0.5], 'MarkerFaceColor', 'k');
+        kept_mean = scatter(nanmean(kept_len_s),nanmean(actv_amp(ch_ix,:)),...
+                            kept_scat.SizeData*2,'o','MarkerEdgeColor','b','MarkerFaceColor','r');
         tmp_xlim = get(gca,'XLim');
         thresh_line = line(xlim,[thresh(ch_ix) thresh(ch_ix)],'Color','r');
         set(gca,'XLim',tmp_xlim);
         xlabel('Time above threshold (ms)');
         ylabel('Mean epoch amplitude');
-        legend([avg_scat thresh_line],{'Mean','Tresh'},'Location','best');
+        legend([toss_mean kept_mean thresh_line],{['Toss (' num2str(sum(~above_kept)) ')'],...
+               ['Kept (' num2str(sum(above_kept)) ')'],'Thresh'},'Location','best');
+        
+        % ROL times vs. amplitudes
+        subplot(1,3,3); hold on;
+        title('ROL vs. Amplitude');
+        % Plot Epochs analyzed
+        rol_scat = scatter(rol_times(ch_ix,:,1), actv_amp(ch_ix,:),[],rt_sort_colors,'o');
+        rol_mean = scatter(nanmean(rol_times(ch_ix,:,1)), nanmean(actv_amp(ch_ix,:)), ...
+                            rol_scat.SizeData*2, 'o', 'MarkerEdgeColor','b','MarkerFaceColor','r');
+%         tmp_xlim = get(gca,'XLim');
+%         thresh_line = line(xlim,[thresh(ch_ix) thresh(ch_ix)],'Color','r');
+%         set(gca,'XLim',tmp_xlim);
+        xlabel('ROL (s)');
+        ylabel('Mean epoch amplitude');
+%         cbar = colorbar;
+%         cbar.Label.String = 'RT';
+        legend(rol_mean,'mean','Location','best');
+%         legend([r_mean kept_mean thresh_line],{['Toss (' num2str(sum(~above_kept)) ')'],...
+%                ['Kept (' num2str(sum(above_kept)) ')'],'Thresh'},'Location','best');
         
         % Save figure
         saveas(gcf,[qa_dir fig_name '.' fig_ftype]);
@@ -311,58 +367,76 @@ for ch_ix = 1:numel(hfa.label)
     end
     
     %% Stimulus vs. Response Modeling of ROLs
-    % Sort RTs
-    [~,rt_sort_idx] = sort(trial_info.response_time);    
-    
     % Flag outlier ROLs
-    outlier_idx = false([size(rol_times,2) 2]);
-    rol_var     = zeros([2 2]);
-    rol_lab = {'der','lin'};
-    evnt_lab = {'S','R'};
-    for rol_ix = 1:2
+    
+    % Regression based method:
+    outlier_idx = false([size(rol_times,2) numel(rol_lab)]);
+    stats       = cell([numel(rol_lab) numel(evnt_lab)]);
+    err_var     = nan([numel(rol_lab) numel(evnt_lab)]);
+    err         = nan([numel(rol_lab) numel(evnt_lab)]);
+    for rol_ix = 1:numel(rol_lab)
         outlier_idx(:,rol_ix) = abs(rol_times(ch_ix,:,rol_ix)-nanmean(rol_times(ch_ix,:,rol_ix))) > ...
             rol_outlier_std*nanstd(squeeze(rol_times(ch_ix,:,rol_ix)));
-        rol_var(rol_ix,1) = nanstd(squeeze(rol_times(ch_ix,~outlier_idx(:,rol_ix),rol_ix)));
-        rol_var(rol_ix,2) = nanstd(squeeze(rol_times(ch_ix,~outlier_idx(:,rol_ix),rol_ix))'-trial_info.response_time(~outlier_idx(:,rol_ix)));
+        model = ones(size(trial_info.trial_n(~outlier_idx(:,rol_ix))));
+        for evnt_ix = 1:numel(evnt_lab)
+            if evnt_ix==1
+                % Stimulus model
+                %   Flip to response locked and try to fit the stimulus times
+%                 model = [-trial_info.response_time(rt_sort_idx(~outlier_idx(:,rol_ix))) ones(size(trial_info.trial_n(~outlier_idx(:,rol_ix))))];
+                fit_data = squeeze(rol_times(ch_ix,~outlier_idx(:,rol_ix),rol_ix))'-trial_info.response_time(rt_sort_idx(~outlier_idx(:,rol_ix)));
+            else
+                % Response model
+%                 model = [trial_info.response_time(rt_sort_idx(~outlier_idx(:,rol_ix))) ones(size(trial_info.trial_n(~outlier_idx(:,rol_ix))))];
+                fit_data = squeeze(rol_times(ch_ix,~outlier_idx(:,rol_ix),rol_ix))';
+            end
+            % stats: (R^2, Fval, pval, error varaince)
+            [~, ~, resid, ~, stats{rol_ix,evnt_ix}] = regress(...
+                fit_data, model);
+            err(rol_ix,evnt_ix) = nansum(abs(resid));
+            err_var(rol_ix,evnt_ix) = stats{rol_ix,evnt_ix}(4);
+        end
         
-        [~,sr_ix] = min(rol_var(rol_ix,:));
-        fprintf('%s: %s var([S, R]) = [%f vs. %f]\n',rol_lab{rol_ix}, evnt_lab{sr_ix}, rol_var(rol_ix,1), rol_var(rol_ix,2));
+        % Assign event label (index)
+        [~,evnt_lock(ch_ix,rol_ix)] = min(err(rol_ix,:));
+    end
+    if any(diff(evnt_lock(ch_ix,:)))
+        warning(['\tWARNING!!! ' hfa.label{ch_ix} ' has different event assignments across ROL methods!']);
     end
     
-    % Plot variance of ROLs vs. RT-ROL
-    figure;
-    for rol_ix = 1:2
-        subplot(1,2,rol_ix); hold on;
-        histogram(rol_times(ch_ix,~outlier_idx(:,rol_ix),rol_ix),n_hist_bins,'FaceColor','b');
-        histogram(rol_times(ch_ix,~outlier_idx(:,rol_ix),rol_ix)'-trial_info.response_time(~outlier_idx(:,rol_ix)),n_hist_bins,'FaceColor','r');
-    end
-    % Regression based method:
-%     stats = cell([2 2]);
-%     err_var = nan([2 2]);
-%     err     = nan([2 2]);
+    % Plotting data to get a feeling...
 %     for rol_ix = 1:2
-%         for evnt_ix = 1:2
-%             if evnt_ix==1
-%                 % Stimulus model (line)
-%                 model = ones(size(trial_info.trial_n(~outlier_idx)));
-%             else
-%                 % Response model (RTs)
-%                 model = [trial_info.response_time(rt_sort_idx(~outlier_idx)) ones(size(trial_info.trial_n(~outlier_idx)))];
-%             end
-%             % stats: (R^2, Fval, pval, error varaince)
-%             [~, ~, resid, ~, stats{rol_ix,evnt_ix}] = regress(...
-%                 squeeze(rol_times(ch_ix,~outlier_idx,rol_ix))', model);
-%             err(rol_ix,evnt_ix) = nansum(abs(resid));
-%             err_var(rol_ix,evnt_ix) = stats{rol_ix,evnt_ix}(4);
-%         end
+%         outlier_idx(:,rol_ix) = abs(rol_times(ch_ix,:,rol_ix)-nanmean(rol_times(ch_ix,:,rol_ix))) > ...
+%             rol_outlier_std*nanstd(squeeze(rol_times(ch_ix,:,rol_ix)));
+%         rol_var(rol_ix,1) = nanstd(squeeze(rol_times(ch_ix,~outlier_idx(:,rol_ix),rol_ix)));
+%         rol_var(rol_ix,2) = nanstd(squeeze(rol_times(ch_ix,~outlier_idx(:,rol_ix),rol_ix))'-trial_info.response_time(~outlier_idx(:,rol_ix)));
+%         
+%         [~,sr_ix] = min(rol_var(rol_ix,:));
+%         fprintf('%s: %s var([S, R]) = [%f vs. %f]\n',rol_lab{rol_ix}, evnt_lab{sr_ix}, rol_var(rol_ix,1), rol_var(rol_ix,2));
 %     end
+%     
+%     % Plot variance of ROLs vs. RT-ROL
+%     figure;
+%     for rol_ix = 1:2
+%         subplot(1,2,rol_ix); hold on;
+%         histogram(rol_times(ch_ix,~outlier_idx(:,rol_ix),rol_ix),n_hist_bins,'FaceColor','b');
+%         histogram(rol_times(ch_ix,~outlier_idx(:,rol_ix),rol_ix)'-trial_info.response_time(~outlier_idx(:,rol_ix)),n_hist_bins,'FaceColor','r');
+%     end
+%     
+%     figure;
+%     scatter(rol_times(ch_ix,~outlier_idx(rt_sort_idx,rol_ix),rol_ix), ...
+%             rol_times(ch_ix,~outlier_idx(rt_sort_idx,rol_ix),rol_ix)'-trial_info.response_time(~outlier_idx(:,rol_ix)),...
+%             [],rt_sort_colors(~outlier_idx(rt_sort_idx,rol_ix)));
+%     xlabel('ROL time (s)');
+%     ylabel('ROL - RT');
     
     %% Plot single trial stacks with ROLs and RTs
     if plot_stack
-        fig_name = [SBJ '_' hfa.label{ch_ix} '_ROL_stack'];
+        fig_name = [SBJ '_' evnt_lab{evnt_lock(ch_ix,1)} '_' hfa.label{ch_ix} '_ROL_stack'];
         figure('Name',fig_name,'units','normalized',...
-               'outerposition',[0 0 0.5 0.6],'Visible',fig_vis); hold on;
+               'outerposition',[0 0 0.5 0.6],'Visible',fig_vis);
         
+        % PLOT ROLS
+        subplot(1,2,1); hold on;
         % Get color limits
         clims = [prctile(ch_data(:),clim_perc(1)) prctile(ch_data(:),clim_perc(2))];
         
@@ -396,22 +470,43 @@ for ch_ix = 1:numel(hfa.label)
         colorbar; caxis(clims);
         legend([d_scat l_scat d_med l_med rt_scat],{'Der','Lin','D avg','L avg','RT'},'Location','southeast');
         
+        % PLOT ABOVE THRESHOLD EPOCHS
+        subplot(1,2,2); hold on;
+        % Plot single trial stack
+        imagesc(hfa.time,1:numel(trial_info.trial_n),above_mat(rt_sort_idx,:));
+        set(gca,'YDir','normal');
+        % Plot stimulus onset
+        line([0 0],ylim,'Color','k');
+        % Plot ROL Means
+        d_med = line([nanmedian(rol_times(ch_ix,:,1)) nanmedian(rol_times(ch_ix,:,1))],[1 size(rol_times,2)],...
+            'Color',deriv_color,'LineStyle','--','LineWidth',2);
+        l_med = line([nanmedian(rol_times(ch_ix,:,2)) nanmedian(rol_times(ch_ix,:,2))],[1 size(rol_times,2)],...
+            'Color',lin_color,'LineStyle',':','LineWidth',2);
+        % Plot RTs
+        rt_scat = scatter(trial_info.response_time(rt_sort_idx),1:numel(trial_info.trial_n),rt_mrkr_sz,...
+            rt_marker,'MarkerEdgeColor',rt_color,'MarkerFaceColor',rt_color);
+        
+        % Axis parameters
+        ax = gca;
+        ax.Title.String = ['Thresholded Epochs: ' num2str(mean(n_ep_above)) ' ep/trl'];
+        ax.XLim = [hfa.time(1) hfa.time(end)];
+        ax.YLim = [1 numel(trial_info.trial_n)];
+        ax.XLabel.String = 'Time (s)';
+        ax.YLabel.String = 'Trials';
+        colorbar; caxis(clims);
+        legend([d_med l_med rt_scat],{'D avg','L avg','RT'},'Location','southeast');
+        
         % Save figure
         saveas(gcf,[stack_dir fig_name '.' fig_ftype]);
         if strcmp(fig_vis,'off')
             close(gcf);
         end
-        
-%         % Print if significant
-%         if any(rol_pval(ch_ix,:,:)<0.05)
-%             fprintf(['\tSIGNIFICANT ROL Corr: ' ax.Title.String '\n']);
-%         end
     end
     
 end
 
 %% Save ROL output
 rol_fname = [SBJ_vars.dirs.proc SBJ '_ROI_' an_id '_' rol_id '.mat'];
-save(rol_fname,'-v7.3','rol_times','thresh','err','err_var','actv_len','actv_amp','rol_win_sz');
+save(rol_fname,'-v7.3','rol_times','evnt_lock','thresh','err','err_var','actv_len','actv_amp','rol_win_sz');
 
 end

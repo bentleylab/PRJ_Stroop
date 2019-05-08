@@ -1,3 +1,6 @@
+rol_lab  = {'der','lin'};
+evnt_lab = {'S','R'};
+
 % Parameters for single trial response onset latencies using linear method
 rol_trl_lim_s = [0 0.4];        % buffer around stim and RT (stim onset to max(RT)+0.7)
 min_actv_s    = 0.1;            % Minimum activation  length (in sec)
