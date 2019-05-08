@@ -1,4 +1,5 @@
 function SBJ09a_TFR_stats(SBJ,conditions,pipeline_id,an_id)
+error('switch to save styel then run separate stats scripts like SBJ08a!');
 % Calculates time frequency representation, computes cluster-based statistics, and plots the results
 % INPUTS:
 %   SBJ [str] - dataset to be processed
