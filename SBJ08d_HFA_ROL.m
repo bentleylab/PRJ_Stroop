@@ -15,6 +15,11 @@ function SBJ08d_HFA_ROL(SBJ, an_id, rol_id, plot_qa_trl, plot_qa_summary, plot_s
 %   ____ [float mat] - matrix size(n_trl,2) of onsets per trial using
 %       (regression, derivative) methods
 
+%% Process SGE inputs
+if ischar(plot_qa_trl); plot_qa_trl = str2num(plot_qa_trl); end
+if ischar(plot_qa_summary); plot_qa_summary = str2num(plot_qa_summary); end
+if ischar(plot_stack); plot_stack = str2num(plot_stack); end
+
 %% Set up paths
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
@@ -461,7 +466,7 @@ for ch_ix = 1:numel(hfa.label)
         ax.XLabel.String = 'Time (s)';
         ax.YLabel.String = 'Trials';
         colorbar; caxis(clims);
-        legend([rol_scat{:} rol_med{:} rt_scat],{'Der','Lin','D avg','L avg','RT'},'Location','southeast');
+        legend([rol_scat{:} rol_med{:} rt_scat],{'Der','Lin','D med','L med','RT'},'Location','southeast');
         
         % PLOT ABOVE THRESHOLD EPOCHS
         subplot(1,2,2); hold on;
@@ -492,7 +497,7 @@ for ch_ix = 1:numel(hfa.label)
         ax.XLabel.String = 'Time (s)';
         ax.YLabel.String = 'Trials';
         colorbar;
-        legend([rol_scat{:} rol_med{:} rt_scat],{'Der','Lin','D avg','L avg','RT'},'Location','southeast');
+        legend([rol_scat{:} rol_med{:} rt_scat],{'Der','Lin','D med','L med','RT'},'Location','southeast');
         
         % Save figure
         saveas(gcf,[stack_dir fig_name '.' fig_ftype]);
