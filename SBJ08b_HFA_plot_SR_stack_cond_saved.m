@@ -80,9 +80,9 @@ cond_mat = horzcat(cond_mat,round(sample_rate*trial_info.response_time),[1:numel
 cond_mat = sortrows(cond_mat,[1 2]);
 
 %% Plot Results
-fig_dir = ['/home/knight/hoycw/PRJ_Stroop/results/HFA/' SBJ '/stack_' conditions '/' an_id_s '-' an_id_r '/'];
+fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/stack_' conditions '/' an_id_s '-' an_id_r '/'];
 if ~exist(fig_dir,'dir')
-    mkdir(fig_dir);
+    [~] = mkdir(fig_dir);
 end
 
 % Create a figure for each channel
@@ -152,9 +152,9 @@ for ch_ix = 1:numel(hfa{1}.label)
     
     % Save figure
     if save_fig
-        fig_filename = [fig_dir fig_name '.' fig_ftype];
-        fprintf('Saving %s\n',fig_filename);
-        saveas(gcf,fig_filename);
+        fig_fname = [fig_dir fig_name '.' fig_ftype];
+        fprintf('Saving %s\n',fig_fname);
+        saveas(gcf,fig_fname);
         %eval(['export_fig ' fig_filename]);
     end
 end
