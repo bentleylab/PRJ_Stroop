@@ -30,7 +30,7 @@ for s = 1:numel(SBJs)
 end
 
 %% Plot stacks with mean traces
-conditions  = 'CNI';%'CSE';%
+conditions  = 'actv';%'CNI';%
 pipeline_id = 'main_ft';
 an_id_s     = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';%'HGh_S_zbtS_trl2to151_fLog_sm0_stat15';
 an_id_r     = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';%'HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1';
@@ -38,10 +38,11 @@ plt_id      = 'ERPstack_S2to15_R5to10_evnt_c5';%'ts_S15R1_errbr_evnt';
 save_fig    = 1;
 fig_vis     = 'off';
 fig_ftype   = 'png';
-for s = 2:numel(SBJs)
+for s = 1:numel(SBJs)
     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},conditions,an_id_s,an_id_r,...
-                                        plt_id,save_fig,fig_vis,fig_ftype)
-%     SBJ08b_HFA_plot_SR_stats(SBJs{s},conditions,an_id_s,an_id_r,plt_id,save_fig,fig_vis,fig_ftype)
+                                        plt_id,save_fig,fig_vis,fig_ftype,'actv_win','100')
+%     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},conditions,an_id_s,an_id_r,...
+%                                         plt_id,save_fig,fig_vis,fig_ftype)
     close all;
 end
 
