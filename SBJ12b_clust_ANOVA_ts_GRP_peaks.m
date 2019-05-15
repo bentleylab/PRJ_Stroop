@@ -74,8 +74,9 @@ for sbj_ix = 1:numel(SBJs)
     if sbj_ix==1
         stat_fname = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id '.mat'];
         load(stat_fname,'stat');
+        sample_rate = (numel(stat.time)-1)/(stat.time(end)-stat.time(1));
         % Get Sliding Window Parameters
-        win_lim    = fn_sliding_window_lim(stat.time,win_len,win_step);
+        win_lim    = fn_sliding_window_lim(stat.time,win_len*sample_rate,win_step*sample_rate);
         win_center = round(mean(win_lim,2));
         
         % Trim data to plotting epoch
@@ -88,7 +89,6 @@ for sbj_ix = 1:numel(SBJs)
             cfg_trim.latency = plt_vars.plt_lim_R;
         end
         stat = ft_selectdata(cfg_trim,stat);
-        sample_rate = (numel(stat.time)-1)/(stat.time(end)-stat.time(1));
     end
     
     % Compute mean RT

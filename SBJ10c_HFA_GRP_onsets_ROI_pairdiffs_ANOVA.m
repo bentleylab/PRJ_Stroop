@@ -54,6 +54,9 @@ for sbj_ix = 1:numel(SBJs)
     % Load data
     load(strcat(SBJ_vars.dirs.proc,SBJ,'_ANOVA_ROI_',stat_id,'_',an_id,'.mat'));
     
+    %% Process parameters
+    sample_rate = (numel(stat.time)-1)/(stat.time(end)-stat.time(1));
+    
     % FDR correct pvalues for ANOVA
     qvals = NaN(size(w2.pval));
     for ch_ix = 1:numel(stat.label)
@@ -61,7 +64,7 @@ for sbj_ix = 1:numel(SBJs)
     end
     
     % Get Sliding Window Parameters
-    win_lim    = fn_sliding_window_lim(stat.time,win_len,win_step);
+    win_lim    = fn_sliding_window_lim(stat.time,win_len*sample_rate,win_step*sample_rate);
     win_center = round(mean(win_lim,2));
     
     %% Load ROI and GM/WM info

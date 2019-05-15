@@ -63,7 +63,7 @@ for sr_ix = 1:2
     end
     
     % Get Sliding Window Parameters
-    win_lim{sr_ix}    = fn_sliding_window_lim(stat{1}.time,win_len,win_step);
+    win_lim{sr_ix}    = fn_sliding_window_lim(stat{sr_ix}.time,win_len*sample_rate,win_step*sample_rate);
     win_center{sr_ix} = round(mean(win_lim{sr_ix},2));
     
     % Convert % explained variance to 0-100 scale

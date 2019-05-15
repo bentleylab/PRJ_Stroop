@@ -77,7 +77,7 @@ for ch_ix = 1:numel(stat.label)
 end
 
 % Get Sliding Window Parameters
-win_lim    = fn_sliding_window_lim(stat.time,win_len,win_step);
+win_lim    = fn_sliding_window_lim(stat.time,win_len*sample_rate,win_step*sample_rate);
 win_center = round(mean(win_lim,2));
 
 % Convert % explained variance to 0-100 scale

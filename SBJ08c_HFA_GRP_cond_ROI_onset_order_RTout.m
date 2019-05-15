@@ -58,6 +58,10 @@ for sbj_ix = 1:numel(SBJs)
     % Load data
     load(strcat(SBJ_vars.dirs.proc,SBJ,'_ANOVA_ROI_',model_lab,'_',an_id,'.mat'));
     
+    %% Process parameters
+    %!!! is this the best way to do this??? Maybe not...
+    sample_rate = (numel(hfa{1}.time)-1)/(hfa{1}.time(end)-hfa{1}.time(1));
+    
     % FDR correct pvalues for ANOVA
     qvals = NaN(size(w2.pval));
     for ch_ix = 1:numel(stat.label)
@@ -65,7 +69,7 @@ for sbj_ix = 1:numel(SBJs)
     end
     
     % Get Sliding Window Parameters
-    win_lim    = fn_sliding_window_lim(stat{1}.time,win_len,win_step);
+    win_lim    = fn_sliding_window_lim(stat{1}.time,win_len*sample_rate,win_step*sample_rate);
     win_center = round(mean(win_lim,2));
     
     %% Load ROI and GM/WM info
@@ -85,10 +89,6 @@ for sbj_ix = 1:numel(SBJs)
     if ~isempty(setdiff(hfa{1}.label,einfo(:,1)))
         error('ERROR: Electrodes do not match between hfa and einfo!');
     end
-    
-    %% Process parameters
-    %!!! is this the best way to do this??? Maybe not...
-    sample_rate = (numel(hfa{1}.time)-1)/(hfa{1}.time(end)-hfa{1}.time(1));
     
     % Confirm channels and time axis are the same
     %   All the rounding and such is because some stupid rounding errors...

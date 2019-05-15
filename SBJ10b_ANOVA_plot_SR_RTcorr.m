@@ -63,7 +63,7 @@ for sr_ix = 1:2
     end
     
     % Get Sliding Window Parameters
-    win_lim{sr_ix}    = fn_sliding_window_lim(stat{1}.time,win_len,win_step);
+    win_lim{sr_ix}    = fn_sliding_window_lim(stat{sr_ix}.time,win_len*sample_rate*sample_rate,win_step*sample_rate*sample_rate);
     win_center{sr_ix} = round(mean(win_lim{sr_ix},2));
     
     % Convert % explained variance to 0-100 scale
@@ -114,7 +114,7 @@ end
 
 % Create a figure for each channel
 sig_ch = cell([1+numel(grp_lab) 2]);
-for ch_ix = 1:numel(stat{1}.label)
+for ch_ix = 1%:numel(stat{1}.label)
     fig_name = [SBJ '_ANOVA_' stat_id '_SR_' stat{1}.label{ch_ix}];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 1 0.5],'Visible',fig_vis); %twice as wide for the double plot

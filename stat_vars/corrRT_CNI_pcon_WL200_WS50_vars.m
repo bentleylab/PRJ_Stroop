@@ -10,8 +10,8 @@ levels      = {{'con','neu','inc'},{'mcon','same','minc'}};
 n_boots = 1000;
 
 % Sliding Window Parameters
-win_len = 200;
-win_step = 50;
+win_len  = 0.2;%200;
+win_step = 0.05;%50;
 
 % RT Correlation Parameters
 rt_correlation = 1;

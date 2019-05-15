@@ -22,6 +22,7 @@ load(strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'.mat'));
 cfg_trim = [];
 cfg_trim.latency = [stat_lim(1) stat_lim(2)+0.001]; %add a data point to get a full window over the tail end
 hfa = ft_selectdata(cfg_trim,hfa);
+sample_rate = (numel(hfa.time)-1)/(hfa.time(end)-hfa.time(1));
 
 %% Build Design Matrix
 design = zeros([numel(trial_info.trial_n) numel(groups)]);
@@ -62,7 +63,7 @@ end
 
 %% Run ANOVA
 % Sliding window parameters
-win_lim    = fn_sliding_window_lim(squeeze(hfa.powspctrm(1,1,1,:)),win_len,win_step);
+win_lim    = fn_sliding_window_lim(squeeze(hfa.powspctrm(1,1,1,:)),win_len*sample_rate,win_step*sample_rate);
 win_center = round(mean(win_lim,2));
 
 % Create structure for w2 in fieldtrip style
