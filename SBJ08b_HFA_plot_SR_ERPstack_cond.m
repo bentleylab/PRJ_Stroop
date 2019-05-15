@@ -188,12 +188,14 @@ end
 
 %% Plot Results
 fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/ERPstack_' conditions '/' an_id_s '-' an_id_r '/'];
-if ~exist(fig_dir,'dir')
-    [~] = mkdir(fig_dir);
+sig_ln_dir = [fig_dir 'sig_ch/'];
+if ~exist(sig_ln_dir,'dir')
+    [~] = mkdir(sig_ln_dir);
 end
 
 % Create a figure for each channel
 for ch_ix = 1:numel(hfa{1}.label)
+    sig_flag = 0;
     % Plot parameters
     fig_name = [SBJ '_' conditions '_SR_ERPstack_' hfa{1}.label{ch_ix}];
     figure('Name',fig_name,'units','normalized',...
@@ -307,6 +309,7 @@ for ch_ix = 1:numel(hfa{1}.label)
         end
         % Plot Significance Shading
         if ~isempty(sig_chunks)
+            sig_flag = 1;
             fprintf('%s %s (%s) -- %i SIGNIFICANT CLUSTERS FOUND...\n',...
                 stat{sr_ix}.label{ch_ix},conditions,evnt_lab{sr_ix},size(sig_chunks,1));
             for sig_ix = 1:size(sig_chunks,1)
@@ -328,7 +331,7 @@ for ch_ix = 1:numel(hfa{1}.label)
         ax.XTickLabel    = x_tick_lab;
         ax.XLabel.String = 'Time (s)';
         ax.YLabel.String = 'HFA';
-        legend([main_lines{:}],cond_lab,'Location',eval(['plt_vars.legend_loc_' evnt_lab{sr_ix}]));
+%         legend([main_lines{:}],cond_lab,'Location',eval(['plt_vars.legend_loc_' evnt_lab{sr_ix}]));
     end
     
     %% Save figure
@@ -336,7 +339,13 @@ for ch_ix = 1:numel(hfa{1}.label)
         fig_fname = [fig_dir fig_name '.' fig_ftype];
         fprintf('Saving %s\n',fig_fname);
         saveas(gcf,fig_fname);
-        %eval(['export_fig ' fig_filename]);
+        
+        % Symbolic link for significant plots
+        if sig_flag
+            cd(sig_ln_dir);
+            link_cmd = ['ln -s ../' fig_name '.' fig_ftype ' .'];
+            system(link_cmd);
+        end
     end
 end
 
