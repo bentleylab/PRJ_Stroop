@@ -1,4 +1,4 @@
-function SBJ08a_HFA_save(SBJ,pipeline_id,an_id)
+function SBJ08a_HFA_save(SBJ,proc_id,an_id)
 % Calculates high frequency activity, computes cluster-based statistics, and plots the results
 % clear all; %close all;
 
@@ -18,7 +18,7 @@ eval(an_vars_cmd);
 % eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
 
 % Load Data
-load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
+load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',proc_id,'.mat'));
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'));
 
 %% Select Channel(s)
@@ -39,7 +39,7 @@ clear data;
 if strcmp(HFA_type,'multiband')
     pad_len = 0.5*max(cfg_hfa.t_ftimwin)*3;
 elseif any(strcmp(HFA_type,{'broadband','hilbert'}))
-    % add 250 ms as a rule of thumb, or onger if necessary
+    % add 250 ms as a rule of thumb, or longer if necessary
     pad_len = 0.5*max([1/min(fois)*3 0.25]);
 end
 % Cut data to bsln_lim to be consistent across S and R locked (confirmed below)

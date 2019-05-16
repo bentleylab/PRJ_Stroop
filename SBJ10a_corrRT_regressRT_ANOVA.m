@@ -63,7 +63,7 @@ end
 
 %% Run ANOVA
 % Sliding window parameters
-win_lim    = fn_sliding_window_lim(squeeze(hfa.powspctrm(1,1,1,:)),win_len*sample_rate,win_step*sample_rate);
+win_lim    = fn_sliding_window_lim(squeeze(hfa.powspctrm(1,1,1,:)),round(win_len*sample_rate),round(win_step*sample_rate));
 win_center = round(mean(win_lim,2));
 
 % Create structure for w2 in fieldtrip style

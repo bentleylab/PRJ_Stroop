@@ -69,7 +69,7 @@ for sbj_ix = 1:numel(SBJs)
     end
     
     % Get Sliding Window Parameters
-    win_lim    = fn_sliding_window_lim(stat{1}.time,win_len*sample_rate,win_step*sample_rate);
+    win_lim    = fn_sliding_window_lim(stat{1}.time,round(win_len*sample_rate),round(win_step*sample_rate));
     win_center = round(mean(win_lim,2));
     
     %% Load ROI and GM/WM info

@@ -39,10 +39,14 @@ plt_id    = 'ERPstack_S2to15_R5to10_evnt_c5';%'ts_S15R1_errbr_evnt';
 save_fig  = 1;
 fig_vis   = 'off';
 fig_ftype = 'png';
-for s = 13:numel(SBJs)
-%     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,...
-%                                         plt_id,save_fig,fig_vis,fig_ftype,'actv_win','100')
+for s = 7:numel(SBJs)
+    SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,...
+                                        plt_id,save_fig,fig_vis,fig_ftype,'actv_win','100')
+    close all;
     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_s,an_id_r,...
+                                        plt_id,save_fig,fig_vis,fig_ftype,'stat_id',stat_id)
+    close all;
+    SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'pcon',an_id_s,an_id_r,...
                                         plt_id,save_fig,fig_vis,fig_ftype,'stat_id',stat_id)
     close all;
 end

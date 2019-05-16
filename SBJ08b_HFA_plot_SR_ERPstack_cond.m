@@ -40,6 +40,8 @@ if exist('stat_id','var')
     stat_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m'];
     eval(stat_vars_cmd);
     [grp_lab, ~, ~] = fn_group_label_styles(model_lab);
+else
+    grp_lab = {};
 end
 
 % Event labels
@@ -119,6 +121,20 @@ if any(time_cells)
     end
 else
     sample_rate = (numel(hfa{1}.time)-1)/(hfa{1}.time(end)-hfa{1}.time(1));
+    % Confirm hfa covers stat
+    for sr_ix = 1:numel(evnt_lab)
+        if strcmp(conditions,'RT')
+            if ~all(hfa{sr_ix}.time==stat{sr_ix}.time)
+                error('Time axes arent the same for hfa and RT stat!');
+            end
+        elseif any(strcmp(conditions,grp_lab))
+            % Allow for some imprecision (needs to be off by at least 1 sample
+            if (w2{sr_ix}.time(1)-win_len/2)-hfa{sr_ix}.time(1)<=-1/sample_rate || ...
+                    (w2{sr_ix}.time(end)+win_len/2)-hfa{sr_ix}.time(end)>=-1/sample_rate
+                error('Time axes arent the same for hfa and ANOVA w2!');
+            end
+        end
+    end
 end
 
 %% Prep Data
@@ -179,8 +195,11 @@ elseif any(strcmp(conditions,grp_lab))
             sig_chunks = fn_find_chunks(squeeze(qvals(grp_ix,:))<0.05);
             sig_chunks(squeeze(qvals(grp_ix,sig_chunks(:,1)))>0.05,:) = [];
             for sig_ix = 1:size(sig_chunks,1)
-                stat{sr_ix}.mask(ch_ix,...
-                    offset_ix+win_lim(sig_chunks(sig_ix,1),1)-1:offset_ix+win_lim(sig_chunks(sig_ix,2),2)-1) = 1;
+                % If last window is cut off due to 10ms over, just go to end of trial
+                if any(sig_chunks(sig_ix,:) > size(win_lim,1))
+                    sig_chunks(sig_ix,sig_chunks(sig_ix,:) > size(win_lim,1)) = size(win_lim,1);
+                end
+                stat{sr_ix}.mask(ch_ix,[win_lim(sig_chunks(sig_ix,1),1):win_lim(sig_chunks(sig_ix,2),2)]+offset_ix-1) = 1;
             end
         end
     end
@@ -311,7 +330,7 @@ for ch_ix = 1:numel(hfa{1}.label)
         if ~isempty(sig_chunks)
             sig_flag = 1;
             fprintf('%s %s (%s) -- %i SIGNIFICANT CLUSTERS FOUND...\n',...
-                stat{sr_ix}.label{ch_ix},conditions,evnt_lab{sr_ix},size(sig_chunks,1));
+                hfa{sr_ix}.label{ch_ix},conditions,evnt_lab{sr_ix},size(sig_chunks,1));
             for sig_ix = 1:size(sig_chunks,1)
                 patch([sig_chunks(sig_ix,1) sig_chunks(sig_ix,1) sig_chunks(sig_ix,2) sig_chunks(sig_ix,2)],...
                     [erp_ylims(1) erp_ylims(2) erp_ylims(2) erp_ylims(1)],...
