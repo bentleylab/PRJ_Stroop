@@ -49,26 +49,26 @@ trial_lim_s_pad = [min(bsln_lim)-pad_len trial_lim_s(2)+pad_len+0.01];
 
 % Always normalize to pre-stimulus baseline for HFA
 bsln_events = trial_info.word_onset;
-if strcmp(event_type,'stim')
-    % Check that baseline will be included in data cut to trial_lim_s
-    if trial_lim_s(1) < bsln_lim(1)
+
+% Check that baseline will be included in data cut to trial_lim_s
+if strcmp(event_type,'stim') && (trial_lim_s(1) < bsln_lim(1))
         error(['ERROR: trial_lim_s does not include bsln_lim for an_id = ' an_id]);
-    end
-    % Cut to desired trial_lim_s
-    roi_trl = fn_ft_cut_trials_equal_len(roi,bsln_events,trial_info.condition_n',...
-        round(trial_lim_s_pad*roi_fsample));
-elseif strcmp(event_type,'resp')
-    % Check that baseline will be included in data cut to trial_lim_s
+end
+if strcmp(event_type,'resp')
     if trial_lim_s(1)+min(trial_info.response_time) < bsln_lim(1)
         error(['ERROR: trial_lim_s does not include bsln_lim for an_id = ' an_id]);
     end
-    % Cut to max_RT+trial_lim_s(2) to include S baseline + full R-locked trial_lim_s
-    max_RT  = max(trial_info.response_time);
-    roi_trl = fn_ft_cut_trials_equal_len(roi,bsln_events,trial_info.condition_n',...
-        round([trial_lim_s_pad(1) max_RT+trial_lim_s_pad(2)]*roi_fsample));
-else
-    error(['Unknown event_type: ' event_type]);
+    % Cut to max(RT)+trial_lim_s(2) to include S baseline + full R-locked trial_lim_s
+    trial_lim_s_pad(2) = trial_lim_s_pad(2)+max(trial_info.response_time);
 end
+% Check that trial_lim_s includes full baseline (e.g., zbtA)
+if trial_lim_s_pad(2) < bsln_lim(2)+pad_len+0.01
+    trial_lim_s_pad(2) = bsln_lim(2)+pad_len+0.01;
+end
+
+% Cut to desired trial_lim_s
+roi_trl = fn_ft_cut_trials_equal_len(roi,bsln_events,trial_info.condition_n',...
+    round(trial_lim_s_pad*roi_fsample));
 % clear roi;
 
 %% Compute HFA
@@ -105,14 +105,21 @@ else
     error('Unknown HFA_type provided');
 end
 
-% Trim back down to original trial_lim_s to exclude NaNs
+% Trim back down to original trial_lim_s (and baseline) to exclude NaNs
 cfg_trim = [];
 if strcmp(event_type,'stim')
     cfg_trim.latency = trial_lim_s;
 elseif strcmp(event_type,'resp') && strcmp(bsln_evnt,'stim')
-    cfg_trim.latency = [bsln_lim(1) max_RT+trial_lim_s(2)];
+    cfg_trim.latency = [bsln_lim(1) max(trial_info.response_time)+trial_lim_s(2)];
 else
     error('mismatched R-locked without S-locked baseline!');
+end
+% Check baseline is still covered
+if cfg_trim.latency(1) > bsln_lim(1)
+    cfg_trim.latency(1) = bsln_lim(1);
+end
+if cfg_trim.latency(2) < bsln_lim(2)
+    cfg_trim.latency(2) = bsln_lim(2);
 end
 hfa = ft_selectdata(cfg_trim,hfa);
 
@@ -133,6 +140,14 @@ switch bsln_type
     otherwise
         error(['No baseline implemented for bsln_type: ' bsln_type]);
 end
+
+% Trim back down to original trial_lim_s (toss zbtA baseline)
+if strcmp(event_type,'stim')
+    cfg_trim.latency = trial_lim_s;
+elseif strcmp(event_type,'resp') && strcmp(bsln_evnt,'stim')
+    cfg_trim.latency = [bsln_lim(1) max(trial_info.response_time)+trial_lim_s(2)];
+end
+hfa = ft_selectdata(cfg_trim,hfa);
 
 %% Smooth Power Time Series
 if smooth_pow_ts
@@ -184,10 +199,10 @@ if resample_ts && hfa.fsample~=resample_freq
 end
 
 %% Save Results
-data_out_filename = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'.mat');
+data_out_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'.mat');
 fprintf('===================================================\n');
-fprintf('--- Saving %s ------------------\n',data_out_filename);
+fprintf('--- Saving %s ------------------\n',data_out_fname);
 fprintf('===================================================\n');
-save(data_out_filename,'-v7.3','hfa');
+save(data_out_fname,'-v7.3','hfa');
 
 end

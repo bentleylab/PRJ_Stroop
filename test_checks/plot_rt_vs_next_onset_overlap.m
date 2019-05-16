@@ -1,5 +1,8 @@
 % original script: SBJs = {'IR21','IR27','IR31','IR32','IR35','IR39','IR41','IR52','IR54','IR57','IR61'};
-SBJs = {'IR21','IR31','IR32','IR35','IR39','IR41','IR52','IR54','IR57','IR61','IR65','IR68','IR72','IR74'};%ALMOST: 'CP24','IR26',  %NEVER: 'IR27','IR37','IR48',
+% SBJs = {'IR21','IR31','IR32','IR35','IR39','IR41','IR52','IR54','IR57','IR61','IR65','IR68','IR72','IR74'};%ALMOST: 'CP24','IR26',  %NEVER: 'IR27','IR37','IR48',
+% CNS 2019 list:
+SBJs = {'CP24','CP26','IR21','IR26','IR31','IR32','IR35','IR39','IR41',...
+        'IR52','IR54','IR57','IR61','IR65','IR67','IR68','IR72','IR74'};
 overlap_thresh = 1.25;
 
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
@@ -13,13 +16,9 @@ ft_defaults
 
 %%
 for sbj_ix = 1:numel(SBJs)
-    SBJ = SBJs{sbj_ix};
-    % Load variables
-    SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
-    eval(SBJ_vars_cmd);
-    
+    SBJ = SBJs{sbj_ix};    
     % Load trial_info
-    load([SBJ_vars.dirs.events SBJ '_trial_info_final.mat']);
+    load([root_dir 'PRJ_Stroop/data/' SBJ '/03_events/' SBJ '_trial_info_final.mat']);
     
     % Get difference between response time and next trial onset
     diffs = [];
@@ -29,7 +28,7 @@ for sbj_ix = 1:numel(SBJs)
         end
     end
 %     if any(diffs<overlap_thresh) % given overlap_thresh post-R analysis period, how many are bad?
-        fprintf('%s trials <1s post-R:\t%i / %i\n',SBJ,sum(diffs<overlap_thresh),numel(trial_info.trial_n));
+        fprintf('%s trials <%.02fs post-R:\t%i / %i\n',SBJ,overlap_thresh,sum(diffs<overlap_thresh),numel(trial_info.trial_n));
         figure;
         histogram(diffs,linspace(-0.3,3,20));
         title([SBJ ' RT to next onset histogram']);
