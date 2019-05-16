@@ -1,5 +1,5 @@
 function B00_RT_GRP_hist(SBJs,conditions,save_fig,fig_vis)
-%% RT Behavioral analysis- draw box plots per SBJ and for Group
+%% RT Histogram: overlapping SBJ histograms in a subplot per condition
 % Check which root directory
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
