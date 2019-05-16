@@ -1,5 +1,5 @@
 -o /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
 -e /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
 -v an_id="HGm_S_zbtS_trl2to251_sm0_wn100_stat0",rol_id="rol",plot_qa_trl="1",plot_qa_summary="1",plot_stack="1",fig_ftype="png"
--l mem_free=8G
+-l mem_free=4G
 -N HFAROL
