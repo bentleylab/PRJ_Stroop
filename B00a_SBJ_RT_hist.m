@@ -93,7 +93,7 @@ hold on;
 cni_legend = cell(size(cni_lab));
 for cond_ix = [2 1 3]   % plot N first so C is on top if they overlap
     histogram(RTs(cni_idx==cond_ix),edges,'FaceColor',cni_colors{cond_ix},'FaceAlpha',hist_alpha);
-    cni_legend{cond_ix} = [cni_lab{cond_ix} ' (n=' num2str(sum(cni_idx==cond_ix)) ')']; 
+    cni_legend{cond_ix} = [cni_lab{cond_ix} ' (n=' num2str(sum(cni_idx==cond_ix)) ')'];
 end
 % Plot Means
 for cond_ix = [2 1 3]   % plot N first so C is on top if they overlap
@@ -102,6 +102,7 @@ for cond_ix = [2 1 3]   % plot N first so C is on top if they overlap
 end
 % [~,pval] = ttest2([trial_RTs{1}],[trial_RTs{3}]);%,'Alpha',alpha);
 title('CNI RT Histogram');% : p=',num2str(pval)));
+xlabel('Time (s)');
 legend(cni_legend);
 
 if save_fig
@@ -114,84 +115,126 @@ if save_fig
     end
 end
 
+%% Proportion Congruent Bar Violins
+fig_name = [SBJ '_RT_violin_pcon'];
+
+% Insert a blank set of data to create gap between block types
+
+violins = violinplot(plot_onsets{cond_ix}(:,good_roi_map{cond_ix}),roi_list(good_roi_map{cond_ix}),...
+    'ViolinAlpha',0.3);
+
+% Adjust plot propeties
+for roi_ix = 1:numel(good_roi_map{cond_ix})
+    if strcmp(plt_vars.violin_scat_colors,'SBJ')
+        % Change scatter colors to mark SBJ
+        violins(roi_ix).ViolinColor = [0.8 0.8 0.8];
+        violins(roi_ix).BoxPlot.FaceColor = roi_colors{good_roi_map{cond_ix}(roi_ix)};
+        violins(roi_ix).EdgeColor = roi_colors{good_roi_map{cond_ix}(roi_ix)};
+        if sum(~isnan(plot_onsets{cond_ix}(:,good_roi_map{cond_ix}(roi_ix))))>1
+            scat_colors = zeros([numel(violins(roi_ix).ScatterPlot.XData) 3]);
+            for sbj_ix = 1:numel(SBJs)
+                scat_colors(plot_onset_sbj{cond_ix}(:,good_roi_map{cond_ix}(roi_ix))==sbj_ix,:) = repmat(SBJ_colors(sbj_ix,:),...
+                    sum(plot_onset_sbj{cond_ix}(:,good_roi_map{cond_ix}(roi_ix))==sbj_ix),1);
+            end
+            violins(roi_ix).ScatterPlot.MarkerFaceColor = 'flat';   % Necessary for CData to work
+            violins(roi_ix).ScatterPlot.MarkerEdgeColor = 'flat';   % Necessary for CData to work
+            violins(roi_ix).ScatterPlot.CData = scat_colors;
+        else   % violin.MedianColor is plotted over only ScatterPlot point
+            violins(roi_ix).MedianColor = ...
+                SBJ_colors(plot_onset_sbj{cond_ix}(1,good_roi_map{cond_ix}(roi_ix)),:);
+        end
+    else
+        % Change violin color to match ROI
+        violins(roi_ix).ViolinColor = roi_colors{good_roi_map{cond_ix}(roi_ix)};
+    end
+end
+
 %% Compare trial types within each block type
-fig_name = strcat(SBJ,'_RT_hist_pcon_wiBlock');
-figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.6 1],'Visible',fig_vis);
-% pval = zeros(size(pcon_lab));
+% fig_name = [SBJ '_RT_hist_pcon_TwiB'];
+% figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.6 1],'Visible',fig_vis);
+% % pval = zeros(size(pcon_lab));
+% 
+% % Plot Histograms
+% ylims = zeros([numel(pcon_lab) 2]);
+% pcon_legend = cell([numel(pcon_lab) numel(cni_lab)]);
+% for cond_ix = 1:length(pcon_lab)
+%     subplot(numel(pcon_lab),1,cond_ix);hold on;
+%     for cni_ix = [2 1 3]
+%         histogram(RTs(all([pcon_idx==cond_ix cni_idx==cni_ix],2)),edges,...
+%             'FaceColor',cni_colors{cni_ix},'FaceAlpha',hist_alpha);
+%         pcon_legend{cond_ix,cni_ix} = [cni_lab{cni_ix} ' (n=' ...
+%                                        num2str(sum(all([pcon_idx==cond_ix cni_idx==cni_ix],2))) ')'];
+%     end
+%     ylims(cond_ix,:) = get(gca,'YLim');
+% %     [~,pval{cond_ix}] = ttest2([block_RTs{cond_ix,1}],[block_RTs{cond_ix,3}]);%,'Alpha',alpha);
+% end
+% 
+% % Plot Condition Means
+% max_ylim = max(ylims(:));
+% for cond_ix = 1:length(pcon_lab)
+%     subplot(3,1,cond_ix);
+%     for cni_ix = [2 1 3]
+%         line([mean(RTs(all([pcon_idx==cond_ix cni_idx==cni_ix],2)))...
+%               mean(RTs(all([pcon_idx==cond_ix cni_idx==cni_ix],2)))],...
+%              [0 max_ylim], 'Color', cni_colors{cni_ix}, 'LineWidth', line_width, 'LineStyle', line_style);
+%     end
+%     legend(pcon_legend{cond_ix,:});
+%     xlabel('Time (s)');
+%     title(['CNI Histogram for ' pcon_lab{cond_ix} ' Blocks']);%: p=',num2str(pval{cond_ix})));
+% end
+% 
+% fig_fname = [fig_dir fig_name '.' fig_type];
+% if save_fig
+%     fprintf('Saving %s\n',fig_fname);
+%     if strcmp(fig_type,'eps')
+%         eval(['export_fig ' fig_fname]);
+%     else
+%         saveas(gcf,fig_fname);
+%     end
+% end
+% 
+% %% Compare block effects within trial type
+% fig_name = [SBJ '_RT_hist_pcon_BwiT'];
+% figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.6 1],'Visible',fig_vis);
+% % pval = zeros(size(pcon_lab));
+% 
+% % Plot Histograms
+% ylims = zeros([numel(cni_lab) 2]);
+% pcon_legend = cell([numel(pcon_lab) numel(cni_lab)]);
+% for cni_ix = [2 1 3]
+%     subplot(numel(cni_lab),1,cni_ix);hold on;
+%     for cond_ix = 1:length(pcon_lab)
+%         histogram(RTs(all([pcon_idx==cond_ix cni_idx==cni_ix],2)),edges,...
+%             'FaceColor',pcon_colors{cond_ix},'FaceAlpha',hist_alpha);
+%         pcon_legend{cond_ix,cni_ix} = [pcon_lab{cond_ix} ' (n=' ...
+%                                        num2str(sum(all([pcon_idx==cond_ix cni_idx==cni_ix],2))) ')'];
+%     end
+%     ylims(cni_ix,:) = get(gca,'YLim');
+% %     [~,pval{cond_ix}] = ttest2([block_RTs{cond_ix,1}],[block_RTs{cond_ix,3}]);%,'Alpha',alpha);
+% end
+% 
+% % Plot Condition Means
+% max_ylim = max(ylims(:));
+% for cni_ix = [2 1 3]
+%     subplot(numel(cni_lab),1,cni_ix);
+%     for cond_ix = 1:length(pcon_lab)
+%         line([mean(RTs(all([pcon_idx==cond_ix cni_idx==cni_ix],2)))...
+%               mean(RTs(all([pcon_idx==cond_ix cni_idx==cni_ix],2)))],...
+%              [0 max_ylim], 'Color', pcon_colors{cond_ix}, 'LineWidth', line_width, 'LineStyle', line_style);
+%     end
+%     legend(pcon_legend{:,cni_ix});
+%     xlabel('Time (s)');
+%     title([cni_lab{cni_ix} ' Trials across pcon blocks']);%: p=',num2str(pval{cond_ix})));
+% end
+% 
+% fig_fname = [fig_dir fig_name '.' fig_type];
+% if save_fig
+%     fprintf('Saving %s\n',fig_fname);
+%     if strcmp(fig_type,'eps')
+%         eval(['export_fig ' fig_fname]);
+%     else
+%         saveas(gcf,fig_fname);
+%     end
+% end
 
-% Plot Histograms
-ylims = zeros([numel(pcon_lab) 2]);
-pcon_legend = cell([numel(pcon_lab) numel(cni_lab)]);
-for cond_ix = 1:length(pcon_lab)
-    subplot(numel(pcon_lab),1,cond_ix);hold on;
-    for cni_ix = [2 1 3]
-        histogram(RTs(all([pcon_idx==cond_ix cni_idx==cni_ix],2)),edges,...
-            'FaceColor',cni_colors{cni_ix},'FaceAlpha',hist_alpha);
-        pcon_legend{cond_ix,cni_ix} = [cni_lab{cni_ix} ' (n=' ...
-                                       num2str(sum(all([pcon_idx==cond_ix cni_idx==cni_ix],2))) ')'];
-    end
-    ylims(cond_ix,:) = get(gca,'YLim');
-%     [~,pval{cond_ix}] = ttest2([block_RTs{cond_ix,1}],[block_RTs{cond_ix,3}]);%,'Alpha',alpha);
 end
-
-% Plot Condition Means
-max_ylim = max(ylims(:));
-for cond_ix = 1:length(pcon_lab)
-    subplot(3,1,cond_ix);
-    for cni_ix = [2 1 3]
-        line([mean(RTs(all([pcon_idx==cond_ix cni_idx==cni_ix],2)))...
-              mean(RTs(all([pcon_idx==cond_ix cni_idx==cni_ix],2)))],...
-             [0 max_ylim], 'Color', cni_colors{cni_ix}, 'LineWidth', line_width, 'LineStyle', line_style);
-    end
-    legend(pcon_legend{cond_ix,:});
-    title(['CNI Histogram for ' pcon_lab{cond_ix} ' Blocks']);%: p=',num2str(pval{cond_ix})));
-end
-
-fig_fname = [fig_dir fig_name '.' fig_type];
-if save_fig
-    fprintf('Saving %s\n',fig_fname);
-    if strcmp(fig_type,'eps')
-        eval(['export_fig ' fig_fname]);
-    else
-        saveas(gcf,fig_fname);
-    end
-end
-
-%% Compare block effects within trial type
-fig_name = strcat(SBJ,'_RT_hist_trial_type_prop_con');
-figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.6 1],'Visible',fig_vis);
-for t_ix = 1:length(trial_lab)
-    subplot(3,1,t_ix);hold on;
-    trl_blk_RTs = {};
-    for cond_ix = 1:length(block_lab)
-        trl_blk_RTs{cond_ix} = RTs(fn_condition_index([trial_lab{t_ix} '_' block_lab{cond_ix}],...
-            trial_info.condition_n)==1);
-        histogram([trl_blk_RTs{cond_ix}],edges,'FaceColor',...
-            trial_colors(cond_ix));%,'EdgeColor',trial_colors(b_ix));
-    end
-    block_legend = {};
-    for cond_ix = 1:length(block_lab)
-        line([mean([trl_blk_RTs{cond_ix}]) mean([trl_blk_RTs{cond_ix}])], ylim, ...
-            'Color',[trial_colors{cond_ix}], 'LineWidth', line_w);
-        block_legend{cond_ix} = [block_lab{cond_ix} '-' num2str(length(trl_blk_RTs{cond_ix}))];
-    end
-    fprintf('Trial type: %s\n',trial_lab{t_ix});
-    fprintf('Mean RT mcon = %f\n',mean([trl_blk_RTs{1}]));
-    fprintf('Mean RT same = %f\n',mean([trl_blk_RTs{2}]));
-    fprintf('Mean RT minc = %f\n',mean([trl_blk_RTs{3}]));
-    [~,pval] = ttest2([trl_blk_RTs{1}],[trl_blk_RTs{3}]);%,'Alpha',alpha);
-    legend(block_legend);
-    title(strcat('"',trial_lab(t_ix), '" RTs across block conditions: p=',num2str(pval)));
-    clear pval
-end
-
-fig_fname = strcat(fig_dir,fig_name,'.',fig_type);
-if save_fig ==1
-    fprintf('Saving %s\n',fig_fname);
-    if strcmp(fig_type,'eps')
-        eval(['export_fig ' fig_fname]);
-    else
-        saveas(gcf,fig_fname);
-    end
-end
-

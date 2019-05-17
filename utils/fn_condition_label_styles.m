@@ -15,7 +15,8 @@ switch factor_name
         line_styles = {'-', '-'};    % colors for cond_lab plotting
     case 'pcon'
         labels = {'mcon', 'same', 'minc'};
-        colors = {[55,126,184]./256, [0 0 0], [228,26,28]./256};
+        colors = {[11 255 200]./256, [255 200 111]./256, [200 111 255]./256};
+        %colors = {[87 255 241]./256, [255 241 87]./256, [241 87 255]./256};
         line_styles = {'-', '-', '-'};    % colors for cond_lab plotting
     case 'pcon_CI'
         labels = {'con_mcon', 'con_minc', 'inc_mcon', 'inc_minc'};
