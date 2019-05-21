@@ -16,8 +16,10 @@ else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtri
 %% Set Up Directories
 addpath([root_dir 'PRJ_Stroop/scripts/']);
 addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
-[~, app_dir] = fn_get_root_dir();
-addpath(genpath([app_dir 'export_fig-master/']));
+if strcmp(fig_type,'eps')
+    [~, app_dir] = fn_get_root_dir();
+    addpath(genpath([app_dir 'export_fig-master/']));
+end
 
 %% Load data
 % Load processing variables
