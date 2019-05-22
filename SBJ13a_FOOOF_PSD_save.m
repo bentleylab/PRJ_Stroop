@@ -39,9 +39,13 @@ if strcmp(pipeline_id,'main_ft')
     cfgs = []; cfgs.channel = atlas_in_elecs;
     elec = fn_select_elec(cfgs, elec);
     data = ft_selectdata(cfgs,data);
-elseif strcmp(pipeline_id,'1000hz')
-    load(strcat(SBJ_vars.dirs.import,SBJ,'_',pipeline_id,'.mat'));
-    load(SBJ_vars.recon.elec_pat);
+elseif strcmp(pipeline_id,'srate')
+    if any(SBJ_vars.low_srate)
+        load(strcat(SBJ_vars.dirs.import,SBJ,'_',num2str(SBJ_vars.low_srate(1)),'hz.mat'));
+    else
+        load(strcat(SBJ_vars.dirs.import,SBJ,'_1000hz.mat'));
+    end
+    elec = fn_load_elec_orig(SBJ,'pat','');
 end
 if ~all(strcmp(data.label,elec.label))
     error('Mismatch between data and elec labels!');

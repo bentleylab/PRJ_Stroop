@@ -1,4 +1,4 @@
-function fn_view_recon(SBJ, pipeline_id, plot_type, view_space, reg_type,...
+function fn_view_recon(SBJ, proc_id, plot_type, view_space, reg_type,...
                        show_labels, hemi, plot_out, varargin)
 %% Plot a reconstruction with electrodes
 % INPUTS:
@@ -52,20 +52,12 @@ else
 end
 
 %% Load elec struct
-if isempty(pipeline_id)
+if isempty(proc_id)
     % Original elec files
-    elec_fname = eval(['SBJ_vars.recon.elec_' view_space reg_suffix]);
-    slash = strfind(elec_fname,'/'); elec_suffix = elec_fname(slash(end)+numel(SBJ)+2:end-4);
-    
-    tmp = load(elec_fname);
-    elec_var_name = fieldnames(tmp);
-    if ~strcmp(elec_var_name,elec_suffix)
-        warning(['\t!!!! ' SBJ ' elec names in variable and file names do not match! file=' elec_suffix '; var=' elec_var_name{1}]);
-    end
-    eval(['elec = tmp.' elec_var_name{1} ';']); clear tmp;
+    [elec] = fn_load_elec_orig(SBJ,view_space,reg_type);
 else
     % Preprocessed (bipolar) elec files
-    load([SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'.mat']);
+    load([SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,'.mat']);
 end
 
 %% Remove electrodes that aren't in hemisphere

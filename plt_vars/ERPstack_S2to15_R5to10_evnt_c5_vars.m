@@ -15,7 +15,7 @@ plt_vars.clim_perc = [5 95];
 plt_vars.ylim_fudge = 0.1;
 
 plt_vars.errbar_alpha   = 0.5;
-plt_vars.errpatch_alpha = 0.3;
+plt_vars.errpatch_alpha = 0.2;
 %plt_vars.main_style = '--';
 
 plt_vars.plot_avg  = 0;

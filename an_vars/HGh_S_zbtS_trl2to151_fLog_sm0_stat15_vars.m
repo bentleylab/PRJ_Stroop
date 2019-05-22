@@ -41,7 +41,7 @@ resample_ts   = 0;
 
 % Stats parameters
 stat_lim    = [0 1.5];            % window in SEC for stats
-n_boots     = 1000;             % Repetitions for non-parametric stats
+n_boots     = 500;             % Repetitions for non-parametric stats
 
 cfg_stat = [];
 cfg_stat.latency          = stat_lim;
