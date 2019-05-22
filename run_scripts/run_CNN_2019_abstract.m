@@ -11,9 +11,14 @@ SBJs = {'CP24','CP26','IR21','IR26','IR31','IR32','IR35','IR39','IR41',...
         'IR52','IR54','IR57','IR61','IR65','IR67','IR68','IR72','IR74'};
 proc_id = 'main_ft';
 actv_win    = '100';
+
+%% Behavior
 save_fig    = 1;
 fig_vis     = 'on';
-fig_type    = 'svg';
+fig_type    = 'png';
+for s = 1:numel(SBJs)
+    B00a_SBJ_RT_hist(SBJs{s},'rt_hist',fig_vis,save_fig,fig_type);
+end
 
 %% ROLs
 proc_id = 'main_ft';
@@ -39,16 +44,18 @@ plt_id    = 'ERPstack_S2to15_R5to10_evnt_c5';%'ts_S15R1_errbr_evnt';
 save_fig  = 1;
 fig_vis   = 'off';
 fig_ftype = 'png';
-for s = 7:numel(SBJs)
+for s = numel(SBJs)
+    SBJ08ab_HFA_actv(SBJs{s},an_id_s,100);
+    SBJ08ab_HFA_actv(SBJs{s},an_id_r,100);
     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,...
                                         plt_id,save_fig,fig_vis,fig_ftype,'actv_win','100')
     close all;
-    SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_s,an_id_r,...
-                                        plt_id,save_fig,fig_vis,fig_ftype,'stat_id',stat_id)
-    close all;
-    SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'pcon',an_id_s,an_id_r,...
-                                        plt_id,save_fig,fig_vis,fig_ftype,'stat_id',stat_id)
-    close all;
+%     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_s,an_id_r,...
+%                                         plt_id,save_fig,fig_vis,fig_ftype,'stat_id',stat_id)
+%     close all;
+%     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'pcon',an_id_s,an_id_r,...
+%                                         plt_id,save_fig,fig_vis,fig_ftype,'stat_id',stat_id)
+%     close all;
 end
 
 %% ================================================================================

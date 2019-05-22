@@ -62,8 +62,8 @@ end
 % con = 1-3, neu = 4-6, inc = 7-9
 % within those: same, mic, mcon
 % trial_type = NaN(size(trial_info.condition_n));
-RTs     = trial_info.response_time; % converts sec to ms
-edges = linspace(min(RTs),max(RTs),n_bins);
+rts     = trial_info.response_time; % converts sec to ms
+edges = linspace(min(rts),max(rts),n_bins);
 
 % Check for RTs overlapping with stim onset or baseline
 late_RT_idx = zeros(size(trial_info.trial_n));
@@ -94,12 +94,12 @@ hold on;
 % Plot Histograms
 cni_legend = cell(size(cni_lab));
 for cond_ix = [2 1 3]   % plot N first so C is on top if they overlap
-    histogram(RTs(cni_idx==cond_ix),edges,'FaceColor',cni_colors{cond_ix},'FaceAlpha',hist_alpha);
+    histogram(rts(cni_idx==cond_ix),edges,'FaceColor',cni_colors{cond_ix},'FaceAlpha',hist_alpha);
     cni_legend{cond_ix} = [cni_lab{cond_ix} ' (n=' num2str(sum(cni_idx==cond_ix)) ')'];
 end
 % Plot Means
 for cond_ix = [2 1 3]   % plot N first so C is on top if they overlap
-    line([mean(RTs(cni_idx==cond_ix)) mean(RTs(cni_idx==cond_ix))], ylim,...
+    line([mean(rts(cni_idx==cond_ix)) mean(rts(cni_idx==cond_ix))], ylim,...
         'Color', cni_colors{cond_ix}, 'LineWidth', line_width, 'LineStyle', line_style);
 end
 % [~,pval] = ttest2([trial_RTs{1}],[trial_RTs{3}]);%,'Alpha',alpha);
@@ -119,35 +119,58 @@ end
 
 %% Proportion Congruent Bar Violins
 fig_name = [SBJ '_RT_violin_pcon'];
+figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.8 0.5],'Visible',fig_vis);
+hold on;
 
-% Insert a blank set of data to create gap between block types
+% Separate data by pcon and CNI
+rt_grps = cell([numel(pcon_lab)*numel(cni_lab)+numel(pcon_lab)-1 1]);
+grp_lab = cell([numel(pcon_lab)*numel(cni_lab)+numel(pcon_lab)-1 1]);
+grp_color = cell([numel(pcon_lab)*numel(cni_lab)+numel(pcon_lab)-1 1]);
+grp_ix = 0;
+for pcon_ix = 1:numel(pcon_lab)
+    for cni_ix = 1:numel(cni_lab)
+        grp_ix = grp_ix + 1;
+        rt_grps{grp_ix} = rts(pcon_idx==pcon_ix & cni_idx==cni_ix);
+        grp_lab{grp_ix} = [pcon_lab{pcon_ix} '-' cni_lab{cni_ix}];
+        grp_color{grp_ix} = cni_colors{cni_ix};
+    end
+    % Insert a blank set of data to create gap between block types for plotting
+    if pcon_ix~=numel(pcon_lab)
+        grp_ix = grp_ix + 1;
+        rt_grps{grp_ix} = mean(rt_grps{grp_ix-1}); % non-empty column vector
+        grp_lab{grp_ix} = '';
+        grp_color{grp_ix} = [1 1 1];
+    end
+end
 
-violins = violinplot(plot_onsets{cond_ix}(:,good_roi_map{cond_ix}),roi_list(good_roi_map{cond_ix}),...
-    'ViolinAlpha',0.3);
+% ANOVA Stats
+
+
+% Plot Violins
+violins = violinplot(padcat(rt_grps{:}), grp_lab, 'ViolinAlpha', violin_alpha);
 
 % Adjust plot propeties
-for roi_ix = 1:numel(good_roi_map{cond_ix})
-    if strcmp(plt_vars.violin_scat_colors,'SBJ')
-        % Change scatter colors to mark SBJ
-        violins(roi_ix).ViolinColor = [0.8 0.8 0.8];
-        violins(roi_ix).BoxPlot.FaceColor = roi_colors{good_roi_map{cond_ix}(roi_ix)};
-        violins(roi_ix).EdgeColor = roi_colors{good_roi_map{cond_ix}(roi_ix)};
-        if sum(~isnan(plot_onsets{cond_ix}(:,good_roi_map{cond_ix}(roi_ix))))>1
-            scat_colors = zeros([numel(violins(roi_ix).ScatterPlot.XData) 3]);
-            for sbj_ix = 1:numel(SBJs)
-                scat_colors(plot_onset_sbj{cond_ix}(:,good_roi_map{cond_ix}(roi_ix))==sbj_ix,:) = repmat(SBJ_colors(sbj_ix,:),...
-                    sum(plot_onset_sbj{cond_ix}(:,good_roi_map{cond_ix}(roi_ix))==sbj_ix),1);
-            end
-            violins(roi_ix).ScatterPlot.MarkerFaceColor = 'flat';   % Necessary for CData to work
-            violins(roi_ix).ScatterPlot.MarkerEdgeColor = 'flat';   % Necessary for CData to work
-            violins(roi_ix).ScatterPlot.CData = scat_colors;
-        else   % violin.MedianColor is plotted over only ScatterPlot point
-            violins(roi_ix).MedianColor = ...
-                SBJ_colors(plot_onset_sbj{cond_ix}(1,good_roi_map{cond_ix}(roi_ix)),:);
-        end
+for grp_ix = 1:numel(rt_grps)
+    % Change scatter colors to mark condition
+    violins(grp_ix).ViolinColor = grp_color{grp_ix};
+    violins(grp_ix).BoxPlot.FaceColor = grp_color{grp_ix};
+    violins(grp_ix).EdgeColor = grp_color{grp_ix};
+    
+    % Make spacers transparent
+    if isempty(grp_lab{grp_ix})
+        violins(grp_ix).MedianPlot.MarkerEdgeColor = grp_color{grp_ix};
+        violins(grp_ix).MedianColor = grp_color{grp_ix};
+    end
+end
+ylabel('Time (s)');
+
+if save_fig
+    fig_fname = [fig_dir fig_name '.' fig_type];
+    fprintf('Saving %s\n',fig_fname);
+    if strcmp(fig_type,'eps')
+        eval(['export_fig ' fig_fname]);
     else
-        % Change violin color to match ROI
-        violins(roi_ix).ViolinColor = roi_colors{good_roi_map{cond_ix}(roi_ix)};
+        saveas(gcf,fig_fname);
     end
 end
 

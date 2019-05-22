@@ -4,7 +4,7 @@ model_lab   = 'corrRT_CNI_pcon';
 % ANOVA Parameters
 regress_rt  = 1;    % regrees reaction time off before running ANOVA
 groups      = {'CNI', 'pcon'};
-levels      = {{'con','neu','inc'},{'mcon','same','minc'}};
+%levels      = {{'con','neu','inc'},{'mcon','same','minc'}};
 
 % Stats parameters
 n_boots = 1000;
