@@ -12,13 +12,18 @@ SBJs = {'CP24','CP26','IR21','IR26','IR31','IR32','IR35','IR39','IR41',...
 proc_id = 'main_ft';
 actv_win    = '100';
 
-%% Behavior
+%% ================================================================================
+% %   BEHAVIOR
+% %  =================================================================================
 save_fig    = 1;
 fig_vis     = 'on';
 fig_type    = 'png';
 for s = 1:numel(SBJs)
     B00a_SBJ_RT_hist(SBJs{s},'rt_hist',fig_vis,save_fig,fig_type);
 end
+
+% RT behavior group level
+% B00_RT_GRP_hist_norm(SBJs,'CNI',save_fig,fig_vis,fig_type);
 
 %% ROLs
 proc_id = 'main_ft';
@@ -38,33 +43,27 @@ end
 % conditions  = 'actv';%'CNI';%
 stat_id   = 'corrRT_CNI_pcon_WL200_WS50';
 proc_id   = 'main_ft';
-an_id_s   = 'HGm_S_zbtA_trl2to151_sm0_wn100_stat15';%'HGh_S_zbtS_trl2to151_fLog_sm0_stat15';
-an_id_r   = 'HGm_R_zbtA_trl5to101_sm0_wn100_stat5to1';%'HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1';
+an_id_s   = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';%'HGh_S_zbtS_trl2to151_fLog_sm0_stat15';
+an_id_r   = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';%'HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1';
 plt_id    = 'ERPstack_S2to15_R5to10_evnt_c5';%'ts_S15R1_errbr_evnt';
 save_fig  = 1;
 fig_vis   = 'off';
 fig_ftype = 'png';
-for s = numel(SBJs)
-    SBJ08ab_HFA_actv(SBJs{s},an_id_s,100);
-    SBJ08ab_HFA_actv(SBJs{s},an_id_r,100);
-    SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,...
-                                        plt_id,save_fig,fig_vis,fig_ftype,'actv_win','100')
+for s = 2:numel(SBJs)-1
+%     SBJ08ab_HFA_actv(SBJs{s},an_id_s,100);
+%     SBJ08ab_HFA_actv(SBJs{s},an_id_r,100);
+%     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,...
+%                                         plt_id,save_fig,fig_vis,fig_ftype,'actv_win','100')
+%     close all;
+    SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_s,an_id_r,...
+                                        plt_id,save_fig,fig_vis,fig_ftype,'stat_id',stat_id)
     close all;
-%     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_s,an_id_r,...
-%                                         plt_id,save_fig,fig_vis,fig_ftype,'stat_id',stat_id)
-%     close all;
-%     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'pcon',an_id_s,an_id_r,...
-%                                         plt_id,save_fig,fig_vis,fig_ftype,'stat_id',stat_id)
-%     close all;
+    SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'pcon',an_id_s,an_id_r,...
+                                        plt_id,save_fig,fig_vis,fig_ftype,'stat_id',stat_id)
+    close all;
 end
 
 %% ================================================================================
-% %   BEHAVIOR
-% %  =================================================================================
-% %% RT behavior group level
-% B00_RT_GRP_hist_norm(SBJs,'CNI',save_fig,fig_vis,fig_type);
-% 
-% %% ================================================================================
 % %   RECONS with EFFECTS
 % %  =================================================================================
 % %% Plot group recon with mgROI

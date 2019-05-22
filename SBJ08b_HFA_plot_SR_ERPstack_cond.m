@@ -78,8 +78,8 @@ elseif strcmp(conditions,'RT')
 %     tmp = load(f_name_s,'stat'); stat{1} = tmp.stat;
 %     tmp = load(f_name_r,'stat'); stat{2} = tmp.stat;
 elseif any(strcmp(conditions,grp_lab))
-    f_name_s = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id_s '.mat'];
-    f_name_r = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id_r '.mat'];
+    f_name_s = [SBJ_vars.dirs.proc SBJ '_mANOVA_ROI_' stat_id '_' an_id_s '.mat'];
+    f_name_r = [SBJ_vars.dirs.proc SBJ '_mANOVA_ROI_' stat_id '_' an_id_r '.mat'];
     tmp = load(f_name_s,'w2'); w2{1} = tmp.w2;
     tmp = load(f_name_r,'w2'); w2{2} = tmp.w2;
 else
