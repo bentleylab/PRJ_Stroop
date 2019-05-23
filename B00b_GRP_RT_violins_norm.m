@@ -185,7 +185,7 @@ if save_fig
 end
 
 %% Interaction Violins
-fig_name = [SBJ '_RT_violins_CNI-pcon_interaction'];
+fig_name = 'GRP_RT_violins_CNI-pcon_interaction';
 figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.8 0.5],'Visible',fig_vis);
 hold on; ax = gca;
 
@@ -247,6 +247,56 @@ ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') RTs: CNI p=' num2str(p
                       '; pcon p=' num2str(pval(2),'%.3f') '; CNI*pcon p='  num2str(pval(4),'%.3f')];
 ax.Title.FontSize  = title_sz;
 legend([grp_object{real_grp_idx}],grp_legend{real_grp_idx},'FontSize',leg_sz,'Location','best');
+
+if save_fig
+    fig_fname = [fig_dir fig_name '.' fig_ftype];
+    fprintf('Saving %s\n',fig_fname);
+    if strcmp(fig_ftype,'eps')
+        eval(['export_fig ' fig_fname]);
+    else
+        saveas(gcf,fig_fname);
+    end
+end
+
+%% Compute Stroop Effect Across Blocks
+fig_name = 'GRP_RT_violins_pcon_stroop';
+figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.4 0.5],'Visible',fig_vis);
+hold on; ax = gca;
+
+stroop = zeros([numel(SBJs) numel(pcon_lab)]);
+design = zeros([numel(SBJs) numel(pcon_lab)]);
+con_ix = find(strcmp(cni_lab,'con'));
+inc_ix = find(strcmp(cni_lab,'inc'));
+for pcon_ix = 1:numel(pcon_lab)
+    for s_ix = 1:numel(SBJs)
+        con_rts = rts{s_ix}(pcon_idx{s_ix}==pcon_ix & cni_idx{s_ix}==con_ix);
+        inc_rts = rts{s_ix}(pcon_idx{s_ix}==pcon_ix & cni_idx{s_ix}==inc_ix);
+        stroop(s_ix,pcon_ix) = mean(inc_rts)-mean(con_rts);
+    end
+    design(:,pcon_ix) = pcon_ix;
+end
+
+% ANOVA Statistics
+[pval, table] = anovan(stroop(:), design(:),...
+    'model', 1, 'varnames', 'pcon', 'display', 'off');
+
+% Plot Violins
+violins = violinplot(stroop, pcon_lab,...
+                     'ViolinAlpha', violin_alpha, 'ShowData', true);
+
+% Adjust plot propeties
+for pcon_ix = 1:numel(pcon_lab)
+    % Change scatter colors to mark condition
+    violins(pcon_ix).ViolinColor = pcon_colors{pcon_ix};
+    violins(pcon_ix).BoxPlot.FaceColor = pcon_colors{pcon_ix};
+    violins(pcon_ix).EdgeColor = pcon_colors{pcon_ix};
+end
+ax.FontSize        = tick_sz;
+ax.YLabel.String   = 'Inc-Con RT (z-score)';
+ax.YLabel.FontSize = axis_sz;
+ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') Stroop RT Effect by pcon: p=' num2str(pval,'%.3f')];
+ax.Title.FontSize  = title_sz;
+legend([violins{:}],pcon_lab,'FontSize',leg_sz,'Location','best');
 
 if save_fig
     fig_fname = [fig_dir fig_name '.' fig_ftype];
