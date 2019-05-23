@@ -8,3 +8,8 @@ line_style = '-';
 % Violin Plotting
 violin_alpha = 0.3;
 
+% Axis parameters
+title_sz = 16;
+axis_sz  = 14;
+leg_sz   = 12;
+tick_sz  = 12;

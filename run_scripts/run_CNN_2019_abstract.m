@@ -15,15 +15,16 @@ actv_win    = '100';
 %% ================================================================================
 % %   BEHAVIOR
 % %  =================================================================================
-save_fig    = 1;
-fig_vis     = 'on';
-fig_type    = 'png';
+plt_id   = 'rt_hist';
+save_fig = 1;
+fig_vis  = 'on';
+fig_ftype = 'png';
 for s = 1:numel(SBJs)
-    B00a_SBJ_RT_violins(SBJs{s},'rt_hist',fig_vis,save_fig,fig_type);
+    B00a_SBJ_RT_violins(SBJs{s},plt_id,fig_vis,save_fig,fig_ftype);
 end
 
 % RT behavior group level
-% B00_RT_GRP_hist_norm(SBJs,'CNI',save_fig,fig_vis,fig_type);
+B00b_GRP_RT_violins_norm(SBJs,plt_id,save_fig,fig_vis,fig_ftype);
 
 %% ROLs
 proc_id = 'main_ft';
