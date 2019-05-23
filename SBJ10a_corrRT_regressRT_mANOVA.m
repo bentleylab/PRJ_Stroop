@@ -131,6 +131,44 @@ for ch_ix = 1:numel(w2.label)
     [~, ~, ~, w2.qval(:,ch_ix,:)] = fdr_bh(squeeze(w2.pval(:,ch_ix,:)));
 end
 
+%% Print results
+% Prep report
+sig_report_fname = [SBJ_vars.dirs.proc SBJ '_mANOVA_ROI_' stat_id '_' an_id '_sig_report.txt'];
+if exist(sig_report_fname)
+    system(['mv ' sig_report_fname ' ' sig_report_fname(1:end-4) '_bck.txt']);
+end
+sig_report = fopen(sig_report_fname,'a');
+if rt_correlation; cond_lab = [groups {'RT'}]; else cond_lab = groups; end;
+result_str = ['%-8s' repmat('%-8i',[1 numel(cond_lab)]) '\n'];
+
+% Print header
+fprintf(sig_report,'%s (n = %i)\n',SBJ,numel(w2.label));
+fprintf(sig_report,[repmat('%-8s',[1 1+numel(cond_lab)]) '\n'],'label',cond_lab{:});
+
+% Print summary lines (absolute)
+fprintf(sig_report,result_str, 'count', sum(any(w2.qval(:,:,:)<0.05,3),2), sum(any(stat.mask(:,1,:),3)));
+fprintf(sig_report,strrep(result_str,'i','.3f'), 'percent',...
+        [sum(any(w2.qval(:,:,:)<0.05,3),2)', sum(any(stat.mask(:,1,:),3))]./numel(w2.label));
+
+% Print Channel Lines
+sig_mat = zeros([numel(w2.label) numel(cond_lab)]);
+for ch_ix = 1:numel(w2.label)
+    % Consolidate to binary sig/non-sig
+    for grp_ix = 1:numel(groups)
+        if any(squeeze(w2.qval(grp_ix,ch_ix,:))<0.05)
+            sig_mat(ch_ix,grp_ix) = 1;
+        end
+    end
+    if rt_correlation && any(stat.mask(ch_ix,1,:))
+        sig_mat(ch_ix,grp_ix) = 1;
+    end
+    
+    % Report on significant electrodes for this SBJ
+    fprintf(sig_report,result_str,w2.label{ch_ix},sig_mat(ch_ix,:));
+end
+
+fclose(sig_report);
+
 %% Save Results
 out_fname = [SBJ_vars.dirs.proc SBJ '_mANOVA_ROI_' stat_id '_' an_id '.mat'];
 if rt_correlation

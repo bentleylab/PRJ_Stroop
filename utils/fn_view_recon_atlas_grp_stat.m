@@ -107,14 +107,14 @@ for sbj_ix = 1:numel(SBJs)
         if exist([elec_fname(1:end-4) '_' roi_id '.mat'],'file')
             elec_fname = [elec_fname(1:end-4) '_' roi_id '.mat'];
         end
-        tmp = load(elec_fname); elec_sbj{sbj_ix} = tmp.elec;
+        tmp = load(elec_fname); elec_sbj{sbj_ix,1} = tmp.elec;
     catch
         error([elec_fname 'doesnt exist, exiting...']);
     end
     
     % Append SBJ name to labels
-    for e_ix = 1:numel(elec_sbj{sbj_ix}.label)
-        elec_sbj{sbj_ix}.label{e_ix} = [SBJs{sbj_ix} '_' elec_sbj{sbj_ix}.label{e_ix}];
+    for e_ix = 1:numel(elec_sbj{sbj_ix,1}.label)
+        elec_sbj{sbj_ix,1}.label{e_ix} = [SBJs{sbj_ix} '_' elec_sbj{sbj_ix,1}.label{e_ix}];
     end
     
     % Match elecs to atlas ROIs
@@ -134,6 +134,15 @@ for sbj_ix = 1:numel(SBJs)
             elec_sbj{sbj_ix,1}.roi       = elec_sbj{sbj_ix,1}.atlas_lab;
         end
         elec_sbj{sbj_ix,1}.roi_color = fn_atlas2color(atlas_id,elec_sbj{sbj_ix,1}.roi);
+    end
+    
+    % Remove hemi and/or atlas elecs
+    if ~plot_out
+        % Remove electrodes that aren't in atlas ROIs & hemisphere
+        roi_elecs = fn_select_elec_lab_match(elec_sbj{sbj_ix,1}, hemi, atlas_id, roi_id);
+    else
+        % Remove electrodes that aren't in hemisphere
+        roi_elecs = fn_select_elec_lab_match(elec_sbj{sbj_ix,1}, hemi, [], []);
     end
     
     % Copy for other conditions
@@ -158,33 +167,20 @@ for sbj_ix = 1:numel(SBJs)
         clear stat
     else    % ANOVA
         eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);        
-        f_name = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id '.mat'];
+        f_name = [SBJ_vars.dirs.proc SBJ '_mANOVA_ROI_' stat_id '_' an_id '.mat'];
         load(f_name,'stat','w2');
         
-        % FDR correct pvalues for ANOVA
         for ch_ix = 1:numel(stat.label)
-            pvals = squeeze(w2.pval(:,ch_ix,:));
-            [~, ~, ~, qvals] = fdr_bh(pvals);%,0.05,'pdep','yes');
-            
             % Consolidate to binary sig/non-sig
             for cond_ix = 1:numel(cond_lab)
                 if strcmp(cond_lab{cond_ix},'RT') && any(stat.mask(ch_ix,1,:))
                     sig_ch{cond_ix} = [sig_ch{cond_ix} {[SBJs{sbj_ix} '_' stat.label{ch_ix}]}];
-                elseif any(strcmp(cond_lab{cond_ix},{'CNI','pcon'})) && any(qvals(cond_ix,:)<0.05,2)
+                elseif any(strcmp(cond_lab{cond_ix},{'CNI','pcon'})) && any(squeeze(w2.qval(cond_ix,ch_ix,:))<0.05)
                     sig_ch{cond_ix} = [sig_ch{cond_ix} {[SBJs{sbj_ix} '_' w2.label{ch_ix}]}];
                 end
             end
         end
         clear stat w2
-    end
-    
-    % Remove hemi and/or atlas elecs
-    if ~plot_out
-        % Remove electrodes that aren't in atlas ROIs & hemisphere
-        good_elecs = fn_select_elec_lab_match(elec_sbj{sbj_ix}, hemi, atlas_id, roi_id);
-    else
-        % Remove electrodes that aren't in hemisphere
-        good_elecs = fn_select_elec_lab_match(elec_sbj{sbj_ix}, hemi, [], []);
     end
     
     % Select sig elecs
@@ -202,7 +198,7 @@ for sbj_ix = 1:numel(SBJs)
         
         % Select sig elecs && elecs matching atlas
         % fn_select_elec messes up if you try to toss all elecs
-        good_elecs = intersect(good_elecs, sig_ch{cond_ix});
+        good_elecs = intersect(roi_elecs, sig_ch{cond_ix});
         if numel(intersect(elec_sbj{sbj_ix,cond_ix}.label,good_elecs))==0
             elec_sbj{sbj_ix,cond_ix} = {};
             good_sbj(sbj_ix,cond_ix) = false;
@@ -249,6 +245,9 @@ for cond_ix = 1:numel(cond_lab)
     % Plot electrodes on top
     for e = 1:numel(elec{cond_ix}.label)
         cfgs = []; cfgs.channel = elec{cond_ix}.label(e);
+        if strcmp(cfgs.channel,'CP24_RLF5')
+            disp('in');
+        end
         elec_tmp = fn_select_elec(cfgs,elec{cond_ix});
         ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', elec_tmp.roi_color, 'label', lab_arg);
     end
@@ -261,54 +260,4 @@ for cond_ix = 1:numel(cond_lab)
     set(f{cond_ix}, 'windowkeypressfcn',   @cb_keyboard);
 end
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SUBFUNCTION
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function cb_keyboard(h, eventdata)
-
-if isempty(eventdata)
-  % determine the key that corresponds to the uicontrol element that was activated
-  key = get(h, 'userdata');
-else
-  % determine the key that was pressed on the keyboard
-  key = parseKeyboardEvent(eventdata);
-end
-% get focus back to figure
-if ~strcmp(get(h, 'type'), 'figure')
-  set(h, 'enable', 'off');
-  drawnow;
-  set(h, 'enable', 'on');
-end
-
-if strcmp(key, 'l') % reset the light position
-  delete(findall(h,'Type','light')) % shut out the lights
-  camlight; lighting gouraud; % add a new light from the current camera position
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SUBFUNCTION
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function key = parseKeyboardEvent(eventdata)
-
-key = eventdata.Key;
-% handle possible numpad events (different for Windows and UNIX systems)
-% NOTE: shift+numpad number does not work on UNIX, since the shift
-% modifier is always sent for numpad events
-if isunix()
-  shiftInd = match_str(eventdata.Modifier, 'shift');
-  if ~isnan(str2double(eventdata.Character)) && ~isempty(shiftInd)
-    % now we now it was a numpad keystroke (numeric character sent AND
-    % shift modifier present)
-    key = eventdata.Character;
-    eventdata.Modifier(shiftInd) = []; % strip the shift modifier
-  end
-elseif ispc()
-  if strfind(eventdata.Key, 'numpad')
-    key = eventdata.Character;d
-  end
-end
-
-if ~isempty(eventdata.Modifier)
-  key = [eventdata.Modifier{1} '+' key];
 end

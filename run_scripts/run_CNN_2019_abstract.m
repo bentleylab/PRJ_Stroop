@@ -7,7 +7,7 @@ addpath(ft_dir);
 ft_defaults
 
 %% Set up variables to enter function
-SBJs = {'CP24','CP26','IR21','IR26','IR31','IR32','IR35','IR39','IR41',...
+SBJs = {'CP24','IR21','IR26','IR31','IR32','IR35','IR39','IR41',...
         'IR52','IR54','IR57','IR61','IR65','IR67','IR68','IR72','IR74'};
 proc_id = 'main_ft';
 actv_win    = '100';
@@ -85,8 +85,9 @@ end
 
 %% Plot CNI sig elecs
 stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
-an_opts     = {'HGh_S_zbtS_trl2to151_fLog_sm0_stat15','HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1'};
-% an_opts  = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
+% an_opts     = {'HGh_S_zbtS_trl2to151_fLog_sm0_stat15','HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1'};
+an_opts  = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
+% an_opts  = {'HGm_S_zbtA_trl2to151_sm0_wn100_stat15','HGm_R_zbtA_trl5to101_sm0_wn100_stat5to1'};
 tbin_id    = 'cnts';
 hemi_opts = {'r','l'};
 roi_id   = 'gROI';
@@ -95,7 +96,7 @@ reg_type = 'v';
 plot_out = 0;
 show_labels = 0;
 
-for an_ix = 1:numel(an_opts)
+for an_ix = 1%:numel(an_opts)
     for hemi_ix = 1:numel(hemi_opts)
         fn_view_recon_atlas_grp_stat(SBJs, proc_id, stat_id, an_opts{an_ix}, reg_type, show_labels,...
                                  hemi_opts{hemi_ix}, atlas_id, roi_id, plot_out)

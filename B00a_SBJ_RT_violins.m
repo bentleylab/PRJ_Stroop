@@ -238,7 +238,7 @@ ax.YLabel.FontSize = axis_sz;
 ax.Title.String    = ['CNI RTs: p=' num2str(pval(1),'%.3f') '; pcon: p=' num2str(pval(2),'%.3f')...
                       '; CNI*pcon p=' num2str(pval(3),'%.3f')];
 ax.Title.FontSize  = title_sz;
-legend([grp_object{real_grp_idx}],grp_legend{real_grp_idx},'FontSize',leg_sz,'Location','best');
+% legend([grp_object{real_grp_idx}],grp_legend{real_grp_idx},'FontSize',leg_sz,'Location','best');
 
 if save_fig
     fig_fname = [fig_dir fig_name '.' fig_type];
