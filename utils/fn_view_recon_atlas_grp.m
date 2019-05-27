@@ -1,9 +1,9 @@
-function fn_view_recon_atlas_grp(SBJs, pipeline_id, reg_type, show_labels,...
+function fn_view_recon_atlas_grp(SBJs, proc_id, reg_type, show_labels,...
                                  hemi, atlas_id, roi_id, plot_out, varargin)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJs [cell array str] - subject IDs to plot
-%   pipeline_id [str] - name of analysis pipeline, used to pick elec file
+%   proc_id [str] - name of analysis pipeline, used to pick elec file
 %   plot_type [str] - {'ortho', '3d'} choose 3 slice orthogonal plot or 3D surface rendering
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
 %   show_labels [0/1] - plot the electrode labels
@@ -67,7 +67,7 @@ for sbj_ix = 1:numel(SBJs)
     eval(SBJ_vars_cmd);
     
     try
-        elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_mni',reg_suffix,'_',atlas_id,'_full.mat'];
+        elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_mni',reg_suffix,'_',atlas_id,'_full.mat'];
         if exist([elec_fname(1:end-4) '_' roi_id '.mat'],'file')
             elec_fname = [elec_fname(1:end-4) '_' roi_id '.mat'];
         end

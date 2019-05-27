@@ -1,4 +1,4 @@
-function SBJ08ab_HFA_stats(SBJ,conditions,an_id)
+function SBJ08ab_HFA_stats(SBJ,an_id,stat_id)
 % Computes cluster-based statistics for given conditions based on saved HFA
 % clear all; %close all;
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
@@ -15,7 +15,8 @@ SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 an_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
-% eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
+stat_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m'];
+eval(stat_vars_cmd);
 
 % Load Data
 hfa_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'.mat');
@@ -23,7 +24,7 @@ load(hfa_fname);
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'));
 
 % Select Conditions of Interest
-[cond_lab, ~, ~] = fn_condition_label_styles(conditions);
+[cond_lab, ~, ~] = fn_condition_label_styles(st.conditions);
 
 %% Separate Trials by Condition
 hfa_all = hfa;
@@ -77,10 +78,10 @@ cfg_stat.design           = design;
 [stat] = ft_freqstatistics(cfg_stat, hfa{:});
 
 %% Save Results
-out_fname = strcat(hfa_fname(1:end-4),'_',conditions,'.mat');
+out_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'_',stat_id,'.mat');
 fprintf('===================================================\n');
 fprintf('--- Saving %s ------------------\n',out_fname);
 fprintf('===================================================\n');
-save(out_fname,'-v7.3','stat');
+save(out_fname,'-v7.3','stat','st');
 
 end

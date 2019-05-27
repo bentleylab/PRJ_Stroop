@@ -1,4 +1,4 @@
-function SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,pipeline_id,an_id,roi_id,...
+function SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,proc_id,an_id,roi_id,...
                                                     atlas_id,gm_thresh,plt_id,save_fig,fig_vis) %,fig_ftype)
 % Load HFA analysis results for active and condition-differentiating
 %   epochs, plot a summary of those time period per electrode
@@ -68,7 +68,7 @@ for sbj_ix = 1:numel(SBJs)
     win_center = round(mean(win_lim,2));
     
     %% Load ROI and GM/WM info
-    elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_' atlas_id '_full.mat'];
+    elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_pat_' atlas_id '_full.mat'];
     load(elec_tis_fname);
     
     % Sort elecs by stat labels
@@ -120,7 +120,7 @@ for sbj_ix = 1:numel(SBJs)
         end
     end
     
-    clear SBJ SBJ_vars hfa stat einfo w2
+    clear SBJ SBJ_vars hfa stat elec w2
 end
 
 %% Compute median onsets and onset differences per ROI pair

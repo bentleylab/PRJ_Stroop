@@ -1,8 +1,8 @@
-function fn_view_recon_atlas_ROI(SBJ, pipeline_id, view_space, reg_type, show_labels, hemi, atlas_id, roi_id)
+function fn_view_recon_atlas_ROI(SBJ, proc_id, view_space, reg_type, show_labels, hemi, atlas_id, roi_id)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJ [str] - subject ID to plot
-%   pipeline_id [str] - name of analysis pipeline, used to pick elec file
+%   proc_id [str] - name of analysis pipeline, used to pick elec file
 %   plot_type [str] - {'ortho', '3d'} choose 3 slice orthogonal plot or 3D surface rendering
 %   view_space [str] - {'pat', 'mni'}
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
@@ -65,7 +65,7 @@ SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 
 try
-    elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'_',atlas_id,'_full.mat'];
+    elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,'_',atlas_id,'_full.mat'];
     if exist([elec_fname(1:end-4) '_' roi_id '.mat'],'file')
         elec_fname = [elec_fname(1:end-4) '_' roi_id '.mat'];
     end
@@ -74,7 +74,7 @@ catch
     answer = input(['Could not load requested file: ' elec_fname ...
         '\nDo you want to run the atlas matching now? "y" or "n"\n'],'s');
     if strcmp(answer,'y')
-        fn_save_elec_atlas(SBJ,pipeline_id,view_space,reg_type,atlas_id);
+        fn_save_elec_atlas(SBJ,proc_id,view_space,reg_type,atlas_id);
     else
         error('not running atlas assignment, exiting...');
     end

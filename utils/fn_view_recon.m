@@ -3,7 +3,7 @@ function fn_view_recon(SBJ, proc_id, plot_type, view_space, reg_type,...
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJ [str] - subject ID to plot
-%   pipeline_id [str] - name of analysis pipeline, used to pick elec file
+%   proc_id [str] - name of analysis pipeline, used to pick elec file
 %   plot_type [str] - {'ortho', '3d'} choose 3 slice orthogonal plot or 3D surface rendering
 %   view_space [str] - {'pat', 'mni'}
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration

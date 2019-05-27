@@ -1,4 +1,4 @@
-function SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,stat_id,pipeline_id,an_id,actv_win,roi_id,...
+function SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,stat_id,proc_id,an_id,actv_win,roi_id,...
                                                             atlas_id,gm_thresh,plt_id,plot_out,plot_scat,save_fig,fig_vis,fig_ftype)
 % Load HFA analysis results for active, RT correlation, and ANOVA epochs
 %   RT correlation: any significance in stat_lim
@@ -41,6 +41,7 @@ eval(stat_vars_cmd);
 % Set up electrode counts
 actv_cnt  = zeros([numel(SBJs) numel(roi_list)]);
 dact_cnt  = zeros([numel(SBJs) numel(roi_list)]);
+% cse_cnt  = zeros([numel(SBJs) numel(roi_list)]);
 rt_cnt    = zeros([numel(SBJs) numel(roi_list)]);
 grp_cnt   = zeros([numel(SBJs) numel(roi_list) numel(grp_lab)]);
 elec_cnt  = zeros([numel(SBJs) numel(roi_list)]);
@@ -61,7 +62,7 @@ for sbj_ix = 1:numel(SBJs)
         mean_RTs(sbj_ix) = mean(trial_info.response_time);
     end
     % Load ANOVA
-    load(strcat(SBJ_vars.dirs.proc,SBJ,'_ANOVA_ROI_',stat_id,'_',an_id,'.mat'));
+    load(strcat(SBJ_vars.dirs.proc,SBJ,'_mANOVA_ROI_',stat_id,'_',an_id,'.mat'));
     
     % Load actv stats
     actv_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'_actv_mn',actv_win,'.mat');
@@ -71,11 +72,13 @@ for sbj_ix = 1:numel(SBJs)
     hfa_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'.mat');
     tmp = load(hfa_fname,'hfa'); hfa = tmp.hfa;
     
+%     CSE_filename = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',cse_an_id,'_',conditions,'.mat');%an_id
+%     tmp = load(CSE_filename,'stat'); cse = tmp.stat;
     %% Load ROI and GM/WM info
     if strcmp(atlas_id,'Yeo7')
-        elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_mni_v_' atlas_id '.mat'];
+        elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_mni_v_' atlas_id '.mat'];
     else
-        elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_' atlas_id '_full.mat'];
+        elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_pat_' atlas_id '_full.mat'];
     end
     load(elec_fname);
     
@@ -108,6 +111,7 @@ for sbj_ix = 1:numel(SBJs)
     cfg_lim.latency = stat_lim;
     hfa      = ft_selectdata(cfg_lim,hfa);
     stat     = ft_selectdata(cfg_lim,stat);
+%     cse      = ft_selectdata(cfg_lim,cse);
     
     % FDR correct pvalues for ANOVA
     qvals = NaN(size(w2.pval));
@@ -134,6 +138,8 @@ for sbj_ix = 1:numel(SBJs)
             roi_ix = find(strcmp(elec.roi{ch_ix},roi_list));
             elec_cnt(sbj_ix,roi_ix) = elec_cnt(sbj_ix,roi_ix)+1;
             
+%             if any(cse.mask(ch_ix,1,:))
+%                 cse_cnt(sbj_ix,roi_ix) = cse_cnt(sbj_ix,roi_ix)+1;
             % Check if active, get epochs
             if any(strcmp(stat.label{ch_ix},actv_ch))
                 % Find significant epoch indices
@@ -196,7 +202,7 @@ for sbj_ix = 1:numel(SBJs)
             end
         end
     end
-    clear SBJ SBJ_vars w2 stat elec hfa actv_ch actv_ch_epochs tmp trial_info qvals
+    clear SBJ SBJ_vars w2 stat elec hfa actv_ch actv_ch_epochs tmp trial_info qvals %cse
 end
 
 %% Plot Percentage of Electrodes Active, Deactive, and Condition Sensitive
@@ -218,11 +224,13 @@ hold on;
 % delete(h2);
 
 % Compile Data in Plotting Format
-scat_vars = {actv_cnt, dact_cnt, rt_cnt};
-bar_data  = zeros([3+numel(grp_lab) numel(roi_list)]);
-var_data  = zeros([3+numel(grp_lab) numel(roi_list)]);
+scat_vars = {actv_cnt, dact_cnt, rt_cnt};%cse_cnt, 
+bar_data  = zeros([3+numel(grp_lab) numel(roi_list)]);%+1 CSE
+var_data  = zeros([3+numel(grp_lab) numel(roi_list)]);%+1 CSE
 for roi_ix = 1:numel(roi_list)
 %     bar_vars(1,roi_ix) = sum(cI_cnt(:,roi_ix))/sum(elec_cnt(:,roi_ix));
+%     bar_data(1,roi_ix) = sum(cse_cnt(:,roi_ix))/sum(elec_cnt(:,roi_ix));
+%     var_data(1,roi_ix) = std(cse_cnt(:,roi_ix)./elec_cnt(:,roi_ix))/sqrt(numel(SBJs));
     bar_data(1,roi_ix) = sum(actv_cnt(:,roi_ix))/sum(elec_cnt(:,roi_ix));
     var_data(1,roi_ix) = nanstd(actv_cnt(:,roi_ix)./elec_cnt(:,roi_ix))/sqrt(numel(SBJs));
     bar_data(2,roi_ix) = sum(dact_cnt(:,roi_ix))/sum(elec_cnt(:,roi_ix));
@@ -277,7 +285,7 @@ ax = gca;
 ax.XLim    = [0.5 3.5+numel(grp_lab)];
 ax.XTick   = 1:3+numel(grp_lab);
 ax.XColor  = 'k';
-ax.XTickLabel = {'Activation','Deactivation','Corr(RT)',grp_lab{:}};
+ax.XTickLabel = {'Activation','Deactivation','Corr(RT)',grp_lab{:}};%'CSE'
 
 ax.YLabel.String   = 'Proportion of Electrodes';
 ax.YLabel.FontSize = 14;

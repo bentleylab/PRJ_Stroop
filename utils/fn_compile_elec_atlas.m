@@ -1,11 +1,11 @@
-function fn_compile_elec_atlas(SBJ,pipeline_id,view_space,reg_type,atlas_id)
+function fn_compile_elec_atlas(SBJ,proc_id,view_space,reg_type,atlas_id)
 %% Compile ROI info (biggest changes are from single electrodes into bipolar pairs)
 %   Goes from smallest to largest (ELEC1-ELEC2, ELEC2-ELEC3, etc.)
 %   Pairs are drawn from imported data labels, then preprocessing logic is applied
 %
 % INPUTS:
 %   SBJ [str] - name of subject
-%   pipeline_id [str] - name of analysis pipeline
+%   proc_id [str] - name of analysis pipeline
 %   view_space [str] - {'pat','mni'} select patient native or mni group space
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
 %   atlas_id [str] - {'DK','Dx','Yeo7','Yeo17'}
@@ -19,7 +19,7 @@ ft_defaults
 
 %% Load variables
 eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
-eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' proc_id '_vars.m']);
 
 %% Load Elec struct
 if ~isempty(reg_type)
@@ -31,8 +31,8 @@ else
     reg_suffix = '';
 end
 
-elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'_orig_',atlas_id,'.mat'];
-out_fname  = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'_',atlas_id,'_full.mat'];
+elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,'_orig_',atlas_id,'.mat'];
+out_fname  = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,'_',atlas_id,'_full.mat'];
 load(elec_fname);
 
 %% For grids/strips only, add GM weight and exit

@@ -1,9 +1,9 @@
-function fn_view_recon_stat_movie(SBJ, pipeline_id, stat_id, an_id, view_space, reg_type, hemi, plot_out, plt_id, varargin)
+function fn_view_recon_stat_movie(SBJ, proc_id, stat_id, an_id, view_space, reg_type, hemi, plot_out, plt_id, varargin)
 %% Plot a reconstruction with electrodes colored according to statistics
 %   FUTURE 2: add option for stat_var to be a cell with 2nd stat for edge
 % INPUTS:
 %   SBJ [str] - subject ID to plot
-%   pipeline_id [str] - name of analysis pipeline, used to pick elec file
+%   proc_id [str] - name of analysis pipeline, used to pick elec file
 %   stat_id [str] - ID of the stats
 %     current:
 %       'actv': HFA activation vs. baseline; red for active, blue for deactive, yellow for both
@@ -74,7 +74,7 @@ vid_ext = '.mp4';
 vid_encoding = 'MPEG-4';
 
 %% Load elec struct
-load([SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'.mat']);
+load([SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,'.mat']);
 
 %% Remove electrodes that aren't in hemisphere
 if ~plot_out
@@ -185,9 +185,9 @@ end
 %% Load timing info
 evnt_times = cell(size(plt_vars.evnt_type));
 for evnt_ix = 1:numel(plt_vars.evnt_type)
-    if strcmp(plt_vars.evnt_type{evnt_ix},'stim')
+    if strcmp(plt_vars.evnt_type{evnt_ix},'S')
         evnt_times{evnt_ix} = 0:1/sample_rate:plt_vars.evnt_len;
-    elseif strcmp(plt_vars.event_type{evnt_ix},'resp')
+    elseif strcmp(plt_vars.evnt_lab{evnt_ix},'R')
         load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
         evnt_times{evnt_ix} = mean(trial_info.response_time):1/sample_rate:mean(trial_info.response_time)+plt_vars.evnt_len;
         %     % Compile cond_type, RT, trial_n
@@ -227,7 +227,7 @@ time_str = text(plt_vars.time_str_pos(1), plt_vars.time_str_pos(2), plt_vars.tim
     [num2str(hfa.time(1),'%.2f') ' s'], 'color', plt_vars.time_str_color,...
     'fontsize', plt_vars.time_str_size, 'horizontalalignment', plt_vars.time_str_horzalign);
 evnt_str = text(plt_vars.evnt_str_pos(1), plt_vars.evnt_str_pos(2), plt_vars.evnt_str_pos(3),...
-    plt_vars.event_type{1}, 'color', plt_vars.evnt_str_color,...
+    plt_vars.evnt_lab{1}, 'color', plt_vars.evnt_str_color,...
     'fontsize', plt_vars.evnt_str_size, 'horizontalalignment', plt_vars.evnt_str_horzalign,...
     'fontweight', plt_vars.evnt_str_weight);
 set(evnt_str,'Visible','off');

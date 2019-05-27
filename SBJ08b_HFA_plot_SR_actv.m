@@ -20,7 +20,7 @@ eval(SBJ_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 
-event_lab = {'stim', 'resp'};
+evnt_lab = {'S', 'R'};
 % Load RTs
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
 
@@ -28,12 +28,20 @@ hfa_fname1 = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id_s,'.mat');
 hfa_fname2 = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id_r,'.mat');
 tmp = load(hfa_fname1,'hfa'); hfa{1} = tmp.hfa;
 tmp = load(hfa_fname2,'hfa'); hfa{2} = tmp.hfa;
+tmp_an1 = load(hfa_fname1,'an'); tmp_an2 = load(hfa_fname2,'an');
+if any(~[strcmp(tmp_an1.evnt_lab,'S') strcmp(tmp_an2.evnt_lab,'R')]);
+    error('HFA analyses not ordered S then R!');
+end
 stat_fname1 = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id_s,'_actv_mn',actv_win,'.mat');
 stat_fname2 = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id_r,'_actv_mn',actv_win,'.mat');
 tmp = load(stat_fname1,'actv_ch'); actv_ch{1} = tmp.actv_ch;
 tmp = load(stat_fname2,'actv_ch'); actv_ch{2} = tmp.actv_ch;
 tmp = load(stat_fname1,'actv_ch_epochs'); actv_ch_epochs{1} = tmp.actv_ch_epochs;
 tmp = load(stat_fname2,'actv_ch_epochs'); actv_ch_epochs{2} = tmp.actv_ch_epochs;
+tmp_st1 = load(stats_fname1,'st'); tmp_st2 = load(stats_fname2,'st');
+if any([~strcmp(tmp_an1.evnt_lab,tmp_st1.evnt_lab) ~strcmp(tmp_an2.evnt_lab,tmp_st2.evnt_lab)]);
+    error('an and st evnt_lab mismatch');
+end
 clear tmp
 
 %!!! is this the best way to do this??? Maybe not...
@@ -78,15 +86,15 @@ for ch_ix = 1:numel(hfa{1}.label)
     data_info.color      = {'k'};
     data_info.alpha      = plt_vars.errbar_alpha;
     
-    for ep_ix = 1:numel(event_lab)
-        subplot(1,numel(event_lab),ep_ix);
+    for ep_ix = 1:numel(evnt_lab)
+        subplot(1,numel(evnt_lab),ep_ix);
         plot_info.ax     = gca;
-        plot_info.title  = [hfa{ep_ix}.label{ch_ix} ':' event_lab{ep_ix}];
+        plot_info.title  = [hfa{ep_ix}.label{ch_ix} ':' evnt_lab{ep_ix}];
         plot_info.legend = plt_vars.legend;
-        if strcmp(event_lab{ep_ix},'stim')
+        if strcmp(evnt_lab{ep_ix},'stim')
             plot_info.x_lab = plt_vars.plt_lim_S(1):plt_vars.x_step_sz:plt_vars.plt_lim_S(2);
             % Stimulus plotting params
-            event_info.name  = {event_lab{ep_ix}, 'Mean RT'};
+            event_info.name  = {evnt_lab{ep_ix}, 'Mean RT'};
             event_info.color = {[0 0 0], [0 0 0]};
             event_info.width = [plt_vars.evnt_width,plt_vars.evnt_width];
             event_info.style = {'-', plt_vars.evnt_style};
@@ -94,7 +102,7 @@ for ch_ix = 1:numel(hfa{1}.label)
         else
             plot_info.x_lab = plt_vars.plt_lim_R(1):plt_vars.x_step_sz:plt_vars.plt_lim_R(2);
             % Stimulus plotting params
-            event_info.name  = {event_lab{ep_ix}};
+            event_info.name  = {evnt_lab{ep_ix}};
             event_info.color = {plt_vars.evnt_color};
             event_info.width = plt_vars.evnt_width;
             event_info.style = {plt_vars.evnt_style};

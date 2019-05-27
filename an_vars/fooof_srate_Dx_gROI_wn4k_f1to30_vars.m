@@ -1,12 +1,12 @@
-pipeline_id = 'srate';
+proc_id = 'srate';
 atlas_id    = 'Dx';
 roi_id      = 'gROI';
 
 % PSD parameters
-wn_len = 4096; %2048
-foi    = [1 30];
+an.wn_len = 4096; %2048
+an.foi    = [1 30];
 
 % FOOOF params
-pk_bw_lim = [1 12];%[0.5 12] is default
-mn_pk_amp = 0.3;
-max_n_pks = 3;
+an.pk_bw_lim = [1 12];%[0.5 12] is default
+an.mn_pk_amp = 0.3;
+an.max_n_pks = 3;

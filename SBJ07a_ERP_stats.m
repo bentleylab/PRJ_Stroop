@@ -1,4 +1,4 @@
-function SBJ07a_ERP_stats(SBJ,conditions,pipeline_id,an_id)
+function SBJ07a_ERP_stats(SBJ,conditions,proc_id,an_id)
 % Calculates ERPs, computes cluster-based statistics, and plots the results
 % clear all; %close all;
 
@@ -17,7 +17,7 @@ eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
 eval(['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m']);
 
 % Load Data
-load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
+load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',proc_id,'.mat'));
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'));
 
 % Select Conditions of Interest

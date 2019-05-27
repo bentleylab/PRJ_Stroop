@@ -1,8 +1,8 @@
-function SBJ04_preproc(SBJ,pipeline_id)
+function SBJ04_preproc(SBJ,proc_id)
 %% Preprocess data using fieldtrip
 % Inputs:
 %   SBJ [str]- name of the subject
-%   pipeline_id [str] - name of the pipeline containing proc_vars struct
+%   proc_id [str] - name of the pipeline containing proc struct
 
 % Parameters
 psd_bp       = 'yes';          % plot psds after filtering?
@@ -20,7 +20,7 @@ ft_defaults
 %% Load data
 fprintf('============== Loading Data %s ==============\n',SBJ);
 eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
-eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' proc_id '_vars.m']);
 
 data_all = {};
 for b_ix = 1:numel(SBJ_vars.block_name)
@@ -32,7 +32,7 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     if any(SBJ_vars.low_srate)
         import_fname = [SBJ_vars.dirs.import SBJ '_',num2str(SBJ_vars.low_srate(b_ix)),'hz',block_suffix,'.mat'];
     else
-        import_fname = [SBJ_vars.dirs.import SBJ '_',num2str(proc_vars.resample_freq),'hz',block_suffix,'.mat'];
+        import_fname = [SBJ_vars.dirs.import SBJ '_',num2str(proc.resample_freq),'hz',block_suffix,'.mat'];
     end
     load(import_fname);
     data_orig = data;
@@ -40,20 +40,20 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     %% High and low pass data
     fprintf('============== High and Low Pass Filtering %s ==============\n',SBJ);
     cfg           = [];
-    cfg.demean    = proc_vars.demean_yn;
+    cfg.demean    = proc.demean_yn;
     if numel(SBJ_vars.block_name)>1
         cfg.demean = 'yes';
     end
-    if proc_vars.lp_freq > data.fsample/2
+    if proc.lp_freq > data.fsample/2
         cfg.lpfilter = 'no';
     else
-        cfg.lpfilter = proc_vars.lp_yn;
-        cfg.lpfreq   = proc_vars.lp_freq;
+        cfg.lpfilter = proc.lp_yn;
+        cfg.lpfreq   = proc.lp_freq;
     end
-    cfg.hpfilter  = proc_vars.hp_yn;
-    cfg.hpfreq    = proc_vars.hp_freq;
-    if isfield(proc_vars,'hp_order')
-        cfg.hpfiltord = proc_vars.hp_order;
+    cfg.hpfilter  = proc.hp_yn;
+    cfg.hpfreq    = proc.hp_freq;
+    if isfield(proc,'hp_order')
+        cfg.hpfiltord = proc.hp_order;
     end
     data = ft_preprocessing(cfg,data);
     data_bp = data;
@@ -152,15 +152,15 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     % SBJ_vars.ch_lab.left_out = [left_out_ch{:}];
     
     %% Filter out line noise
-    fprintf('============== Filtering Line Noise %s via %s ==============\n',SBJ,proc_vars.notch_type);
+    fprintf('============== Filtering Line Noise %s via %s ==============\n',SBJ,proc.notch_type);
     
-    if strcmp(proc_vars.notch_type,'dft')
+    if strcmp(proc.notch_type,'dft')
         cfg           = [];
         cfg.dftfilter = 'yes'; % line noise removal using discrete fourier transform
         cfg.dftfreq   = SBJ_vars.notch_freqs;
         cfg.dftfreq(cfg.dftfreq > data.fsample/2) = [];
         data = ft_preprocessing(cfg,data);
-    elseif strcmp(proc_vars.notch_type,'bandstop')
+    elseif strcmp(proc.notch_type,'bandstop')
         % Calculate frequency limits
         bs_freq_lim = NaN([length(SBJ_vars.notch_freqs) 2]);
         for f_ix = 1:length(SBJ_vars.notch_freqs)
@@ -171,20 +171,20 @@ for b_ix = 1:numel(SBJ_vars.block_name)
         cfg.bsfilter = 'yes';
         cfg.bsfreq   = bs_freq_lim;
         data = ft_preprocessing(cfg,data);
-    elseif strcmp(proc_vars.notch_type,'cleanline')
+    elseif strcmp(proc.notch_type,'cleanline')
         data = fn_cleanline(data,SBJ_vars.notch_freqs);
     else
-        error('ERROR: proc_vars.notch_type type not in [dft, bandstop, cleanline]');
+        error('ERROR: proc.notch_type type not in [dft, bandstop, cleanline]');
     end
     
     if strcmp(psd_line,'yes')
-        psd_dir = strcat(SBJ_vars.dirs.preproc,'PSDs/',pipeline_id,'/');
+        psd_dir = strcat(SBJ_vars.dirs.preproc,'PSDs/',proc_id,'/');
         if ~exist(psd_dir,'dir')
             mkdir(psd_dir);
         end
         fn_plot_PSD_1by1_compare_save(data_reref.trial{1},data.trial{1},data_reref.label,data.label,...
-            data_reref.fsample,strcat(psd_dir,SBJ,'_PSD_',pipeline_id,block_suffix),...
-            'bp.reref',pipeline_id,psd_fig_type);
+            data_reref.fsample,strcat(psd_dir,SBJ,'_PSD_',proc_id,block_suffix),...
+            'bp.reref',proc_id,psd_fig_type);
     end
     
     data_all{b_ix} = data;
@@ -195,7 +195,7 @@ end
 data = fn_concat_blocks(data_all);
 
 %% Save data
-output_filename = strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat');
+output_filename = strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',proc_id,'.mat');
 fprintf('============== Saving %s ==============\n',output_filename);
 save(output_filename, '-v7.3', 'data');
 

@@ -85,7 +85,11 @@ elseif any(strcmp(conditions,grp_lab))
 else
     warning(['Stats not loaded for conditions: ' conditions]);
 end
-clear tmp
+tmp_st1 = load(stat_fname1,'st'); tmp_st2 = load(stat_fname2,'st');
+if any([~strcmp(tmp_an1.evnt_lab,tmp_st1.evnt_lab) ~strcmp(tmp_an2.evnt_lab,tmp_st2.evnt_lab)]);
+    error('an and st evnt_lab mismatch');
+end
+clear tmp tmp_st1 tmp_st2
 
 %% Quality checks
 % Check channel match between analyses

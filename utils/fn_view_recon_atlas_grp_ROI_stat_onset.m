@@ -1,9 +1,9 @@
-function fn_view_recon_atlas_grp_ROI_stat_onset(SBJs, pipeline_id, stat_id, an_id, reg_type, show_labels,...
+function fn_view_recon_atlas_grp_ROI_stat_onset(SBJs, proc_id, stat_id, an_id, reg_type, show_labels,...
                                  hemi, atlas_id, roi_id, plot_roi, tbin_id, varargin)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJs [cell array str] - subject IDs to plot
-%   pipeline_id [str] - name of analysis pipeline, used to pick elec file
+%   proc_id [str] - name of analysis pipeline, used to pick elec file
 %   stat_id [str] - ID of the stats
 %       'actv': red for active, blue for deactive, yellow for both
 %       NOPE: 'CI': inc vs. con via ft statistics (not run for all patients!)
@@ -108,7 +108,7 @@ end
 
 % Prep report
 out_dir = [root_dir 'PRJ_Stroop/results/HFA/GRP/' stat_id '/' an_id '/'];
-sig_report_fname = [out_dir 'GRP_' atlas_id '_' plot_roi '_' event_type '_sig_report.txt'];
+sig_report_fname = [out_dir 'GRP_' atlas_id '_' plot_roi '_' evnt_lab '_sig_report.txt'];
 if ~exist(out_dir,'dir')
     mkdir(out_dir);
 end
@@ -118,7 +118,7 @@ end
 sig_report = fopen(sig_report_fname,'a');
 
 %% Cluster info
-if strcmp(event_type,'stim');
+if strcmp(evnt_lab,'S');
     error('onsets for stim need more thought!');
 end
 [roi_list, ~] = fn_roi_label_styles(roi_id);
@@ -173,7 +173,7 @@ for sbj_ix = 1:numel(SBJs)
     
     %% Elec
     % Load elec struct
-    elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_mni',reg_suffix,'_',atlas_id,'_full.mat'];
+    elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_mni',reg_suffix,'_',atlas_id,'_full.mat'];
     if exist([elec_fname(1:end-4) '_' roi_id '.mat'],'file')
         elec_fname = [elec_fname(1:end-4) '_' roi_id '.mat'];
     end
@@ -248,10 +248,10 @@ for sbj_ix = 1:numel(SBJs)
                     %                 sig_ch{sbj_ix,grp_ix} = [sig_ch{sbj_ix,grp_ix} stat.label{ch_ix}];
                     sig_onset_ix = find(squeeze(qvals(grp_ix,stat_ix,:))<0.05,1);
                     sig_onsets   = stat.time(win_lim(sig_onset_ix,1));
-                    if strcmp(event_type,'resp')
+                    if strcmp(evnt_lab,'R')
                         elec_sbj{sbj_ix,grp_ix}.onset_ix(elec_ix) = sig_onset_ix(1);
                         elec_sbj{sbj_ix,grp_ix}.onset(elec_ix)    = sig_onsets(1);
-                    elseif strcmp(event_type,'stim') && (sig_onsets(1)<mean_RTs(sbj_ix))
+                    elseif strcmp(evnt_lab,'S') && (sig_onsets(1)<mean_RTs(sbj_ix))
                         elec_sbj{sbj_ix,grp_ix}.onset_ix(elec_ix) = sig_onset_ix(1);
                         elec_sbj{sbj_ix,grp_ix}.onset(elec_ix)    = sig_onsets(1);
                     end
@@ -266,10 +266,10 @@ for sbj_ix = 1:numel(SBJs)
                 % Convert the first onset of significance to time
                 onset_time = stat.time(mask_chunks(1,1));
                 % Exclude differences after the mean RT for this SBJ
-                if strcmp(event_type,'resp')
+                if strcmp(evnt_lab,'R')
                     elec_sbj{sbj_ix,numel(grp_lab)+1}.onset_ix(elec_ix) = mask_chunks(1,1);
                     elec_sbj{sbj_ix,numel(grp_lab)+1}.onset(elec_ix)    = onset_time;
-                elseif strcmp(event_type,'stim') && (onset_time<mean_RTs(sbj_ix))
+                elseif strcmp(evnt_lab,'S') && (onset_time<mean_RTs(sbj_ix))
                     elec_sbj{sbj_ix,numel(grp_lab)+1}.onset_ix(elec_ix) = mask_chunks(1,1);
                     elec_sbj{sbj_ix,numel(grp_lab)+1}.onset(elec_ix)    = onset_time;
                 end
@@ -277,7 +277,7 @@ for sbj_ix = 1:numel(SBJs)
         end
         
         %     % Normalize all onset times by mean reaction time
-        %     if strcmp(event_type,'stim')
+        %     if strcmp(evnt_lab,'S')
         %         for roi_ix = 1:size(all_onsets,2)
         %             for cond_ix = 1:size(all_onsets,3)
         %                 all_onsets{sbj_ix,roi_ix,cond_ix} = all_onsets{sbj_ix,roi_ix,cond_ix}./mean_RTs(sbj_ix);
@@ -421,9 +421,9 @@ end
 f = cell(size(cond_lab));
 for cond_ix = 1%:numel(cond_lab)
     if strcmp(stat_id,'actv') || strcmp(stat_id,'CSE')
-        fig_name = ['GRP_' stat_id '_' event_type '_' atlas_id '_' roi_id '_' plot_roi '_' hemi];
+        fig_name = ['GRP_' stat_id '_' evnt_lab '_' atlas_id '_' roi_id '_' plot_roi '_' hemi];
     else
-        fig_name = ['GRP_' cond_lab{cond_ix} '_' event_type '_' atlas_id '_' roi_id '_' plot_roi '_' hemi];
+        fig_name = ['GRP_' cond_lab{cond_ix} '_' evnt_lab '_' atlas_id '_' roi_id '_' plot_roi '_' hemi];
     end
     f{cond_ix} = figure('Name',fig_name);
     

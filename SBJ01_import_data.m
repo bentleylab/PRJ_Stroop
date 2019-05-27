@@ -1,6 +1,6 @@
 %% SBJ01_import_data.m
 % Extract data with fieldtrip and save out by data type
-function SBJ01_import_data(SBJ,pipeline_id)
+function SBJ01_import_data(SBJ,proc_id)
 
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
@@ -11,7 +11,7 @@ ft_defaults
 %% Load and preprocess the data
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
-proc_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m'];
+proc_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' proc_id '_vars.m'];
 eval(proc_vars_cmd);
 
 %% Process channel labels
@@ -167,9 +167,9 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     end
     
     %% Resample data
-    if strcmp(proc_vars.resample_yn,'yes') && (data.fsample > proc_vars.resample_freq)
+    if strcmp(proc.resample_yn,'yes') && (data.fsample > proc.resample_freq)
         cfg = [];
-        cfg.resamplefs = proc_vars.resample_freq;
+        cfg.resamplefs = proc.resample_freq;
         cfg.detrend = 'no';
         data = ft_resampledata(cfg, data);
         if ~isempty(SBJ_vars.ch_lab.eeg)

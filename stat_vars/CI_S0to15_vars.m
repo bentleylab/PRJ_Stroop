@@ -1,19 +1,14 @@
-event_type  = 'stim';           % event around which to cut trials
-trial_lim_s = [-0.5 2.5];       % window in SEC for cutting trials
-%plt_lim     = [-0.2 2];         % window for plotting these results
-demean_yn   = 'yes';
-bsln_lim    = [-0.25 -0.05];    % window in SEC for baseline correction
-stat_lim    = [0 1.5];            % window in SEC for stats
-n_boots     = 1000;             % Repetitions for non-parametric stats
-lp_yn       = 'yes';
-lp_freq     = 20;
-hp_yn       = 'yes';
-hp_freq     = 0.5;
+st.conditions = 'CI';
+
+% Stats parameters
+st.stat_lim    = [0 1.5];            % window in SEC for stats
+st.n_boots     = 500;             % Repetitions for non-parametric stats
+st.alpha    = 0.05;
 
 cfg_stat = [];
-cfg_stat.latency          = stat_lim;
+cfg_stat.latency          = st.stat_lim;
 cfg_stat.channel          = 'all';
-cfg_stat.parameter        = 'trial';
+cfg_stat.parameter        = 'powspctrm';
 cfg_stat.method           = 'montecarlo';
 cfg_stat.statistic        = 'ft_statfun_indepsamplesT';
 cfg_stat.correctm         = 'cluster';
@@ -22,8 +17,8 @@ cfg_stat.clusterstatistic = 'maxsum';
 cfg_stat.clustertail      = 0;
 cfg_stat.tail             = 0; %two sided
 cfg_stat.correcttail      = 'alpha'; %correct the .alpha for two-tailed test (/2)
-cfg_stat.alpha            = 0.05;
-cfg_stat.numrandomization = n_boots;
+cfg_stat.alpha            = st.alpha;
+cfg_stat.numrandomization = st.n_boots;
 cfg_stat.neighbours       = [];%neighbors;
 % cfg_stat.minnbchan        = 0;
 cfg_stat.ivar             = 1;  %row of design matrix containing independent variable

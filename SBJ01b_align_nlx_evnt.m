@@ -1,4 +1,4 @@
-function SBJ01b_align_nlx_evnt(SBJ, pipeline_id, block_ix, save_it)
+function SBJ01b_align_nlx_evnt(SBJ, proc_id, block_ix, save_it)
 % save_it == 0: don't save plots, compare to raw data
 %         == 1: save plots and data, compare to import
 error('fix mic alignment for saving .wav!');
@@ -20,7 +20,7 @@ ft_defaults
 
 %% SBJ vars
 eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
-eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' proc_id '_vars.m']);
 
 %% Read photodiode, NLX macro, clinical data
 % First check for invalid samples
@@ -54,7 +54,7 @@ else
     if any(SBJ_vars.low_srate)
         srate_str = num2str(SBJ_vars.low_srate(block_ix));
     else
-        srate_str = num2str(proc_vars.resample_freq);
+        srate_str = num2str(proc.resample_freq);
     end
     if numel(SBJ_vars.raw_file)>1
         error('only ready for single block SBJ');
@@ -154,8 +154,8 @@ if mic.fsample > clin.fsample
 end
 
 % % Remove extreme values
-% clin_thresh  = proc_vars.nlx_nk_align_std_thresh*std(clin.trial{1});
-% macro_thresh = proc_vars.nlx_nk_align_std_thresh*std(macro.trial{1});
+% clin_thresh  = proc.nlx_nk_align_std_thresh*std(clin.trial{1});
+% macro_thresh = proc.nlx_nk_align_std_thresh*std(macro.trial{1});
 % clin.trial{1}((clin.trial{1}>median(clin.trial{1})+clin_thresh)|(clin.trial{1}<median(clin.trial{1})-clin_thresh)) = median(clin.trial{1});
 % macro.trial{1}((macro.trial{1}>median(macro.trial{1})+macro_thresh)|(macro.trial{1}<median(macro.trial{1})-macro_thresh)) = median(macro.trial{1});
 

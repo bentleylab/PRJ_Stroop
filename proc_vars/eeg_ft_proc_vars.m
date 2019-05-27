@@ -20,8 +20,8 @@ proc_vars.notch_type    = 'bandstop';     % method for nothc filtering out line 
 proc_vars.rt_bounds = [0.3 2.0];          % bounds on a reasonable RT to be detected with KLA algorithm
 
 % Trial Cut Parameteres
-proc_vars.event_type    = 'stim';         % 'stim'/'resp': lock trial to these event
-proc_vars.trial_lim_s = [-0.25 2];      % data segments (in seconds) to grab around events
+proc_vars.evnt_lab      = 'S';         % 'S'/'R': lock trial to these event
+proc_vars.trial_lim_s   = [-0.25 2];      % data segments (in seconds) to grab around events
 proc_vars.RT_std_thresh = 3;              % rejection threshold for RTs
 
 % Varaince-Based Trial Rejection Parameters

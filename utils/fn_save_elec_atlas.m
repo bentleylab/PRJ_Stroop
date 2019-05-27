@@ -1,8 +1,8 @@
-function fn_save_elec_atlas(SBJ, pipeline_id, view_space, reg_type, atlas_id, reref)
+function fn_save_elec_atlas(SBJ, proc_id, view_space, reg_type, atlas_id, reref)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJ [str] - subject ID to plot
-%   pipeline_id [str] - name of analysis pipeline, used to pick elec file
+%   proc_id [str] - name of analysis pipeline, used to pick elec file
 %   view_space [str] - {'pat', 'mni'}
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
 %   atlas_id [str] - {'DK','Dx','Yeo7','Yeo17'} are the only ones implemented so far
@@ -32,7 +32,7 @@ else
 end
 
 %% Load elec struct
-load([SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,reref_suffix,'.mat']);
+load([SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,reref_suffix,'.mat']);
 
 %% Load Atlas
 atlas = fn_load_recon_atlas(SBJ,atlas_id);
@@ -75,7 +75,7 @@ if any(strcmp(atlas_id,{'DK','Dx'}))
 end
 
 %% Save elec strcut with atlas labels
-out_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,reref_suffix,'_',atlas_id,'.mat'];
+out_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,reref_suffix,'_',atlas_id,'.mat'];
 fprintf('Saving %s\n',out_fname);
 fprintf('==================================================================\n');
 save(out_fname,'-v7.3','elec');

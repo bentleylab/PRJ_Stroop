@@ -23,7 +23,7 @@ if strcmp(atlas_id,'Yeo7') || strcmp(atlas_id,'Yeo17')
 else
     elec_space = 'pat';
 end
-elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_' elec_space '_' atlas_id '.mat'];
+elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' elec_space '_' atlas_id '.mat'];
 load(elec_fname);
 
 %% Load FOOOF outputs

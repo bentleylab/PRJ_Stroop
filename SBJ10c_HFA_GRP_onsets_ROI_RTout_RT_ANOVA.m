@@ -1,4 +1,4 @@
-function SBJ10c_HFA_GRP_onsets_ROI_RTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_id,roi_id,...
+function SBJ10c_HFA_GRP_onsets_ROI_RTout_RT_ANOVA(SBJs,stat_id,proc_id,an_id,roi_id,...
                                                     atlas_id,gm_thresh,plt_id,save_fig,fig_vis,fig_filetype)
 % Load HFA analysis results for active and condition-differentiating
 %   epochs, plot a summary of those time period per electrode
@@ -73,7 +73,7 @@ for sbj_ix = 1:numel(SBJs)
     win_center = round(mean(win_lim,2));
     
     %% Load ROI and GM/WM info
-    elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_' atlas_id '_tis.mat'];
+    elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_pat_' atlas_id '_tis.mat'];
     load(elec_tis_fname);
     
     % Sort elecs by stat labels
@@ -121,7 +121,7 @@ for sbj_ix = 1:numel(SBJs)
         end
     end
     
-    clear SBJ SBJ_vars hfa stat einfo w2
+    clear SBJ SBJ_vars hfa elec stat w2
 end
 %% Compute medians per gROI
 median_onsets = NaN([numel(SBJs) numel(roi_list) numel(grp_lab)+1]);

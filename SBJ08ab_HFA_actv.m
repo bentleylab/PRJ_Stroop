@@ -1,9 +1,8 @@
-function SBJ08ab_HFA_actv(SBJ,an_id,actv_win)
+function SBJ08ab_HFA_actv(SBJ,an_id,stat_id)
 % Calculates activation relative to baseline via point wise t-test wtih FDR
 
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
-if ischar(actv_win); actv_win = str2num(actv_win); end
 
 %% Set up paths
 addpath([root_dir 'PRJ_Stroop/scripts/']);
@@ -16,7 +15,8 @@ SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 an_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
-% eval(['run /home/knight/hoycw/PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
+stat_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m'];
+eval(stat_vars_cmd);
 
 % Load Data
 hfa_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'.mat');
@@ -30,8 +30,9 @@ fprintf('===================================================\n');
 
 % Select data in stat window
 cfg_trim = [];
-cfg_trim.latency = stat_lim;
+cfg_trim.latency = st.stat_lim;
 hfa_stat = ft_selectdata(cfg_trim,hfa);
+sample_rate = (numel(hfa.time)-1)/(hfa.time(end)-hfa.time(1));
 
 actv_ch = {};
 actv_ch_epochs = {};
@@ -48,11 +49,11 @@ for ch_ix = 1:numel(hfa_stat.label)
 %     in IR32), so I'm trying the below function
 %     [h, crit_p, adj_ci_cvrg, adj_p]=fdr_bh(pvals,q,method,report);
     [~, ~, ~, qvals] = fdr_bh(pvals);
-    actv_mask = qvals<=0.05;
+    actv_mask = qvals<=st.alpha;
     actv_chunks = fn_find_chunks(actv_mask);
     actv_chunks(actv_mask(actv_chunks(:,1))==0,:) = [];
     actv_chunk_sz = diff(actv_chunks,1,2)+1;
-    actv_epochs = actv_chunks(actv_chunk_sz > actv_win,:);
+    actv_epochs = actv_chunks(actv_chunk_sz > sample_rate*st.actv_win,:);
     if ~isempty(actv_epochs)
         actv_ch = {actv_ch{:} hfa_stat.label{ch_ix}};
         actv_ch_epochs = {actv_ch_epochs{:}, hfa_stat.time(actv_epochs)};
@@ -60,10 +61,10 @@ for ch_ix = 1:numel(hfa_stat.label)
 end
 
 %% Save Results
-out_fname = strcat(hfa_fname(1:end-4),'_actv_mn',num2str(actv_win),'.mat');
+out_fname = strcat(hfa_fname(1:end-4),'_',stat_id,'.mat');
 fprintf('===================================================\n');
 fprintf('--- Saving %s ------------------\n',out_fname);
 fprintf('===================================================\n');
-save(out_fname,'-v7.3','actv_ch','actv_ch_epochs','pvals','qvals');
+save(out_fname,'-v7.3','actv_ch','actv_ch_epochs','pvals','qvals','st');
 
 end

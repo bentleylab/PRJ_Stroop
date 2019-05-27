@@ -1,4 +1,4 @@
-function [at_epochs] = fn_compile_epochs_full2at(SBJ,pipeline_id)
+function [at_epochs] = fn_compile_epochs_full2at(SBJ,proc_id)
 %% Wrapper function to convert multiple blocks of preclean (full) epochs to combined preproc (analysis_time)
 % INPUTS:
 %   SBJ [str] - ID of dataset to process
@@ -11,7 +11,7 @@ function [at_epochs] = fn_compile_epochs_full2at(SBJ,pipeline_id)
 addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
 
 % Load SBJ and processing vars
-eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' proc_id '_vars.m']);
 eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
 
 % Load bad_epochs from preclean data and adjust to analysis_time
@@ -41,7 +41,7 @@ for b_ix = 2:numel(SBJ_vars.block_name)
         if SBJ_vars.low_srate(b_ix)~=0
             at_epochs{b_ix} = at_epochs{b_ix}+block_len(1:b_ix-1)*SBJ_vars.low_srate(b_ix);
         else
-            at_epochs{b_ix} = at_epochs{b_ix}+block_len(1:b_ix-1)*proc_vars.resample_freq;
+            at_epochs{b_ix} = at_epochs{b_ix}+block_len(1:b_ix-1)*proc.resample_freq;
         end
     end
 end

@@ -18,15 +18,15 @@ ft_defaults
 eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
 eval(['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m']);
 
-if strcmp(pipeline_id,'main_ft')
-    load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
+if strcmp(proc_id,'main_ft')
+    load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',proc_id,'.mat'));
     % Load elec
     if strcmp(atlas_id,'Yeo7') || strcmp(atlas_id,'Yeo17')
         elec_space = 'mni_v';
     else
         elec_space = 'pat';
     end
-    elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_' elec_space '_' atlas_id '.mat'];
+    elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' elec_space '_' atlas_id '.mat'];
     load(elec_fname);
     % Select ROI-specific elecs
     [roi_list, ~] = fn_roi_label_styles(roi_id);
@@ -39,7 +39,7 @@ if strcmp(pipeline_id,'main_ft')
     cfgs = []; cfgs.channel = atlas_in_elecs;
     elec = fn_select_elec(cfgs, elec);
     data = ft_selectdata(cfgs,data);
-elseif strcmp(pipeline_id,'srate')
+elseif strcmp(proc_id,'srate')
     if any(SBJ_vars.low_srate)
         load(strcat(SBJ_vars.dirs.import,SBJ,'_',num2str(SBJ_vars.low_srate(1)),'hz.mat'));
     else

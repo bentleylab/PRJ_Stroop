@@ -1,9 +1,9 @@
-function fn_view_recon_atlas_grp_stat(SBJs, pipeline_id, stat_id, an_id, reg_type, show_labels,...
+function fn_view_recon_atlas_grp_stat(SBJs, proc_id, stat_id, an_id, reg_type, show_labels,...
                                  hemi, atlas_id, roi_id, plot_out, varargin)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJs [cell array str] - subject IDs to plot
-%   pipeline_id [str] - name of analysis pipeline, used to pick elec file
+%   proc_id [str] - name of analysis pipeline, used to pick elec file
 %   stat_id [str] - ID of the stats
 %       'actv': red for active, blue for deactive, yellow for both
 %       NOPE: 'CI': inc vs. con via ft statistics (not run for all patients!)
@@ -103,7 +103,7 @@ for sbj_ix = 1:numel(SBJs)
     
     % Load elec struct
     try
-        elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_mni',reg_suffix,'_',atlas_id,'_full.mat'];
+        elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_mni',reg_suffix,'_',atlas_id,'_full.mat'];
         if exist([elec_fname(1:end-4) '_' roi_id '.mat'],'file')
             elec_fname = [elec_fname(1:end-4) '_' roi_id '.mat'];
         end

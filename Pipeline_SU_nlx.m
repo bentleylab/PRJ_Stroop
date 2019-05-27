@@ -18,8 +18,8 @@ ft_defaults
 %% Step 0 - Processing Variables
 % SBJ = 'IR';
 
-pipeline_id = 'SU_nlx';
-eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
+proc_id = 'SU_nlx';
+eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' proc_id '_vars.m']);
 
 %% ========================================================================
 %   Step 1- Load SBJ and Processing Variable Structures
@@ -31,15 +31,15 @@ eval(SBJ_vars_cmd);
 %   Step 2- Quick Import and Processing for Data Cleaning/Inspection
 %  ========================================================================
 SU00_extract_evnt(SBJ)
-% SU00_extract_data(SBJ,proc_vars.resample_freq??)
+% SU00_extract_data(SBJ,proc.resample_freq??)
 % block_prefix = '';
-% !!! outdated command SBJ00_cleaning_prep(SBJ,SBJ_vars.raw_file,proc_vars.plot_psd,block_prefix);
+% !!! outdated command SBJ00_cleaning_prep(SBJ,SBJ_vars.raw_file,proc.plot_psd,block_prefix);
 
 %% ========================================================================
 %   Step 3- Import Data, Resample, and Save Individual Data Types
 %  ========================================================================
 % FILE TOO BIG, RUNNING THIS VIA SGE
-% SBJ01_import_data(SBJ,proc_vars.resample_freq);
+% SBJ01_import_data(SBJ,proc.resample_freq);
 
 %% ========================================================================
 %   Step 4a- Manually Clean Photodiode Trace: Load & Plot
@@ -106,10 +106,10 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     %% ========================================================================
     %   Step 5- Parse Event Traces into Behavioral Data
     %  ========================================================================
-    if proc_vars.resample_freq~=1000
+    if proc.resample_freq~=1000
         error('ERROR!!! SBJ02_behav_parse assumes 1 kHz neural sampling rate!!!\n');
     end
-    SU01_behav_parse(SBJ,b_ix,proc_vars.rt_bounds,1,1)
+    SU01_behav_parse(SBJ,b_ix,proc.rt_bounds,1,1)
     % Be sure to save the two figures coming from this function!
     %   i.e., SBJ_photodiode_segmentation.fig & SBJ_events.fig
 end
@@ -123,7 +123,7 @@ fig_vis     = 'on';
 save_plots  = 1;
 close_plots = 0;
 for an_ix = 1%:numel(an_opts)
-    SU02_PSTH_ft(SBJ,conditions,pipeline_id,an_opts{an_ix},plt_opts{an_ix},plot_ISI,fig_vis,save_plots,close_plots);
+    SU02_PSTH_ft(SBJ,conditions,proc_id,an_opts{an_ix},plt_opts{an_ix},plot_ISI,fig_vis,save_plots,close_plots);
 end
 
 %% ========================================================================
@@ -131,9 +131,9 @@ end
 %  ========================================================================
 % look at recon and create spreadsheet of general ROI, WM/GM, etc.
 %   save that as tsv
-% fn_compile_elec_struct(SBJ,pipeline_id,'pat')
-% fn_compile_elec_struct(SBJ,pipeline_id,'mni')
-% fn_compile_einfo(SBJ,pipeline_id)
+% fn_compile_elec_struct(SBJ,proc_id,'pat')
+% fn_compile_elec_struct(SBJ,proc_id,'mni')
+% fn_compile_einfo(SBJ,proc_id)
 
 % %% ========================================================================
 % %   Step 7- Manually Correct Reaction Times
@@ -166,10 +166,10 @@ end
 % %% ========================================================================
 % %   Step 8- Preprocess Neural Data
 % %  ========================================================================
-% SBJ04_preproc(SBJ,pipeline_id)
+% SBJ04_preproc(SBJ,proc_id)
 % 
 % % Second visual cleaning
-% load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
+% load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',proc_id,'.mat'));
 % bad_preclean = load(strcat(SBJ_vars.dirs.events,SBJ,'_bob_bad_epochs_preclean',block_suffix,'.mat'));
 % bad_at = fn_convert_epochs_full2at(bad_preclean.bad_epochs,SBJ_vars.analysis_time{b_ix},...
 %                                             strcat(SBJ_vars.dirs.preproc,SBJ,'_preclean',block_suffix,'.mat'),1);
@@ -195,7 +195,7 @@ end
 %         block_suffix = strcat('_',SBJ_vars.block_name{b_ix});
 %         % Get block length
 %         tmp = load(strcat(SBJ_vars.dirs.import,SBJ,'_',...
-%             num2str(proc_vars.resample_freq),'hz',block_suffix,'.mat'));
+%             num2str(proc.resample_freq),'hz',block_suffix,'.mat'));
 %         block_lens(b_ix) = size(tmp.data.trial{1},2);
 %         block_times(b_ix) = tmp.data.time{1}(end);
 %     else
@@ -247,14 +247,14 @@ end
 % clear ti block_lens block_times block_trlcnt block_blkcnt
 % 
 % % Toss trials based on behavior and cleaning with Bob
-% trial_info_clean = SBJ05_reject_behavior(SBJ,trial_info,pipeline_id);
+% trial_info_clean = SBJ05_reject_behavior(SBJ,trial_info,proc_id);
 % 
 % %% ========================================================================
 % %   Step 10a- Prepare Variance Estimates for Variance-Based Trial Rejection
 % %  ========================================================================
 % % Load data for visualization
-% % load(strcat(preproc_dir,SBJ,'_proc_vars.mat'));
-% load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
+% % load(strcat(preproc_dir,SBJ,'_proc.mat'));
+% load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',proc_id,'.mat'));
 % 
 % % Select channels of interest
 % cfg = [];
@@ -262,15 +262,15 @@ end
 % data = ft_selectdata(cfg,data);
 % 
 % % Segment into trials
-% if strcmp(proc_vars.event_type,'stim')
+% if strcmp(proc.event_type,'stim')
 %     events = trial_info_clean.word_onset;
-% elseif strcmp(proc_vars.event_type,'resp')
+% elseif strcmp(proc.event_type,'resp')
 %     events = trial_info_clean.resp_onset;
 % else
-%     error(strcat('ERROR: unknown event_type ',proc_vars.event_type));
+%     error(strcat('ERROR: unknown event_type ',proc.event_type));
 % end
 % trials = fn_ft_cut_trials_equal_len(data,events,...
-%     trial_info_clean.condition_n',proc_vars.trial_lim_s*data.fsample);
+%     trial_info_clean.condition_n',proc.trial_lim_s*data.fsample);
 % 
 % % Compute Derivative
 % cfg = [];
@@ -281,18 +281,18 @@ end
 % [trial_mat,~] = fn_format_trials_ft2KLA(trials);
 % var_mat = std(trial_mat,0,3);
 % ch_var_mean = mean(var_mat,2);
-% ch_var_thresh = mean(ch_var_mean)+std(ch_var_mean)*proc_vars.var_std_warning_thresh;
+% ch_var_thresh = mean(ch_var_mean)+std(ch_var_mean)*proc.var_std_warning_thresh;
 % 
 % trial_var_mean = mean(var_mat,1);
-% trial_var_thresh = mean(trial_var_mean)+std(trial_var_mean)*proc_vars.var_std_warning_thresh;
+% trial_var_thresh = mean(trial_var_mean)+std(trial_var_mean)*proc.var_std_warning_thresh;
 % 
 % [trial_mat_dif,~] = fn_format_trials_ft2KLA(trials_dif);
 % var_mat_dif = std(trial_mat_dif,0,3);
 % ch_var_mean_dif = mean(var_mat_dif,2);
-% ch_var_dif_thresh = mean(ch_var_mean_dif)+std(ch_var_mean_dif)*proc_vars.var_std_warning_thresh;
+% ch_var_dif_thresh = mean(ch_var_mean_dif)+std(ch_var_mean_dif)*proc.var_std_warning_thresh;
 % 
 % trial_var_mean_dif = mean(var_mat_dif,1);
-% trial_var_dif_thresh = mean(trial_var_mean_dif)+std(trial_var_mean_dif)*proc_vars.var_std_warning_thresh;
+% trial_var_dif_thresh = mean(trial_var_mean_dif)+std(trial_var_mean_dif)*proc.var_std_warning_thresh;
 % 
 % % Report on potentially bad channels
 % bad_var_ch      = trials.label(abs(ch_var_mean) > ch_var_thresh);
@@ -354,12 +354,12 @@ end
 % 
 % % Reload data and re-select channels of interest after excluding bad ones
 % clear data
-% load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
+% load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',proc_id,'.mat'));
 % cfg = [];
 % cfg.channel = SBJ_vars.ch_lab.ROI;
 % data = ft_selectdata(cfg,data);
 % trials = fn_ft_cut_trials_equal_len(data,events,...
-%     trial_info_clean.condition_n',proc_vars.trial_lim_s*data.fsample);
+%     trial_info_clean.condition_n',proc.trial_lim_s*data.fsample);
 % 
 % % Compute Derivative
 % cfg = [];

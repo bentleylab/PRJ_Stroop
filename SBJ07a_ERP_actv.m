@@ -1,4 +1,4 @@
-function SBJ07a_ERP_actv(SBJ,pipeline_id,an_id)
+function SBJ07a_ERP_actv(SBJ,proc_id,an_id)
 % Calculates ERPs and inter-trial phase coherence to identify which ERPs have
 %   consistent phase locking and are likely true evoked responses, and should
 %   therefore be used in future analyses
@@ -21,7 +21,7 @@ eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
 eval(['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m']);
 
 % Load Data
-load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
+load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',proc_id,'.mat'));
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'));
 
 % Select Channel(s)

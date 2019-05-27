@@ -146,8 +146,9 @@ end
 %% Proportions of significant effects across ROI
 stat_id     = 'corrRT_CNI_pcon_WL200_WS50';
 atlas_id    = 'Dx';
-an_opts     = {'HGh_S_zbtS_trl2to151_fLog_sm0_stat15','HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1'};
-% an_opts     = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
+% an_opts     = {'HGh_S_zbtS_trl2to151_fLog_sm0_stat15','HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1'};
+an_opts     = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
+% an_opts  = {'HGm_S_zbtA_trl2to151_sm0_wn100_stat15','HGm_R_zbtA_trl5to101_sm0_wn100_stat5to1'};
 actv_win    = 100;
 plt_id      = 'onsets_trl0to15_evnt_roi';
 roi_id      = 'gROI';%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
@@ -157,13 +158,13 @@ plot_scat   = 0;
 fig_vis     = 'on';
 fig_ftype   = 'svg';
 
-for an_ix = 1:2
+for an_ix = 2
     % with SBJ scatter (for myself to understand)
     SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,stat_id,proc_id,...
         an_opts{an_ix},actv_win,roi_id,atlas_id,gm_thresh,plt_id,plot_out,1,save_fig,fig_vis,fig_ftype);
     % with just errbr (for nice plot)
-    SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,stat_id,proc_id,...
-        an_opts{an_ix},actv_win,roi_id,atlas_id,gm_thresh,plt_id,plot_out,plot_scat,save_fig,fig_vis,fig_ftype);
+%     SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,stat_id,proc_id,...
+%         an_opts{an_ix},actv_win,roi_id,atlas_id,gm_thresh,plt_id,plot_out,plot_scat,save_fig,fig_vis,fig_ftype);
     % with CSE (no results with HGh! try again later with HGm...)
 %     SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_CSE_RT_ANOVA_ROI(SBJs,stat_id,proc_id,...
 %         an_opts{an_ix},roi_id,atlas_id,gm_thresh,plt_id,plot_out,plot_scat,save_fig,fig_vis,fig_ftype);

@@ -1,7 +1,8 @@
-function SBJ09b_TFR_plot_stats(SBJ,conditions,pipeline_id,an_id,plt_id,save_fig,fig_vis)
+function SBJ09b_TFR_plot_stats(SBJ,conditions,proc_id,an_id,plt_id,save_fig,fig_vis)
 % Plots TFRs computed in SBJ09a_TFR_stats
 %   3 TFRs in a row: (1) con; (2) inc; (3) inc-con with stats
 % clear all; %close all;
+error('not adapted to stat_id yet');
 
 %% Check which root directory
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
@@ -40,7 +41,7 @@ for cond_ix = 1:numel(cond_lab)
 end
 
 % Load ROI and GM/WM info
-elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_Dx.mat'];
+elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_pat_Dx.mat'];
 load(elec_fname);
 % Select TFR elecs
 cfgs = []; cfgs.channel = stat.label;

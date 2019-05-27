@@ -1,8 +1,8 @@
-function SBJ02_behav_parse(SBJ, block, pipeline_id, plot_it, save_it)
+function SBJ02_behav_parse(SBJ, block, proc_id, plot_it, save_it)
 %
 % SBJ [str] -- uniquely identifies the subject, e.g., 'IR54'
 % block [int] -- index of which block of data should be analyzed
-% pipeline_id [str] - name of the pipeline containing proc_vars struct
+% proc_id [str] - name of the pipeline containing proc struct
 % plot_it [0/1] -- optional. plot_it = 1 to plot detected events
 % save_it [0/1] -- whether to save output
 
@@ -14,7 +14,7 @@ else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtri
 
 % Import helper functions to Matlab path
 addpath(genpath([root_dir 'PRJ_Stroop/scripts/utils/']));
-eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' proc_id '_vars.m']);
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 if numel(SBJ_vars.raw_file)>1
@@ -32,9 +32,9 @@ output_fname = [SBJ_vars.dirs.events SBJ '_trial_info_auto',block_suffix,'.mat']
 if any(SBJ_vars.low_srate)
     nrl_srate = SBJ_vars.low_srate(block);
 else
-    nrl_srate = proc_vars.resample_freq;
+    nrl_srate = proc.resample_freq;
 end
-rt_window = proc_vars.rt_bounds;
+rt_window = proc.rt_bounds;
 
 % Load input data
 fprintf('Loading %s\n',evnt_fname);

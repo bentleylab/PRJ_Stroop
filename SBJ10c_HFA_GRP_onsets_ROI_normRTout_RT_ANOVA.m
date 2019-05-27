@@ -1,4 +1,4 @@
-function SBJ10c_HFA_GRP_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,pipeline_id,an_id,median_yn,roi_id,...
+function SBJ10c_HFA_GRP_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,proc_id,an_id,median_yn,roi_id,...
                                                     atlas_id,gm_thresh,plt_id,save_fig,fig_vis,fig_filetype)
 % Load HFA analysis results for active and condition-differentiating
 %   epochs, plot a summary of those time period per electrode
@@ -82,14 +82,14 @@ for sbj_ix = 1:numel(SBJs)
     
     %% Load ROI and GM/WM info
     if any(strcmp(atlas_id,{'DK','Dx'})) % these have tissue probabilities
-        elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_' view_space '_' atlas_id '_tis.mat'];
+        elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' view_space '_' atlas_id '_tis.mat'];
         load(elec_tis_fname);
     else
         % Load tissue prob
-        elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_Dx_tis.mat'];
+        elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_pat_Dx_tis.mat'];
         load(elec_tis_fname);
         tiss_prob = elec.tissue_prob;
-        elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_' view_space '_' atlas_id '.mat'];
+        elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' view_space '_' atlas_id '.mat'];
         load(elec_fname);
         elec.tissue_prob = tiss_prob;
     end
@@ -147,7 +147,7 @@ for sbj_ix = 1:numel(SBJs)
             end
         end
     end
-    clear SBJ SBJ_vars hfa stat einfo w2
+    clear SBJ SBJ_vars hfa stat elec w2
 end
 %% Compute medians per gROI
 if median_yn

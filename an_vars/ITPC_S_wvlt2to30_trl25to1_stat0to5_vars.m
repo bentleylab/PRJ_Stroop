@@ -1,3 +1,4 @@
+error('add an. and change stat to own file');
 event_type  = 'stim';           % event around which to cut trials
 % trial_lim_s will be expanded in SBJ09a by t_ftimwin/2 on front and back to avoid NaNs within real trial_lim_s
 %   cfg_tfr.method = 'mtmconvol': expand by t_ftimewin/2

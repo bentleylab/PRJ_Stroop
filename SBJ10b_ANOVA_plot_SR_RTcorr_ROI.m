@@ -1,4 +1,4 @@
-function SBJ10b_ANOVA_plot_SR_RTcorr_ROI(SBJ,pipeline_id,stat_id,an_id_s,an_id_r,...
+function SBJ10b_ANOVA_plot_SR_RTcorr_ROI(SBJ,proc_id,stat_id,an_id_s,an_id_r,...
                                         atlas_id,roi_id,plt_id,save_fig,fig_vis,fig_filetype)
 % Plots ANOVA results
 % clear all; %close all;
@@ -44,7 +44,7 @@ clear tmp
 sample_rate = (numel(stat{1}.time)-1)/(stat{1}.time(end)-stat{1}.time(1));
 
 % Load ROI and GM/WM info
-elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' pipeline_id '_pat_' atlas_id '_tis.mat'];
+elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_pat_' atlas_id '_tis.mat'];
 load(elec_tis_fname);
 
 % Sort elecs by stat labels

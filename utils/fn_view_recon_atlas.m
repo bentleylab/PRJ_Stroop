@@ -1,9 +1,9 @@
-function fn_view_recon_atlas(SBJ, pipeline_id, view_space, reg_type, show_labels,...
+function fn_view_recon_atlas(SBJ, proc_id, view_space, reg_type, show_labels,...
                              hemi, atlas_id, roi_id, plot_out, varargin)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJ [str] - subject ID to plot
-%   pipeline_id [str] - name of analysis pipeline, used to pick elec file
+%   proc_id [str] - name of analysis pipeline, used to pick elec file
 %       'full' for the bipolar logic combined
 %   view_space [str] - {'pat', 'mni'}
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
@@ -57,8 +57,8 @@ if strcmp(reg_type,'v') || strcmp(reg_type,'s')
 else
     reg_suffix = '';                % Patient space
 end
-if strcmp(pipeline_id,'full') || any(strcmp(roi_id,{'tissueC','tisue'}))
-    pipeline_id = 'main_ft';
+if strcmp(proc_id,'full') || any(strcmp(roi_id,{'tissueC','tisue'}))
+    proc_id = 'main_ft';
     elec_suffix = '_full';
 else
     elec_suffix = '';
@@ -66,7 +66,7 @@ end
 
 %% Load elec struct
 try
-    elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_',view_space,reg_suffix,'_',atlas_id,elec_suffix,'.mat'];
+    elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,'_',atlas_id,elec_suffix,'.mat'];
     if exist([elec_fname(1:end-4) '_' roi_id '.mat'],'file')
         elec_fname = [elec_fname(1:end-4) '_' roi_id '.mat'];
     end
@@ -75,7 +75,7 @@ catch
     answer = input(['Could not load requested file: ' elec_fname ...
         '\nDo you want to run the atlas matching now? "y" or "n"\n'],'s');
     if strcmp(answer,'y')
-        fn_save_elec_atlas(SBJ,pipeline_id,view_space,reg_type,atlas_id);
+        fn_save_elec_atlas(SBJ,proc_id,view_space,reg_type,atlas_id);
     else
         error('not running atlas assignment, exiting...');
     end

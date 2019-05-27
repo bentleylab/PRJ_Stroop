@@ -1,8 +1,8 @@
-function fn_copy_elec_atlas_pat2mni(SBJ,pipeline_id,reg_type,atlas_id,varargin)
+function fn_copy_elec_atlas_pat2mni(SBJ,proc_id,reg_type,atlas_id,varargin)
 %% Copy atlas+tissue info from patient space elec to mni space elec
 % INPUTS:
 %   SBJ [str] - name of subject
-%   pipeline_id [str] - name of analysis pipeline
+%   proc_id [str] - name of analysis pipeline
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
 %   atlas_id [str] - {'DK','Dx','Yeo7','Yeo17'}
 
@@ -26,7 +26,7 @@ end
 
 %% Load variables
 eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
-eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' pipeline_id '_proc_vars.m']);
+eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' proc_id '_vars.m']);
 
 %% Load Elec struct
 if strcmp(reg_type,'v') || strcmp(reg_type,'s')
@@ -35,9 +35,9 @@ else
     error('reg_type must be selected for mni space');
 end
 
-pat_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_pat','_',atlas_id,'_full.mat'];
-mni_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_mni',reg_suffix,'.mat'];
-out_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',pipeline_id,'_mni',reg_suffix,'_',atlas_id,'_full.mat'];
+pat_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_pat','_',atlas_id,'_full.mat'];
+mni_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_mni',reg_suffix,'.mat'];
+out_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_mni',reg_suffix,'_',atlas_id,'_full.mat'];
 if exist('roi_id','var')
     if exist([pat_fname(1:end-4) '_' roi_id '.mat'],'file')
         pat_fname = [pat_fname(1:end-4) '_' roi_id '.mat'];
