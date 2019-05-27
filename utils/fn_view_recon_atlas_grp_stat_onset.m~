@@ -34,10 +34,10 @@ if ~isempty(varargin)
             view_angle = varargin{v+1};
         elseif strcmp(varargin{v},'mesh_alpha') && varargin{v+1}>0 && varargin{v+1}<=1
             mesh_alpha = varargin{v+1};
-%         elseif strcmp(varargin{v},'save_fig')
-%             save_fig = varargin{v+1};
-%         elseif strcmp(varargin{v},'fig_ftype')
-%             fig_ftype = varargin{v+1};
+        elseif strcmp(varargin{v},'save_fig')
+            save_fig = varargin{v+1};
+        elseif strcmp(varargin{v},'fig_ftype')
+            fig_ftype = varargin{v+1};
         else
             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
         end
@@ -52,12 +52,12 @@ end
 if ~exist('view_angle','var')
     view_angle = fn_get_view_angle(hemi,'');
 end
-% if ~exist('save_fig','var')
-%     save_fig = 0;
-% end
-% if ~exist('fig_ftype','var')
-%     fig_ftype = 'fig';
-% end
+if ~exist('save_fig','var')
+    save_fig = 0;
+end
+if ~exist('fig_ftype','var')
+    fig_ftype = 'fig';
+end
 if ~exist('mesh_alpha','var')
     % assume SEEG
     mesh_alpha = 0.3;
@@ -340,11 +340,11 @@ mesh = fn_load_recon_mesh([],'mni',reg_type,hemi);
 f = cell(size(cond_lab));
 for cond_ix = 1%:numel(cond_lab)
     if strcmp(stat_id,'actv') || strcmp(stat_id,'CSE')
-        fig_name = ['GRP_' stat_id '_' an_id];
+        plot_name = ['GRP_' stat_id '_' an_id];
     else
-        fig_name = ['GRP_ANOVA_' cond_lab{cond_ix} '_' stat_id '_' an_id];
+        plot_name = ['GRP_ANOVA_' cond_lab{cond_ix} '_' stat_id '_' an_id];
     end
-    f{cond_ix} = figure('Name',fig_name);
+    f{cond_ix} = figure('Name',plot_name);
     
     % Plot 3D mesh
     ft_plot_mesh(mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
@@ -368,9 +368,9 @@ for cond_ix = 1%:numel(cond_lab)
         '(i.e., uncheck them within the figure), and then hit ''l'' on the keyboard\n'])
     set(f{cond_ix}, 'windowkeypressfcn',   @cb_keyboard);
     
-%     if save_fig
-%         fig_fname = [out_dir fig_name fig_ftype];
-%         saveas(gcf,fig_fname);
-%     end
+    if save_fig
+        fig_fname = [out_dir fig_name fig_ftype];
+        saveas(gcf,fig_fname);
+    end
 end
 

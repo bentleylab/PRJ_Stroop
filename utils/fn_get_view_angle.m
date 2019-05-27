@@ -2,6 +2,11 @@ function view_angle = fn_get_view_angle(hemi,roi_id)
 %% Define the view angle given hemisphere and ROI
 %   OFC = bottom
 
+% If no ROI, assume lateral view
+if isempty(roi_id)
+    roi_id = 'LPFC';
+end
+
 if strcmp(roi_id,'OFC')
     view_angle = [0 -90];   % from the bottom
 elseif strcmp(hemi,'l')

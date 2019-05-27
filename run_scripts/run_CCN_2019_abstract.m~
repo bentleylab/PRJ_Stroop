@@ -108,7 +108,7 @@ end
 
 %% Plot CNI sig onsets on recon
 stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
-an_id    = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';%,'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
+an_id    = 'HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1';
 tbin_id  = 'cnts';
 reg_type = 'v';
 show_labels = 0;
@@ -116,19 +116,12 @@ atlas_id = 'Dx';
 roi_id        = 'gROI';
 plot_roi_opts = {{'l','lat'},{'r','lat'},{'l','MPFC'},{'r','MPFC'},{'l','deep'},{'r','deep'},{'b','OFC'}};
 
-% individual ROIs
 for roi_ix = 1:numel(plot_roi_opts)
     fn_view_recon_atlas_grp_ROI_stat_onset(SBJs, proc_id, stat_id, an_id, reg_type, show_labels,...
                                         plot_roi_opts{roi_ix}{1}, atlas_id, roi_id, plot_roi_opts{roi_ix}{2}, tbin_id,...
                                         'save_fig', 1, 'fig_ftype', 'svg');
 end
 
-% all ROIs
-fn_view_recon_atlas_grp_stat_onset(SBJs, proc_id, stat_id, an_id, reg_type, show_labels,...
-                                 'r', atlas_id, roi_id, tbin_id)
-fn_view_recon_atlas_grp_stat_onset(SBJs, proc_id, stat_id, an_id, reg_type, show_labels,...
-                                 'l', atlas_id, roi_id, tbin_id)
-                             
 %% HG active examples
 % SBJ         = 'IR74';
 % conditions  = 'CNI';
@@ -195,7 +188,7 @@ for roi_ix = 1%:numel(roi_opts)
 %             % Violin Plots
             SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,proc_id,an_opts{an_ix},roi_opts{roi_ix},...
                                                     atlas_opts{roi_ix},gm_thresh,plt_opts{an_ix},1,'on',fig_ftype)
-            % Music staff + histogram of onsets
+                                                
 %             SBJ10c_HFA_GRP_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,proc_id,an_opts{an_ix},median_yn,roi_opts{roi_ix},...
 %                                                     atlas_opts{roi_ix},gm_thresh,plt_opts{an_ix},1,'on',fig_ftype)
             % Pair differences

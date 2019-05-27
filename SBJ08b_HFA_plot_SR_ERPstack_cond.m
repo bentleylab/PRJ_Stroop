@@ -189,7 +189,7 @@ elseif any(strcmp(conditions,grp_lab))
         stat{sr_ix}.mask = zeros([numel(w2{sr_ix}.label) size(hfa{sr_ix}.time,2)]);
         
         % Get Sliding Window Parameters
-        win_lim = fn_sliding_window_lim(hfa{sr_ix}.time,round(win_len*sample_rate),round(win_step*sample_rate));
+        win_lim = fn_sliding_window_lim(hfa{sr_ix}.time,round(st.win_len*sample_rate),round(st.win_step*sample_rate));
         [~, offset_ix] = min(abs(hfa{sr_ix}.time-(w2{sr_ix}.time(1)-win_len/2)));
         
         for ch_ix = 1:numel(stat{1}.label)

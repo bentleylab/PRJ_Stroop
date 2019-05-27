@@ -99,7 +99,7 @@ for sbj_ix = 1:numel(SBJs)
     end
     
     % Get Time Bin and Sliding Window Parameters
-    win_lim    = fn_sliding_window_lim(stat.time,round(win_len*sample_rate),round(win_step*sample_rate));
+    win_lim    = fn_sliding_window_lim(stat.time,round(st.win_len*sample_rate),round(st.win_step*sample_rate));
     win_center = round(mean(win_lim,2));
     if strcmp(tbin_id,'eqROI')  %!!! check for 1st 2 letters = 'eq'
         % 4 ROIs = R time bins: -0.5, -0.1, 0.25, 0.6, 1.0

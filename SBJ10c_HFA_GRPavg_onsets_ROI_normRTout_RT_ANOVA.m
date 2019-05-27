@@ -29,7 +29,7 @@ stat_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.
 eval(stat_vars_cmd);
 
 % Get condition info
-[grp_lab, grp_colors, grp_style] = fn_group_label_styles(model_lab);
+[grp_lab, grp_colors, grp_style] = fn_group_label_styles(st.model_lab);
 cond_lab = [grp_lab, {'corr(RT)'}];
 
 % Get event timing
@@ -63,25 +63,19 @@ for sbj_ix = 1:numel(SBJs)
     eval(SBJ_vars_cmd);
     
     % Compute mean RT
-    if strcmp(event_type,'stim')
+    if strcmp(st.evnt_lab,'S')
         load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
         % Compute mean RT
         mean_RTs(sbj_ix) = mean(trial_info.response_time);
     end
     % Load data
-    load(strcat(SBJ_vars.dirs.proc,SBJ,'_ANOVA_ROI_',stat_id,'_',an_id,'.mat'));
+    load(strcat(SBJ_vars.dirs.proc,SBJ,'_mANOVA_ROI_',stat_id,'_',an_id,'.mat'));
     
     %% Process parameters
     sample_rate = (numel(stat.time)-1)/(stat.time(end)-stat.time(1));
     
-    % FDR correct pvalues for ANOVA
-    qvals = NaN(size(w2.pval));
-    for ch_ix = 1:numel(stat.label)
-        [~, ~, ~, qvals(:,ch_ix,:)] = fdr_bh(squeeze(w2.pval(:,ch_ix,:)));%,0.05,'pdep','yes');
-    end
-    
     % Get Sliding Window Parameters
-    win_lim    = fn_sliding_window_lim(stat.time,round(win_len*sample_rate),round(win_step*sample_rate));
+    win_lim    = fn_sliding_window_lim(stat.time,round(st.win_len*sample_rate),round(st.win_step*sample_rate));
     win_center = round(mean(win_lim,2));
     
     %% Load ROI and GM/WM info
@@ -114,13 +108,13 @@ for sbj_ix = 1:numel(SBJs)
             roi_ix = find(strcmp(elec.roi{ch_ix},roi_list));
             % Get ANOVA group onsets
             for grp_ix = 1:numel(grp_lab)
-                if any(squeeze(qvals(grp_ix,ch_ix,:))<0.05)
+                if any(squeeze(w2.qval(grp_ix,ch_ix,:))<0.05)
                     sig_ch{sbj_ix,grp_ix} = [sig_ch{sbj_ix,grp_ix} stat.label{ch_ix}];
-                    sig_onsets = stat.time(win_lim(squeeze(qvals(grp_ix,ch_ix,:))<0.05,1));
-                    if strcmp(event_type,'resp')
+                    sig_onsets = stat.time(win_lim(squeeze(w2.qval(grp_ix,ch_ix,:))<0.05,1));
+                    if strcmp(st.evnt_lab,'R')
                         all_onsets{sbj_ix,roi_ix,grp_ix} = ...
                             [all_onsets{sbj_ix,roi_ix,grp_ix} sig_onsets(1)];
-                    elseif strcmp(event_type,'stim') && (sig_onsets(1)<mean_RTs(sbj_ix))
+                    elseif strcmp(st.evnt_lab,'S') && (sig_onsets(1)<mean_RTs(sbj_ix))
                         all_onsets{sbj_ix,roi_ix,grp_ix} = ...
                             [all_onsets{sbj_ix,roi_ix,grp_ix} sig_onsets(1)];
                     end
@@ -135,10 +129,10 @@ for sbj_ix = 1:numel(SBJs)
                 % Convert the first onset of significance to time
                 onset_time = stat.time(mask_chunks(1,1));
                 % Exclude differences after the mean RT for this SBJ
-                if strcmp(event_type,'resp')
+                if strcmp(st.evnt_lab,'R')
                     all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} = ...
                         [all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} onset_time];
-                elseif strcmp(event_type,'stim') && (onset_time<mean_RTs(sbj_ix))
+                elseif strcmp(st.evnt_lab,'S') && (onset_time<mean_RTs(sbj_ix))
                     all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} = ...
                         [all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} onset_time];
                 end
@@ -147,7 +141,7 @@ for sbj_ix = 1:numel(SBJs)
     end
     
     % Normalize all onset times by mean reaction time
-    if strcmp(event_type,'stim')
+    if strcmp(st.evnt_lab,'S')
         for roi_ix = 1:size(all_onsets,2)
             for cond_ix = 1:size(all_onsets,3)
                 all_onsets{sbj_ix,roi_ix,cond_ix} = all_onsets{sbj_ix,roi_ix,cond_ix}./mean_RTs(sbj_ix);
@@ -203,7 +197,7 @@ save([root_dir 'PRJ_Stroop/data/tmp_onsets_sig_ch.mat'],'-v7.3','sig_ch','plot_o
 %% Plot GROI Results
 for cond_ix = 1:numel(cond_lab)
     % Create and format the plot
-    fig_name = ['GRP' plt_vars.grp_metric '_HFA_onsets_' cond_lab{cond_ix} '_' roi_id '_' event_type...
+    fig_name = ['GRP' plt_vars.grp_metric '_HFA_onsets_' cond_lab{cond_ix} '_' roi_id '_' st.evnt_lab...
         '_GM' num2str(gm_thresh) '_normRTout'];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.6],'Visible',fig_vis);

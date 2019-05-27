@@ -131,7 +131,8 @@ end
 % Get Time Bin and Sliding Window Parameters
 eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJs{1} '_vars.m']);
 load(strcat(SBJ_vars.dirs.proc,SBJs{1},'_ANOVA_ROI_',stat_id,'_',an_id,'.mat'),'stat');
-win_lim    = fn_sliding_window_lim(stat.time,win_len,win_step);
+sample_rate = (numel(stat.time)-1)/(stat.time(end)-stat.time(1));
+win_lim    = fn_sliding_window_lim(stat.time,round(st.win_len*sample_rate),round(st.win_step*sample_rate));
 win_center = round(mean(win_lim,2));
 % 4 ROIs = R time bins: -0.5, -0.1, 0.25, 0.6, 1.0
 %   peak_bins = [7 14 21 40; 7 14 21 40; 400 800 1200 2000];
