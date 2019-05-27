@@ -19,6 +19,10 @@ switch model_id
         labels = {'CNI', 'pcon'};
     case 'crRT_CNI_pcon'
         labels = {'CNI', 'pcon'};
+    case 'pcon'
+        labels = {'pcon'};
+    case 'CNI'
+        labels = {'CNI'};
     case 'RT'
         labels = {'RT'};
     otherwise

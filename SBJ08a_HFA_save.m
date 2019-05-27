@@ -35,9 +35,9 @@ clear data;
 %   but ft_preprocessing would return a filtered time series with an edge artifact.)
 %   Also note this padding buffer should be at least 3x the slowest cycle
 %   of interest.
-if strcmp(HFA_type,'multiband')
+if strcmp(an.HFA_type,'multiband')
     pad_len = 0.5*max(cfg_hfa.t_ftimwin)*3;
-elseif any(strcmp(HFA_type,{'broadband','hilbert'}))
+elseif any(strcmp(an.HFA_type,{'broadband','hilbert'}))
     % add 250 ms as a rule of thumb, or longer if necessary
     pad_len = 0.5*max([1/min(an.fois)*3 0.25]);
 end
