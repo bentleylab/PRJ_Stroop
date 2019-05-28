@@ -139,16 +139,22 @@ if exist(sig_report_fname)
 end
 sig_report = fopen(sig_report_fname,'a');
 if st.rt_corr; cond_lab = [st.groups {'RT'}]; else cond_lab = st.groups; end;
-result_str = ['%-8s' repmat('%-8i',[1 numel(cond_lab)]) '\n'];
+result_str = ['%-10s' repmat('%-10i',[1 numel(cond_lab)]) '\n'];
 
 % Print header
 fprintf(sig_report,'%s (n = %i)\n',SBJ,numel(w2.label));
-fprintf(sig_report,[repmat('%-8s',[1 1+numel(cond_lab)]) '\n'],'label',cond_lab{:});
+fprintf(sig_report,[repmat('%-10s',[1 1+numel(cond_lab)]) '\n'],'label',cond_lab{:});
 
 % Print summary lines (absolute)
-fprintf(sig_report,result_str, 'count', sum(any(w2.qval(:,:,:)<0.05,3),2), sum(any(stat.mask(:,1,:),3)));
-fprintf(sig_report,strrep(result_str,'i','.3f'), 'percent',...
+if st.rt_corr
+    fprintf(sig_report,result_str, 'count', sum(any(w2.qval(:,:,:)<0.05,3),2), sum(any(stat.mask(:,1,:),3)));
+    fprintf(sig_report,strrep(result_str,'i','.3f'), 'percent',...
         [sum(any(w2.qval(:,:,:)<st.alpha,3),2)', sum(any(stat.mask(:,1,:),3))]./numel(w2.label));
+else
+    fprintf(sig_report,result_str, 'count', sum(any(w2.qval(:,:,:)<0.05,3),2));
+    fprintf(sig_report,strrep(result_str,'i','.3f'), 'percent',...
+        sum(any(w2.qval(:,:,:)<st.alpha,3),2)'./numel(w2.label));
+end
 
 % Print Channel Lines
 sig_mat = zeros([numel(w2.label) numel(cond_lab)]);
