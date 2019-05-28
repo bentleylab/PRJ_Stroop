@@ -20,6 +20,7 @@ n_big_slopes  = 5;      % number of biggest slopes to examine
 
 % Stimulus/Response modeling
 rol_outlier_std = 2;
+n_boots         = 1000;
 %rol_outlier_s   = 0.5;
 %plot_model_fits = 0;
 

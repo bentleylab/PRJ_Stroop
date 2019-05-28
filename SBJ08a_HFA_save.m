@@ -51,7 +51,7 @@ bsln_events = trial_info.word_onset;
 
 % Check that baseline will be included in data cut to trial_lim_s
 if strcmp(an.evnt_lab,'S') && (an.trial_lim_s(1) < an.bsln_lim(1))
-        error(['ERROR: an.trial_lim_s does not include an.bsln_lim for an_id = ' an_id]);
+    error(['ERROR: an.trial_lim_s does not include an.bsln_lim for an_id = ' an_id]);
 end
 if strcmp(an.evnt_lab,'R')
     if an.trial_lim_s(1)+min(trial_info.response_time) < an.bsln_lim(1)
@@ -85,7 +85,7 @@ elseif strcmp(an.HFA_type,'hilbert')
     hfa.powspctrm = zeros([numel(roi_trl.trial) numel(roi_trl.label) numel(an.fois) numel(roi_trl.time{1})]);
     hfa.dimord = 'rpt_chan_freq_time';
     hfa.trialinfo = roi_trl.trialinfo;
-    for f_ix = 1:numel(fois)
+    for f_ix = 1:numel(an.fois)
         cfg_hfa.bpfreq = an.bp_lim(f_ix,:);
         cfg_hfa.hilbert = 'abs';
         fprintf('\n------> %s filtering: %.03f - %.03f\n', an.HFA_type, an.bp_lim(f_ix,1), an.bp_lim(f_ix,2));

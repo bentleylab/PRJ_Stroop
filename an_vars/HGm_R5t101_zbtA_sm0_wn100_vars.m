@@ -2,7 +2,7 @@ an.evnt_lab    = 'R';              % event around which to cut trials
 % trial_lim_s will NOT be full of data! the first and last t_ftimwin/2 epochs will be NaNs
 an.trial_lim_s = [-0.5 1.01];      % window in SEC for cutting trials
 an.demean_yn   = 'no';             % z-score for HFA instead
-an.bsln_evnt   = 'stim';
+an.bsln_evnt   = 'S';
 an.bsln_type   = 'zboot';
 % This baseline should include entire trial without any overlap (2.5s min trial length)
 an.bsln_lim    = [-0.25 2.25];    % window in SEC for baseline correction
