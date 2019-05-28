@@ -26,7 +26,7 @@ switch factor_name
         labels = {'cI','iI'};
         colors = {[55,126,184]./256, [228,26,28]./256};
         line_styles = {'-', '-', '-'};    % colors for cond_lab plotting
-case 'actv'
+    case 'actv'
         labels = {'actv'};
         colors = {'k'};
         line_styles = {'-'};

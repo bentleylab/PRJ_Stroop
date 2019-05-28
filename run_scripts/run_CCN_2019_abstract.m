@@ -42,26 +42,28 @@ end
 
 %% Plot stacks with mean traces
 % conditions  = 'actv';%'CNI';%
-stat_id   = 'corrRT_CNI_pcon_WL200_WS50';
+stat_id_s = 'crRT_CNI_pcon_WL200_WS50';
 proc_id   = 'main_ft';
-an_id_s   = 'HGm_S_zbtA_trl2to151_sm0_wn100_stat15';%'HGh_S_zbtS_trl2to151_fLog_sm0_stat15';
-an_id_r   = 'HGm_R_zbtA_trl5to101_sm0_wn100_stat5to1';%'HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1';
+an_id_s   = 'HGm_S2t151_zbtA_sm0_wn100';
+an_id_r   = 'HGm_R5t101_zbtA_sm0_wn100';
+% an_id_s   = 'HGm_S_zbtA_trl2to151_sm0_wn100_stat15';%'HGh_S_zbtS_trl2to151_fLog_sm0_stat15';
+% an_id_r   = 'HGm_R_zbtA_trl5to101_sm0_wn100_stat5to1';%'HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1';
 plt_id    = 'ERPstack_S2to15_R5to10_evnt_c5';%'ts_S15R1_errbr_evnt';
 save_fig  = 1;
 fig_vis   = 'off';
 fig_ftype = 'png';
-for s = numel(SBJs)-1
-    SBJ08ab_HFA_actv(SBJs{s},an_id_s,100);
-    SBJ08ab_HFA_actv(SBJs{s},an_id_r,100);
-    SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,...
+for s = 1%:numel(SBJs)
+    SBJ08ab_HFA_actv(SBJs{s},an_id_s,'actv_S0t15_mn100');
+    SBJ08ab_HFA_actv(SBJs{s},an_id_r,'actv_R5t1_mn100');
+    SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,'actv_S0t15_mn100','actv_R5t1_mn100',...
                                         plt_id,save_fig,fig_vis,fig_ftype,'actv_win','100')
     close all;
-    SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_s,an_id_r,...
-                                        plt_id,save_fig,fig_vis,fig_ftype,'stat_id',stat_id)
-    close all;
-    SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'pcon',an_id_s,an_id_r,...
-                                        plt_id,save_fig,fig_vis,fig_ftype,'stat_id',stat_id)
-    close all;
+%     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_s,an_id_r,...
+%                                         plt_id,save_fig,fig_vis,fig_ftype,'stat_id',stat_id)
+%     close all;
+%     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'pcon',an_id_s,an_id_r,...
+%                                         plt_id,save_fig,fig_vis,fig_ftype,'stat_id',stat_id)
+%     close all;
 end
 
 %% ================================================================================

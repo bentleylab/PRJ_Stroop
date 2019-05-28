@@ -34,8 +34,8 @@ cfg_trim.latency = st.stat_lim;
 hfa_stat = ft_selectdata(cfg_trim,hfa);
 sample_rate = (numel(hfa.time)-1)/(hfa.time(end)-hfa.time(1));
 
-actv_ch = {};
-actv_ch_epochs = {};
+actv_ch = cell(size(hfa.label));
+actv_ch_epochs = cell(size(hfa.label));
 for ch_ix = 1:numel(hfa_stat.label)
     % Compute t-test per time point
     n_tests   = size(hfa_stat.powspctrm,4);

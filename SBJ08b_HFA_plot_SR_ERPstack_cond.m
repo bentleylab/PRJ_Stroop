@@ -1,4 +1,4 @@
-function SBJ08b_HFA_plot_SR_ERPstack_cond(SBJ,conditions,an_id_s,an_id_r,...
+function SBJ08b_HFA_plot_SR_ERPstack_cond(SBJ,conditions,an_id_s,an_id_r,stat_id_s,stat_id_r,...
                                         plt_id,save_fig,fig_vis,fig_ftype,varargin)
 % Plots single trial stack for both stimulus- and response-locked HFA computed in SBJ08a_HFA_actv
 %   sorts by condition, then by RT; scatter for RTs in stim-locked
@@ -36,26 +36,51 @@ SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
-if exist('stat_id','var')
-    stat_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m'];
-    eval(stat_vars_cmd);
-    [grp_lab, ~, ~] = fn_group_label_styles(model_lab);
-else
-    grp_lab = {};
-end
 
 % Event labels
 evnt_lab = {'S', 'R'};
+an_ids   = {an_id_s an_id_r}; stat_ids = {stat_id_s stat_id_r};
+[cond_lab, cond_colors, cond_style] = fn_condition_label_styles(conditions);
 
 % Load RTs
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
 
 % Load data
-hfa_filename1 = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id_s,'.mat');
-hfa_filename2 = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id_r,'.mat');
-tmp = load(hfa_filename1,'hfa'); hfa{1} = tmp.hfa;
-tmp = load(hfa_filename2,'hfa'); hfa{2} = tmp.hfa;
-clear tmp
+hfa        = cell([2 1]);
+evnt_check = cell([2 1]);
+grp_check  = cell([2 1]);
+for sr_ix = 1:2
+    % Load HFA
+    hfa_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_ids{sr_ix},'.mat');
+    tmp = load(hfa_fname,'hfa'); hfa{sr_ix} = tmp.hfa;
+    tmp = load(hfa_fname,'an'); evnt_check{1} = tmp.an.evnt_lab;
+    % Load Stats
+    if strcmp(conditions,'actv')
+        stat_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_ids{sr_ix},'_',stat_ids{sr_ix},'.mat');
+        tmp = load(stat_fname,'actv_ch'); actv_ch{sr_ix} = tmp.actv_ch;
+        tmp = load(stat_fname,'actv_ch_epochs'); actv_ch_epochs{sr_ix} = tmp.actv_ch_epochs;
+        grp_lab = {};
+    elseif any(strcmp(conditions,{'CNI','pcon'}))
+        stat_fname = [SBJ_vars.dirs.proc SBJ '_mANOVA_ROI_' stat_ids{sr_ix} '_' an_ids{sr_ix} '.mat'];
+        tmp = load(stat_fname,'w2'); w2{sr_ix} = tmp.w2;
+        [grp_lab, ~, ~] = fn_group_label_styles(st.model_lab);
+    elseif strcmp(conditions,'RT')
+        error('RT not yet implemented');
+    else
+        error(['unknown stat_id:' stat_id_s ' and ' stat_id_r]);
+    end
+    % Check events are the same
+    tmp = load(stat_fname,'st'); evnt_check{2} = tmp.st.evnt_lab; st = tmp.st;
+    grp_check{sr_ix} = tmp.st.groups;
+    if ~strcmp(evnt_check{1},evnt_check{2})
+        error('an and st evnt_lab mismatch');
+    end
+    clear tmp
+end
+% Check groups are the same
+if ~all(strcmp(grp_check{1},grp_check{2}))
+    error('model groups don''t match between stat_ids');
+end
 
 % Load elec
 elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_main_ft_pat_Dx_full.mat'];
@@ -64,32 +89,6 @@ load(elec_fname);
 cfgs = []; cfgs.channel = hfa{1}.label;
 elec = fn_select_elec(cfgs,elec);
 elec.roi = fn_atlas2roi_labels(elec.atlas_lab,elec.atlas_id,'ROI');
-
-% Load stats
-if strcmp(conditions,'actv')
-    stat_fname1 = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id_s,'_actv_mn',actv_win,'.mat');
-    stat_fname2 = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id_r,'_actv_mn',actv_win,'.mat');
-    tmp = load(stat_fname1,'actv_ch'); actv_ch{1} = tmp.actv_ch;
-    tmp = load(stat_fname2,'actv_ch'); actv_ch{2} = tmp.actv_ch;
-    tmp = load(stat_fname1,'actv_ch_epochs'); actv_ch_epochs{1} = tmp.actv_ch_epochs;
-    tmp = load(stat_fname2,'actv_ch_epochs'); actv_ch_epochs{2} = tmp.actv_ch_epochs;
-elseif strcmp(conditions,'RT')
-    error('RT not yet implemented');
-%     tmp = load(f_name_s,'stat'); stat{1} = tmp.stat;
-%     tmp = load(f_name_r,'stat'); stat{2} = tmp.stat;
-elseif any(strcmp(conditions,grp_lab))
-    f_name_s = [SBJ_vars.dirs.proc SBJ '_mANOVA_ROI_' stat_id '_' an_id_s '.mat'];
-    f_name_r = [SBJ_vars.dirs.proc SBJ '_mANOVA_ROI_' stat_id '_' an_id_r '.mat'];
-    tmp = load(f_name_s,'w2'); w2{1} = tmp.w2;
-    tmp = load(f_name_r,'w2'); w2{2} = tmp.w2;
-else
-    warning(['Stats not loaded for conditions: ' conditions]);
-end
-tmp_st1 = load(stat_fname1,'st'); tmp_st2 = load(stat_fname2,'st');
-if any([~strcmp(tmp_an1.evnt_lab,tmp_st1.evnt_lab) ~strcmp(tmp_an2.evnt_lab,tmp_st2.evnt_lab)]);
-    error('an and st evnt_lab mismatch');
-end
-clear tmp tmp_st1 tmp_st2
 
 %% Quality checks
 % Check channel match between analyses
@@ -132,7 +131,7 @@ else
                 error('Time axes arent the same for hfa and RT stat!');
             end
         elseif any(strcmp(conditions,grp_lab))
-            % Allow for some imprecision (needs to be off by at least 1 sample
+            % Allow for some imprecision (error if off by at least 1 sample)
             if (w2{sr_ix}.time(1)-win_len/2)-hfa{sr_ix}.time(1)<=-1/sample_rate || ...
                     (w2{sr_ix}.time(end)+win_len/2)-hfa{sr_ix}.time(end)>=-1/sample_rate
                 error('Time axes arent the same for hfa and ANOVA w2!');
@@ -150,21 +149,19 @@ cfg_trim.latency = plt_vars.plt_lim_R;
 hfa{2} = ft_selectdata(cfg_trim,hfa{2});
 
 % Compile cond_type, RT, trial_n
-[cond_lab, cond_colors, cond_style] = fn_condition_label_styles(conditions);
 if strcmp(conditions,'actv')
     [sort_rts, sort_rt_idx] = sort(round(sample_rate*trial_info.response_time));
     % Fake cond_mat with only sorted RTs
     cond_mat = [ones([numel(trial_info.trial_n) 1]) sort_rts sort_rt_idx];
 else
-    cond_idx = false([length(cond_lab) length(trial_info.trial_n)]);
+    cond_mat = zeros(size(trial_info.trial_n));
     for cond_ix = 1:length(cond_lab)
         % Get binary condition index
-        cond_idx(cond_ix,:) = logical(fn_condition_index(cond_lab{cond_ix},...
-            trial_info.condition_n));
+        cond_mat(logical(fn_condition_index(cond_lab{cond_ix},...
+            trial_info.condition_n))) = cond_ix;
     end
     
     % Create matrix of [cond_idx, rt, trial_ix]
-    [cond_mat,~] = find(cond_idx);
     cond_mat = horzcat(cond_mat,round(sample_rate*trial_info.response_time),[1:numel(cond_mat)]');
     cond_mat = sortrows(cond_mat,[1 2]);
 end
@@ -193,11 +190,9 @@ elseif any(strcmp(conditions,grp_lab))
         [~, offset_ix] = min(abs(hfa{sr_ix}.time-(w2{sr_ix}.time(1)-win_len/2)));
         
         for ch_ix = 1:numel(stat{1}.label)
-            % FDR correct over all factors in ANOVA
-            [~, ~, ~, qvals] = fdr_bh(squeeze(w2{sr_ix}.pval(:,ch_ix,:)));%,0.05,'pdep','yes');
             % Add significant epochs for condition of interest to mask
-            sig_chunks = fn_find_chunks(squeeze(qvals(grp_ix,:))<0.05);
-            sig_chunks(squeeze(qvals(grp_ix,sig_chunks(:,1)))>0.05,:) = [];
+            sig_chunks = fn_find_chunks(squeeze(w2{sr_ix}.qval(grp_ix,ch_ix,:))<st.alpha);
+            sig_chunks(squeeze(w2{sr_ix}.qval(grp_ix,ch_ix,sig_chunks(:,1)))>st.alpha,:) = [];
             for sig_ix = 1:size(sig_chunks,1)
                 % If last window is cut off due to 10ms over, just go to end of trial
                 if any(sig_chunks(sig_ix,:) > size(win_lim,1))
@@ -210,7 +205,8 @@ elseif any(strcmp(conditions,grp_lab))
 end
 
 %% Plot Results
-fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/ERPstack_' conditions '/' an_id_s '-' an_id_r '/'];
+fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/ERPstack_' conditions '/' ...
+            stat_id_s '-' stat_id_r '/' an_id_s '-' an_id_r '/'];
 sig_ln_dir = [fig_dir 'sig_ch/'];
 if ~exist(sig_ln_dir,'dir')
     [~] = mkdir(sig_ln_dir);
