@@ -127,9 +127,9 @@ for sbj_ix = 1:numel(SBJs)
     if ~plot_out
         cfgs = []; cfgs.channel = fn_select_elec_lab_match(elec, 'b', atlas_id, roi_id);
         elec = fn_select_elec(cfgs, elec);
-        hfa = ft_selectdata(cfgs,hfa);
-        w2 = ft_selectdata(cfgs,w2);
-        if rt_grp; stat = ft_selectdata(cfgs,stat); end
+%         hfa = ft_selectdata(cfgs,hfa);
+%         w2 = ft_selectdata(cfgs,w2);
+%         if rt_grp; stat = ft_selectdata(cfgs,stat); end
     end
     
     % Get GM probability from tissue labels {'GM','WM','CSF','OUT'}
@@ -140,7 +140,7 @@ for sbj_ix = 1:numel(SBJs)
     end
     
     %% Aggregate results per ROI
-    for ch_ix = 1:numel(hfa.label)
+    for ch_ix = 1:numel(elec.label)
         % If elec matches roi_list, get stats
         if any(strcmp(elec.roi{ch_ix},roi_list)) && gm_bin(ch_ix)
             roi_ix = find(strcmp(elec.roi{ch_ix},roi_list));
@@ -149,9 +149,9 @@ for sbj_ix = 1:numel(SBJs)
 %             if any(cse.mask(ch_ix,1,:))
 %                 cse_cnt(sbj_ix,roi_ix) = cse_cnt(sbj_ix,roi_ix)+1;
             % Check if active, get epochs
-            if any(strcmp(hfa.label{ch_ix},actv_ch))
+            if any(strcmp(elec.label{ch_ix},actv_ch))
                 % Find significant epoch indices
-                actv_epochs = actv_ch_epochs{strcmp(hfa.label{ch_ix},actv_ch)};
+                actv_epochs = actv_ch_epochs{strcmp(elec.label{ch_ix},actv_ch)};
                 
                 % Toss late epochs if S-locked
                 if strcmp(evnt_lab,'S')
@@ -159,13 +159,14 @@ for sbj_ix = 1:numel(SBJs)
                 end
                 
                 % Find sign of (de)activation
+                hfa_ch_ix = strcmp(hfa.label,elec.label{ch_ix});
                 actv_ep_sign = NaN([1 size(actv_epochs,1)]);
                 sig_chunk_ix = NaN([1 2]);
                 for ep_ix = 1:size(actv_epochs,1)
                     sig_chunk_ix = [find(hfa.time==actv_epochs(ep_ix,1))...
                         find(hfa.time==actv_epochs(ep_ix,2))];
                     % Report sign
-                    if 0<=squeeze(mean(mean(hfa.powspctrm(:,ch_ix,1,sig_chunk_ix(1):sig_chunk_ix(2)),1),4))
+                    if 0<=squeeze(mean(mean(hfa.powspctrm(:,hfa_ch_ix,1,sig_chunk_ix(1):sig_chunk_ix(2)),1),4))
                         actv_ep_sign(ep_ix) = 1;
                     else
                         actv_ep_sign(ep_ix) = -1;
@@ -182,13 +183,17 @@ for sbj_ix = 1:numel(SBJs)
             end
             
             % Check for RT correlations, get epochs
-            if rt_grp && sum(squeeze(stat.mask(ch_ix,1,:)))>0
-                rt_cnt(sbj_ix,roi_ix) = rt_cnt(sbj_ix,roi_ix) + 1;
+            if rt_grp
+                stat_ch_ix = strcmp(stat.label,elec.label{ch_ix});
+                if sum(squeeze(stat.mask(stat_ch_ix,1,:)))>0
+                    rt_cnt(sbj_ix,roi_ix) = rt_cnt(sbj_ix,roi_ix) + 1;
+                end
             end
             
             % Check for ANOVA group effects
+            grp_ch_ix = strcmp(w2.label,elec.label{ch_ix});
             for grp_ix = 1:numel(grp_lab)
-                if any(squeeze(w2.qval(grp_ix,ch_ix,:))<st.alpha)
+                if any(squeeze(w2.qval(grp_ix,grp_ch_ix,:))<st.alpha)
                     grp_cnt(sbj_ix,roi_ix,grp_ix) = grp_cnt(sbj_ix,roi_ix,grp_ix)+1;
                 end
             end

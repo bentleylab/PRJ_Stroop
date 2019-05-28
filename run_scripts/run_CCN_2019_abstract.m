@@ -44,8 +44,8 @@ end
 stat_id_s = 'CNI_pcon_S0t15_WL200_WS50';
 stat_id_r = 'CNI_pcon_R5t10_WL200_WS50';
 proc_id   = 'main_ft';
-an_id_s   = 'HGm_S2t151_zbtS_sm0_wn100';
-an_id_r   = 'HGm_R5t101_zbtS_sm0_wn100';
+an_id_s   = 'HGm_S2t151_zbtA_sm0_wn100';
+an_id_r   = 'HGm_R5t101_zbtA_sm0_wn100';
 actv_id_s = 'actv_S0t15_mn100';
 actv_id_r = 'actv_R5t1_mn100';
 % an_id_s   = 'HGm_S_zbtA_trl2to151_sm0_wn100_stat15';%'HGh_S_zbtS_trl2to151_fLog_sm0_stat15';
@@ -55,7 +55,7 @@ save_fig  = 1;
 fig_vis   = 'off';
 fig_ftype = 'png';
 for s = 1:numel(SBJs)
-%     SBJ08ab_HFA_actv(SBJs{s},an_id_s,'actv_S2t0');
+    SBJ08ab_HFA_actv(SBJs{s},an_id_s,'actv_S2t0_mn50');
 %     SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_s);
 %     SBJ08ab_HFA_actv(SBJs{s},an_id_r,actv_id_r);
 %     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,actv_id_s,actv_id_r,...
@@ -174,6 +174,31 @@ save_fig    = 1;
 for an_ix = 1:2
     % with SBJ scatter (for myself to understand)
     SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,stat_id{an_ix},proc_id,...
+        an_opts{an_ix},actv_id{an_ix},roi_id,atlas_id,gm_thresh,plt_id,plot_out,1,save_fig,fig_vis,fig_ftype);
+    % with just errbr (for nice plot)
+%     SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,stat_id,proc_id,...
+%         an_opts{an_ix},actv_id{an_ix},roi_id,atlas_id,gm_thresh,plt_id,plot_out,plot_scat,save_fig,fig_vis,fig_ftype);
+end
+
+%% PCON Baseline analysis by ROI
+stat_id     = 'pcon_S2t0';
+atlas_id    = 'Dx';
+% an_opts     = {'HGh_S_zbtS_trl2to151_fLog_sm0_stat15','HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1'};
+an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t151_zbtA_sm0_wn100','HGm_S2t151_zbtS_sm0_wn100'};
+% an_opts  = {'HGm_S_zbtA_trl2to151_sm0_wn100_stat15','HGm_R_zbtA_trl5to101_sm0_wn100_stat5to1'};
+actv_id     = {'actv_S2t0_mn100','actv_S2t0_mn50','actv_S2t0_mn100'};
+plt_id      = '';
+roi_id      = 'gROI';%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
+gm_thresh   = 0;
+plot_out    = 0;
+plot_scat   = 0;
+fig_vis     = 'on';
+fig_ftype   = 'png';
+save_fig    = 1;
+
+for an_ix = 1:numel(an_opts)
+    % with SBJ scatter (for myself to understand)
+    SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,stat_id,proc_id,...
         an_opts{an_ix},actv_id{an_ix},roi_id,atlas_id,gm_thresh,plt_id,plot_out,1,save_fig,fig_vis,fig_ftype);
     % with just errbr (for nice plot)
 %     SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,stat_id,proc_id,...
