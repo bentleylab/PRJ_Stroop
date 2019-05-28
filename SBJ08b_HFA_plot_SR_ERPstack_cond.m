@@ -1,5 +1,5 @@
 function SBJ08b_HFA_plot_SR_ERPstack_cond(SBJ,conditions,an_id_s,an_id_r,stat_id_s,stat_id_r,...
-                                        plt_id,save_fig,fig_vis,fig_ftype,varargin)
+                                        plt_id,save_fig,fig_vis,fig_ftype)%varargin
 % Plots single trial stack for both stimulus- and response-locked HFA computed in SBJ08a_HFA_actv
 %   sorts by condition, then by RT; scatter for RTs in stim-locked
 % clear all; %close all;
@@ -17,18 +17,18 @@ ft_defaults
 % SGE inputs
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
-if ~isempty(varargin)
-    for v = 1:2:numel(varargin)
-        if strcmp(varargin{v},'actv_win')
-            actv_win = varargin{v+1};
-            if isnumeric(actv_win); actv_win = num2str(actv_win); end
-        elseif strcmp(varargin{v},'stat_id')
-            stat_id = varargin{v+1};
-        else
-            error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
-        end
-    end
-end
+% if ~isempty(varargin)
+%     for v = 1:2:numel(varargin)
+%         if strcmp(varargin{v},'actv_win')
+%             actv_win = varargin{v+1};
+%             if isnumeric(actv_win); actv_win = num2str(actv_win); end
+%         elseif strcmp(varargin{v},'stat_id')
+%             stat_id = varargin{v+1};
+%         else
+%             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
+%         end
+%     end
+% end
 
 %% Load Results
 % Load analysis parameters
@@ -59,11 +59,9 @@ for sr_ix = 1:2
         stat_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_ids{sr_ix},'_',stat_ids{sr_ix},'.mat');
         tmp = load(stat_fname,'actv_ch'); actv_ch{sr_ix} = tmp.actv_ch;
         tmp = load(stat_fname,'actv_ch_epochs'); actv_ch_epochs{sr_ix} = tmp.actv_ch_epochs;
-        grp_lab = {};
     elseif any(strcmp(conditions,{'CNI','pcon'}))
         stat_fname = [SBJ_vars.dirs.proc SBJ '_mANOVA_ROI_' stat_ids{sr_ix} '_' an_ids{sr_ix} '.mat'];
         tmp = load(stat_fname,'w2'); w2{sr_ix} = tmp.w2;
-        [grp_lab, ~, ~] = fn_group_label_styles(st.model_lab);
     elseif strcmp(conditions,'RT')
         error('RT not yet implemented');
     else
@@ -72,6 +70,7 @@ for sr_ix = 1:2
     % Check events are the same
     tmp = load(stat_fname,'st'); evnt_check{2} = tmp.st.evnt_lab; st = tmp.st;
     grp_check{sr_ix} = tmp.st.groups;
+    [grp_lab, ~, ~] = fn_group_label_styles(st.model_lab);
     if ~strcmp(evnt_check{1},evnt_check{2})
         error('an and st evnt_lab mismatch');
     end
@@ -132,8 +131,8 @@ else
             end
         elseif any(strcmp(conditions,grp_lab))
             % Allow for some imprecision (error if off by at least 1 sample)
-            if (w2{sr_ix}.time(1)-win_len/2)-hfa{sr_ix}.time(1)<=-1/sample_rate || ...
-                    (w2{sr_ix}.time(end)+win_len/2)-hfa{sr_ix}.time(end)>=-1/sample_rate
+            if (w2{sr_ix}.time(1)-st.win_len/2)-hfa{sr_ix}.time(1)<=-1/sample_rate || ...
+                    (w2{sr_ix}.time(end)+st.win_len/2)-hfa{sr_ix}.time(end)>=-1/sample_rate
                 error('Time axes arent the same for hfa and ANOVA w2!');
             end
         end
@@ -187,7 +186,7 @@ elseif any(strcmp(conditions,grp_lab))
         
         % Get Sliding Window Parameters
         win_lim = fn_sliding_window_lim(hfa{sr_ix}.time,round(st.win_len*sample_rate),round(st.win_step*sample_rate));
-        [~, offset_ix] = min(abs(hfa{sr_ix}.time-(w2{sr_ix}.time(1)-win_len/2)));
+        [~, offset_ix] = min(abs(hfa{sr_ix}.time-(w2{sr_ix}.time(1)-st.win_len/2)));
         
         for ch_ix = 1:numel(stat{1}.label)
             % Add significant epochs for condition of interest to mask

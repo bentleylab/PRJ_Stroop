@@ -25,6 +25,8 @@ switch model_id
         labels = {'CNI'};
     case 'RT'
         labels = {'RT'};
+    case 'actv'
+        labels = {};
     otherwise
         error(strcat('Only one, unrecognized condition offered: ',labels{:}));
 end
