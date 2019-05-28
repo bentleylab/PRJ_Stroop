@@ -171,7 +171,7 @@ fclose(sig_report);
 
 %% Save Results
 out_fname = [SBJ_vars.dirs.proc SBJ '_mANOVA_ROI_' stat_id '_' an_id '.mat'];
-if rt_correlation
+if st.rt_corr
     save(out_fname,'-v7.3','w2','stat','st');
 else
     save(out_fname,'-v7.3','w2','st');
