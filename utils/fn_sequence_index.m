@@ -2,13 +2,13 @@ function sequence_idx = fn_sequence_index(condition_lab1, condition_lab2, condit
 % Returns binary truth array of trials matching a certain condition
 % INPUTS:
 %   condition_lab1 [str] - 1st trial type in sequence
-%       one of [con, neu, inc, mcon, same, minc, ${trial-block}]
-%       ${trial-block} can be any combination, e.g., "con-same"
+%       one of [C, N, I, MC, EQ, MI, ${trial-block}]
+%       ${trial-block} can be any combination, e.g., "C-EQ"
 %   condition_lab2 [str] - 2nd trial type in sequence; same as condition_lab2
 %   condition_num [int array] - numeric condition labels, has length(n_trials)
-%       con = 1-3, neu = 4-6, inc = 7-9
-%       those are ordered: same, minc, mcon
-%       e.g., 5 is minc-neu
+%       C = 1-3, N = 4-6, I = 7-9
+%       those are ordered: EQ, MI, MC
+%       e.g., 5 is MI-N
 %   block_num [int array] - numeric block number, length(n_trials)
 %       used to exclude the first trial in each block
 % OUTPUTS:
