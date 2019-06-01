@@ -1,8 +1,8 @@
 function B00a_SBJ_RT_hist(SBJ,plt_id,fig_vis,save_fig,fig_type)
 %% Plot SBJ RTs for give conditions:
 %       CNI: single histogram with RTs per trial type overlapping
-%       pcon: Plot 1- CNI hist with subplot per block
-%             Plot 2- pcon hists with subplot per trial type
+%       PC: Plot 1- CNI hist with subplot per block
+%             Plot 2- PC hists with subplot per trial type
 % INPUTS:
 %   SBJ [str] - 
 %   plt_id [str] - defines histogram and line parameters
@@ -33,24 +33,16 @@ late_RT_cut = 0.6;      %ms window before next stim to eliminate
 %!!! implement!!! stat      = 'mean';         % do stats on 'mean' or 'median'
 
 [cni_lab, cni_colors, ~] = fn_condition_label_styles('CNI');
-[pcon_lab, pcon_colors, ~] = fn_condition_label_styles('pcon');
+[pc_lab, pc_colors, ~]   = fn_condition_label_styles('PC');
 
 cni_idx = zeros(size(trial_info.trial_n));
 for cond_ix = 1:numel(cni_lab)
     cni_idx(logical(fn_condition_index(cni_lab{cond_ix},trial_info.condition_n))) = cond_ix;
 end
-pcon_idx = zeros(size(trial_info.trial_n));
-for cond_ix = 1:numel(pcon_lab)
-    pcon_idx(logical(fn_condition_index(pcon_lab{cond_ix},trial_info.condition_n))) = cond_ix;
+pc_idx = zeros(size(trial_info.trial_n));
+for cond_ix = 1:numel(pc_lab)
+    pc_idx(logical(fn_condition_index(pc_lab{cond_ix},trial_info.condition_n))) = cond_ix;
 end
-% n_bins        = 50;
-% line_w        = 2;
-% trial_lab     = {'con', 'neu', 'inc'};
-% block_lab     = {'mcon', 'same', 'minc'};
-% trial_colors   = {'b', 'k', 'r'};    % colors for cond_lab plotting
-% block_colors  = {repmat(0.8,3,1), repmat(0.5,3,1), repmat(0.2,3,1)};    % colors for [mcon, same, minc]
-% prop_con_lab  = {'con_mcon', 'con_same', 'con_minc', 'neu_mcon', 'neu_same',...
-%     'neu_minc', 'inc_mcon', 'inc_same', 'inc_minc'};
 
 % Create figure directory
 fig_dir  = strcat([root_dir 'PRJ_Stroop/results/RTs/' SBJ '/']);
@@ -59,9 +51,8 @@ if ~exist(fig_dir,'dir')
 end
 
 %% Process data
-% con = 1-3, neu = 4-6, inc = 7-9
-% within those: same, mic, mcon
-% trial_type = NaN(size(trial_info.condition_n));
+% C = 1-3, N = 4-6, I = 7-9
+% within those: EQ, MI, MC
 rts     = trial_info.response_time; % converts sec to ms
 edges = linspace(min(rts),max(rts),n_bins);
 
@@ -87,10 +78,10 @@ fprintf('%i late trials detected\n',sum(late_RT_idx));
 % end
 
 %% ANOVA Statistics
-[pval, table] = anovan(rts, {cni_idx, pcon_idx},...
+[pval, table] = anovan(rts, {cni_idx, pc_idx},...
     'model', 'interaction', ...%, 'sstype', 3% 'continuous', strmatch('RT',w2.cond),
-    'varnames', {'CNI','pcon'}, 'display', 'off');
-effect_lab = {'CNI','pcon','CNI*pcon'};
+    'varnames', {'CNI','PC'}, 'display', 'off');
+effect_lab = {'CNI','PC','CNI*PC'};
 
 %% CNI Histogram
 fig_name = [SBJ '_RT_hist_CNI'];
@@ -124,24 +115,24 @@ if save_fig
 end
 
 %% Proportion Congruent Bar Violins
-fig_name = [SBJ '_RT_violin_pcon'];
+fig_name = [SBJ '_RT_violin_PC'];
 figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.8 0.5],'Visible',fig_vis);
 hold on;
 
-% Separate data by pcon and CNI
-rt_grps = cell([numel(pcon_lab)*numel(cni_lab)+numel(pcon_lab)-1 1]);
-grp_lab = cell([numel(pcon_lab)*numel(cni_lab)+numel(pcon_lab)-1 1]);
-grp_color = cell([numel(pcon_lab)*numel(cni_lab)+numel(pcon_lab)-1 1]);
+% Separate data by PC and CNI
+rt_grps = cell([numel(pc_lab)*numel(cni_lab)+numel(pc_lab)-1 1]);
+grp_lab = cell([numel(pc_lab)*numel(cni_lab)+numel(pc_lab)-1 1]);
+grp_color = cell([numel(pc_lab)*numel(cni_lab)+numel(pc_lab)-1 1]);
 grp_ix = 0;
-for pcon_ix = 1:numel(pcon_lab)
+for pc_ix = 1:numel(pc_lab)
     for cni_ix = 1:numel(cni_lab)
         grp_ix = grp_ix + 1;
-        rt_grps{grp_ix} = rts(pcon_idx==pcon_ix & cni_idx==cni_ix);
-        grp_lab{grp_ix} = [pcon_lab{pcon_ix} '-' cni_lab{cni_ix}];
+        rt_grps{grp_ix} = rts(pc_idx==pc_ix & cni_idx==cni_ix);
+        grp_lab{grp_ix} = [pc_lab{pc_ix} '-' cni_lab{cni_ix}];
         grp_color{grp_ix} = cni_colors{cni_ix};
     end
     % Insert a blank set of data to create gap between block types for plotting
-    if pcon_ix~=numel(pcon_lab)
+    if pc_ix~=numel(pc_lab)
         grp_ix = grp_ix + 1;
         rt_grps{grp_ix} = mean(rt_grps{grp_ix-1}); % non-empty column vector
         grp_lab{grp_ix} = '';
@@ -166,7 +157,7 @@ for grp_ix = 1:numel(rt_grps)
     end
 end
 ylabel('Time (s)');
-title(['pcon: p=' num2str(pval(2),'%.3f') '; CNI*pcon p=' num2str(pval(3),'%.3f')]);
+title(['PC: p=' num2str(pval(2),'%.3f') '; CNI*PC p=' num2str(pval(3),'%.3f')]);
 
 if save_fig
     fig_fname = [fig_dir fig_name '.' fig_type];
@@ -179,64 +170,64 @@ if save_fig
 end
 
 %% Compare trial types within each block type
-% fig_name = [SBJ '_RT_hist_pcon_TwiB'];
+fig_name = [SBJ '_RT_hist_PC_TwiB'];
+figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.6 1],'Visible',fig_vis);
+% pval = zeros(size(pc_lab));
+
+% Plot Histograms
+ylims = zeros([numel(pc_lab) 2]);
+pc_legend = cell([numel(pc_lab) numel(cni_lab)]);
+for cond_ix = 1:length(pc_lab)
+    subplot(numel(pc_lab),1,cond_ix);hold on;
+    for cni_ix = [2 1 3]
+        histogram(RTs(all([pc_idx==cond_ix cni_idx==cni_ix],2)),edges,...
+            'FaceColor',cni_colors{cni_ix},'FaceAlpha',hist_alpha);
+        pc_legend{cond_ix,cni_ix} = [cni_lab{cni_ix} ' (n=' ...
+                                       num2str(sum(all([pc_idx==cond_ix cni_idx==cni_ix],2))) ')'];
+    end
+    ylims(cond_ix,:) = get(gca,'YLim');
+%     [~,pval{cond_ix}] = ttest2([block_RTs{cond_ix,1}],[block_RTs{cond_ix,3}]);%,'Alpha',alpha);
+end
+
+% Plot Condition Means
+max_ylim = max(ylims(:));
+for cond_ix = 1:length(pc_lab)
+    subplot(3,1,cond_ix);
+    for cni_ix = [2 1 3]
+        line([mean(RTs(all([pc_idx==cond_ix cni_idx==cni_ix],2)))...
+              mean(RTs(all([pc_idx==cond_ix cni_idx==cni_ix],2)))],...
+             [0 max_ylim], 'Color', cni_colors{cni_ix}, 'LineWidth', line_width, 'LineStyle', line_style);
+    end
+    legend(pc_legend{cond_ix,:});
+    xlabel('Time (s)');
+    title(['CNI Histogram for ' pc_lab{cond_ix} ' Blocks']);%: p=',num2str(pval{cond_ix})));
+end
+
+fig_fname = [fig_dir fig_name '.' fig_type];
+if save_fig
+    fprintf('Saving %s\n',fig_fname);
+    if strcmp(fig_type,'eps')
+        eval(['export_fig ' fig_fname]);
+    else
+        saveas(gcf,fig_fname);
+    end
+end
+
+%% Compare block effects within trial type
+% fig_name = [SBJ '_RT_hist_PC_BwiT'];
 % figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.6 1],'Visible',fig_vis);
-% % pval = zeros(size(pcon_lab));
-% 
-% % Plot Histograms
-% ylims = zeros([numel(pcon_lab) 2]);
-% pcon_legend = cell([numel(pcon_lab) numel(cni_lab)]);
-% for cond_ix = 1:length(pcon_lab)
-%     subplot(numel(pcon_lab),1,cond_ix);hold on;
-%     for cni_ix = [2 1 3]
-%         histogram(RTs(all([pcon_idx==cond_ix cni_idx==cni_ix],2)),edges,...
-%             'FaceColor',cni_colors{cni_ix},'FaceAlpha',hist_alpha);
-%         pcon_legend{cond_ix,cni_ix} = [cni_lab{cni_ix} ' (n=' ...
-%                                        num2str(sum(all([pcon_idx==cond_ix cni_idx==cni_ix],2))) ')'];
-%     end
-%     ylims(cond_ix,:) = get(gca,'YLim');
-% %     [~,pval{cond_ix}] = ttest2([block_RTs{cond_ix,1}],[block_RTs{cond_ix,3}]);%,'Alpha',alpha);
-% end
-% 
-% % Plot Condition Means
-% max_ylim = max(ylims(:));
-% for cond_ix = 1:length(pcon_lab)
-%     subplot(3,1,cond_ix);
-%     for cni_ix = [2 1 3]
-%         line([mean(RTs(all([pcon_idx==cond_ix cni_idx==cni_ix],2)))...
-%               mean(RTs(all([pcon_idx==cond_ix cni_idx==cni_ix],2)))],...
-%              [0 max_ylim], 'Color', cni_colors{cni_ix}, 'LineWidth', line_width, 'LineStyle', line_style);
-%     end
-%     legend(pcon_legend{cond_ix,:});
-%     xlabel('Time (s)');
-%     title(['CNI Histogram for ' pcon_lab{cond_ix} ' Blocks']);%: p=',num2str(pval{cond_ix})));
-% end
-% 
-% fig_fname = [fig_dir fig_name '.' fig_type];
-% if save_fig
-%     fprintf('Saving %s\n',fig_fname);
-%     if strcmp(fig_type,'eps')
-%         eval(['export_fig ' fig_fname]);
-%     else
-%         saveas(gcf,fig_fname);
-%     end
-% end
-% 
-% %% Compare block effects within trial type
-% fig_name = [SBJ '_RT_hist_pcon_BwiT'];
-% figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.6 1],'Visible',fig_vis);
-% % pval = zeros(size(pcon_lab));
+% % pval = zeros(size(pc_lab));
 % 
 % % Plot Histograms
 % ylims = zeros([numel(cni_lab) 2]);
-% pcon_legend = cell([numel(pcon_lab) numel(cni_lab)]);
+% pc_legend = cell([numel(pc_lab) numel(cni_lab)]);
 % for cni_ix = [2 1 3]
 %     subplot(numel(cni_lab),1,cni_ix);hold on;
-%     for cond_ix = 1:length(pcon_lab)
-%         histogram(RTs(all([pcon_idx==cond_ix cni_idx==cni_ix],2)),edges,...
-%             'FaceColor',pcon_colors{cond_ix},'FaceAlpha',hist_alpha);
-%         pcon_legend{cond_ix,cni_ix} = [pcon_lab{cond_ix} ' (n=' ...
-%                                        num2str(sum(all([pcon_idx==cond_ix cni_idx==cni_ix],2))) ')'];
+%     for cond_ix = 1:length(pc_lab)
+%         histogram(RTs(all([pc_idx==cond_ix cni_idx==cni_ix],2)),edges,...
+%             'FaceColor',pc_colors{cond_ix},'FaceAlpha',hist_alpha);
+%         pc_legend{cond_ix,cni_ix} = [pc_lab{cond_ix} ' (n=' ...
+%                                        num2str(sum(all([pc_idx==cond_ix cni_idx==cni_ix],2))) ')'];
 %     end
 %     ylims(cni_ix,:) = get(gca,'YLim');
 % %     [~,pval{cond_ix}] = ttest2([block_RTs{cond_ix,1}],[block_RTs{cond_ix,3}]);%,'Alpha',alpha);
@@ -246,14 +237,14 @@ end
 % max_ylim = max(ylims(:));
 % for cni_ix = [2 1 3]
 %     subplot(numel(cni_lab),1,cni_ix);
-%     for cond_ix = 1:length(pcon_lab)
-%         line([mean(RTs(all([pcon_idx==cond_ix cni_idx==cni_ix],2)))...
-%               mean(RTs(all([pcon_idx==cond_ix cni_idx==cni_ix],2)))],...
-%              [0 max_ylim], 'Color', pcon_colors{cond_ix}, 'LineWidth', line_width, 'LineStyle', line_style);
+%     for cond_ix = 1:length(pc_lab)
+%         line([mean(RTs(all([pc_idx==cond_ix cni_idx==cni_ix],2)))...
+%               mean(RTs(all([pc_idx==cond_ix cni_idx==cni_ix],2)))],...
+%              [0 max_ylim], 'Color', pc_colors{cond_ix}, 'LineWidth', line_width, 'LineStyle', line_style);
 %     end
-%     legend(pcon_legend{:,cni_ix});
+%     legend(pc_legend{:,cni_ix});
 %     xlabel('Time (s)');
-%     title([cni_lab{cni_ix} ' Trials across pcon blocks']);%: p=',num2str(pval{cond_ix})));
+%     title([cni_lab{cni_ix} ' Trials across PC blocks']);%: p=',num2str(pval{cond_ix})));
 % end
 % 
 % fig_fname = [fig_dir fig_name '.' fig_type];

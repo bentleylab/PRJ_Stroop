@@ -1,8 +1,8 @@
 function B00a_SBJ_RT_violins(SBJ,plt_id,fig_vis,save_fig,fig_type)
 %% Plot SBJ RTs for give conditions:
 %       CNI: single histogram with RTs per trial type overlapping
-%       pcon: Plot 1- CNI hist with subplot per block
-%             Plot 2- pcon hists with subplot per trial type
+%       PC: Plot 1- CNI hist with subplot per block
+%             Plot 2- PC hists with subplot per trial type
 % INPUTS:
 %   SBJ [str] - 
 %   plt_id [str] - defines histogram and line parameters
@@ -33,24 +33,16 @@ late_RT_cut = 0.6;      %ms window before next stim to eliminate
 %!!! implement!!! stat      = 'mean';         % do stats on 'mean' or 'median'
 
 [cni_lab, cni_colors, ~] = fn_condition_label_styles('CNI');
-[pcon_lab, pcon_colors, ~] = fn_condition_label_styles('pcon');
+[pc_lab, pc_colors, ~] = fn_condition_label_styles('PC');
 
 cni_idx = zeros(size(trial_info.trial_n));
 for cond_ix = 1:numel(cni_lab)
     cni_idx(logical(fn_condition_index(cni_lab{cond_ix},trial_info.condition_n))) = cond_ix;
 end
-pcon_idx = zeros(size(trial_info.trial_n));
-for cond_ix = 1:numel(pcon_lab)
-    pcon_idx(logical(fn_condition_index(pcon_lab{cond_ix},trial_info.condition_n))) = cond_ix;
+pc_idx = zeros(size(trial_info.trial_n));
+for cond_ix = 1:numel(pc_lab)
+    pc_idx(logical(fn_condition_index(pc_lab{cond_ix},trial_info.condition_n))) = cond_ix;
 end
-% n_bins        = 50;
-% line_w        = 2;
-% trial_lab     = {'con', 'neu', 'inc'};
-% block_lab     = {'mcon', 'same', 'minc'};
-% trial_colors   = {'b', 'k', 'r'};    % colors for cond_lab plotting
-% block_colors  = {repmat(0.8,3,1), repmat(0.5,3,1), repmat(0.2,3,1)};    % colors for [mcon, same, minc]
-% prop_con_lab  = {'con_mcon', 'con_same', 'con_minc', 'neu_mcon', 'neu_same',...
-%     'neu_minc', 'inc_mcon', 'inc_same', 'inc_minc'};
 
 % Create figure directory
 fig_dir  = strcat([root_dir 'PRJ_Stroop/results/RTs/' SBJ '/']);
@@ -59,9 +51,8 @@ if ~exist(fig_dir,'dir')
 end
 
 %% Process data
-% con = 1-3, neu = 4-6, inc = 7-9
-% within those: same, mic, mcon
-% trial_type = NaN(size(trial_info.condition_n));
+% C = 1-3, N = 4-6, I = 7-9
+% within those: EQ, MI, MC
 rts     = trial_info.response_time; % converts sec to ms
 
 % Check for RTs overlapping with stim onset or baseline
@@ -86,10 +77,10 @@ fprintf('%i late trials detected\n',sum(late_RT_idx));
 % end
 
 %% ANOVA Statistics
-[pval, table] = anovan(rts, {cni_idx, pcon_idx},...
+[pval, table] = anovan(rts, {cni_idx, pc_idx},...
     'model', 'interaction', ...%, 'sstype', 3% 'continuous', strmatch('RT',w2.cond),
-    'varnames', {'CNI','pcon'}, 'display', 'off');
-effect_lab = {'CNI','pcon','CNI*pcon'};
+    'varnames', {'CNI','PC'}, 'display', 'off');
+effect_lab = {'CNI','PC','CNI*PC'};
 
 % OLD C vs. I t-test:
 % [~,pval] = ttest2([trial_RTs{1}],[trial_RTs{3}]);%,'Alpha',alpha);
@@ -138,37 +129,37 @@ if save_fig
 end
 
 %% Proportion Congruent Bar Violins
-fig_name = [SBJ '_RT_violins_pcon'];
+fig_name = [SBJ '_RT_violins_PC'];
 figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.4 0.5],'Visible',fig_vis);
 hold on; ax = gca;
 
-% Separate data by pcon
-rt_grps    = cell(size(pcon_lab));
-pcon_legend = cell(size(pcon_lab));
-for pcon_ix = 1:numel(pcon_lab)
-    rt_grps{pcon_ix} = rts(pcon_idx==pcon_ix);
-    pcon_legend{pcon_ix} = [pcon_lab{pcon_ix} ' (n=' num2str(sum(pcon_idx==pcon_ix)) ')'];
+% Separate data by PC
+rt_grps    = cell(size(pc_lab));
+pc_legend = cell(size(pc_lab));
+for pc_ix = 1:numel(pc_lab)
+    rt_grps{pc_ix} = rts(pc_idx==pc_ix);
+    pc_legend{pc_ix} = [pc_lab{pc_ix} ' (n=' num2str(sum(pc_idx==pc_ix)) ')'];
 end
 
 % Plot Violins
-violins = violinplot(padcat(rt_grps{:}), pcon_lab, 'ViolinAlpha', violin_alpha);
+violins = violinplot(padcat(rt_grps{:}), pc_lab, 'ViolinAlpha', violin_alpha);
 
 % Adjust plot propeties
-legend_obj = cell(size(pcon_lab));
-for pcon_ix = 1:numel(pcon_lab)
+legend_obj = cell(size(pc_lab));
+for pc_ix = 1:numel(pc_lab)
     % Change scatter colors to mark condition
-    violins(pcon_ix).ViolinColor = pcon_colors{pcon_ix};
-    violins(pcon_ix).BoxPlot.FaceColor = pcon_colors{pcon_ix};
-    violins(pcon_ix).EdgeColor = pcon_colors{pcon_ix};
+    violins(pc_ix).ViolinColor = pc_colors{pc_ix};
+    violins(pc_ix).BoxPlot.FaceColor = pc_colors{pc_ix};
+    violins(pc_ix).EdgeColor = pc_colors{pc_ix};
     % Grab violin for legend
-    legend_obj{pcon_ix} = violins(pcon_ix).ViolinPlot;
+    legend_obj{pc_ix} = violins(pc_ix).ViolinPlot;
 end
 ax.FontSize        = tick_sz;
 ax.YLabel.String   = 'Time (s)';
 ax.YLabel.FontSize = axis_sz;
-ax.Title.String    = ['pcon RTs: p=' num2str(pval(2),'%.3f')];
+ax.Title.String    = ['PC RTs: p=' num2str(pval(2),'%.3f')];
 ax.Title.FontSize  = title_sz;
-legend([legend_obj{:}],pcon_legend,'FontSize',leg_sz,'Location','best');
+legend([legend_obj{:}],pc_legend,'FontSize',leg_sz,'Location','best');
 
 if save_fig
     fig_fname = [fig_dir fig_name '.' fig_type];
@@ -181,22 +172,22 @@ if save_fig
 end
 
 %% Interaction Violins
-fig_name = [SBJ '_RT_violins_CNI-pcon_interaction'];
+fig_name = [SBJ '_RT_violins_CNI-PC_interaction'];
 figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.8 0.5],'Visible',fig_vis);
 hold on; ax = gca;
 
-% Separate data by pcon and CNI
-rt_grps    = cell([numel(cni_lab)*numel(pcon_lab)+numel(cni_lab)-1 1]);
+% Separate data by PC and CNI
+rt_grps    = cell([numel(cni_lab)*numel(pc_lab)+numel(cni_lab)-1 1]);
 grp_lab    = cell(size(rt_grps));
 grp_color  = cell(size(rt_grps));
 grp_legend = cell(size(rt_grps));
 grp_ix = 0;
 for cni_ix = 1:numel(cni_lab)
-    for pcon_ix = 1:numel(pcon_lab)
+    for pc_ix = 1:numel(pc_lab)
         grp_ix = grp_ix + 1;
-        rt_grps{grp_ix}    = rts(pcon_idx==pcon_ix & cni_idx==cni_ix);
-        grp_lab{grp_ix}    = [cni_lab{cni_ix} '-' pcon_lab{pcon_ix}];
-        grp_color{grp_ix}  = pcon_colors{pcon_ix};
+        rt_grps{grp_ix}    = rts(pc_idx==pc_ix & cni_idx==cni_ix);
+        grp_lab{grp_ix}    = [cni_lab{cni_ix} '-' pc_lab{pc_ix}];
+        grp_color{grp_ix}  = pc_colors{pc_ix};
         grp_legend{grp_ix} = [grp_lab{grp_ix} ' (n=' num2str(numel(rt_grps{grp_ix})) ')'];
     end
     % Insert a blank set of data to create gap between block types for plotting
@@ -224,7 +215,7 @@ for grp_ix = 1:numel(rt_grps)
         violins(grp_ix).MedianPlot.MarkerEdgeColor = grp_color{grp_ix};
         violins(grp_ix).MedianColor = grp_color{grp_ix};
     else
-        % Color boxplot bar according to pcon block
+        % Color boxplot bar according to PC block
         cni_ix = find(~cellfun(@isempty,strfind(cni_lab,grp_lab{grp_ix}(1:3))));
         violins(grp_ix).BoxColor  = cni_colors{cni_ix};
         violins(grp_ix).EdgeColor = cni_colors{cni_ix};
@@ -235,8 +226,8 @@ end
 ax.FontSize        = tick_sz;
 ax.YLabel.String   = 'Time (s)';
 ax.YLabel.FontSize = axis_sz;
-ax.Title.String    = ['CNI RTs: p=' num2str(pval(1),'%.3f') '; pcon: p=' num2str(pval(2),'%.3f')...
-                      '; CNI*pcon p=' num2str(pval(3),'%.3f')];
+ax.Title.String    = ['CNI RTs: p=' num2str(pval(1),'%.3f') '; PC: p=' num2str(pval(2),'%.3f')...
+                      '; CNI*PC p=' num2str(pval(3),'%.3f')];
 ax.Title.FontSize  = title_sz;
 % legend([grp_object{real_grp_idx}],grp_legend{real_grp_idx},'FontSize',leg_sz,'Location','best');
 
@@ -249,5 +240,11 @@ if save_fig
         saveas(gcf,fig_fname);
     end
 end
+
+% %% Neutral Trials across PC Blocks
+% n_idx = cni_idx==find(strcmp(cni_lab,'N'));
+% [pval, table] = anovan(rts(n_idx), {pc_idx(n_idx)},...
+%     'model', 'interaction', ...%, 'sstype', 3% 'continuous', strmatch('RT',w2.cond),
+%     'varnames', {'PC'}, 'display', 'off');
 
 end

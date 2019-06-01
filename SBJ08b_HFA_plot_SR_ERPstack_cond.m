@@ -59,7 +59,7 @@ for sr_ix = 1:2
         stat_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_ids{sr_ix},'_',stat_ids{sr_ix},'.mat');
         tmp = load(stat_fname,'actv_ch'); actv_ch{sr_ix} = tmp.actv_ch;
         tmp = load(stat_fname,'actv_ch_epochs'); actv_ch_epochs{sr_ix} = tmp.actv_ch_epochs;
-    elseif any(strcmp(conditions,{'CNI','pcon'}))
+    elseif any(strcmp(conditions,{'CNI','PC'}))
         stat_fname = [SBJ_vars.dirs.proc SBJ '_mANOVA_ROI_' stat_ids{sr_ix} '_' an_ids{sr_ix} '.mat'];
         tmp = load(stat_fname,'w2'); w2{sr_ix} = tmp.w2;
     elseif strcmp(conditions,'RT')

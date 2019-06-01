@@ -1,10 +1,10 @@
 function [labels, colors, line_styles] = fn_group_label_styles(model_id)
 %% Converts the name of a set of conditions into labels, plotting colors/styles
-% condition_name: [str] 'CNI', 'CI', 'pcon'
+% condition_name: [str] 'CNI', 'CI', 'PC'
 % colors from http://colorbrewer2.org/#type=qualitative&scheme=Set1&n=3
 
 %% List of possible labels and their colors
-conditions  = {'RT','CNI','pcon'};
+conditions  = {'RT','CNI','PC'};
 cond_colors = {[77 175 74]./256, [228 26 28]./256, [55 126 184]./256};
 % Taken from: colorbrewer2.org, qualitative, 5-class Set1
 %   currently: green, red, blue
@@ -13,16 +13,16 @@ cond_colors = {[77 175 74]./256, [228 26 28]./256, [55 126 184]./256};
 
 %% Convert model_id into set of conditions
 switch model_id
-    case 'RT_CNI_pcon'
-        labels = {'RT', 'CNI', 'pcon'};
-    case 'rRT_CNI_pcon'
-        labels = {'CNI', 'pcon'};
-    case 'crRT_CNI_pcon'
-        labels = {'CNI', 'pcon'};
-    case 'CNI_pcon'
-        labels = {'CNI', 'pcon'};
-    case 'pcon'
-        labels = {'pcon'};
+    case 'RT_CNI_PC'
+        labels = {'RT', 'CNI', 'PC'};
+    case 'rRT_CNI_PC'
+        labels = {'CNI', 'PC'};
+    case 'crRT_CNI_PC'
+        labels = {'CNI', 'PC'};
+    case 'CNI_PC'
+        labels = {'CNI', 'PC'};
+    case 'PC'
+        labels = {'PC'};
     case 'CNI'
         labels = {'CNI'};
     case 'RT'

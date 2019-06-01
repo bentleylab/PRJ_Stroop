@@ -10,7 +10,7 @@ function fn_view_recon_stat(SBJ, proc_id, stat_id, an_id, view_space, reg_type, 
 %       NOPE: 'CI': inc vs. con via ft statistics (not run for all patients!)
 %       'RT': correlation with RT (red for significant)
 %       'CNI': ANOVA of congruence (red for sig)
-%       'pcon': ANOVA of proportion congruence (red for sig)
+%       'PC': ANOVA of proportion congruence (red for sig)
 %   an_id [str] - analysis ID for preprocessing, filtering, etc.
 %   view_space [str] - {'pat', 'mni'}
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
@@ -78,7 +78,7 @@ end
 mesh = fn_load_recon_mesh(SBJ,view_space,reg_type,hemi);
 
 %% Load Stats
-% Determine options: {'actv','CI','RT','CNI','pcon'}
+% Determine options: {'actv','CI','RT','CNI','PC'}
 if strcmp(stat_id,'actv')
     % Load HFA to get channel list
     load([SBJ_vars.dirs.proc SBJ '_ROI_' an_id '.mat']);

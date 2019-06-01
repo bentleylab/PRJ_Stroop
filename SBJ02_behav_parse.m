@@ -233,8 +233,8 @@ trial_info.resp_onset = word_onsets + floor(trial_info.response_time*s_rate);
 
 % Make order of condition types [congruent neutral incongruent]
 %trial_info.condition_types = unique(trial_info.condition); % This is more general, but since we know what we want:
-trial_types = {'con','neu','inc'};
-block_types = {'same','minc','mcon'};
+trial_types = {'C','N','I'};
+block_types = {'EQ','MI','MC'};
 k = 0;
 for i = 1:length(trial_types)
     for j = 1:length(block_types)

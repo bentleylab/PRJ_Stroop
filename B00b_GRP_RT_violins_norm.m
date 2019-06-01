@@ -15,8 +15,8 @@ late_RT_cut = 0.6;      %ms window before next stim to eliminate
 %!!! implement!!! stat      = 'mean';         % do stats on 'mean' or 'median'
 %!!! add outlier threshold (z-score = 3)
 
-[cni_lab, cni_colors, ~]   = fn_condition_label_styles('CNI');
-[pcon_lab, pcon_colors, ~] = fn_condition_label_styles('pcon');
+[cni_lab, cni_colors, ~] = fn_condition_label_styles('CNI');
+[pc_lab, pc_colors, ~]   = fn_condition_label_styles('PC');
 
 % Process parameters
 fig_dir  = strcat([root_dir 'PRJ_Stroop/results/RTs/GRP/']);
@@ -25,11 +25,11 @@ if ~exist(fig_dir,'dir')
 end
 
 %% Load data
-cni_idx   = cell(size(SBJs));
-pcon_idx  = cell(size(SBJs));
-rts       = cell(size(SBJs));
-late_idx  = cell(size(SBJs));
-sbj_idx   = cell(size(SBJs));
+cni_idx  = cell(size(SBJs));
+pc_idx   = cell(size(SBJs));
+rts      = cell(size(SBJs));
+late_idx = cell(size(SBJs));
+sbj_idx  = cell(size(SBJs));
 % RT_means  = NaN([numel(SBJs) numel(cond_lab)]);
 % RT_vars   = NaN([numel(SBJs) numel(cond_lab)]);
 for s_ix = 1:numel(SBJs)
@@ -46,9 +46,9 @@ for s_ix = 1:numel(SBJs)
         cni_idx{s_ix}(logical(fn_condition_index(cni_lab{cond_ix},...
                         trial_info.condition_n))) = cond_ix;
     end
-    pcon_idx{s_ix} = zeros(size(trial_info.trial_n));
-    for cond_ix = 1:numel(pcon_lab)
-        pcon_idx{s_ix}(logical(fn_condition_index(pcon_lab{cond_ix},...
+    pc_idx{s_ix} = zeros(size(trial_info.trial_n));
+    for cond_ix = 1:numel(pc_lab)
+        pc_idx{s_ix}(logical(fn_condition_index(pc_lab{cond_ix},...
                         trial_info.condition_n))) = cond_ix;
     end
     
@@ -68,7 +68,7 @@ for s_ix = 1:numel(SBJs)
     end
     rts{s_ix}(late_idx{s_ix}) = [];
     cni_idx{s_ix}(late_idx{s_ix}) = [];
-    pcon_idx{s_ix}(late_idx{s_ix}) = [];
+    pc_idx{s_ix}(late_idx{s_ix}) = [];
     clear trial_info
 end
 
@@ -82,13 +82,13 @@ end
 % end
 
 %% ANOVA Statistics
-factor_lab = {'CNI','pcon','SBJ'};
+factor_lab = {'CNI','PC','SBJ'};
 % model_terms = [1 0 0; 0 1 0; 1 1 0];
 [pval, table] = anovan(vertcat(rts{:}),...
-    {vertcat(cni_idx{:}), vertcat(pcon_idx{:}), vertcat(sbj_idx{:})},...
+    {vertcat(cni_idx{:}), vertcat(pc_idx{:}), vertcat(sbj_idx{:})},...
     'model', 'interaction', 'random', 3,...%, 'sstype', 3% 'continuous', strmatch('RT',w2.cond),
     'varnames', factor_lab, 'display', 'off');
-% Output pvals = [CNI, pcon, SBJ, CNI*pcon, CNI*SBJ, pcon*SBJ]
+% Output pvals = [CNI, PC, SBJ, CNI*PC, CNI*SBJ, PC*SBJ]
 
 %% CNI Violins
 % Trial Type
@@ -139,40 +139,40 @@ if save_fig
 end
 
 %% Proportion Congruent Bar Violins
-fig_name = 'GRP_RT_violins_pcon';
+fig_name = 'GRP_RT_violins_PC';
 figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.4 0.5],'Visible',fig_vis);
 hold on; ax = gca;
 
-% Separate data by pcon
-rt_grps    = cell(size(pcon_lab));
-pcon_legend = cell(size(pcon_lab));
-for pcon_ix = 1:numel(pcon_lab)
+% Separate data by PC
+rt_grps    = cell(size(pc_lab));
+pc_legend = cell(size(pc_lab));
+for pc_ix = 1:numel(pc_lab)
     for s_ix = 1:numel(SBJs)
-        rt_grps{pcon_ix} = [rt_grps{pcon_ix}; rts{s_ix}(pcon_idx{s_ix}==pcon_ix)];
+        rt_grps{pc_ix} = [rt_grps{pc_ix}; rts{s_ix}(pc_idx{s_ix}==pc_ix)];
     end
-    pcon_legend{pcon_ix} = [pcon_lab{pcon_ix} ' (n=' num2str(numel(rt_grps{pcon_ix})) ')'];
+    pc_legend{pc_ix} = [pc_lab{pc_ix} ' (n=' num2str(numel(rt_grps{pc_ix})) ')'];
 end
 
 % Plot Violins
-violins = violinplot(padcat(rt_grps{:}), pcon_lab,...
+violins = violinplot(padcat(rt_grps{:}), pc_lab,...
                      'ViolinAlpha', violin_alpha, 'ShowData', false);
 
 % Adjust plot propeties
-legend_obj = cell(size(pcon_lab));
-for pcon_ix = 1:numel(pcon_lab)
+legend_obj = cell(size(pc_lab));
+for pc_ix = 1:numel(pc_lab)
     % Change scatter colors to mark condition
-    violins(pcon_ix).ViolinColor = pcon_colors{pcon_ix};
-    violins(pcon_ix).BoxPlot.FaceColor = pcon_colors{pcon_ix};
-    violins(pcon_ix).EdgeColor = pcon_colors{pcon_ix};
+    violins(pc_ix).ViolinColor = pc_colors{pc_ix};
+    violins(pc_ix).BoxPlot.FaceColor = pc_colors{pc_ix};
+    violins(pc_ix).EdgeColor = pc_colors{pc_ix};
     % Grab violin for legend
-    legend_obj{pcon_ix} = violins(pcon_ix).ViolinPlot;
+    legend_obj{pc_ix} = violins(pc_ix).ViolinPlot;
 end
 ax.FontSize        = tick_sz;
 ax.YLabel.String   = 'RT (z-score)';
 ax.YLabel.FontSize = axis_sz;
-ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') RTs: pcon p=' num2str(pval(2),'%.3f')];
+ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') RTs: PC p=' num2str(pval(2),'%.3f')];
 ax.Title.FontSize  = title_sz;
-legend([legend_obj{:}],pcon_legend,'FontSize',leg_sz,'Location','best');
+legend([legend_obj{:}],pc_legend,'FontSize',leg_sz,'Location','best');
 
 if save_fig
     fig_fname = [fig_dir fig_name '.' fig_ftype];
@@ -185,25 +185,25 @@ if save_fig
 end
 
 %% Interaction Violins
-fig_name = 'GRP_RT_violins_CNI-pcon_interaction';
+fig_name = 'GRP_RT_violins_CNI-PC_interaction';
 figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.8 0.5],'Visible',fig_vis);
 hold on; ax = gca;
 
-% Separate data by pcon and CNI
-rt_grps    = cell([numel(cni_lab)*numel(pcon_lab)+numel(cni_lab)-1 1]);
+% Separate data by PC and CNI
+rt_grps    = cell([numel(cni_lab)*numel(pc_lab)+numel(cni_lab)-1 1]);
 grp_lab    = cell(size(rt_grps));
 grp_color  = cell(size(rt_grps));
 grp_legend = cell(size(rt_grps));
 grp_ix = 0;
 for cni_ix = 1:numel(cni_lab)
-    for pcon_ix = 1:numel(pcon_lab)
+    for pc_ix = 1:numel(pc_lab)
         grp_ix = grp_ix + 1;
         for s_ix = 1:numel(SBJs)
             rt_grps{grp_ix} = [rt_grps{grp_ix};...
-                               rts{s_ix}(pcon_idx{s_ix}==pcon_ix & cni_idx{s_ix}==cni_ix)];
+                               rts{s_ix}(pc_idx{s_ix}==pc_ix & cni_idx{s_ix}==cni_ix)];
         end
-        grp_lab{grp_ix}    = [cni_lab{cni_ix} '-' pcon_lab{pcon_ix}];
-        grp_color{grp_ix}  = pcon_colors{pcon_ix};
+        grp_lab{grp_ix}    = [cni_lab{cni_ix} '-' pc_lab{pc_ix}];
+        grp_color{grp_ix}  = pc_colors{pc_ix};
         grp_legend{grp_ix} = [grp_lab{grp_ix} ' (n=' num2str(numel(rt_grps{grp_ix})) ')'];
     end
     % Insert a blank set of data to create gap between block types for plotting
@@ -232,7 +232,7 @@ for grp_ix = 1:numel(rt_grps)
         violins(grp_ix).MedianPlot.MarkerEdgeColor = grp_color{grp_ix};
         violins(grp_ix).MedianColor = grp_color{grp_ix};
     else
-        % Color boxplot bar according to pcon block
+        % Color boxplot bar according to PC block
         cni_ix = find(~cellfun(@isempty,strfind(cni_lab,grp_lab{grp_ix}(1:3))));
         violins(grp_ix).BoxColor  = cni_colors{cni_ix};
         violins(grp_ix).EdgeColor = cni_colors{cni_ix};
@@ -244,7 +244,7 @@ ax.FontSize        = tick_sz;
 ax.YLabel.String   = 'RT (z-score)';
 ax.YLabel.FontSize = axis_sz;
 ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') RTs: CNI p=' num2str(pval(1),'%.3f')...
-                      '; pcon p=' num2str(pval(2),'%.3f') '; CNI*pcon p='  num2str(pval(4),'%.3f')];
+                      '; PC p=' num2str(pval(2),'%.3f') '; CNI*PC p='  num2str(pval(4),'%.3f')];
 ax.Title.FontSize  = title_sz;
 % legend([grp_object{real_grp_idx}],grp_legend{real_grp_idx},'FontSize',leg_sz,'Location','best');
 
@@ -259,44 +259,44 @@ if save_fig
 end
 
 %% Compute Stroop Effect Across Blocks
-fig_name = 'GRP_RT_violins_pcon_stroop';
+fig_name = 'GRP_RT_violins_PC_stroop';
 figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.4 0.5],'Visible',fig_vis);
 hold on; ax = gca;
 
-stroop = zeros([numel(SBJs) numel(pcon_lab)]);
-design = zeros([numel(SBJs) numel(pcon_lab)]);
+stroop = zeros([numel(SBJs) numel(pc_lab)]);
+design = zeros([numel(SBJs) numel(pc_lab)]);
 con_ix = find(strcmp(cni_lab,'con'));
 inc_ix = find(strcmp(cni_lab,'inc'));
-for pcon_ix = 1:numel(pcon_lab)
+for pc_ix = 1:numel(pc_lab)
     for s_ix = 1:numel(SBJs)
-        con_rts = rts{s_ix}(pcon_idx{s_ix}==pcon_ix & cni_idx{s_ix}==con_ix);
-        inc_rts = rts{s_ix}(pcon_idx{s_ix}==pcon_ix & cni_idx{s_ix}==inc_ix);
-        stroop(s_ix,pcon_ix) = mean(inc_rts)-mean(con_rts);
+        con_rts = rts{s_ix}(pc_idx{s_ix}==pc_ix & cni_idx{s_ix}==con_ix);
+        inc_rts = rts{s_ix}(pc_idx{s_ix}==pc_ix & cni_idx{s_ix}==inc_ix);
+        stroop(s_ix,pc_ix) = mean(inc_rts)-mean(con_rts);
     end
-    design(:,pcon_ix) = pcon_ix;
+    design(:,pc_ix) = pc_ix;
 end
 
 % ANOVA Statistics
 [pval, table] = anovan(stroop(:), design(:),...
-    'model', 1, 'varnames', 'pcon', 'display', 'off');
+    'model', 1, 'varnames', 'PC', 'display', 'off');
 
 % Plot Violins
-violins = violinplot(stroop, pcon_lab,...
+violins = violinplot(stroop, pc_lab,...
                      'ViolinAlpha', violin_alpha, 'ShowData', true);
 
 % Adjust plot propeties
-for pcon_ix = 1:numel(pcon_lab)
+for pc_ix = 1:numel(pc_lab)
     % Change scatter colors to mark condition
-    violins(pcon_ix).ViolinColor = pcon_colors{pcon_ix};
-    violins(pcon_ix).BoxPlot.FaceColor = pcon_colors{pcon_ix};
-    violins(pcon_ix).EdgeColor = pcon_colors{pcon_ix};
+    violins(pc_ix).ViolinColor = pc_colors{pc_ix};
+    violins(pc_ix).BoxPlot.FaceColor = pc_colors{pc_ix};
+    violins(pc_ix).EdgeColor = pc_colors{pc_ix};
 end
 ax.FontSize        = tick_sz;
 ax.YLabel.String   = 'Inc-Con RT (z-score)';
 ax.YLabel.FontSize = axis_sz;
-ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') Stroop RT Effect by pcon: p=' num2str(pval,'%.3f')];
+ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') Stroop RT Effect by PC: p=' num2str(pval,'%.3f')];
 ax.Title.FontSize  = title_sz;
-legend([violins{:}],pcon_lab,'FontSize',leg_sz,'Location','best');
+legend([violins{:}],pc_lab,'FontSize',leg_sz,'Location','best');
 
 if save_fig
     fig_fname = [fig_dir fig_name '.' fig_ftype];

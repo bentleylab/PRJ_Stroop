@@ -9,7 +9,7 @@ function fn_view_recon_atlas_grp_stat(SBJs, proc_id, stat_id, an_id, reg_type, s
 %       NOPE: 'CI': inc vs. con via ft statistics (not run for all patients!)
 %       'RT': correlation with RT (red for significant)
 %       'CNI': ANOVA of congruence (red for sig)
-%       'pcon': ANOVA of proportion congruence (red for sig)
+%       'PC': ANOVA of proportion congruence (red for sig)
 %   an_id [str] - analysis ID for preprocessing, filtering, etc.
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
 %   show_labels [0/1] - plot the electrode labels
@@ -72,7 +72,7 @@ fprintf('Using atlas: %s\n',atlas_id);
 eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
 if strcmp(stat_id,'actv') || strcmp(stat_id,'CSE')
     cond_lab = stat_id;
-elseif strcmp(stat_id,'corrRT_CNI_pcon_WL200_WS50')
+elseif strcmp(stat_id,'crRT_CNI_PC_WL200_WS50')
     % Get condition info
     [grp_lab, ~, ~] = fn_group_label_styles(model_lab);
     % if rt_correlation
@@ -151,7 +151,7 @@ for sbj_ix = 1:numel(SBJs)
     end
     
     % Load Stats
-    % Determine options: {'actv','CI','RT','CNI','pcon'}
+    % Determine options: {'actv','CI','RT','CNI','PC'}
     sig_ch = cell(size(cond_lab));
     if strcmp(stat_id,'actv')
         load([SBJ_vars.dirs.proc SBJ '_ROI_' an_id '_actv_mn100.mat'],'actv_ch');
@@ -175,7 +175,7 @@ for sbj_ix = 1:numel(SBJs)
             for cond_ix = 1:numel(cond_lab)
                 if strcmp(cond_lab{cond_ix},'RT') && any(stat.mask(ch_ix,1,:))
                     sig_ch{cond_ix} = [sig_ch{cond_ix} {[SBJs{sbj_ix} '_' stat.label{ch_ix}]}];
-                elseif any(strcmp(cond_lab{cond_ix},{'CNI','pcon'})) && any(squeeze(w2.qval(cond_ix,ch_ix,:))<0.05)
+                elseif any(strcmp(cond_lab{cond_ix},{'CNI','PC'})) && any(squeeze(w2.qval(cond_ix,ch_ix,:))<0.05)
                     sig_ch{cond_ix} = [sig_ch{cond_ix} {[SBJs{sbj_ix} '_' w2.label{ch_ix}]}];
                 end
             end

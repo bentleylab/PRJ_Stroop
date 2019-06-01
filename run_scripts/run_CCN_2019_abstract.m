@@ -48,8 +48,8 @@ end
 
 %% Plot stacks with mean traces
 % conditions  = 'actv';%'CNI';%
-stat_id_s = 'CNI_pcon_S0t15_WL200_WS50';
-stat_id_r = 'CNI_pcon_R5t10_WL200_WS50';
+stat_id_s = 'CNI_PC_S0t15_WL200_WS50';
+stat_id_r = 'CNI_PC_R5t10_WL200_WS50';
 proc_id   = 'main_ft';
 an_id_s   = 'HGm_S2t151_zbtA_sm0_wn100';
 an_id_r   = 'HGm_R5t101_zbtA_sm0_wn100';
@@ -71,7 +71,7 @@ for s = 1:numel(SBJs)
 %     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_s,an_id_r,stat_id_s,stat_id_r,...
 %                                         plt_id,save_fig,fig_vis,fig_ftype)
 %     close all;
-%     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'pcon',an_id_s,an_id_r,...
+%     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'PC',an_id_s,an_id_r,...
 %                                         plt_id,save_fig,fig_vis,fig_ftype,'stat_id',stat_id)
 %     close all;
 end
@@ -96,7 +96,7 @@ for roi_ix = [5 6]%1:numel(roi_opts)
 end
 
 %% Plot CNI sig elecs
-stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
+stat_id  = 'corrRT_CNI_PC_WL200_WS50';
 % an_opts     = {'HGh_S_zbtS_trl2to151_fLog_sm0_stat15','HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1'};
 an_opts  = {'HGm_S_zbtS_trl2to151_sm0_wn100_stat15','HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
 % an_opts  = {'HGm_S_zbtA_trl2to151_sm0_wn100_stat15','HGm_R_zbtA_trl5to101_sm0_wn100_stat5to1'};
@@ -119,7 +119,7 @@ for an_ix = 1%:numel(an_opts)
 end
 
 %% Plot CNI sig onsets on recon
-stat_id  = 'corrRT_CNI_pcon_WL200_WS50';
+stat_id  = 'corrRT_CNI_PC_WL200_WS50';
 an_id    = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';%,'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1'};
 tbin_id  = 'cnts';
 reg_type = 'v';
@@ -156,14 +156,14 @@ fn_view_recon_atlas_grp_stat_onset(SBJs, proc_id, stat_id, an_id, reg_type, show
 % SBJ10b_ANOVA_plot_SR_RTcorr(SBJ,stat_id,an_id_s,an_id_r,plt_id,save_fig,fig_vis,fig_ftype)
 % %% Plot ANOVA with RT correlation
 % SBJ = 'IR35';
-% stat_id = 'corrRT_CNI_pcon_WL200_WS50';
+% stat_id = 'corrRT_CNI_PC_WL200_WS50';
 % an_id_s = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
 % an_id_r = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
 % plt_id  = 'ts_S0to15_R5to10_evnt_sigline';
 % SBJ10b_ANOVA_plot_SR_RTcorr(SBJ,stat_id,an_id_s,an_id_r,plt_id,1,'on','svg');
 % 
 %% Proportions of significant effects across ROI
-stat_id     = {'CNI_pcon_S0t15_WL200_WS50','CNI_pcon_R5t10_WL200_WS50'};
+stat_id     = {'CNI_PC_S0t15_WL200_WS50','CNI_PC_R5t10_WL200_WS50'};
 atlas_id    = 'Dx';
 % an_opts     = {'HGh_S_zbtS_trl2to151_fLog_sm0_stat15','HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1'};
 an_opts     = {'HGm_S2t151_zbtS_sm0_wn100','HGm_R5t101_zbtS_sm0_wn100'};
@@ -187,8 +187,8 @@ for an_ix = 1:2
 %         an_opts{an_ix},actv_id{an_ix},roi_id,atlas_id,gm_thresh,plt_id,plot_out,plot_scat,save_fig,fig_vis,fig_ftype);
 end
 
-%% PCON Baseline analysis by ROI
-stat_id     = 'pcon_S2t0';
+%% PC Baseline analysis by ROI
+stat_id     = 'PC_S2t0';
 atlas_id    = 'Dx';
 % an_opts     = {'HGh_S_zbtS_trl2to151_fLog_sm0_stat15','HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1'};
 an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t151_zbtA_sm0_wn100','HGm_S2t151_zbtS_sm0_wn100'};
@@ -214,7 +214,7 @@ end
 
 %% Plot onsets of ANOVA+RT
 proc_id = 'main_ft';
-stat_id     = 'corrRT_CNI_pcon_WL200_WS50';
+stat_id     = 'corrRT_CNI_PC_WL200_WS50';
 tbin_id     = 'cnts';
 an_opts     = {'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1','HGm_R_zbtA_trl5to101_sm0_wn100_stat5to1'};% stim?
 gm_thresh   = 0;
