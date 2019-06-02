@@ -216,7 +216,7 @@ for grp_ix = 1:numel(rt_grps)
         violins(grp_ix).MedianColor = grp_color{grp_ix};
     else
         % Color boxplot bar according to PC block
-        cni_ix = find(~cellfun(@isempty,strfind(cni_lab,grp_lab{grp_ix}(1:3))));
+        cni_ix = find(~cellfun(@isempty,strfind(cni_lab,grp_lab{grp_ix}(1))));
         violins(grp_ix).BoxColor  = cni_colors{cni_ix};
         violins(grp_ix).EdgeColor = cni_colors{cni_ix};
     end
@@ -241,10 +241,50 @@ if save_fig
     end
 end
 
-% %% Neutral Trials across PC Blocks
-% n_idx = cni_idx==find(strcmp(cni_lab,'N'));
-% [pval, table] = anovan(rts(n_idx), {pc_idx(n_idx)},...
-%     'model', 'interaction', ...%, 'sstype', 3% 'continuous', strmatch('RT',w2.cond),
-%     'varnames', {'PC'}, 'display', 'off');
+%% Neutral Trials across PC Blocks
+n_ix = find(strcmp(cni_lab,'N'));
+[pval, table] = anova1(rts(cni_idx==n_ix), pc_idx(cni_idx==n_ix), 'off');
+
+fig_name = [SBJ '_RT_violins_PC_N'];
+figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.4 0.5],'Visible',fig_vis);
+hold on; ax = gca;
+
+% Separate data by PC
+rt_grps    = cell(size(pc_lab));
+pc_legend = cell(size(pc_lab));
+for pc_ix = 1:numel(pc_lab)
+    rt_grps{pc_ix} = rts(pc_idx==pc_ix & cni_idx==n_ix);
+    pc_legend{pc_ix} = [pc_lab{pc_ix} ' (n=' num2str(sum(pc_idx==pc_ix & cni_idx==n_ix)) ')'];
+end
+
+% Plot Violins
+violins = violinplot(padcat(rt_grps{:}), pc_lab, 'ViolinAlpha', violin_alpha);
+
+% Adjust plot propeties
+legend_obj = cell(size(pc_lab));
+for pc_ix = 1:numel(pc_lab)
+    % Change scatter colors to mark condition
+    violins(pc_ix).ViolinColor = pc_colors{pc_ix};
+    violins(pc_ix).BoxPlot.FaceColor = pc_colors{pc_ix};
+    violins(pc_ix).EdgeColor = pc_colors{pc_ix};
+    % Grab violin for legend
+    legend_obj{pc_ix} = violins(pc_ix).ViolinPlot;
+end
+ax.FontSize        = tick_sz;
+ax.YLabel.String   = 'Time (s)';
+ax.YLabel.FontSize = axis_sz;
+ax.Title.String    = ['N PC RTs: p=' num2str(pval,'%.3f')];
+ax.Title.FontSize  = title_sz;
+legend([legend_obj{:}],pc_legend,'FontSize',leg_sz,'Location','best');
+
+if save_fig
+    fig_fname = [fig_dir fig_name '.' fig_type];
+    fprintf('Saving %s\n',fig_fname);
+    if strcmp(fig_type,'eps')
+        eval(['export_fig ' fig_fname]);
+    else
+        saveas(gcf,fig_fname);
+    end
+end
 
 end

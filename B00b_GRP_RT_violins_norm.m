@@ -84,7 +84,7 @@ end
 %% ANOVA Statistics
 factor_lab = {'CNI','PC','SBJ'};
 % model_terms = [1 0 0; 0 1 0; 1 1 0];
-[pval, table] = anovan(vertcat(rts{:}),...
+[pval, table, stats, terms] = anovan(vertcat(rts{:}),...
     {vertcat(cni_idx{:}), vertcat(pc_idx{:}), vertcat(sbj_idx{:})},...
     'model', 'interaction', 'random', 3,...%, 'sstype', 3% 'continuous', strmatch('RT',w2.cond),
     'varnames', factor_lab, 'display', 'off');
@@ -233,7 +233,7 @@ for grp_ix = 1:numel(rt_grps)
         violins(grp_ix).MedianColor = grp_color{grp_ix};
     else
         % Color boxplot bar according to PC block
-        cni_ix = find(~cellfun(@isempty,strfind(cni_lab,grp_lab{grp_ix}(1:3))));
+        cni_ix = find(~cellfun(@isempty,strfind(cni_lab,grp_lab{grp_ix}(1))));
         violins(grp_ix).BoxColor  = cni_colors{cni_ix};
         violins(grp_ix).EdgeColor = cni_colors{cni_ix};
     end
@@ -302,6 +302,65 @@ if save_fig
     fig_fname = [fig_dir fig_name '.' fig_ftype];
     fprintf('Saving %s\n',fig_fname);
     if strcmp(fig_ftype,'eps')
+        eval(['export_fig ' fig_fname]);
+    else
+        saveas(gcf,fig_fname);
+    end
+end
+
+%% Neutral Trials across PC Blocks
+fig_name = 'GRP_RT_violins_PC_N';
+figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.4 0.5],'Visible',fig_vis);
+hold on; ax = gca;
+
+% Separate data by PC
+n_ix = find(strcmp(cni_lab,'N'));
+rt_grps   = cell(size(pc_lab));
+sbj_n_idx = cell(size(pc_lab));
+pc_n_idx  = cell(size(pc_lab));
+pc_legend = cell(size(pc_lab));
+for pc_ix = 1:numel(pc_lab)
+    for s_ix = 1:numel(SBJs)
+        rt_grps{pc_ix}   = [rt_grps{pc_ix}; rts{s_ix}(pc_idx{s_ix}==pc_ix & cni_idx{s_ix}==n_ix)];
+        sbj_n_idx{pc_ix} = [sbj_n_idx{pc_ix}; sbj_idx{s_ix}(pc_idx{s_ix}==pc_ix & cni_idx{s_ix}==n_ix)];
+        pc_n_idx{pc_ix}  = [pc_n_idx{pc_ix} pc_idx{s_ix}(cni_idx{s_ix}==n_ix)];
+    end
+    pc_legend{pc_ix} = [pc_lab{pc_ix} ' (n=' num2str(numel(rt_grps{pc_ix})) ')'];
+end
+
+% Run ANOVA on Neutral Trials
+factor_lab = {'PC','SBJ'};
+[pval, table] = anovan(vertcat(rt_grps{:}),...
+    {vertcat(pc_idx{:}), vertcat(sbj_idx{:})},...
+    'model', 'interaction', 'random', 3,...%, 'sstype', 3% 'continuous', strmatch('RT',w2.cond),
+    'varnames', factor_lab, 'display', 'off');
+[pval, table] = anova1(rts(cni_idx==n_ix), pc_idx(cni_idx==n_ix), 'off');
+
+% Plot Violins
+violins = violinplot(padcat(rt_grps{:}), pc_lab,...
+                     'ViolinAlpha', violin_alpha, 'ShowData', false);
+
+% Adjust plot propeties
+legend_obj = cell(size(pc_lab));
+for pc_ix = 1:numel(pc_lab)
+    % Change scatter colors to mark condition
+    violins(pc_ix).ViolinColor = pc_colors{pc_ix};
+    violins(pc_ix).BoxPlot.FaceColor = pc_colors{pc_ix};
+    violins(pc_ix).EdgeColor = pc_colors{pc_ix};
+    % Grab violin for legend
+    legend_obj{pc_ix} = violins(pc_ix).ViolinPlot;
+end
+ax.FontSize        = tick_sz;
+ax.YLabel.String   = 'RT (z-score)';
+ax.YLabel.FontSize = axis_sz;
+ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') RTs: N PC p=' num2str(pval,'%.3f')];
+ax.Title.FontSize  = title_sz;
+legend([legend_obj{:}],pc_legend,'FontSize',leg_sz,'Location','best');
+
+if save_fig
+    fig_fname = [fig_dir fig_name '.' fig_type];
+    fprintf('Saving %s\n',fig_fname);
+    if strcmp(fig_type,'eps')
         eval(['export_fig ' fig_fname]);
     else
         saveas(gcf,fig_fname);
