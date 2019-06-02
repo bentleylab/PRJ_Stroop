@@ -8,6 +8,10 @@ switch factor_name
         labels = {'C', 'N', 'I'};
         colors = {[55,126,184]./256, [0 0 0], [228,26,28]./256};
         line_styles = {'-', '-', '-'};    % colors for cond_lab plotting
+    case 'pCNI'
+        labels = {'pC', 'pN', 'pI'};
+        colors = {[55,126,184]./256, [0 0 0], [228,26,28]./256};
+        line_styles = {'-', '-', '-'};    % colors for cond_lab plotting
     case 'CI'
         labels = {'C', 'I'};
         colors = {[55,126,184]./256, [228,26,28]./256};
@@ -18,7 +22,7 @@ switch factor_name
         %colors = {[87 255 241]./256, [255 241 87]./256, [241 87 255]./256};
         line_styles = {'-', '-', '-'};    % colors for cond_lab plotting
     case 'PC_CI'
-        labels = {'C_MC', 'C_MI', 'I_MC', 'I_MI'}
+        labels = {'C_MC', 'C_MI', 'I_MC', 'I_MI'};
         colors = {[0 0 0], [0 0 0], [228,26,28]./256, [228,26,28]./256};    % colors for cond_lab plotting
         line_styles = {'-', '--', '-','--'};    % colors for cond_lab plotting
     case 'CSE'

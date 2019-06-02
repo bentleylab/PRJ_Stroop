@@ -138,42 +138,41 @@ elseif strcmp(stat_id,'CSE')
         end
     end    
 else    % ANOVA
+    f_name = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id '.mat'];
+    load(f_name);
     eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
-    [grp_lab, grp_colors, ~] = fn_group_label_styles(model_lab);
-    [rt_lab, rt_color, ~]    = fn_group_label_styles('RT');
+    [grp_lab, grp_colors, ~] = fn_group_label_styles(st.model_lab);
+    if st.rt_corr
+        [rt_lab, rt_color, ~]    = fn_group_label_styles('RT');
+    end
     % % Load RTs
     % load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
     
-    f_name = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id '.mat'];
-    load(f_name,'stat','w2');
-    elec = fn_reorder_elec(elec,stat.label);
+    elec = fn_reorder_elec(elec,w2.label);
     
     % FDR correct pvalues for ANOVA
 %     win_lim = {}; win_center = {};
-    elec_colors = cell([numel(w2.label) numel(grp_lab)+1]);
-    for ch_ix = 1:numel(stat.label)
-        pvals = squeeze(w2.pval(:,ch_ix,:));
-        [~, ~, ~, qvals] = fdr_bh(pvals);%,0.05,'pdep','yes');
-        
+    elec_colors = cell([numel(w2.label) numel(grp_lab)+st.rt_corr]);
+    for ch_ix = 1:numel(w2.label)
         % Consolidate to binary sig/non-sig
         for grp_ix = 1:numel(grp_lab)
-            if any(qvals(grp_ix,:)<0.05,2)
+            if any(w2.qval(grp_ix,:)<st.alpha,2)
                 elec_colors{ch_ix,grp_ix} = grp_colors{grp_ix};  % sig
             else
                 elec_colors{ch_ix,grp_ix} = ns_color;  % non-sig
             end
         end
-        if any(stat.mask(ch_ix,1,:))
-            elec_colors{ch_ix,numel(grp_lab)+1} = rt_color{:};  % sig
+        if st.rt_corr && any(stat.mask(ch_ix,1,:))
+            elec_colors{ch_ix,numel(grp_lab)+st.rt_corr} = rt_color{:};  % sig
         else
-            elec_colors{ch_ix,numel(grp_lab)+1} = ns_color;  % non-sig
+            elec_colors{ch_ix,numel(grp_lab)+st.rt_corr} = ns_color;  % non-sig
         end
     end
 end
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
 f = {};
-for grp_ix = 1:numel(grp_lab)+1
+for grp_ix = 1:numel(grp_lab)+st.rt_corr
     if any(strcmp(stat_id,{'actv','CSE'}))
         plot_name = [SBJ '_' stat_id '_' an_id];
     else
@@ -205,54 +204,4 @@ for grp_ix = 1:numel(grp_lab)+1
 end
 
 
-%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SUBFUNCTION
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function cb_keyboard(h, eventdata)
-
-if isempty(eventdata)
-    % determine the key that corresponds to the uicontrol element that was activated
-    key = get(h, 'userdata');
-else
-    % determine the key that was pressed on the keyboard
-    key = parseKeyboardEvent(eventdata);
-end
-% get focus back to figure
-if ~strcmp(get(h, 'type'), 'figure')
-    set(h, 'enable', 'off');
-    drawnow;
-    set(h, 'enable', 'on');
-end
-
-if strcmp(key, 'l') % reset the light position
-    delete(findall(h,'Type','light')) % shut out the lights
-    camlight; lighting gouraud; % add a new light from the current camera position
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SUBFUNCTION
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function key = parseKeyboardEvent(eventdata)
-
-key = eventdata.Key;
-% handle possible numpad events (different for Windows and UNIX systems)
-% NOTE: shift+numpad number does not work on UNIX, since the shift
-% modifier is always sent for numpad events
-if isunix()
-  shiftInd = match_str(eventdata.Modifier, 'shift');
-  if ~isnan(str2double(eventdata.Character)) && ~isempty(shiftInd)
-    % now we now it was a numpad keystroke (numeric character sent AND
-    % shift modifier present)
-    key = eventdata.Character;
-    eventdata.Modifier(shiftInd) = []; % strip the shift modifier
-  end
-elseif ispc()
-  if strfind(eventdata.Key, 'numpad')
-    key = eventdata.Character;d
-  end
-end
-
-if ~isempty(eventdata.Modifier)
-  key = [eventdata.Modifier{1} '+' key];
 end

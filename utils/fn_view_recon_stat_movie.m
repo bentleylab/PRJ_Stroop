@@ -1,4 +1,5 @@
 function fn_view_recon_stat_movie(SBJ, proc_id, stat_id, an_id, view_space, reg_type, hemi, plot_out, plt_id, varargin)
+error('fix for new st.ANOVA params');
 %% Plot a reconstruction with electrodes colored according to statistics
 %   FUTURE 2: add option for stat_var to be a cell with 2nd stat for edge
 % INPUTS:

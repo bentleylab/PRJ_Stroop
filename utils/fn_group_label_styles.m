@@ -1,3 +1,4 @@
+
 function [labels, colors, line_styles] = fn_group_label_styles(model_id)
 %% Converts the name of a set of conditions into labels, plotting colors/styles
 % condition_name: [str] 'CNI', 'CI', 'PC'
@@ -13,12 +14,14 @@ cond_colors = {[77 175 74]./256, [228 26 28]./256, [55 126 184]./256};
 
 %% Convert model_id into set of conditions
 switch model_id
-    case 'RT_CNI_PC'
-        labels = {'RT', 'CNI', 'PC'};
+%     case 'RT_CNI_PC'
+%         labels = {'RT', 'CNI', 'PC'};
     case 'rRT_CNI_PC'
         labels = {'CNI', 'PC'};
     case 'crRT_CNI_PC'
         labels = {'CNI', 'PC'};
+    case 'pCNI_PC'
+        labels = {'pCNI', 'PC'};
     case 'CNI_PC'
         labels = {'CNI', 'PC'};
     case 'PC'

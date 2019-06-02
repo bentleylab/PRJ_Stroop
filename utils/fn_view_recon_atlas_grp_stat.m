@@ -9,6 +9,7 @@ function fn_view_recon_atlas_grp_stat(SBJs, proc_id, stat_id, an_id, reg_type, s
 %       NOPE: 'CI': inc vs. con via ft statistics (not run for all patients!)
 %       'RT': correlation with RT (red for significant)
 %       'CNI': ANOVA of congruence (red for sig)
+%       'pCNI': ANOVA of previous trial congruence (red for sig)
 %       'PC': ANOVA of proportion congruence (red for sig)
 %   an_id [str] - analysis ID for preprocessing, filtering, etc.
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
@@ -72,15 +73,15 @@ fprintf('Using atlas: %s\n',atlas_id);
 eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
 if strcmp(stat_id,'actv') || strcmp(stat_id,'CSE')
     cond_lab = stat_id;
-elseif strcmp(stat_id,'crRT_CNI_PC_WL200_WS50')
+else%if strcmp(stat_id,'crRT_CNI_PC_WL200_WS50')
     % Get condition info
     [grp_lab, ~, ~] = fn_group_label_styles(model_lab);
     % if rt_correlation
     [rt_lab, ~, ~]     = fn_group_label_styles('RT');
     % end
     cond_lab = [grp_lab rt_lab];
-else
-    error(['Unknown stat_id: ' stat_id]);
+% else
+%     error(['Unknown stat_id: ' stat_id]);
 end
 
 % Prep report
@@ -167,20 +168,19 @@ for sbj_ix = 1:numel(SBJs)
         clear stat
     else    % ANOVA
         eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);        
-        f_name = [SBJ_vars.dirs.proc SBJ '_mANOVA_ROI_' stat_id '_' an_id '.mat'];
-        load(f_name,'stat','w2');
+        load([SBJ_vars.dirs.proc SBJ '_mANOVA_ROI_' stat_id '_' an_id '.mat']);
         
-        for ch_ix = 1:numel(stat.label)
+        for ch_ix = 1:numel(w2.label)
             % Consolidate to binary sig/non-sig
             for cond_ix = 1:numel(cond_lab)
                 if strcmp(cond_lab{cond_ix},'RT') && any(stat.mask(ch_ix,1,:))
                     sig_ch{cond_ix} = [sig_ch{cond_ix} {[SBJs{sbj_ix} '_' stat.label{ch_ix}]}];
-                elseif any(strcmp(cond_lab{cond_ix},{'CNI','PC'})) && any(squeeze(w2.qval(cond_ix,ch_ix,:))<0.05)
+                elseif any(strcmp(cond_lab{cond_ix},{'CNI','pCNI','PC'})) && any(squeeze(w2.qval(cond_ix,ch_ix,:))<st.alpha)
                     sig_ch{cond_ix} = [sig_ch{cond_ix} {[SBJs{sbj_ix} '_' w2.label{ch_ix}]}];
                 end
             end
         end
-        clear stat w2
+        clear stat w2 st
     end
     
     % Select sig elecs
@@ -245,9 +245,6 @@ for cond_ix = 1:numel(cond_lab)
     % Plot electrodes on top
     for e = 1:numel(elec{cond_ix}.label)
         cfgs = []; cfgs.channel = elec{cond_ix}.label(e);
-        if strcmp(cfgs.channel,'CP24_RLF5')
-            disp('in');
-        end
         elec_tmp = fn_select_elec(cfgs,elec{cond_ix});
         ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', elec_tmp.roi_color, 'label', lab_arg);
     end

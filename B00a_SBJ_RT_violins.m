@@ -1,4 +1,4 @@
-function B00a_SBJ_RT_violins(SBJ,plt_id,fig_vis,save_fig,fig_type)
+function B00a_SBJ_RT_violins(SBJ,plt_id,fig_vis,save_fig,fig_ftype)
 %% Plot SBJ RTs for give conditions:
 %       CNI: single histogram with RTs per trial type overlapping
 %       PC: Plot 1- CNI hist with subplot per block
@@ -16,7 +16,7 @@ else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtri
 %% Set Up Directories
 addpath([root_dir 'PRJ_Stroop/scripts/']);
 addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
-if strcmp(fig_type,'eps')
+if strcmp(fig_ftype,'eps')
     [~, app_dir] = fn_get_root_dir();
     addpath(genpath([app_dir 'export_fig-master/']));
 end
@@ -119,9 +119,9 @@ ax.Title.FontSize  = title_sz;
 legend([legend_obj{:}],cni_legend,'FontSize',leg_sz,'Location','best');
 
 if save_fig
-    fig_fname = [fig_dir fig_name '.' fig_type];
+    fig_fname = [fig_dir fig_name '.' fig_ftype];
     fprintf('Saving %s\n',fig_fname);
-    if strcmp(fig_type,'eps')
+    if strcmp(fig_ftype,'eps')
         eval(['export_fig ' fig_fname]);
     else
         saveas(gcf,fig_fname);
@@ -162,9 +162,9 @@ ax.Title.FontSize  = title_sz;
 legend([legend_obj{:}],pc_legend,'FontSize',leg_sz,'Location','best');
 
 if save_fig
-    fig_fname = [fig_dir fig_name '.' fig_type];
+    fig_fname = [fig_dir fig_name '.' fig_ftype];
     fprintf('Saving %s\n',fig_fname);
-    if strcmp(fig_type,'eps')
+    if strcmp(fig_ftype,'eps')
         eval(['export_fig ' fig_fname]);
     else
         saveas(gcf,fig_fname);
@@ -232,41 +232,55 @@ ax.Title.FontSize  = title_sz;
 % legend([grp_object{real_grp_idx}],grp_legend{real_grp_idx},'FontSize',leg_sz,'Location','best');
 
 if save_fig
-    fig_fname = [fig_dir fig_name '.' fig_type];
+    fig_fname = [fig_dir fig_name '.' fig_ftype];
     fprintf('Saving %s\n',fig_fname);
-    if strcmp(fig_type,'eps')
+    if strcmp(fig_ftype,'eps')
         eval(['export_fig ' fig_fname]);
     else
         saveas(gcf,fig_fname);
     end
 end
 
-%% Neutral Trials across PC Blocks
-n_ix = find(strcmp(cni_lab,'N'));
-[pval, table] = anova1(rts(cni_idx==n_ix), pc_idx(cni_idx==n_ix), 'off');
+%% Neutral Trials across MC vs. MI Blocks
+% n_ix = find(strcmp(cni_lab,'N'));
+% [pval, table] = anova1(rts(cni_idx==n_ix), pc_idx(cni_idx==n_ix), 'off');
 
 fig_name = [SBJ '_RT_violins_PC_N'];
 figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.4 0.5],'Visible',fig_vis);
 hold on; ax = gca;
 
+% Compare only MI and MC
+n_ix = find(strcmp(cni_lab,'N'));
+mc_ix = find(strcmp(pc_lab,'MC'));
+mi_ix = find(strcmp(pc_lab,'MI'));
+n_pc_lab = pc_lab([mc_ix mi_ix]);
+n_pc_colors = pc_colors([mc_ix mi_ix]);
+
 % Separate data by PC
-rt_grps    = cell(size(pc_lab));
-pc_legend = cell(size(pc_lab));
-for pc_ix = 1:numel(pc_lab)
-    rt_grps{pc_ix} = rts(pc_idx==pc_ix & cni_idx==n_ix);
-    pc_legend{pc_ix} = [pc_lab{pc_ix} ' (n=' num2str(sum(pc_idx==pc_ix & cni_idx==n_ix)) ')'];
+rt_grps     = cell(size(n_pc_lab));
+n_pc_legend = cell(size(n_pc_lab));
+for pc_ix = 1:numel(n_pc_lab)
+    rt_grps{pc_ix} = rts(pc_idx==find(strcmp(pc_lab,n_pc_lab{pc_ix})) & cni_idx==n_ix);
+    n_pc_legend{pc_ix} = [n_pc_lab{pc_ix} ' (n=' num2str(sum(pc_idx==find(strcmp(pc_lab,n_pc_lab{pc_ix})) & cni_idx==n_ix)) ')'];
 end
 
-% Plot Violins
-violins = violinplot(padcat(rt_grps{:}), pc_lab, 'ViolinAlpha', violin_alpha);
+% Two-sample t-test
+[h, pval, ci, stats] = ttest2(rt_grps{strcmp(n_pc_lab,'MC')},...
+                              rt_grps{strcmp(n_pc_lab,'MI')});
+% % Two-sample t-test, MI RTs < MC RTs
+% [h, pval, ci, stats] = ttest2(rt_grps{strcmp(n_pc_lab,'MC')},...
+%                               rt_grps{strcmp(n_pc_lab,'MI')},'Tail','right');
 
-% Adjust plot propeties
-legend_obj = cell(size(pc_lab));
-for pc_ix = 1:numel(pc_lab)
+% Plot Violins
+violins = violinplot(padcat(rt_grps{:}), n_pc_lab, 'ViolinAlpha', violin_alpha);
+
+% Adjust plot properties
+legend_obj = cell(size(n_pc_lab));
+for pc_ix = 1:numel(n_pc_lab)
     % Change scatter colors to mark condition
-    violins(pc_ix).ViolinColor = pc_colors{pc_ix};
-    violins(pc_ix).BoxPlot.FaceColor = pc_colors{pc_ix};
-    violins(pc_ix).EdgeColor = pc_colors{pc_ix};
+    violins(pc_ix).ViolinColor = n_pc_colors{pc_ix};
+    violins(pc_ix).BoxPlot.FaceColor = n_pc_colors{pc_ix};
+    violins(pc_ix).EdgeColor = n_pc_colors{pc_ix};
     % Grab violin for legend
     legend_obj{pc_ix} = violins(pc_ix).ViolinPlot;
 end
@@ -275,12 +289,12 @@ ax.YLabel.String   = 'Time (s)';
 ax.YLabel.FontSize = axis_sz;
 ax.Title.String    = ['N PC RTs: p=' num2str(pval,'%.3f')];
 ax.Title.FontSize  = title_sz;
-legend([legend_obj{:}],pc_legend,'FontSize',leg_sz,'Location','best');
+legend([legend_obj{:}],n_pc_legend,'FontSize',leg_sz,'Location','best');
 
 if save_fig
-    fig_fname = [fig_dir fig_name '.' fig_type];
+    fig_fname = [fig_dir fig_name '.' fig_ftype];
     fprintf('Saving %s\n',fig_fname);
-    if strcmp(fig_type,'eps')
+    if strcmp(fig_ftype,'eps')
         eval(['export_fig ' fig_fname]);
     else
         saveas(gcf,fig_fname);

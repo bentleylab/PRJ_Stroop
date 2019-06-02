@@ -8,9 +8,9 @@ st.win_len  = 0.2;%200;
 st.win_step = 0.05;%50;
 
 % ANOVA Parameters
-st.model_lab   = 'PC';
+st.model_lab   = 'pCNI_PC';
 st.regress_rt  = 0;    % regrees reaction time off before running ANOVA
-st.groups      = {'PC'};
+st.groups      = {'pCNI','PC'};
 st.n_boots     = 1000;
 
 % RT Correlation Parameters

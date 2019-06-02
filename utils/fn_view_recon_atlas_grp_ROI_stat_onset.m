@@ -9,6 +9,7 @@ function fn_view_recon_atlas_grp_ROI_stat_onset(SBJs, proc_id, stat_id, an_id, r
 %       NOPE: 'CI': inc vs. con via ft statistics (not run for all patients!)
 %       'RT': correlation with RT (red for significant)
 %       'CNI': ANOVA of congruence (red for sig)
+%       'pCNI': ANOVA of previous trial congruence (red for sig)
 %       'PC': ANOVA of proportion congruence (red for sig)
 %   an_id [str] - analysis ID for preprocessing, filtering, etc.
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
@@ -95,15 +96,15 @@ eval(['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m']);
 if strcmp(stat_id,'actv') || strcmp(stat_id,'CSE')
     cond_lab = stat_id;
     error('not ready for actv or CSE yet');
-elseif strcmp(stat_id,'crRT_CNI_PC_WL200_WS50')
+else%if strcmp(stat_id,'crRT_CNI_PC_WL200_WS50')
     % Get condition info
     [grp_lab, ~, ~] = fn_group_label_styles(model_lab);
     % if rt_correlation
     [rt_lab, ~, ~]     = fn_group_label_styles('RT');
     % end
     cond_lab = [grp_lab rt_lab];
-else
-    error(['Unknown stat_id: ' stat_id]);
+% else
+%     error(['Unknown stat_id: ' stat_id]);
 end
 
 % Prep report
@@ -130,10 +131,7 @@ end
 
 % Get Time Bin and Sliding Window Parameters
 eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJs{1} '_vars.m']);
-load(strcat(SBJ_vars.dirs.proc,SBJs{1},'_ANOVA_ROI_',stat_id,'_',an_id,'.mat'),'stat');
-sample_rate = (numel(stat.time)-1)/(stat.time(end)-stat.time(1));
-win_lim    = fn_sliding_window_lim(stat.time,round(st.win_len*sample_rate),round(st.win_step*sample_rate));
-win_center = round(mean(win_lim,2));
+load(strcat(SBJ_vars.dirs.proc,SBJs{1},'_mANOVA_ROI_',stat_id,'_',an_id,'.mat'),'stat');
 % 4 ROIs = R time bins: -0.5, -0.1, 0.25, 0.6, 1.0
 %   peak_bins = [7 14 21 40; 7 14 21 40; 400 800 1200 2000];
 % 4 ROIs = R time bins: [0.3 0.6 1 2]
@@ -143,7 +141,7 @@ for cond_ix = 1:numel(cond_lab)
     % Determine coloring
     if strcmp(tbin_id,'cnts')
         if any(strcmp(cond_lab{cond_ix},grp_lab))
-            n_tbins{cond_ix} = numel(win_center);
+            n_tbins{cond_ix} = numel(w2.time);
         else
             n_tbins{cond_ix} = numel(stat.time);
         end
@@ -231,24 +229,18 @@ for sbj_ix = 1:numel(SBJs)
         end
     else
         % Load data
-        load(strcat(SBJ_vars.dirs.proc,SBJ,'_ANOVA_ROI_',stat_id,'_',an_id,'.mat'));
-        
-        % FDR correct pvalues for ANOVA
-        qvals = NaN(size(w2.pval));
-        for elec_ix = 1:numel(stat.label)
-            [~, ~, ~, qvals(:,elec_ix,:)] = fdr_bh(squeeze(w2.pval(:,elec_ix,:)));%,0.05,'pdep','yes');
-        end
+        load(strcat(SBJ_vars.dirs.proc,SBJ,'_mANOVA_ROI_',stat_id,'_',an_id,'.mat'));
         
         % Aggregate results per elec
         for elec_ix = 1:numel(elec_sbj{sbj_ix,1}.label)
             orig_lab = strrep(elec_sbj{sbj_ix,1}.label{elec_ix},[SBJs{sbj_ix} '_'],'');
-            stat_ix  = find(strcmp(stat.label,orig_lab));
+            w2_ix  = find(strcmp(w2.label,orig_lab));
             % Get ANOVA group onsets
             for grp_ix = 1:numel(grp_lab)
-                if any(squeeze(qvals(grp_ix,stat_ix,:))<0.05)
+                if any(squeeze(w2.qval(grp_ix,w2_ix,:))<st.alpha)
                     %                 sig_ch{sbj_ix,grp_ix} = [sig_ch{sbj_ix,grp_ix} stat.label{ch_ix}];
-                    sig_onset_ix = find(squeeze(qvals(grp_ix,stat_ix,:))<0.05,1);
-                    sig_onsets   = stat.time(win_lim(sig_onset_ix,1));
+                    sig_onset_ix = find(squeeze(w2.qval(grp_ix,w2_ix,:))<st.alpha,1);
+                    sig_onsets   = w2.time(sig_onset_ix)-st.win_len/2;
                     if strcmp(evnt_lab,'R')
                         elec_sbj{sbj_ix,grp_ix}.onset_ix(elec_ix) = sig_onset_ix(1);
                         elec_sbj{sbj_ix,grp_ix}.onset(elec_ix)    = sig_onsets(1);
@@ -260,10 +252,10 @@ for sbj_ix = 1:numel(SBJs)
             end
             
             % Get RT correlation onset
-            if sum(squeeze(stat.mask(stat_ix,1,:)))>0
+            if st.rt_corr && sum(squeeze(stat.mask(w2_ix,1,:)))>0
                 %             sig_ch{sbj_ix,numel(grp_lab)+1} = [sig_ch{sbj_ix,numel(grp_lab)+1} stat.label{ch_ix}];
-                mask_chunks = fn_find_chunks(squeeze(stat.mask(stat_ix,1,:)));
-                mask_chunks(squeeze(stat.mask(stat_ix,1,mask_chunks(:,1)))==0,:) = [];
+                mask_chunks = fn_find_chunks(squeeze(stat.mask(w2_ix,1,:)));
+                mask_chunks(squeeze(stat.mask(w2_ix,1,mask_chunks(:,1)))==0,:) = [];
                 % Convert the first onset of significance to time
                 onset_time = stat.time(mask_chunks(1,1));
                 % Exclude differences after the mean RT for this SBJ

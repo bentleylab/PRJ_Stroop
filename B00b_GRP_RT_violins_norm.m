@@ -265,8 +265,8 @@ hold on; ax = gca;
 
 stroop = zeros([numel(SBJs) numel(pc_lab)]);
 design = zeros([numel(SBJs) numel(pc_lab)]);
-con_ix = find(strcmp(cni_lab,'con'));
-inc_ix = find(strcmp(cni_lab,'inc'));
+con_ix = find(strcmp(cni_lab,'C'));
+inc_ix = find(strcmp(cni_lab,'I'));
 for pc_ix = 1:numel(pc_lab)
     for s_ix = 1:numel(SBJs)
         con_rts = rts{s_ix}(pc_idx{s_ix}==pc_ix & cni_idx{s_ix}==con_ix);
@@ -285,18 +285,21 @@ violins = violinplot(stroop, pc_lab,...
                      'ViolinAlpha', violin_alpha, 'ShowData', true);
 
 % Adjust plot propeties
+legend_obj = cell(size(pc_lab));
 for pc_ix = 1:numel(pc_lab)
     % Change scatter colors to mark condition
     violins(pc_ix).ViolinColor = pc_colors{pc_ix};
     violins(pc_ix).BoxPlot.FaceColor = pc_colors{pc_ix};
     violins(pc_ix).EdgeColor = pc_colors{pc_ix};
+    % Grab violin for legend
+    legend_obj{pc_ix} = violins(pc_ix).ViolinPlot;
 end
 ax.FontSize        = tick_sz;
-ax.YLabel.String   = 'Inc-Con RT (z-score)';
+ax.YLabel.String   = 'I-C RT (z-score)';
 ax.YLabel.FontSize = axis_sz;
 ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') Stroop RT Effect by PC: p=' num2str(pval,'%.3f')];
 ax.Title.FontSize  = title_sz;
-legend([violins{:}],pc_lab,'FontSize',leg_sz,'Location','best');
+legend([legend_obj{:}],pc_lab,'FontSize',leg_sz,'Location','best');
 
 if save_fig
     fig_fname = [fig_dir fig_name '.' fig_ftype];
@@ -313,54 +316,109 @@ fig_name = 'GRP_RT_violins_PC_N';
 figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.4 0.5],'Visible',fig_vis);
 hold on; ax = gca;
 
-% Separate data by PC
+% % Separate data by PC
+% n_ix = find(strcmp(cni_lab,'N'));
+% rt_grps   = cell(size(pc_lab));
+% sbj_n_idx = cell(size(pc_lab));
+% pc_n_idx  = cell(size(pc_lab));
+% pc_legend = cell(size(pc_lab));
+% for pc_ix = 1:numel(pc_lab)
+%     for s_ix = 1:numel(SBJs)
+%         rt_grps{pc_ix}   = [rt_grps{pc_ix}; rts{s_ix}(pc_idx{s_ix}==pc_ix & cni_idx{s_ix}==n_ix)];
+%         sbj_n_idx{pc_ix} = [sbj_n_idx{pc_ix}; sbj_idx{s_ix}(pc_idx{s_ix}==pc_ix & cni_idx{s_ix}==n_ix)];
+%         pc_n_idx{pc_ix}  = [pc_n_idx{pc_ix}; pc_idx{s_ix}(pc_idx{s_ix}==pc_ix & cni_idx{s_ix}==n_ix)];
+%     end
+%     pc_legend{pc_ix} = [pc_lab{pc_ix} ' (n=' num2str(numel(rt_grps{pc_ix})) ')'];
+% end
+% 
+% % Run ANOVA on Neutral Trials
+% factor_lab = {'PC','SBJ'};
+% [pval, table] = anovan(vertcat(rt_grps{:}),...
+%     {vertcat(pc_n_idx{:}), vertcat(sbj_n_idx{:})},...
+%     'model', 'interaction', 'random', 2,...%, 'sstype', 3% 'continuous', strmatch('RT',w2.cond),
+%     'varnames', factor_lab, 'display', 'off');
+
+% % Create PC groups combining EQ + MI
+% n_ix = find(strcmp(cni_lab,'N'));
+% eq_ix = find(strcmp(pc_lab,'EQ'));
+% mc_ix = find(strcmp(pc_lab,'MC'));
+% mi_ix = find(strcmp(pc_lab,'MI'));
+% n_pc_lab = [pc_lab(mc_ix) strjoin(pc_lab([eq_ix, mi_ix]),'+')];
+% n_pc_colors = [pc_colors(mc_ix) {mean([pc_colors{eq_ix}; pc_colors{mi_ix}],1)}];
+% 
+% % Separate data by PC, but combine EQ and MI
+% rt_grps   = cell(size(n_pc_lab));
+% sbj_n_idx = cell(size(n_pc_lab));
+% pc_n_idx  = cell(size(n_pc_lab));
+% pc_legend = cell(size(n_pc_lab));
+% for pc_ix = 1:numel(n_pc_lab)
+%     for s_ix = 1:numel(SBJs)
+%         if pc_ix==1
+%             tmp_pc_idx = pc_idx{s_ix}==mc_ix;
+%         else
+%             tmp_pc_idx = any([pc_idx{s_ix}==eq_ix pc_idx{s_ix}==mi_ix],2);
+%         end
+%         rt_grps{pc_ix}   = [rt_grps{pc_ix}; rts{s_ix}(tmp_pc_idx & cni_idx{s_ix}==n_ix)];
+%         sbj_n_idx{pc_ix} = [sbj_n_idx{pc_ix}; sbj_idx{s_ix}(tmp_pc_idx & cni_idx{s_ix}==n_ix)];
+%         pc_n_idx{pc_ix}  = [pc_n_idx{pc_ix}; pc_idx{s_ix}(tmp_pc_idx & cni_idx{s_ix}==n_ix)];
+%     end
+%     pc_legend{pc_ix} = [n_pc_lab{pc_ix} ' (n=' num2str(numel(rt_grps{pc_ix})) ')'];
+% end
+
+% Compare only MI and MC
 n_ix = find(strcmp(cni_lab,'N'));
-rt_grps   = cell(size(pc_lab));
-sbj_n_idx = cell(size(pc_lab));
-pc_n_idx  = cell(size(pc_lab));
-pc_legend = cell(size(pc_lab));
-for pc_ix = 1:numel(pc_lab)
+mc_ix = find(strcmp(pc_lab,'MC'));
+mi_ix = find(strcmp(pc_lab,'MI'));
+n_pc_lab = pc_lab([mc_ix mi_ix]);
+n_pc_colors = pc_colors([mc_ix mi_ix]);
+
+% Separate data by PC, but combine EQ and MI
+rt_grps   = cell(size(n_pc_lab));
+sbj_n_idx = cell(size(n_pc_lab));
+pc_n_idx  = cell(size(n_pc_lab));
+pc_legend = cell(size(n_pc_lab));
+for pc_ix = 1:numel(n_pc_lab)
     for s_ix = 1:numel(SBJs)
-        rt_grps{pc_ix}   = [rt_grps{pc_ix}; rts{s_ix}(pc_idx{s_ix}==pc_ix & cni_idx{s_ix}==n_ix)];
-        sbj_n_idx{pc_ix} = [sbj_n_idx{pc_ix}; sbj_idx{s_ix}(pc_idx{s_ix}==pc_ix & cni_idx{s_ix}==n_ix)];
-        pc_n_idx{pc_ix}  = [pc_n_idx{pc_ix} pc_idx{s_ix}(cni_idx{s_ix}==n_ix)];
+        tmp_pc_idx = pc_idx{s_ix}==find(strcmp(pc_lab,n_pc_lab{pc_ix}));
+        rt_grps{pc_ix}   = [rt_grps{pc_ix}; rts{s_ix}(tmp_pc_idx & cni_idx{s_ix}==n_ix)];
+        sbj_n_idx{pc_ix} = [sbj_n_idx{pc_ix}; sbj_idx{s_ix}(tmp_pc_idx & cni_idx{s_ix}==n_ix)];
+        pc_n_idx{pc_ix}  = [pc_n_idx{pc_ix}; pc_idx{s_ix}(tmp_pc_idx & cni_idx{s_ix}==n_ix)];
     end
-    pc_legend{pc_ix} = [pc_lab{pc_ix} ' (n=' num2str(numel(rt_grps{pc_ix})) ')'];
+    pc_legend{pc_ix} = [n_pc_lab{pc_ix} ' (n=' num2str(numel(rt_grps{pc_ix})) ')'];
 end
 
 % Run ANOVA on Neutral Trials
 factor_lab = {'PC','SBJ'};
 [pval, table] = anovan(vertcat(rt_grps{:}),...
-    {vertcat(pc_idx{:}), vertcat(sbj_idx{:})},...
-    'model', 'interaction', 'random', 3,...%, 'sstype', 3% 'continuous', strmatch('RT',w2.cond),
+    {vertcat(pc_n_idx{:}), vertcat(sbj_n_idx{:})},...
+    'model', 'interaction', 'random', 2,...%, 'sstype', 3% 'continuous', strmatch('RT',w2.cond),
     'varnames', factor_lab, 'display', 'off');
-[pval, table] = anova1(rts(cni_idx==n_ix), pc_idx(cni_idx==n_ix), 'off');
 
 % Plot Violins
-violins = violinplot(padcat(rt_grps{:}), pc_lab,...
+violins = violinplot(padcat(rt_grps{:}), n_pc_lab,...
                      'ViolinAlpha', violin_alpha, 'ShowData', false);
 
 % Adjust plot propeties
-legend_obj = cell(size(pc_lab));
-for pc_ix = 1:numel(pc_lab)
+legend_obj = cell(size(n_pc_lab));
+for pc_ix = 1:numel(n_pc_lab)
     % Change scatter colors to mark condition
-    violins(pc_ix).ViolinColor = pc_colors{pc_ix};
-    violins(pc_ix).BoxPlot.FaceColor = pc_colors{pc_ix};
-    violins(pc_ix).EdgeColor = pc_colors{pc_ix};
+    violins(pc_ix).ViolinColor = n_pc_colors{pc_ix};
+    violins(pc_ix).BoxPlot.FaceColor = n_pc_colors{pc_ix};
+    violins(pc_ix).EdgeColor = n_pc_colors{pc_ix};
     % Grab violin for legend
     legend_obj{pc_ix} = violins(pc_ix).ViolinPlot;
 end
 ax.FontSize        = tick_sz;
 ax.YLabel.String   = 'RT (z-score)';
 ax.YLabel.FontSize = axis_sz;
-ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') RTs: N PC p=' num2str(pval,'%.3f')];
+ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') RTs: N PC p=' num2str(pval(1),'%.3f')];
 ax.Title.FontSize  = title_sz;
 legend([legend_obj{:}],pc_legend,'FontSize',leg_sz,'Location','best');
 
 if save_fig
-    fig_fname = [fig_dir fig_name '.' fig_type];
+    fig_fname = [fig_dir fig_name '.' fig_ftype];
     fprintf('Saving %s\n',fig_fname);
-    if strcmp(fig_type,'eps')
+    if strcmp(fig_ftype,'eps')
         eval(['export_fig ' fig_fname]);
     else
         saveas(gcf,fig_fname);

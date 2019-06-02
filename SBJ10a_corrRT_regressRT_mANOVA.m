@@ -36,8 +36,8 @@ for grp_ix = 1:numel(st.groups)
     [levels{grp_ix}, ~, ~] = fn_condition_label_styles(st.groups{grp_ix});
     design{grp_ix} = nan([numel(trial_info.trial_n) 1]);
     for level_ix = 1:numel(levels{grp_ix})
-        trl_idx = fn_condition_index(levels{grp_ix}{level_ix}, trial_info.condition_n);
-        design{grp_ix}(logical(trl_idx)) = level_ix;
+        trl_idx = fn_condition_index(levels{grp_ix}{level_ix}, trial_info.condition_n, 'trial_info', trial_info);
+        design{grp_ix}(trl_idx) = level_ix;
     end
 end
 
