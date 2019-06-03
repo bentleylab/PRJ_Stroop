@@ -29,6 +29,7 @@ event_lab = {'stim', 'resp'};
 
 % Load RTs
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
+srate = trial_info.sample_rate;
 
 f_name_s = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id_s '.mat'];
 f_name_r = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id_r '.mat'];
@@ -39,9 +40,6 @@ tmp = load(f_name_r,'w2'); w2{2} = tmp.w2;
 tmp = load(f_name_s,'stat'); stat{1} = tmp.stat;
 tmp = load(f_name_r,'stat'); stat{2} = tmp.stat;
 clear tmp
-
-%!!! is this the best way to do this??? Maybe not...
-sample_rate = (numel(stat{1}.time)-1)/(stat{1}.time(end)-stat{1}.time(1));
 
 % Load ROI and GM/WM info
 elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_pat_' atlas_id '_tis.mat'];
@@ -63,7 +61,7 @@ for sr_ix = 1:2
     end
     
     % Get Sliding Window Parameters
-    win_lim{sr_ix}    = fn_sliding_window_lim(stat{sr_ix}.time,round(st.win_len*sample_rate),round(st.win_step*sample_rate));
+    win_lim{sr_ix}    = fn_sliding_window_lim(stat{sr_ix}.time,round(st.win_len*srate),round(st.win_step*srate));
     win_center{sr_ix} = round(mean(win_lim{sr_ix},2));
     
     % Convert % explained variance to 0-100 scale
@@ -71,8 +69,6 @@ for sr_ix = 1:2
 end
 
 % Trim data to plotting epoch
-%   NOTE: stat should be on stat_lim(1):stat_lim(2)+0.001 time axis
-%   w2 should fit within that since it's averaging into a smaller window
 cfg_trim = [];
 cfg_trim.latency = plt_vars.plt_lim_S;
 % hfa{1}  = ft_selectdata(cfg_trim,hfa{1});
@@ -241,7 +237,7 @@ for cond_ix = 1:numel(cond_lab)
             ax.YTick         = yticks;
             ax.YLabel.String = ylab;
             ax.XLim          = [0,size(stat{sr_ix}.time,2)];
-            ax.XTick         = 0:plt_vars.x_step_sz*sample_rate:size(stat{sr_ix}.time,2);
+            ax.XTick         = 0:plt_vars.x_step_sz*srate:size(stat{sr_ix}.time,2);
             ax.XTickLabel    = x_tick_lab;
             ax.XLabel.String = 'Time (s)';
 %             ax(2).YColor        = 'k';

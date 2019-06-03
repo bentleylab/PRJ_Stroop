@@ -22,6 +22,7 @@ eval(stat_vars_cmd);
 hfa_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'.mat');
 load(hfa_fname);
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'));
+srate = trial_info.sample_rate;
 
 %% Run Statistics
 fprintf('===================================================\n');
@@ -32,7 +33,7 @@ fprintf('===================================================\n');
 cfg_trim = [];
 cfg_trim.latency = st.stat_lim;
 hfa_stat = ft_selectdata(cfg_trim,hfa);
-sample_rate = (numel(hfa.time)-1)/(hfa.time(end)-hfa.time(1));
+srate = (numel(hfa.time)-1)/(hfa.time(end)-hfa.time(1));
 
 actv_ch = cell(size(hfa.label));
 actv_ch_epochs = cell(size(hfa.label));
@@ -53,7 +54,7 @@ for ch_ix = 1:numel(hfa_stat.label)
     actv_chunks = fn_find_chunks(actv_mask);
     actv_chunks(actv_mask(actv_chunks(:,1))==0,:) = [];
     actv_chunk_sz = diff(actv_chunks,1,2)+1;
-    actv_epochs = actv_chunks(actv_chunk_sz > sample_rate*st.actv_win,:);
+    actv_epochs = actv_chunks(actv_chunk_sz > srate*st.actv_win,:);
     if ~isempty(actv_epochs)
         actv_ch = {actv_ch{:} hfa_stat.label{ch_ix}};
         actv_ch_epochs = {actv_ch_epochs{:}, hfa_stat.time(actv_epochs)};

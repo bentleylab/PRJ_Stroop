@@ -63,19 +63,16 @@ for sbj_ix = 1:numel(SBJs)
     eval(SBJ_vars_cmd);
     
     % Compute mean RT
+    load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
     if strcmp(st.evnt_lab,'S')
-        load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
         % Compute mean RT
         mean_RTs(sbj_ix) = mean(trial_info.response_time);
     end
     % Load data
     load(strcat(SBJ_vars.dirs.proc,SBJ,'_mANOVA_ROI_',stat_id,'_',an_id,'.mat'));
     
-    %% Process parameters
-    sample_rate = (numel(stat.time)-1)/(stat.time(end)-stat.time(1));
-    
     % Get Sliding Window Parameters
-    win_lim    = fn_sliding_window_lim(stat.time,round(st.win_len*sample_rate),round(st.win_step*sample_rate));
+    win_lim    = fn_sliding_window_lim(stat.time,round(st.win_len*trail_info.sample_rate),round(st.win_step*trail_info.sample_rate));
     win_center = round(mean(win_lim,2));
     
     %% Load ROI and GM/WM info
@@ -148,7 +145,7 @@ for sbj_ix = 1:numel(SBJs)
             end
         end
     end
-    clear SBJ SBJ_vars hfa stat elec w2
+    clear SBJ SBJ_vars hfa stat elec w2 trial_info st
 end
 
 %% Aggregate/Process onsets per gROI

@@ -44,6 +44,7 @@ an_ids   = {an_id_s an_id_r}; stat_ids = {stat_id_s stat_id_r};
 
 % Load RTs
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
+srate = trial_info.sample_rate;
 
 % Load data
 hfa        = cell([2 1]);
@@ -107,22 +108,14 @@ end
 % If singe trial format, check all time axes are the same
 time_cells = [iscell(hfa{1}.time), iscell(hfa{2}.time)];
 if any(time_cells)
-    sample_rate = zeros([1 2]);
     for sr_ix = find(time_cells)
         for t_ix = 2:numel(hfa{sr_ix}.time)
             if ~all(hfa{sr_ix}.time{1}==hfa{sr_ix}.time{t_ix})
                 error('Time axes arent the same for all trials!');
             end
         end
-        sample_rate(sr_ix) = (numel(hfa{sr_ix}.time{1})-1)/(hfa{sr_ix}.time{1}(end)-hfa{sr_ix}.time{1}(1));
-    end
-    if diff(sample_rate) > 1
-        error('sample rates dont match between analyses!');
-    else
-        sample_rate = sample_rate(1);
     end
 else
-    sample_rate = (numel(hfa{1}.time)-1)/(hfa{1}.time(end)-hfa{1}.time(1));
     % Confirm hfa covers stat
     for sr_ix = 1:numel(evnt_lab)
         if strcmp(conditions,'RT')
@@ -131,8 +124,8 @@ else
             end
         elseif any(strcmp(conditions,grp_lab))
             % Allow for some imprecision (error if off by at least 1 sample)
-            if (w2{sr_ix}.time(1)-st.win_len/2)-hfa{sr_ix}.time(1)<=-1/sample_rate || ...
-                    (w2{sr_ix}.time(end)+st.win_len/2)-hfa{sr_ix}.time(end)>=-1/sample_rate
+            if (w2{sr_ix}.time(1)-st.win_len/2)-hfa{sr_ix}.time(1)<=-1/srate || ...
+                    (w2{sr_ix}.time(end)+st.win_len/2)-hfa{sr_ix}.time(end)>=-1/srate
                 error('Time axes arent the same for hfa and ANOVA w2!');
             end
         end
@@ -149,7 +142,7 @@ hfa{2} = ft_selectdata(cfg_trim,hfa{2});
 
 % Compile cond_type, RT, trial_n
 if strcmp(conditions,'actv')
-    [sort_rts, sort_rt_idx] = sort(round(sample_rate*trial_info.response_time));
+    [sort_rts, sort_rt_idx] = sort(round(srate*trial_info.response_time));
     % Fake cond_mat with only sorted RTs
     cond_mat = [ones([numel(trial_info.trial_n) 1]) sort_rts sort_rt_idx];
 else
@@ -161,14 +154,13 @@ else
     end
     
     % Create matrix of [cond_idx, rt, trial_ix]
-    cond_mat = horzcat(cond_mat,round(sample_rate*trial_info.response_time),[1:numel(cond_mat)]');
+    cond_mat = horzcat(cond_mat,round(srate*trial_info.response_time),[1:numel(cond_mat)]');
     cond_mat = sortrows(cond_mat,[1 2]);
 end
 
 %% Prep stats
 if strcmp(conditions,'RT')
     % Trim data to plotting epoch
-    %   NOTE: stat should be on stat_lim(1):stat_lim(2)+0.001 time axis
     cfg_trim = [];
     cfg_trim.latency = plt_vars.plt_lim_S;
     stat{1} = ft_selectdata(cfg_trim,stat{1});
@@ -185,7 +177,7 @@ elseif any(strcmp(conditions,grp_lab))
         stat{sr_ix}.mask = zeros([numel(w2{sr_ix}.label) size(hfa{sr_ix}.time,2)]);
         
         % Get Sliding Window Parameters
-        win_lim = fn_sliding_window_lim(hfa{sr_ix}.time,round(st.win_len*sample_rate),round(st.win_step*sample_rate));
+        win_lim = fn_sliding_window_lim(hfa{sr_ix}.time,round(st.win_len*srate),round(st.win_step*srate));
         [~, offset_ix] = min(abs(hfa{sr_ix}.time-(w2{sr_ix}.time(1)-st.win_len/2)));
         
         for ch_ix = 1:numel(stat{1}.label)
@@ -261,15 +253,15 @@ for ch_ix = 1:numel(hfa{1}.label)
         set(gca,'YDir','normal');
         if strcmp(evnt_lab{sr_ix},'S')
             x_tick_lab = plt_vars.plt_lim_S(1):plt_vars.x_step_sz:plt_vars.plt_lim_S(2);
-            event_time = -plt_vars.plt_lim_S(1)*sample_rate;
+            event_time = -plt_vars.plt_lim_S(1)*srate;
             for cond_ix = 1:numel(cond_lab)
                 idx = cond_mat(:,1)==cond_ix;
-                scat = scatter(cond_mat(idx,2)-plt_vars.plt_lim_S(1)*sample_rate,find(idx),...
+                scat = scatter(cond_mat(idx,2)-plt_vars.plt_lim_S(1)*srate,find(idx),...
                     'MarkerFaceColor',[cond_colors{cond_ix}],'MarkerEdgeColor','k');
             end
         else
             x_tick_lab = plt_vars.plt_lim_R(1):plt_vars.x_step_sz:plt_vars.plt_lim_R(2);
-            event_time = -plt_vars.plt_lim_R(1)*sample_rate;
+            event_time = -plt_vars.plt_lim_R(1)*srate;
         end
         ylim([1 size(cond_mat,1)]);
         event_line = line([event_time event_time],ylim,...
@@ -280,7 +272,7 @@ for ch_ix = 1:numel(hfa{1}.label)
 %         ax.legend = plt_vars.legend;
         ax.Title.String  = [hfa{sr_ix}.label{ch_ix} ' (' elec.roi{ch_ix} '): ' evnt_lab{sr_ix} ' trials'];
         ax.XLim          = [0,size(ch_data{sr_ix},2)];
-        ax.XTick         = 0:plt_vars.x_step_sz*sample_rate:size(ch_data{sr_ix},2);
+        ax.XTick         = 0:plt_vars.x_step_sz*srate:size(ch_data{sr_ix},2);
         ax.XTickLabel    = x_tick_lab;
         ax.XLabel.String = 'Time (s)';
         ax.YLabel.String = 'Trials';
@@ -301,8 +293,8 @@ for ch_ix = 1:numel(hfa{1}.label)
             
             % Plot mean RT (for S-locked)
             if strcmp(evnt_lab{sr_ix},'S')
-                line([mean(cond_mat(cond_mat(:,1)==cond_ix,2))-plt_vars.plt_lim_S(1)*sample_rate...
-                    mean(cond_mat(cond_mat(:,1)==cond_ix,2))-plt_vars.plt_lim_S(1)*sample_rate],erp_ylims,...
+                line([mean(cond_mat(cond_mat(:,1)==cond_ix,2))-plt_vars.plt_lim_S(1)*srate...
+                    mean(cond_mat(cond_mat(:,1)==cond_ix,2))-plt_vars.plt_lim_S(1)*srate],erp_ylims,...
                     'Color',cond_colors{cond_ix},'LineStyle',plt_vars.evnt_style);
             end
         end
@@ -339,13 +331,13 @@ for ch_ix = 1:numel(hfa{1}.label)
         
         % Plot Event Line
         if strcmp(evnt_lab{sr_ix},'R')
-            line([-plt_vars.plt_lim_R(1)*sample_rate -plt_vars.plt_lim_R(1)*sample_rate],erp_ylims,...
+            line([-plt_vars.plt_lim_R(1)*srate -plt_vars.plt_lim_R(1)*srate],erp_ylims,...
                 'Color','k');%'LineWidth',plt_vars.evnt_width,
         end
         ax = gca;
         ax.YLim          = erp_ylims;
         ax.XLim          = [0,size(ch_data{sr_ix},2)];
-        ax.XTick         = 0:plt_vars.x_step_sz*sample_rate:size(ch_data{sr_ix},2);
+        ax.XTick         = 0:plt_vars.x_step_sz*srate:size(ch_data{sr_ix},2);
         ax.XTickLabel    = x_tick_lab;
         ax.XLabel.String = 'Time (s)';
         ax.YLabel.String = 'HFA';

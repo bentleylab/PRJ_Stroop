@@ -7,23 +7,19 @@ min_rt_thresh  = 0.35;
 min_rt_thresh2 = 0.3;
 str = 'not yet';
 for s = 1:numel(SBJs)
-    load([root_dir 'PRJ_Stroop/data/' SBJs{s} '/03_events/' SBJs{s} '_trial_info_final.mat']);
+    tmp = load([root_dir 'PRJ_Stroop/data/' SBJs{s} '/03_events/' SBJs{s} '_trial_info_final.mat']);
 %     max_RTs(s) = min(ITI);
 %     max_RTs(s) = max(tmp.trial_info.response_time);
-    fprintf('%s = %.3f - %.3f\n',SBJs{s},min(trial_info.response_time),max(trial_info.response_time));
+    fprintf('%s = %.3f - %.3f\n',SBJs{s},min(tmp.trial_info.response_time),max(tmp.trial_info.response_time));
     
     % Check that ti.response_time is accurate
-    %   IR67 is off by +/-1ms, likely due to sampling rate = 500 Hz
-    if any((trial_info.response_time-(trial_info.resp_onset-trial_info.word_onset)./trial_info.sample_rate)>0.0011)
-        error(['bad rts in ' SBJs{s}]);
-    end
-    
+    if any((tmp.trial_info.resp_onset-tmp.trial_info.word_onset)./trial_info.sample_rate)
     % Print RTs below 0.4s
-    short_rts = find(trial_info.response_time<min_rt_thresh);
+    short_rts = find(tmp.trial_info.response_time<min_rt_thresh);
     if ~isempty(short_rts)
         fprintf(2,'\t%s < %.2f = %i\n',SBJs{s},min_rt_thresh,numel(short_rts));
-        if any(trial_info.response_time<min_rt_thresh2)
-            fprintf(2,'\t%s < %.2f = %i\n',SBJs{s},min_rt_thresh2,sum(trial_info.response_time<min_rt_thresh2));
+        if any(tmp.trial_info.response_time<min_rt_thresh2)
+            fprintf(2,'\t%s < %.2f = %i\n',SBJs{s},min_rt_thresh2,sum(tmp.trial_info.response_time<min_rt_thresh2));
         end
 %         tmp.trial_info.response_time(short_rts)
     end
@@ -36,6 +32,6 @@ for s = 1:numel(SBJs)
 % %     set(gca,'xlim',[0 4]);
 %     title(SBJs{s});
 %     pause;
-    clear trial_info
+    clear tmp
 end
 % fprintf('Maximum RT = %f\n',max(max_RTs));

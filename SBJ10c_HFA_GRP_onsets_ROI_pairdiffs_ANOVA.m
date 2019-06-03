@@ -44,27 +44,19 @@ for sbj_ix = 1:numel(SBJs)
     % Load variables
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
     eval(SBJ_vars_cmd);
+    load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
+    srate = trial_info.sample_rate;
     
     % Compute mean RT
     if strcmp(event_type,'stim')
-        load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
         % Compute mean RT
         mean_RTs(sbj_ix) = mean(trial_info.response_time);
     end
     % Load data
-    load(strcat(SBJ_vars.dirs.proc,SBJ,'_ANOVA_ROI_',stat_id,'_',an_id,'.mat'));
-    
-    %% Process parameters
-    sample_rate = (numel(stat.time)-1)/(stat.time(end)-stat.time(1));
-    
-    % FDR correct pvalues for ANOVA
-    qvals = NaN(size(w2.pval));
-    for ch_ix = 1:numel(stat.label)
-        [~, ~, ~, qvals(:,ch_ix,:)] = fdr_bh(squeeze(w2.pval(:,ch_ix,:)));%,0.05,'pdep','yes');
-    end
+    load(strcat(SBJ_vars.dirs.proc,SBJ,'_mANOVA_ROI_',stat_id,'_',an_id,'.mat'));
     
     % Get Sliding Window Parameters
-    win_lim    = fn_sliding_window_lim(stat.time,round(st.win_len*sample_rate),round(st.win_step*sample_rate));
+    win_lim    = fn_sliding_window_lim(stat.time,round(st.win_len*srate),round(st.win_step*srate));
     win_center = round(mean(win_lim,2));
     
     %% Load ROI and GM/WM info
@@ -86,8 +78,8 @@ for sbj_ix = 1:numel(SBJs)
             roi_ix = find(strcmp(elec.roi{ch_ix},roi_list));
             % Get ANOVA group onsets
             for grp_ix = 1:numel(grp_lab)
-                if any(squeeze(qvals(grp_ix,ch_ix,:))<0.05)
-                    sig_onsets = stat.time(win_lim(squeeze(qvals(grp_ix,ch_ix,:))<0.05,1));
+                if any(squeeze(w2.qval(grp_ix,ch_ix,:))<st.alpha)
+                    sig_onsets = stat.time(win_lim(squeeze(w2.qval(grp_ix,ch_ix,:))<st.alpha,1));
                     if strcmp(event_type,'resp')% && (sig_onsets(1)<0)
                         all_onsets{sbj_ix,roi_ix,grp_ix} = [all_onsets{sbj_ix,roi_ix,grp_ix} sig_onsets(1)];
                         all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} = [all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} stat.label(ch_ix)];
@@ -120,7 +112,7 @@ for sbj_ix = 1:numel(SBJs)
         end
     end
     
-    clear SBJ SBJ_vars hfa stat elec w2
+    clear SBJ SBJ_vars hfa stat elec w2 st trial_info
 end
 
 %% Compute median onsets and onset differences per ROI pair

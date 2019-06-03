@@ -1,12 +1,11 @@
-
 function [labels, colors, line_styles] = fn_group_label_styles(model_id)
 %% Converts the name of a set of conditions into labels, plotting colors/styles
 % condition_name: [str] 'CNI', 'CI', 'PC'
 % colors from http://colorbrewer2.org/#type=qualitative&scheme=Set1&n=3
 
 %% List of possible labels and their colors
-conditions  = {'RT','CNI','PC'};
-cond_colors = {[77 175 74]./256, [228 26 28]./256, [55 126 184]./256};
+conditions  = {'RT','pCNI','CNI','PC'};
+cond_colors = {[77 175 74]./256, [228 26 28]./256, [228 26 28]./256, [55 126 184]./256};
 % Taken from: colorbrewer2.org, qualitative, 5-class Set1
 %   currently: green, red, blue
 %   purple for later: [152 78  163]
@@ -37,10 +36,10 @@ switch model_id
 end
 
 % Assign colors and line styles
-colors = {};
-line_styles = {};
+colors = cell(size(labels));
+line_styles = cell(size(labels));
 for cond_ix = 1:numel(labels)
-    colors{cond_ix} = cond_colors{strmatch(labels{cond_ix},conditions,'exact')};
+    colors{cond_ix} = cond_colors{strcmp(conditions,labels{cond_ix})};
     line_styles{cond_ix} = '-';
 end
 

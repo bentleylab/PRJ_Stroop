@@ -76,14 +76,10 @@ for sbj_ix = 1:numel(SBJs)
 %     tmp = load(CSE_filename,'stat'); cse = tmp.stat;
     
     % Compute mean RT
+    load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
     if strcmp(evnt_lab,'S')
-        load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
         mean_RTs(sbj_ix) = mean(trial_info.response_time);
     end
-    
-    %% Process parameters
-    %!!! is this the best way to do this??? Maybe not...
-    sample_rate = (numel(hfa.time)-1)/(hfa.time(end)-hfa.time(1));
     
     % Restrict hfa to stat_lim (should obviate some of below comparisons)
     cfg_lim = [];
@@ -98,8 +94,8 @@ for sbj_ix = 1:numel(SBJs)
     end
     if rt_grp
         % All the rounding and such is because some stupid rounding errors...
-        same_start = round(hfa.time(1)*uint8(sample_rate))==round(stat.time(1)*uint8(sample_rate));
-        same_end   = round(hfa.time(end)*uint8(sample_rate))==round(stat.time(end)*uint8(sample_rate));
+        same_start = round(hfa.time(1)*uint8(trail_info.sample_rate))==round(stat.time(1)*uint8(trail_info.sample_rate));
+        same_end   = round(hfa.time(end)*uint8(trail_info.sample_rate))==round(stat.time(end)*uint8(trail_info.sample_rate));
         same_numel = size(hfa.time,2)==size(stat.time,2);
         if ~same_start || ~same_end || ~same_numel
             error('time axes are not the same across hfa analyses!');
@@ -199,7 +195,7 @@ for sbj_ix = 1:numel(SBJs)
             end
         end
     end
-    clear SBJ SBJ_vars w2 stat elec hfa actv_ch actv_ch_epochs tmp trial_info qvals st %cse
+    clear SBJ SBJ_vars w2 stat elec hfa actv_ch actv_ch_epochs tmp trial_info st %cse
 end
 
 %% Plot Percentage of Electrodes Active, Deactive, and Condition Sensitive

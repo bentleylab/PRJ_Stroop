@@ -23,6 +23,7 @@ eval(plt_vars_cmd);
 evnt_lab = {'S', 'R'};
 % Load RTs
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
+srate = trial_info.sample_rate;
 
 hfa_fname1 = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id_s,'.mat');
 hfa_fname2 = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id_r,'.mat');
@@ -44,8 +45,6 @@ if any([~strcmp(tmp_an1.evnt_lab,tmp_st1.evnt_lab) ~strcmp(tmp_an2.evnt_lab,tmp_
 end
 clear tmp
 
-%!!! is this the best way to do this??? Maybe not...
-sample_rate = (numel(hfa{1}.time)-1)/(hfa{1}.time(end)-hfa{1}.time(1));
 if ~isempty(setdiff(hfa{1}.label,hfa{2}.label))
     error('ERROR: channels do not match between the two analyses!');
 end
@@ -59,9 +58,9 @@ cfg_trim.latency = plt_vars.plt_lim_R;
 hfa{2} = ft_selectdata(cfg_trim,hfa{2});
 
 % Compute mean RT
-RT_mean = mean(round(sample_rate*trial_info.response_time));
+RT_mean = mean(round(srate*trial_info.response_time));
 % Add in the baseline offset to plot correctly
-RT_mean = RT_mean-plt_vars.plt_lim_S(1)*sample_rate;
+RT_mean = RT_mean-plt_vars.plt_lim_S(1)*srate;
 
 %% Plot Results
 fig_dir = ['/home/knight/hoycw/PRJ_Stroop/results/HFA/' SBJ '/actv/SR/' an_id_s '-' an_id_r '/'];
@@ -76,7 +75,7 @@ for ch_ix = 1:numel(hfa{1}.label)
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 1 0.5],'Visible',fig_vis); %twice as wide for the double plot
     plot_info.fig        = gcf;
-    plot_info.x_step     = plt_vars.x_step_sz*sample_rate;
+    plot_info.x_step     = plt_vars.x_step_sz*srate;
     plot_info.legend_loc = plt_vars.legend_loc;
     plot_info.sig_alpha  = plt_vars.sig_alpha;
     plot_info.sig_color  = plt_vars.sig_color;
@@ -98,7 +97,7 @@ for ch_ix = 1:numel(hfa{1}.label)
             event_info.color = {[0 0 0], [0 0 0]};
             event_info.width = [plt_vars.evnt_width,plt_vars.evnt_width];
             event_info.style = {'-', plt_vars.evnt_style};
-            event_info.time  = [-plt_vars.plt_lim_S(1)*sample_rate, RT_mean];
+            event_info.time  = [-plt_vars.plt_lim_S(1)*srate, RT_mean];
         else
             plot_info.x_lab = plt_vars.plt_lim_R(1):plt_vars.x_step_sz:plt_vars.plt_lim_R(2);
             % Stimulus plotting params
@@ -106,7 +105,7 @@ for ch_ix = 1:numel(hfa{1}.label)
             event_info.color = {plt_vars.evnt_color};
             event_info.width = plt_vars.evnt_width;
             event_info.style = {plt_vars.evnt_style};
-            event_info.time  = -plt_vars.plt_lim_R(1)*sample_rate;
+            event_info.time  = -plt_vars.plt_lim_R(1)*srate;
         end
         
         % Compute means and variance

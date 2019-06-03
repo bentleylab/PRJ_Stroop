@@ -11,7 +11,7 @@ if (ndims(time)>2) || ~(size(time,1)==1 || size(time,2)==1)
     error('Too many dimensions in time variable');
 end
 
-win_lim = zeros([ceil((numel(time)-win_len-1)/win_step) 2]);
+win_lim = zeros([ceil((numel(time)-win_len)/win_step) 2]);
 win_lim(1,:) = [1 win_len];
 for win_ix = 2:size(win_lim,1)
     win_lim(win_ix,:) = [win_lim(win_ix-1,1)+win_step win_lim(win_ix-1,2)+win_step];

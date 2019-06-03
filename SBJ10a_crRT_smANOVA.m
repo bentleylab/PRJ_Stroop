@@ -1,6 +1,20 @@
-function SBJ10a_corrRT_regressRT_mANOVA(SBJ,an_id,stat_id)
-%% Run ANOVA with potential RT regression before
-% Set up paths
+function SBJ10a_crRT_smANOVA(SBJ,an_id,stat_id)
+%% function SBJ10a_crRT_smANOVA(SBJ,an_id,stat_id)
+%   Run ANOVA with smart sliding windows for given time-frequency analysis
+%   Sliding windows are smart and will not average pre- and post-RT data
+%   Correlation with RT and regression of RT as confound supported
+% INPUTS:
+%   SBJ [str] - subject ID
+%   an_id [str] - HFA analysis to run stats
+%   stat_id [str] - ID of the statistical parameters and design
+% OUTPUTS:
+%   w2 [struct] - pseudo-FT structure with main ANOVA output
+%   stat [FT struct] - output of correlation with RT if st.rt_corr==1
+%   st [struct] - stat params loaded via stat_id
+%   win_lim [int] - [start, stop] indices of sliding windows (N,2) shape
+%       NaN is stand in for single trial RT
+
+%% Set up paths
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 addpath([root_dir 'PRJ_Stroop/scripts/']);
@@ -16,7 +30,6 @@ eval(['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m']);
 eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
 
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'));
-srate = trial_info.sample_rate;
 load(strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'.mat'));
 
 % Check if more than one frequency, error for now
@@ -24,10 +37,20 @@ if numel(hfa.freq)>1
     error('HFA has more than one frequency, can''t run on that for now!');
 end
 
-%% Select data in stat window
-cfg_trim = [];
-cfg_trim.latency = [st.stat_lim(1) st.stat_lim(2)+0.001]; %add a data point to get a full window over the tail end
-hfa = ft_selectdata(cfg_trim,hfa);
+%% Check for RTs out of range
+if isfield(st,'min_rt')
+    % Find bad trials
+    bad_rt_idx = trial_info.response_time<st.min_rt;
+    st.bad_trial_n = trial_info.trial_n(bad_rt_idx);
+    % Exclude those trials
+    ti_fields = fieldnames(trial_info);
+    orig_n_trials = numel(trial_info.trial_n);
+    for f_ix = 1:numel(ti_fields)
+        if numel(trial_info.(ti_fields{f_ix}))==orig_n_trials
+            trial_info.(ti_fields{f_ix}) = trial_info.(ti_fields{f_ix})(~bad_rt_idx);
+        end
+    end
+end
 
 %% Build Design Matrix
 design = cell([1 numel(st.groups)]);
@@ -40,6 +63,16 @@ for grp_ix = 1:numel(st.groups)
         design{grp_ix}(trl_idx) = level_ix;
     end
 end
+
+%% Select data in stat window
+cfg_trim = [];
+cfg_trim.trials = ~bad_rt_idx;
+cfg_trim.latency = st.stat_lim;
+% If NaN, find custom latency
+if isnan(cfg_trim.latency(2))
+    cfg_trim.latency(2) = min(trial_info.response_time);
+end
+hfa = ft_selectdata(cfg_trim,hfa);
 
 %% Run correlations with RT
 if st.rt_corr
@@ -74,7 +107,9 @@ end
 %% Average HFA in Sliding Windows
 fprintf('================== Averaging HFA within Windows =======================\n');
 % Sliding window parameters
-win_lim    = fn_sliding_window_lim(squeeze(hfa.powspctrm(1,1,1,:)),round(st.win_len*srate),round(st.win_step*srate));
+win_lim    = fn_sliding_window_lim(squeeze(hfa.powspctrm(1,1,1,:)),...
+                                   round(st.win_len*trial_info.sample_rate),...
+                                   round(st.win_step*trial_info.sample_rate));
 win_center = round(mean(win_lim,2));
 
 % Average in windows
@@ -133,7 +168,7 @@ end
 
 %% Print results
 % Prep report
-sig_report_fname = [SBJ_vars.dirs.proc SBJ '_mANOVA_ROI_' stat_id '_' an_id '_sig_report.txt'];
+sig_report_fname = [SBJ_vars.dirs.proc SBJ '_smANOVA_ROI_' stat_id '_' an_id '_sig_report.txt'];
 if exist(sig_report_fname)
     system(['mv ' sig_report_fname ' ' sig_report_fname(1:end-4) '_bck.txt']);
 end
@@ -176,7 +211,7 @@ end
 fclose(sig_report);
 
 %% Save Results
-out_fname = [SBJ_vars.dirs.proc SBJ '_mANOVA_ROI_' stat_id '_' an_id '.mat'];
+out_fname = [SBJ_vars.dirs.proc SBJ '_smANOVA_ROI_' stat_id '_' an_id '.mat'];
 if st.rt_corr
     save(out_fname,'-v7.3','w2','stat','st','win_lim');
 else

@@ -188,7 +188,7 @@ for an_ix = 1:2
 end
 
 %% PC Baseline analysis by ROI
-stat_id     = 'PC_S2t0';
+stat_id     = 'PC_S2t0';%'pCNI_PC_S2t0'
 atlas_id    = 'Dx';
 % an_opts     = {'HGh_S_zbtS_trl2to151_fLog_sm0_stat15','HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1'};
 an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t151_zbtA_sm0_wn100','HGm_S2t151_zbtS_sm0_wn100'};

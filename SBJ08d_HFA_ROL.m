@@ -40,6 +40,7 @@ eval(rol_vars_cmd);
 hfa_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'.mat');
 load(hfa_fname);
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'));
+srate = trial_info.sample_rate;
 
 % Sort RTs
 [~,rt_sort_idx] = sort(trial_info.response_time);
@@ -63,8 +64,7 @@ hfa = ft_selectdata(cfgs, hfa);
 
 %% Response Onset Latency Analyses
 % Time threshold
-sample_rate = (numel(hfa.time)-1)/(hfa.time(end)-hfa.time(1));
-min_actv_dp = round(min_actv_s*sample_rate);
+min_actv_dp = round(min_actv_s*srate);
 
 % response onset latencies (in sec) per channel and trial for [derivative, linear regression] methods 
 thresh     = zeros([numel(hfa.label) 1]);
@@ -163,8 +163,8 @@ for ch_ix = 1:numel(hfa.label)
             above_kept = [above_kept ep_kept];
             
             % Define start and end of onset search epoch
-            rol_lim = round([above_idx(1)+rol_lim_s(1)*sample_rate ...
-                             above_idx(1)+rol_lim_s(2)*sample_rate]);
+            rol_lim = round([above_idx(1)+rol_lim_s(1)*srate ...
+                             above_idx(1)+rol_lim_s(2)*srate]);
             
             % Check search epoch is within trial limits
             if rol_lim(1)<=0
@@ -182,9 +182,9 @@ for ch_ix = 1:numel(hfa.label)
             rol_win_sz(ch_ix,trl_ix) = rol_lim(2)-rol_lim(1);
             actv_len(ch_ix,trl_ix)   = numel(above_idx);
             actv_amp(ch_ix,trl_ix)   = mean(trl_data(above_idx));
-%             if rol_win_sz(ch_ix,trl_ix) < round((rol_lim_s(2)-rol_lim_s(1))*sample_rate)
+%             if rol_win_sz(ch_ix,trl_ix) < round((rol_lim_s(2)-rol_lim_s(1))*srate)
 %                 fprintf('\tWarning: trial %i rol window is %i dp long (not %i)\n',...
-%                         trl_ix,rol_win_sz(ch_ix,trl_ix),round((rol_lim_s(2)-rol_lim_s(1)))*sample_rate);
+%                         trl_ix,rol_win_sz(ch_ix,trl_ix),round((rol_lim_s(2)-rol_lim_s(1)))*srate);
 %             end
             
             % Plot search epoch for ROL
@@ -243,11 +243,11 @@ for ch_ix = 1:numel(hfa.label)
             
             %% LINEAR REGRESSION METHOD:
             % Set up sliding window parameters
-            win_len  = round(reg_win_len_s*sample_rate);
-            win_step = round(reg_win_stp_s*sample_rate);
+            win_len  = round(reg_win_len_s*srate);
+            win_step = round(reg_win_stp_s*srate);
             win_lim  = zeros([ceil((numel(search_ep)-win_len-1)/win_step) 2]);           
-%             win_lim = fn_sliding_window_lim(search_ep,round(reg_win_len_s*sample_rate),...
-%                                                 round(reg_win_stp_s*sample_rate));
+%             win_lim = fn_sliding_window_lim(search_ep,round(reg_win_len_s*srate),...
+%                                                 round(reg_win_stp_s*srate));
                         
             % Linear regression in each window
             lm_fit = zeros(size(win_lim,1),5);
@@ -366,20 +366,20 @@ for ch_ix = 1:numel(hfa.label)
         
         % ROL window sizes
         subplot(2,2,1); hold on;
-        small_win_cnt = sum(rol_win_sz(ch_ix,:)/sample_rate < rol_lim_s(2)-rol_lim_s(1)-0.001);
+        small_win_cnt = sum(rol_win_sz(ch_ix,:)/srate < rol_lim_s(2)-rol_lim_s(1)-0.001);
         title(['# win < ' num2str(rol_lim_s(2)-rol_lim_s(1)) ' = ' ...
               num2str(small_win_cnt) ' (' num2str(100*small_win_cnt/sum(~isnan(rol_win_sz(ch_ix,:))),'%.01f') '%)']);
-        histogram(rol_win_sz(ch_ix,:)/sample_rate, n_hist_bins);
+        histogram(rol_win_sz(ch_ix,:)/srate, n_hist_bins);
         xlabel('ROL window size (ms)');
         
         % ROL activation lengths vs. amplitudes
         subplot(2,2,2); hold on;
         title(['ep/trl = ' num2str(mean(n_ep_above))]);
         % Plot Epochs not analyzed
-        above_len_s = above_lens/sample_rate;
+        above_len_s = above_lens/srate;
         toss_scat = scatter(above_len_s(~above_kept), above_amps(~above_kept), 'd', 'MarkerEdgeColor',[0.5 0.5 0.5]);
         % Plot Epochs analyzed
-        kept_len_s = actv_len(ch_ix,:)/sample_rate;
+        kept_len_s = actv_len(ch_ix,:)/srate;
         kept_scat = scatter(kept_len_s, actv_amp(ch_ix,:),'o','MarkerEdgeColor','b');
         toss_mean = scatter(nanmean(above_len_s(~above_kept)), nanmean(above_amps(~above_kept)), ...
                             toss_scat.SizeData*2, 'd', 'MarkerEdgeColor',[0.5 0.5 0.5], 'MarkerFaceColor', 'k');

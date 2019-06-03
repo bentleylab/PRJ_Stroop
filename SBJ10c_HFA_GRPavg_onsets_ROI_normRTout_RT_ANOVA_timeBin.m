@@ -81,25 +81,16 @@ for sbj_ix = 1:numel(SBJs)
     eval(SBJ_vars_cmd);
     
     % Compute mean RT
+    load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
     if strcmp(event_type,'stim')
-        load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
         % Compute mean RT
         mean_RTs(sbj_ix) = mean(trial_info.response_time);
     end
     % Load data
-    load(strcat(SBJ_vars.dirs.proc,SBJ,'_ANOVA_ROI_',stat_id,'_',an_id,'.mat'));
-    
-    %% Process parameters
-    sample_rate = (numel(stat.time)-1)/(stat.time(end)-stat.time(1));
-    
-    % FDR correct pvalues for ANOVA
-    qvals = NaN(size(w2.pval));
-    for ch_ix = 1:numel(stat.label)
-        [~, ~, ~, qvals(:,ch_ix,:)] = fdr_bh(squeeze(w2.pval(:,ch_ix,:)));%,0.05,'pdep','yes');
-    end
+    load(strcat(SBJ_vars.dirs.proc,SBJ,'_mANOVA_ROI_',stat_id,'_',an_id,'.mat'));
     
     % Get Time Bin and Sliding Window Parameters
-    win_lim    = fn_sliding_window_lim(stat.time,round(st.win_len*sample_rate),round(st.win_step*sample_rate));
+    win_lim    = fn_sliding_window_lim(stat.time,round(st.win_len*trail_info.sample_rate),round(st.win_step*trail_info.sample_rate));
     win_center = round(mean(win_lim,2));
     if strcmp(tbin_id,'eqROI')  %!!! check for 1st 2 letters = 'eq'
         % 4 ROIs = R time bins: -0.5, -0.1, 0.25, 0.6, 1.0
@@ -151,11 +142,11 @@ for sbj_ix = 1:numel(SBJs)
             % Get ANOVA group onsets
             for cond_ix = 1:numel(cond_lab)               
                 % ANOVA conditions
-                if any(strcmp(cond_lab{cond_ix},grp_lab)) && any(squeeze(qvals(cond_ix,ch_ix,:))<0.05)
+                if any(strcmp(cond_lab{cond_ix},grp_lab)) && any(squeeze(w2.qval(cond_ix,ch_ix,:))<st.alpha)
                     sig_ch{sbj_ix,cond_ix} = [sig_ch{sbj_ix,cond_ix} stat.label(ch_ix)];
-                    sig_onsets = stat.time(win_lim(squeeze(qvals(cond_ix,ch_ix,:))<0.05,1));
+                    sig_onsets = stat.time(win_lim(squeeze(w2.qval(cond_ix,ch_ix,:))<st.alpha,1));
                     % Assign time bin by first onset
-                    time_bin = find(find(squeeze(qvals(cond_ix,ch_ix,:))<0.05,1)<=peak_bins(cond_ix,:),1);
+                    time_bin = find(find(squeeze(w2.qval(cond_ix,ch_ix,:))<st.alpha,1)<=peak_bins(cond_ix,:),1);
                     sig_ch_tbin{sbj_ix,cond_ix} = [sig_ch_tbin{sbj_ix,cond_ix} time_bin];
                     sig_ch_onset{sbj_ix,cond_ix} = [sig_ch_onset{sbj_ix,cond_ix} sig_onsets(1)];
                     if strcmp(event_type,'resp')
@@ -208,7 +199,7 @@ for sbj_ix = 1:numel(SBJs)
             end
         end
     end
-    clear SBJ SBJ_vars hfa stat elec w2
+    clear SBJ SBJ_vars hfa stat elec w2 trial_info st
 end
 
 %% Aggregate/Process onsets per gROI
