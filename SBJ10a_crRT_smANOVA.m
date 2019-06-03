@@ -66,7 +66,11 @@ end
 
 %% Select data in stat window
 cfg_trim = [];
-cfg_trim.trials = ~bad_rt_idx;
+if isfield(st,'min_rt')
+    cfg_trim.trials = ~bad_rt_idx;
+else
+    cfg_trim.trials = 'all';
+end
 cfg_trim.latency = st.stat_lim;
 % If NaN, find custom latency
 if isnan(cfg_trim.latency(2))
