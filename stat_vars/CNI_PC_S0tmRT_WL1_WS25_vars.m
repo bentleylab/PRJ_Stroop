@@ -1,6 +1,8 @@
 % Time Parameters
 st.evnt_lab = 'S';
-st.stat_lim = [0 NaN];
+st.stat_lim = [0 0];
+st.lim_adj  = {'', 'min(RT)'};
+st.cust_win = 0;            % custom windows per trials
 st.min_rt   = 0.35;
 st.alpha    = 0.05;
 

@@ -1,5 +1,7 @@
 % % Stats parameters
 % st.stat_lim    = [0 1.5];            % window in SEC for stats
+% st.lim_adj  = {'', ''};
+% st.cust_win = 0;            % custom windows per trials
 % st.n_boots     = 1000;             % Repetitions for non-parametric stats
 % st.alpha       = 0.05;
 % 

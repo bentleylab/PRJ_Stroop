@@ -66,15 +66,26 @@ end
 
 %% Select data in stat window
 cfg_trim = [];
+% Remove excluded trials
 if isfield(st,'min_rt')
     cfg_trim.trials = ~bad_rt_idx;
 else
     cfg_trim.trials = 'all';
 end
+
+% Adjust stat_lim if needed
 cfg_trim.latency = st.stat_lim;
-% If NaN, find custom latency
-if isnan(cfg_trim.latency(2))
-    cfg_trim.latency(2) = min(trial_info.response_time);
+for lim_ix = find(~cellfun(@isempty,st.lim_adj))
+    if strcmp(st.lim_adj{lim_ix},'min(RT)')
+        % S-locked to min(RT) or custom window
+        cfg_trim.latency(lim_ix) = cfg_trim.latency(lim_ix)+min(trial_info.response_time);
+    elseif lim_ix==2 && strcmp(st.lim_adj{lim_ix},'RT')
+        % Align end to max(RT) to alter trim for custom windows
+        cfg_trim.latency(lim_ix) = cfg_trim.latency(lim_ix)+max(trial_info.response_time);
+    else
+        % Nothing else makes sense...
+        error(['What are you trying to do with st.lim_adj{' num2str(lim_ix) '} = ' st.lim_adj{lim_ix}]);
+    end
 end
 hfa = ft_selectdata(cfg_trim,hfa);
 
@@ -111,15 +122,30 @@ end
 %% Average HFA in Sliding Windows
 fprintf('================== Averaging HFA within Windows =======================\n');
 % Sliding window parameters
-win_lim    = fn_sliding_window_lim(squeeze(hfa.powspctrm(1,1,1,:)),...
-                                   round(st.win_len*trial_info.sample_rate),...
-                                   round(st.win_step*trial_info.sample_rate));
-win_center = round(mean(win_lim,2));
-
-% Average in windows
-hfa_win = zeros([size(hfa.powspctrm,1) size(hfa.powspctrm,2) numel(win_center)]);%size(hfa.powspctrm,3) 
-for w_ix = 1:size(win_lim,1)
-    hfa_win(:,:,w_ix) = squeeze(nanmean(hfa.powspctrm(:,:,1,win_lim(w_ix,1):win_lim(w_ix,2)),4));
+if st.cust_win
+    if ~strcmp(st.evnt_lab,'S') || ~strcmp(st.lim_adj{2},'RT')
+        error('This is only meant for D analyses, check your options!');
+    end
+    % Define custom window per trial based on RT
+    win_lim = zeros([numel(trial_info.trial_n) 2]);
+    hfa_win = zeros([size(hfa.powspctrm,1) size(hfa.powspctrm,2)]);%size(hfa.powspctrm,3) size(win_lim,1)
+    for trl_ix = 1:numel(trial_info.trial_n)
+        pre_rt_ix = find(hfa.time<trial_info.response_time(trl_ix));
+        win_lim(trl_ix,:) = [1 pre_rt_ix(end)];
+        hfa_win(trl_ix,:) = squeeze(nanmean(hfa.powspctrm(trl_ix,:,1,win_lim(trl_ix,1):win_lim(trl_ix,2)),4));
+    end
+    win_center = round(mean(mean(win_lim,2)));
+else
+    win_lim    = fn_sliding_window_lim(squeeze(hfa.powspctrm(1,1,1,:)),...
+        round(st.win_len*trial_info.sample_rate),...
+        round(st.win_step*trial_info.sample_rate));
+    
+    % Average in windows
+    hfa_win = zeros([size(hfa.powspctrm,1) size(hfa.powspctrm,2) size(win_lim,1)]);%size(hfa.powspctrm,3)
+    for w_ix = 1:size(win_lim,1)
+        hfa_win(:,:,w_ix) = squeeze(nanmean(hfa.powspctrm(:,:,1,win_lim(w_ix,1):win_lim(w_ix,2)),4));
+    end
+    win_center = round(mean(win_lim,2));
 end
 
 %% Run ANOVA

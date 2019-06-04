@@ -1,18 +1,19 @@
 % Time Parameters
 st.evnt_lab = 'S';
-st.stat_lim = [-0.2 0];
-st.lim_adj  = {'', ''};
-st.cust_win = 0;            % custom windows per trials
+st.stat_lim = [-0.1 0];
+st.lim_adj  = {'min(RT)', 'RT'};
+st.cust_win = 1;            % custom windows per trials
+st.min_rt   = 0.35;
 st.alpha    = 0.05;
 
-% Sliding Window Parameters
-st.win_len  = 0.2;%200;
-st.win_step = 0.05;%50;
+% Sliding Window Parameters (in sec)
+st.win_len  = 0.1;
+st.win_step = 0.025;
 
 % ANOVA Parameters
-st.model_lab   = 'PC';
+st.model_lab   = 'CNI_PC';
 st.regress_rt  = 0;    % regrees reaction time off before running ANOVA
-st.groups      = {'PC'};
+st.groups      = {'CNI', 'PC'};
 st.n_boots     = 1000;
 
 % RT Correlation Parameters

@@ -1,6 +1,8 @@
 % Time Parameters
 st.evnt_lab = 'S';
 st.stat_lim = [-0.2 0];
+st.lim_adj  = {'', ''};
+st.cust_win = 0;            % custom windows per trials
 st.alpha    = 0.05;
 
 % Sliding Window Parameters
