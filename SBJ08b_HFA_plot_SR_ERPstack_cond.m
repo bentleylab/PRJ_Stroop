@@ -57,11 +57,12 @@ for sr_ix = 1:2
     tmp = load(hfa_fname,'an'); evnt_check{1} = tmp.an.evnt_lab;
     % Load Stats
     if strcmp(conditions,'actv')
+        error('fix significance to dealw ith new struct format');
         stat_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_ids{sr_ix},'_',stat_ids{sr_ix},'.mat');
         tmp = load(stat_fname,'actv_ch'); actv_ch{sr_ix} = tmp.actv_ch;
         tmp = load(stat_fname,'actv_ch_epochs'); actv_ch_epochs{sr_ix} = tmp.actv_ch_epochs;
-    elseif any(strcmp(conditions,{'CNI','PC'}))
-        stat_fname = [SBJ_vars.dirs.proc SBJ '_mANOVA_ROI_' stat_ids{sr_ix} '_' an_ids{sr_ix} '.mat'];
+    elseif any(strcmp(conditions,{'CNI','pCNI','PC'}))
+        stat_fname = [SBJ_vars.dirs.proc SBJ '_smANOVA_ROI_' stat_ids{sr_ix} '_' an_ids{sr_ix} '.mat'];
         tmp = load(stat_fname,'w2'); w2{sr_ix} = tmp.w2;
     elseif strcmp(conditions,'RT')
         error('RT not yet implemented');
@@ -177,7 +178,6 @@ elseif any(strcmp(conditions,grp_lab))
         stat{sr_ix}.mask = zeros([numel(w2{sr_ix}.label) size(hfa{sr_ix}.time,2)]);
         
         % Get Sliding Window Parameters
-        win_lim = fn_sliding_window_lim(hfa{sr_ix}.time,round(st.win_len*srate),round(st.win_step*srate));
         [~, offset_ix] = min(abs(hfa{sr_ix}.time-(w2{sr_ix}.time(1)-st.win_len/2)));
         
         for ch_ix = 1:numel(stat{1}.label)
@@ -186,10 +186,10 @@ elseif any(strcmp(conditions,grp_lab))
             sig_chunks(squeeze(w2{sr_ix}.qval(grp_ix,ch_ix,sig_chunks(:,1)))>st.alpha,:) = [];
             for sig_ix = 1:size(sig_chunks,1)
                 % If last window is cut off due to 10ms over, just go to end of trial
-                if any(sig_chunks(sig_ix,:) > size(win_lim,1))
-                    sig_chunks(sig_ix,sig_chunks(sig_ix,:) > size(win_lim,1)) = size(win_lim,1);
+                if any(sig_chunks(sig_ix,:) > size(w2{sr_ix}.win_lim,1))
+                    sig_chunks(sig_ix,sig_chunks(sig_ix,:) > size(w2{sr_ix}.win_lim,1)) = size(w2{sr_ix}.win_lim,1);
                 end
-                stat{sr_ix}.mask(ch_ix,[win_lim(sig_chunks(sig_ix,1),1):win_lim(sig_chunks(sig_ix,2),2)]+offset_ix-1) = 1;
+                stat{sr_ix}.mask(ch_ix,[w2{sr_ix}.win_lim(sig_chunks(sig_ix,1),1):w2{sr_ix}.win_lim(sig_chunks(sig_ix,2),2)]+offset_ix-1) = 1;
             end
         end
     end
@@ -246,7 +246,6 @@ for ch_ix = 1:numel(hfa{1}.label)
     for sr_ix = 1:numel(evnt_lab)
         subplot('Position',plt_vars.subplot_pos{1,sr_ix});
         hold on;
-        ax     = gca;
         
         %% Plot Single Trials Per Condition
         imagesc(ch_data{sr_ix}(cond_mat(:,3),:));

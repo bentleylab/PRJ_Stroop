@@ -63,18 +63,18 @@ save_fig  = 1;
 fig_vis   = 'off';
 fig_ftype = 'png';
 for s = 1:numel(SBJs)
-%     SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_b);
+    SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_b);
 %     SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_s);
 %     SBJ08ab_HFA_actv(SBJs{s},an_id_r,actv_id_r);
 %     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,actv_id_s,actv_id_r,...
 %                                         plt_id,save_fig,fig_vis,fig_ftype,'actv_win','100')
 %     close all;
-    SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_s,an_id_r,stat_id_s,stat_id_r,...
-                                        plt_id,save_fig,fig_vis,fig_ftype)
-    close all;
-    SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'PC',an_id_s,an_id_r,...
-                                        plt_id,save_fig,fig_vis,fig_ftype,'stat_id',stat_id)
-    close all;
+%     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_s,an_id_r,stat_id_s,stat_id_r,...
+%                                         plt_id,save_fig,fig_vis,fig_ftype)
+%     close all;
+%     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'PC',an_id_s,an_id_r,stat_id_s,stat_id_r,...
+%                                         plt_id,save_fig,fig_vis,fig_ftype)
+%     close all;
 end
 
 %% ================================================================================

@@ -1,5 +1,5 @@
-function SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,stat_id,proc_id,an_id,actv_id,roi_id,...
-                                                            atlas_id,gm_thresh,plt_id,plot_out,plot_scat,save_fig,fig_vis,fig_ftype)
+function SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,proc_id,an_id,stat_id,actv_id,atlas_id,roi_id,...
+                                                            gm_thresh,plt_id,plot_out,plot_scat,save_fig,fig_vis,fig_ftype)
 % Load HFA analysis results for active, RT correlation, and ANOVA epochs
 %   RT correlation: any significance in stat_lim
 %   ANOVA factors: any significance in stat_lim, after FDR correction
@@ -27,7 +27,7 @@ eval(an_vars_cmd);
 % eval(plt_vars_cmd);
 
 % Get example condition info
-load([root_dir 'PRJ_Stroop/data/' SBJs{1} '/04_proc/' SBJs{1} '_mANOVA_ROI_' stat_id '_' an_id '.mat'],'st');
+load([root_dir 'PRJ_Stroop/data/' SBJs{1} '/04_proc/' SBJs{1} '_smANOVA_ROI_' stat_id '_' an_id '.mat'],'st');
 evnt_lab = st.evnt_lab;
 [grp_lab, ~, ~] = fn_group_label_styles(st.model_lab);
 rt_grp = st.rt_corr;
@@ -59,14 +59,15 @@ for sbj_ix = 1:numel(SBJs)
     eval(SBJ_vars_cmd);
     
     % Load ANOVA
-    load(strcat(SBJ_vars.dirs.proc,SBJ,'_mANOVA_ROI_',stat_id,'_',an_id,'.mat'));
+    load(strcat(SBJ_vars.dirs.proc,SBJ,'_smANOVA_ROI_',stat_id,'_',an_id,'.mat'));
     if ~strcmp(st.evnt_lab,evnt_lab); error('mismatching evnt_lab in w2 stats'); end
     
     % Load actv stats
     actv_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'_',actv_id,'.mat');
-    load(actv_fname,'actv_ch','actv_ch_epochs');
+    load(actv_fname,'actv');
     tmp = load(actv_fname,'st');
     if ~strcmp(tmp.st.evnt_lab,evnt_lab); error('mismatching evnt_lab in actv stats'); end
+    if tmp.st.alpha~=st.alpha; error('mismatching alpha in actv stats'); end
     
     % Load HFA (to get sign of activation)
     hfa_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'.mat');
@@ -91,18 +92,6 @@ for sbj_ix = 1:numel(SBJs)
     % Confirm channels and time axis are the same
     if ~isempty(setdiff(w2.label,hfa.label));
         error('Different electrodes across hfa analyses!');
-    end
-    if rt_grp
-        % All the rounding and such is because some stupid rounding errors...
-        same_start = round(hfa.time(1)*uint8(trail_info.sample_rate))==round(stat.time(1)*uint8(trail_info.sample_rate));
-        same_end   = round(hfa.time(end)*uint8(trail_info.sample_rate))==round(stat.time(end)*uint8(trail_info.sample_rate));
-        same_numel = size(hfa.time,2)==size(stat.time,2);
-        if ~same_start || ~same_end || ~same_numel
-            error('time axes are not the same across hfa analyses!');
-        end
-        if ~isempty(setdiff(stat.label,hfa.label));
-            error('Different electrodes across hfa analyses!');
-        end
     end
     
     %% Load ROI and GM/WM info
@@ -145,24 +134,17 @@ for sbj_ix = 1:numel(SBJs)
 %             if any(cse.mask(ch_ix,1,:))
 %                 cse_cnt(sbj_ix,roi_ix) = cse_cnt(sbj_ix,roi_ix)+1;
             % Check if active, get epochs
-            if any(strcmp(elec.label{ch_ix},actv_ch))
+            actv_ch_ix = strcmp(actv.label,elec.label{ch_ix});
+            if any(squeeze(actv.qval(actv_ch_ix,:))<st.alpha)
                 % Find significant epoch indices
-                actv_epochs = actv_ch_epochs{strcmp(elec.label{ch_ix},actv_ch)};
+                actv_idx = squeeze(actv.qval(actv_ch_ix,:))<st.alpha;
+                actv_epochs = fn_find_chunks(actv_idx);
+                actv_epochs(actv_idx(actv_epochs(:,1))==0,:) = [];
                 
-                % Toss late epochs if S-locked
-                if strcmp(evnt_lab,'S')
-                    actv_epochs(actv_epochs(:,1)>mean_RTs(sbj_ix),:) = [];
-                end
-                
-                % Find sign of (de)activation
-                hfa_ch_ix = strcmp(hfa.label,elec.label{ch_ix});
+                % Find sign of (de)activation of all epochs
                 actv_ep_sign = NaN([1 size(actv_epochs,1)]);
-                sig_chunk_ix = NaN([1 2]);
                 for ep_ix = 1:size(actv_epochs,1)
-                    sig_chunk_ix = [find(hfa.time==actv_epochs(ep_ix,1))...
-                        find(hfa.time==actv_epochs(ep_ix,2))];
-                    % Report sign
-                    if 0<=squeeze(mean(mean(hfa.powspctrm(:,hfa_ch_ix,1,sig_chunk_ix(1):sig_chunk_ix(2)),1),4))
+                    if mean(actv.avg(actv_ch_ix,actv_epochs(ep_ix,1):actv_epochs(ep_ix,2)),2)>=0
                         actv_ep_sign(ep_ix) = 1;
                     else
                         actv_ep_sign(ep_ix) = -1;
@@ -285,7 +267,7 @@ ax.XTickLabel = stat_lab;%'CSE'
 
 ax.YLabel.String   = 'Proportion of Electrodes';
 ax.YLabel.FontSize = 14;
-ax.YLim            = [0 0.6];%[0 ymaxs(plot_ix)];%
+% ax.YLim            = [0 0.8];%[0 ymaxs(plot_ix)];%
 ax.YTick           = ax.YLim(1):0.1:ax.YLim(2);
 % ax.YTickLabel      = roi_list;
 % ax.YTickLabelRotation = 45;
