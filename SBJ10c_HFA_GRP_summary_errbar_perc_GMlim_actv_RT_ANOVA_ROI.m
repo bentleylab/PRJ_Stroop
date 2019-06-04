@@ -267,7 +267,7 @@ ax.XTickLabel = stat_lab;%'CSE'
 
 ax.YLabel.String   = 'Proportion of Electrodes';
 ax.YLabel.FontSize = 14;
-% ax.YLim            = [0 0.8];%[0 ymaxs(plot_ix)];%
+ax.YLim            = [0 1];%[0 ymaxs(plot_ix)];%
 ax.YTick           = ax.YLim(1):0.1:ax.YLim(2);
 % ax.YTickLabel      = roi_list;
 % ax.YTickLabelRotation = 45;

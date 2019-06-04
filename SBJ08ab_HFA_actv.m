@@ -85,13 +85,13 @@ if st.cust_win
     % Define custom window per trial based on RT
     win_lim = zeros([numel(trial_info.trial_n) 2]);
     for trl_ix = 1:numel(trial_info.trial_n)
-        pre_rt_ix = find(hfa.time<trial_info.response_time(trl_ix));
+        pre_rt_ix = find(hfa_stat.time<trial_info.response_time(trl_ix));
         win_lim(trl_ix,:) = [1 pre_rt_ix(end)];
         hfa_tmp.powspctrm(trl_ix,:) = ...
             squeeze(nanmean(hfa_stat.powspctrm(trl_ix,:,1,win_lim(trl_ix,1):win_lim(trl_ix,2)),4));
     end
+    hfa_tmp.time = hfa_stat.time(round(mean(mean(win_lim,2))));
     hfa_stat = hfa_tmp;
-    hfa_stat.time = hfa_tmp.time(round(mean(mean(win_lim,2))));
     clear hfa_tmp
 end
 
@@ -106,8 +106,10 @@ actv.time    = hfa_stat.time;
 actv.label   = hfa_stat.label;
 actv.dimord  = 'chan_time';
 actv.avg     = squeeze(nanmean(hfa_stat.powspctrm(:,:,1,:),1));
+if st.cust_win; actv.avg = actv.avg'; end % ensure dimord
 actv.pval    = zeros(size(actv.avg));
 actv.qval    = zeros(size(actv.avg));
+actv.mask    = zeros(size(actv.avg));
 if st.cust_win
     actv.win_lim = win_lim;
 end
@@ -124,6 +126,16 @@ for ch_ix = 1:numel(hfa_stat.label)
 %     in IR32), so I'm trying the below function
 %     [h, crit_p, adj_ci_cvrg, adj_p]=fdr_bh(pvals,q,method,report);
     [~, ~, ~, actv.qval(ch_ix,:)] = fdr_bh(actv.pval(ch_ix,:));
+    actv.mask(ch_ix,:) = actv.qval(ch_ix,:)<=st.alpha;
+    
+    % Remove epochs less than actv_win
+    actv_chunks = fn_find_chunks(actv.mask(ch_ix,:));
+    actv_chunks(actv.mask(ch_ix,actv_chunks(:,1))==0,:) = [];
+    actv_chunk_sz = diff(actv_chunks,1,2)+1;
+    bad_chunks = actv_chunks(actv_chunk_sz < trial_info.sample_rate*st.actv_win,:);
+    for chunk_ix = 1:size(bad_chunks,1)
+        actv.mask(ch_ix,bad_chunks(chunk_ix,1):bad_chunks(chunk_ix,2)) = 0;
+    end
 end
 
 %% Print results

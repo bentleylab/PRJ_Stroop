@@ -48,13 +48,15 @@ end
 
 %% Plot stacks with mean traces
 % conditions  = 'actv';%'CNI';%
-stat_id_s = 'CNI_PC_S0tmRT_WL1_WS25';
-stat_id_r = 'CNI_PC_R1t5_WL1_WS25';
+stat_id_s = {'CNI_PC_S0tmRT_WL1_WS25','CNI_PC_S0tmRT_WL1_WS50'};
+stat_id_r = {'CNI_PC_R1t5_WL1_WS25','CNI_PC_R1t5_WL1_WS50'};
 proc_id   = 'main_ft';
 an_id_s   = 'HGm_S2t151_zbtA_sm0_wn100';
+an_id_d   = 'HGm_S2t251_zbtA_sm0_wn100';
 an_id_r   = 'HGm_R5t101_zbtA_sm0_wn100';
 actv_id_b = 'actv_S2t0_mn50';
 actv_id_s = 'actv_S0tmRT_mn1';
+actv_id_d = 'actv_D1tRT';
 actv_id_r = 'actv_R1t5_mn1';
 % an_id_s   = 'HGm_S_zbtA_trl2to151_sm0_wn100_stat15';%'HGh_S_zbtS_trl2to151_fLog_sm0_stat15';
 % an_id_r   = 'HGm_R_zbtA_trl5to101_sm0_wn100_stat5to1';%'HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1';
@@ -65,16 +67,19 @@ fig_ftype = 'png';
 for s = 1:numel(SBJs)
 %     SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_b);
 %     SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_s);
+%     SBJ08ab_HFA_actv(SBJs{s},an_id_d,actv_id_d);
 %     SBJ08ab_HFA_actv(SBJs{s},an_id_r,actv_id_r);
     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,actv_id_s,actv_id_r,...
-                                        plt_id,save_fig,fig_vis,fig_ftype,'actv_win','100')
-    close all;
-    SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_s,an_id_r,stat_id_s,stat_id_r,...
                                         plt_id,save_fig,fig_vis,fig_ftype)
     close all;
-%     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'PC',an_id_s,an_id_r,stat_id_s,stat_id_r,...
-%                                         plt_id,save_fig,fig_vis,fig_ftype)
-%     close all;
+%     for an_ix = 1:2
+%         SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_s,an_id_r,stat_id_s{an_ix},stat_id_r{an_ix},...
+%             plt_id,save_fig,fig_vis,fig_ftype)
+%         close all;
+%         SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'PC',an_id_s,an_id_r,stat_id_s{an_ix},stat_id_r{an_ix},...
+%             plt_id,save_fig,fig_vis,fig_ftype)
+%         close all;
+%     end
 end
 
 %% ================================================================================
@@ -164,11 +169,11 @@ fn_view_recon_atlas_grp_stat_onset(SBJs, proc_id, stat_id, an_id, reg_type, show
 % SBJ10b_ANOVA_plot_SR_RTcorr(SBJ,stat_id,an_id_s,an_id_r,plt_id,1,'on','svg');
 % 
 %% Proportions of significant effects across ROI
-stat_opts   = {'pCNI_PC_S2t0','CNI_PC_S0tmRT_WL1_WS25','CNI_PC_R1t5_WL1_WS25'};
+stat_opts   = {'CNI_PC_D1tRT'};%'CNI_PC_S0tmRT_WL1_WS50','CNI_PC_R1t5_WL1_WS50'};
 atlas_id    = 'Dx';
 % an_opts     = {'HGh_S_zbtS_trl2to151_fLog_sm0_stat15','HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1'};
-an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t151_zbtA_sm0_wn100','HGm_R5t101_zbtA_sm0_wn100'};
-actv_opts   = {'actv_S2t0_mn50','actv_S0tmRT_mn1','actv_R1t5_mn1'};
+an_opts     = {'HGm_S2t251_zbtA_sm0_wn100'};%'HGm_S2t151_zbtA_sm0_wn100','HGm_R5t101_zbtA_sm0_wn100'};
+actv_opts   = {'actv_D1tRT'};%'actv_S0tmRT_mn1','actv_R1t5_mn1'};
 plt_id      = '';
 roi_id      = 'gROI';%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
 gm_thresh   = 0;

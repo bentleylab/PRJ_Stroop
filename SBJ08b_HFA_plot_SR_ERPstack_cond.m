@@ -45,7 +45,6 @@ for sr_ix = 1:2
     tmp = load(hfa_fname,'an'); evnt_check{1} = tmp.an.evnt_lab;
     % Load Stats
     if strcmp(conditions,'actv')
-        error('fix significance to dealw ith new struct format');
         stat_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_ids{sr_ix},'_',stat_ids{sr_ix},'.mat');
         tmp = load(stat_fname,'actv'); actv{sr_ix} = tmp.actv;
     elseif any(strcmp(conditions,{'CNI','pCNI','PC'}))
@@ -57,13 +56,12 @@ for sr_ix = 1:2
         error(['unknown stat_id:' stat_id_s ' and ' stat_id_r]);
     end
     % Check events are the same
-    tmp = load(stat_fname,'st'); evnt_check{2} = tmp.st.evnt_lab; st = tmp.st;
-    alpha_chk{sr_ix} = tmp.st.alpha;
-    grp_check{sr_ix} = tmp.st.groups;
+    load(stat_fname,'st');
+    evnt_check{2}    = st.evnt_lab;
+    alpha_chk{sr_ix} = st.alpha;
+    grp_check{sr_ix} = st.groups;
     [grp_lab, ~, ~] = fn_group_label_styles(st.model_lab);
-    if ~strcmp(evnt_check{1},evnt_check{2})
-        error('an and st evnt_lab mismatch');
-    end
+    if ~strcmp(evnt_check{1},evnt_check{2}); error('evnt_lab mismatch'); end
     clear tmp
 end
 % Check groups are the same
@@ -80,22 +78,11 @@ elec.roi = fn_atlas2roi_labels(elec.atlas_lab,elec.atlas_id,'ROI');
 
 %% Quality checks
 % Check channel match between analyses
-if ~isempty(setdiff(hfa{1}.label,hfa{2}.label))
-    error('ERROR: channels do not match between the two analyses!');
-end
-if strcmp(conditions,'RT')
-    if any(~strcmp(hfa{1}.label,stat{1}.label))
-        error('ERROR: channels do not match between hfa and stat!');
-    end
-elseif strcmp(conditions,'actv')
-    if any(~strcmp(hfa{1}.label,actv{1}.label))
-        error('ERROR: channels do not match between hfa and w2!');
-    end
-elseif any(strcmp(conditions,grp_lab))
-    if any(~strcmp(hfa{1}.label,w2{1}.label))
-        error('ERROR: channels do not match between hfa and w2!');
-    end
-end
+if ~isempty(setdiff(hfa{1}.label,hfa{2}.label)); error('an label mismatch'); end
+if strcmp(conditions,'RT');             lab_check = stat{1}.label;
+elseif strcmp(conditions,'actv');       lab_check = actv{1}.label;
+elseif any(strcmp(conditions,grp_lab)); lab_check = w2{1}.label; end
+if any(~strcmp(hfa{1}.label,lab_check)); error('label mismatch'); end
 
 % If singe trial format, check all time axes are the same
 time_cells = [iscell(hfa{1}.time), iscell(hfa{2}.time)];
@@ -103,12 +90,12 @@ if any(time_cells)
     for sr_ix = find(time_cells)
         for t_ix = 2:numel(hfa{sr_ix}.time)
             if ~all(hfa{sr_ix}.time{1}==hfa{sr_ix}.time{t_ix})
-                error('Time axes arent the same for all trials!');
+                error('Time axes aren''t the same for all trials!');
             end
         end
     end
 else
-    % Confirm hfa covers stat
+    % Confirm hfa starts before and ends after stat
     for sr_ix = 1:numel(evnt_lab)
         if strcmp(conditions,'RT')
             if ~all(hfa{sr_ix}.time==stat{sr_ix}.time)
@@ -165,39 +152,29 @@ if strcmp(conditions,'RT')
     cfg_trim.latency = plt_vars.plt_lim_R;
     stat{2} = ft_selectdata(cfg_trim,stat{2});
 elseif strcmp(conditions,'actv')
-    % Trimming data:  actv should fit within that since it's averaging into a smaller window
-    
     % Convert to mask time series
+    stat = cell(size(evnt_lab));
     for sr_ix = 1:numel(evnt_lab)
         % Prepare stat mask to match hfa for specific factor
         stat{sr_ix} = rmfield(hfa{sr_ix},{'powspctrm','freq','cumtapcnt'});
         stat{sr_ix}.mask = zeros([numel(actv{sr_ix}.label) size(hfa{sr_ix}.time,2)]);
         
-        % Get Sliding Window Parameters
+        % Get time offset
         [~, offset_ix] = min(abs(hfa{sr_ix}.time-actv{sr_ix}.time(1)));
         
-        for ch_ix = 1:numel(stat{1}.label)
-            % Add significant epochs for condition of interest to mask
-            error('start again here, why cant I just use the logical with qval to make a mask directly since its on the right time axis???');
-            !!! speaking of which, double check the time business above...
-            sig_chunks = fn_find_chunks(squeeze(actv{sr_ix}.qval(ch_ix,:))<st.alpha);
-            sig_chunks(squeeze(actv{sr_ix}.qval(ch_ix,sig_chunks(:,1)))>st.alpha,:) = [];
-            for sig_ix = 1:size(sig_chunks,1)
-                stat{sr_ix}.mask(ch_ix,[actv{sr_ix}.win_lim(sig_chunks(sig_ix,1),1):actv{sr_ix}.win_lim(sig_chunks(sig_ix,2),2)]+offset_ix-1) = 1;
-            end
-        end
+        % Add mask of thresholded stats
+        stat{sr_ix}.mask(:,offset_ix:offset_ix+size(actv{sr_ix}.time,2)-1) = actv{sr_ix}.mask;
     end
 elseif any(strcmp(conditions,grp_lab))
     grp_ix = find(strcmp(grp_lab,conditions));
-    % Trimming data:  w2 should fit within that since it's averaging into a smaller window
-    
     % Convert to mask time series
+    stat = cell(size(evnt_lab));
     for sr_ix = 1:numel(evnt_lab)
         % Prepare stat mask to match hfa for specific factor
         stat{sr_ix} = rmfield(hfa{sr_ix},{'powspctrm','freq','cumtapcnt'});
         stat{sr_ix}.mask = zeros([numel(w2{sr_ix}.label) size(hfa{sr_ix}.time,2)]);
         
-        % Get Sliding Window Parameters
+        % Get time offset
         [~, offset_ix] = min(abs(hfa{sr_ix}.time-(w2{sr_ix}.time(1)-st.win_len/2)));
         
         for ch_ix = 1:numel(stat{1}.label)
@@ -224,7 +201,7 @@ if ~exist(sig_ln_dir,'dir')
 end
 
 % Create a figure for each channel
-for ch_ix = 1:numel(hfa{1}.label)
+for ch_ix = 2%1:numel(hfa{1}.label)
     sig_flag = 0;
     % Plot parameters
     fig_name = [SBJ '_' conditions '_SR_ERPstack_' hfa{1}.label{ch_ix}];
@@ -319,23 +296,9 @@ for ch_ix = 1:numel(hfa{1}.label)
         end
         
         % Find significant epochs
-        if strcmp(conditions,'actv')
-            % Find significant time periods
-            if any(strcmp(hfa{sr_ix}.label{ch_ix},actv_ch{sr_ix}))
-                % Find significant epoch indices
-                actv_ch_ix = strcmp(hfa{sr_ix}.label{ch_ix},actv_ch{sr_ix});
-                sig_chunks = NaN(size(actv_ch_epochs{sr_ix}{actv_ch_ix}));
-                for win_ix = 1:size(actv_ch_epochs{sr_ix}{actv_ch_ix},1)
-                    sig_chunks(win_ix,1) = find(hfa{sr_ix}.time==actv_ch_epochs{sr_ix}{actv_ch_ix}(win_ix,1));
-                    sig_chunks(win_ix,2) = find(hfa{sr_ix}.time==actv_ch_epochs{sr_ix}{actv_ch_ix}(win_ix,2));
-                end
-            else
-                sig_chunks = [];
-            end
-        elseif any(strcmp(conditions,[grp_lab {'RT'}]))
-            sig_chunks = fn_find_chunks(squeeze(stat{sr_ix}.mask(ch_ix,:))<st.alpha);
-            sig_chunks(squeeze(stat{sr_ix}.mask(ch_ix,sig_chunks(:,1)))==0,:) = [];
-        end
+        sig_chunks = fn_find_chunks(squeeze(stat{sr_ix}.mask(ch_ix,:))<st.alpha);
+        sig_chunks(squeeze(stat{sr_ix}.mask(ch_ix,sig_chunks(:,1)))==0,:) = [];
+        
         % Plot Significance Shading
         if ~isempty(sig_chunks)
             sig_flag = 1;
