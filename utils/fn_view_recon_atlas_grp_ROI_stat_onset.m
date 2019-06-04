@@ -300,13 +300,13 @@ for sbj_ix = 1:numel(SBJs)
         %         % FDR correct pvalues for ANOVA
         %         for elec_ix = 1:numel(stat.label)
         %             pvals = squeeze(w2.pval(:,elec_ix,:));
-        %             [~, ~, ~, qvals] = fdr_bh(pvals);%,0.05,'pdep','yes');
+        %             [~, ~, ~, qvals] = fdr_bh(pvals);%,st.alpha,'pdep','yes');
         %
         %             % Consolidate to binary sig/non-sig
         %             for cond_ix = 1:numel(cond_lab)
         %                 if strcmp(cond_lab{cond_ix},'RT') && any(stat.mask(elec_ix,1,:))
         %                     sig_ch{cond_ix} = [sig_ch{cond_ix} {[SBJs{sbj_ix} '_' stat.label{elec_ix}]}];
-        %                 elseif any(strcmp(cond_lab{cond_ix},{'CNI','PC'})) && any(qvals(cond_ix,:)<0.05,2)
+        %                 elseif any(strcmp(cond_lab{cond_ix},{'CNI','PC'})) && any(qvals(cond_ix,:)<st.alpha,2)
         %                     sig_ch{cond_ix} = [sig_ch{cond_ix} {[SBJs{sbj_ix} '_' w2.label{elec_ix}]}];
         %                 end
         %             end

@@ -150,11 +150,11 @@ if strcmp(stat_id,'actv')
 %     elec_colors = cell([numel(w2.label) numel(grp_lab)+1]);
 %     for ch_ix = 1:numel(stat.label)
 %         pvals = squeeze(w2.pval(:,ch_ix,:));
-%         [~, ~, ~, qvals] = fdr_bh(pvals);%,0.05,'pdep','yes');
+%         [~, ~, ~, qvals] = fdr_bh(pvals);%,st.alpha,'pdep','yes');
 %         
 %         % Consolidate to binary sig/non-sig
 %         for grp_ix = 1:numel(grp_lab)
-%             if any(qvals(grp_ix,:)<0.05,2)
+%             if any(qvals(grp_ix,:)<st.alpha,2)
 %                 elec_colors{ch_ix,grp_ix} = grp_colors{grp_ix};  % sig
 %             else
 %                 elec_colors{ch_ix,grp_ix} = ns_color;  % non-sig

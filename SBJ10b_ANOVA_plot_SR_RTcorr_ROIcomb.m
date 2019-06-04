@@ -57,7 +57,7 @@ qvals = {NaN(size(w2{1}.pval)) NaN(size(w2{2}.pval))};
 for sr_ix = 1:2
     for ch_ix = 1:numel(stat{1}.label)
         pvals = squeeze(w2{sr_ix}.pval(:,ch_ix,:));
-        [~, ~, ~, qvals{sr_ix}(:,ch_ix,:)] = fdr_bh(pvals);%,0.05,'pdep','yes');
+        [~, ~, ~, qvals{sr_ix}(:,ch_ix,:)] = fdr_bh(pvals);%,st.alpha,'pdep','yes');
     end
     
     % Get Sliding Window Parameters
@@ -137,7 +137,7 @@ for cond_ix = 1:numel(cond_lab)
                 ylims = ylims1;
                 yticks = yticks1;
                 ylab = '% Variance Explained';
-                if any(squeeze(qvals{sr_ix}(cond_ix,ch_ix,:))<0.05) && ~isempty(roi_ix)
+                if any(squeeze(qvals{sr_ix}(cond_ix,ch_ix,:))<st.alpha) && ~isempty(roi_ix)
                     any_plot = 1;
                     plot(win_center{sr_ix},squeeze(w2{sr_ix}.trial(cond_ix,ch_ix,:))',...
                         'Color',[roi_colors{roi_ix}],'LineStyle',grp_style{cond_ix});
@@ -149,8 +149,8 @@ for cond_ix = 1:numel(cond_lab)
                     
                     % Find significant periods
                     if strcmp(plt_vars.sig_type,'bold')
-                        sig_chunks = fn_find_chunks(squeeze(qvals{sr_ix}(cond_ix,ch_ix,:))<0.05);
-                        sig_chunks(squeeze(qvals{sr_ix}(cond_ix,ch_ix,sig_chunks(:,1)))>0.05,:) = [];
+                        sig_chunks = fn_find_chunks(squeeze(qvals{sr_ix}(cond_ix,ch_ix,:))<st.alpha);
+                        sig_chunks(squeeze(qvals{sr_ix}(cond_ix,ch_ix,sig_chunks(:,1)))>st.alpha,:) = [];
                         for sig_ix = 1:size(sig_chunks,1)
                             line(win_center{sr_ix}(sig_chunks(sig_ix,1):sig_chunks(sig_ix,2)),...
                                 squeeze(w2{sr_ix}.trial(cond_ix,ch_ix,sig_chunks(sig_ix,1):sig_chunks(sig_ix,2))),...
@@ -158,12 +158,12 @@ for cond_ix = 1:numel(cond_lab)
                                 'LineWidth',plt_vars.sig_width);
                         end
                     elseif strcmp(plt_vars.sig_type,'scatter')
-                        sig_times = win_center{sr_ix}(squeeze(qvals{sr_ix}(cond_ix,ch_ix,:))<0.05);
+                        sig_times = win_center{sr_ix}(squeeze(qvals{sr_ix}(cond_ix,ch_ix,:))<st.alpha);
                         scatter(sig_times,repmat(y_sig(cond_ix),size(sig_times)),...
                             plt_vars.sig_scat_size,roi_colors{roi_ix},plt_vars.sig_scat_mrkr);
                     elseif strcmp(plt_vars.sig_type,'patch')
-                        sig_chunks = fn_find_chunks(squeeze(qvals{sr_ix}(cond_ix,ch_ix,:))<0.05);
-                        sig_chunks(squeeze(qvals{sr_ix}(cond_ix,ch_ix,sig_chunks(:,1)))>0.05,:) = [];
+                        sig_chunks = fn_find_chunks(squeeze(qvals{sr_ix}(cond_ix,ch_ix,:))<st.alpha);
+                        sig_chunks(squeeze(qvals{sr_ix}(cond_ix,ch_ix,sig_chunks(:,1)))>st.alpha,:) = [];
                         error('sig_type = patch needs sig_times variable!');
                         % Plot Significance Shading
                         fprintf('%s %s (%s) -- %i SIGNIFICANT CLUSTERS FOUND...\n',...

@@ -105,9 +105,9 @@ for sbj_ix = 1:numel(SBJs)
             roi_ix = find(strcmp(elec.roi{ch_ix},roi_list));
             % Get ANOVA group onsets
             for grp_ix = 1:numel(grp_lab)
-                if any(squeeze(w2.qval(grp_ix,ch_ix,:))<0.05)
+                if any(squeeze(w2.qval(grp_ix,ch_ix,:))<st.alpha)
                     sig_ch{sbj_ix,grp_ix} = [sig_ch{sbj_ix,grp_ix} stat.label{ch_ix}];
-                    sig_onsets = stat.time(win_lim(squeeze(w2.qval(grp_ix,ch_ix,:))<0.05,1));
+                    sig_onsets = stat.time(win_lim(squeeze(w2.qval(grp_ix,ch_ix,:))<st.alpha,1));
                     if strcmp(st.evnt_lab,'R')
                         all_onsets{sbj_ix,roi_ix,grp_ix} = ...
                             [all_onsets{sbj_ix,roi_ix,grp_ix} sig_onsets(1)];

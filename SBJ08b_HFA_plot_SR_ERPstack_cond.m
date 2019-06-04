@@ -314,7 +314,7 @@ for ch_ix = 1:numel(hfa{1}.label)
                 sig_chunks = [];
             end
         elseif any(strcmp(conditions,[grp_lab {'RT'}]))
-            sig_chunks = fn_find_chunks(squeeze(stat{sr_ix}.mask(ch_ix,:))<0.05);
+            sig_chunks = fn_find_chunks(squeeze(stat{sr_ix}.mask(ch_ix,:))<st.alpha);
             sig_chunks(squeeze(stat{sr_ix}.mask(ch_ix,sig_chunks(:,1)))==0,:) = [];
         end
         % Plot Significance Shading

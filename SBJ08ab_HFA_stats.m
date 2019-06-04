@@ -1,4 +1,5 @@
 function SBJ08ab_HFA_stats(SBJ,an_id,stat_id)
+error('needs updates that SBJ08ab_actv got!');
 % Computes cluster-based statistics for given conditions based on saved HFA
 % clear all; %close all;
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];

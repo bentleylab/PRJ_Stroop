@@ -11,8 +11,6 @@ function SBJ10a_crRT_smANOVA(SBJ,an_id,stat_id)
 %   w2 [struct] - pseudo-FT structure with main ANOVA output
 %   stat [FT struct] - output of correlation with RT if st.rt_corr==1
 %   st [struct] - stat params loaded via stat_id
-%   win_lim [int] - [start, stop] indices of sliding windows (N,2) shape
-%       NaN is stand in for single trial RT
 
 %% Set up paths
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
@@ -212,11 +210,11 @@ fprintf(sig_report,[repmat('%-10s',[1 1+numel(cond_lab)]) '\n'],'label',cond_lab
 
 % Print summary lines (absolute)
 if st.rt_corr
-    fprintf(sig_report,result_str, 'count', sum(any(w2.qval(:,:,:)<0.05,3),2), sum(any(stat.mask(:,1,:),3)));
+    fprintf(sig_report,result_str, 'count', sum(any(w2.qval(:,:,:)<st.alpha,3),2), sum(any(stat.mask(:,1,:),3)));
     fprintf(sig_report,strrep(result_str,'i','.3f'), 'percent',...
         [sum(any(w2.qval(:,:,:)<st.alpha,3),2)', sum(any(stat.mask(:,1,:),3))]./numel(w2.label));
 else
-    fprintf(sig_report,result_str, 'count', sum(any(w2.qval(:,:,:)<0.05,3),2));
+    fprintf(sig_report,result_str, 'count', sum(any(w2.qval(:,:,:)<st.alpha,3),2));
     fprintf(sig_report,strrep(result_str,'i','.3f'), 'percent',...
         sum(any(w2.qval(:,:,:)<st.alpha,3),2)'./numel(w2.label));
 end
@@ -226,7 +224,7 @@ sig_mat = zeros([numel(w2.label) numel(cond_lab)]);
 for ch_ix = 1:numel(w2.label)
     % Consolidate to binary sig/non-sig
     for grp_ix = 1:numel(st.groups)
-        if any(squeeze(w2.qval(grp_ix,ch_ix,:))<0.05)
+        if any(squeeze(w2.qval(grp_ix,ch_ix,:))<st.alpha)
             sig_mat(ch_ix,grp_ix) = 1;
         end
     end
@@ -243,9 +241,9 @@ fclose(sig_report);
 %% Save Results
 out_fname = [SBJ_vars.dirs.proc SBJ '_smANOVA_ROI_' stat_id '_' an_id '.mat'];
 if st.rt_corr
-    save(out_fname,'-v7.3','w2','stat','st','win_lim');
+    save(out_fname,'-v7.3','w2','stat','st');
 else
-    save(out_fname,'-v7.3','w2','st','win_lim');
+    save(out_fname,'-v7.3','w2','st');
 end
 
 end
