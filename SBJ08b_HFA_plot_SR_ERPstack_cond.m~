@@ -178,8 +178,6 @@ elseif strcmp(conditions,'actv')
         
         for ch_ix = 1:numel(stat{1}.label)
             % Add significant epochs for condition of interest to mask
-            error('start again here, why cant I just use the logical with qval to make a mask directly since its on the right time axis???');
-            !!! speaking of which, double check the time business above...
             sig_chunks = fn_find_chunks(squeeze(actv{sr_ix}.qval(ch_ix,:))<st.alpha);
             sig_chunks(squeeze(actv{sr_ix}.qval(ch_ix,sig_chunks(:,1)))>st.alpha,:) = [];
             for sig_ix = 1:size(sig_chunks,1)
