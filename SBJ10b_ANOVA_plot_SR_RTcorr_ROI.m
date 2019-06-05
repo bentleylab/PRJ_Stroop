@@ -15,7 +15,8 @@ ft_defaults
 
 %% Load Results
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
-eval(SBJ_vars_cmd);plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
+eval(SBJ_vars_cmd);
+plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 stat_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
@@ -31,8 +32,8 @@ event_lab = {'stim', 'resp'};
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
 srate = trial_info.sample_rate;
 
-f_name_s = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id_s '.mat'];
-f_name_r = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id_r '.mat'];
+f_name_s = [SBJ_vars.dirs.proc SBJ '_smANOVA_ROI_' stat_id '_' an_id_s '.mat'];
+f_name_r = [SBJ_vars.dirs.proc SBJ '_smANOVA_ROI_' stat_id '_' an_id_r '.mat'];
 tmp = load(f_name_s,'w2'); w2{1} = tmp.w2;
 tmp = load(f_name_r,'w2'); w2{2} = tmp.w2;
 % tmp = load(f_name_s,'hfa'); hfa{1} = tmp.hfa;

@@ -149,15 +149,16 @@ end
 %% Run ANOVA
 fprintf('================== Running ANOVA =======================\n');
 % Create structure for w2 in fieldtrip style
-w2.design  = design;
-w2.cond    = st.groups;
-w2.time    = hfa.time(win_center);
-w2.win_lim = win_lim;
-w2.label   = hfa.label;
-w2.dimord  = 'rpt_chan_time';
-% w2.trial   = zeros([numel(w2.cond) length(hfa.label) length(w2.time)]);
-w2.boot    = zeros([numel(w2.cond) length(hfa.label) length(w2.time) st.n_boots]);
-% w2.pval    = w2.trial;
+w2.design    = design;
+w2.cond      = st.groups;
+w2.time      = hfa.time(win_center);
+w2.win_lim   = win_lim;
+w2.win_lim_s = hfa.time(win_lim);
+w2.label     = hfa.label;
+w2.dimord    = 'rpt_chan_time';
+% w2.trial     = zeros([numel(w2.cond) length(hfa.label) length(w2.time)]);
+w2.boot      = zeros([numel(w2.cond) length(hfa.label) length(w2.time) st.n_boots]);
+% w2.pval      = w2.trial;
 
 
 % Compute ANOVA and Explained Variance for real model

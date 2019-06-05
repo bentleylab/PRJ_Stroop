@@ -39,6 +39,9 @@ evnt_check = cell([2 1]);
 alpha_chk  = cell([2 1]);
 grp_check  = cell([2 1]);
 for sr_ix = 1:2
+    if ~isempty(strfind(stat_ids{sr_ix},'D1tRT'))
+        error('not ready to handle D analyses');
+    end
     % Load HFA
     hfa_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_ids{sr_ix},'.mat');
     tmp = load(hfa_fname,'hfa'); hfa{sr_ix} = tmp.hfa;
@@ -161,6 +164,8 @@ elseif strcmp(conditions,'actv')
         
         % Get time offset
         [~, offset_ix] = min(abs(hfa{sr_ix}.time-actv{sr_ix}.time(1)));
+        %!!! add check for cust_win for S+D analyses here
+        %!!! can also switch to using .win_lim_s now!
         
         % Add mask of thresholded stats
         stat{sr_ix}.mask(:,offset_ix:offset_ix+size(actv{sr_ix}.time,2)-1) = actv{sr_ix}.mask;
