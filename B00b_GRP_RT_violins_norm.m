@@ -125,7 +125,7 @@ ax.YLabel.String   = 'RT (z-score)';
 ax.YLabel.FontSize = axis_sz;
 ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') RTs: CNI p=' num2str(pval(1),'%.3f')];
 ax.Title.FontSize  = title_sz;
-legend([legend_obj{:}],cni_legend,'FontSize',leg_sz,'Location','best');
+legend([legend_obj{:}],cni_legend,'FontSize',leg_sz,'Location','northwest');
 
 % Save Figure
 fig_fname = [fig_dir,fig_name,'.',fig_ftype];
@@ -172,7 +172,7 @@ ax.YLabel.String   = 'RT (z-score)';
 ax.YLabel.FontSize = axis_sz;
 ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') RTs: PC p=' num2str(pval(2),'%.3f')];
 ax.Title.FontSize  = title_sz;
-legend([legend_obj{:}],pc_legend,'FontSize',leg_sz,'Location','best');
+legend([legend_obj{:}],pc_legend,'FontSize',leg_sz,'Location','northwest');
 
 if save_fig
     fig_fname = [fig_dir fig_name '.' fig_ftype];
@@ -299,7 +299,7 @@ ax.YLabel.String   = 'I-C RT (z-score)';
 ax.YLabel.FontSize = axis_sz;
 ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') Stroop RT Effect by PC: p=' num2str(pval,'%.3f')];
 ax.Title.FontSize  = title_sz;
-legend([legend_obj{:}],pc_lab,'FontSize',leg_sz,'Location','best');
+legend([legend_obj{:}],pc_lab,'FontSize',leg_sz,'Location','southwest');
 
 if save_fig
     fig_fname = [fig_dir fig_name '.' fig_ftype];
@@ -384,7 +384,7 @@ for pc_ix = 1:numel(n_pc_lab)
         sbj_n_idx{pc_ix} = [sbj_n_idx{pc_ix}; sbj_idx{s_ix}(tmp_pc_idx & cni_idx{s_ix}==n_ix)];
         pc_n_idx{pc_ix}  = [pc_n_idx{pc_ix}; pc_idx{s_ix}(tmp_pc_idx & cni_idx{s_ix}==n_ix)];
     end
-    pc_legend{pc_ix} = [n_pc_lab{pc_ix} ' (n=' num2str(numel(rt_grps{pc_ix})) ')'];
+    pc_legend{pc_ix} = [n_pc_lab{pc_ix} ' (n=' num2str(numel(rt_grps{pc_ix})) '; avg=' num2str(mean(rt_grps{pc_ix}),'%.2f') ')'];
 end
 
 % Run ANOVA on Neutral Trials
@@ -413,7 +413,7 @@ ax.YLabel.String   = 'RT (z-score)';
 ax.YLabel.FontSize = axis_sz;
 ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') RTs: N PC p=' num2str(pval(1),'%.3f')];
 ax.Title.FontSize  = title_sz;
-legend([legend_obj{:}],pc_legend,'FontSize',leg_sz,'Location','best');
+legend([legend_obj{:}],pc_legend,'FontSize',leg_sz,'Location','northwest');
 
 if save_fig
     fig_fname = [fig_dir fig_name '.' fig_ftype];

@@ -25,9 +25,9 @@ plt_id   = 'rt_hist';
 save_fig = 1;
 fig_vis  = 'on';
 fig_ftype = 'png';
-for s = 1:numel(SBJs)
-    B00a_SBJ_RT_violins(SBJs{s},plt_id,fig_vis,save_fig,fig_ftype);
-end
+% for s = 1:numel(SBJs)
+%     B00a_SBJ_RT_violins(SBJs{s},plt_id,fig_vis,save_fig,fig_ftype);
+% end
 
 % RT behavior group level
 B00b_GRP_RT_violins_norm(SBJs,plt_id,save_fig,fig_vis,fig_ftype);
@@ -169,11 +169,11 @@ fn_view_recon_atlas_grp_stat_onset(SBJs, proc_id, stat_id, an_id, reg_type, show
 % SBJ10b_ANOVA_plot_SR_RTcorr(SBJ,stat_id,an_id_s,an_id_r,plt_id,1,'on','svg');
 % 
 %% Proportions of significant effects across ROI
-stat_opts   = {'CNI_PC_D1tRT'};%'CNI_PC_S0tmRT_WL1_WS50','CNI_PC_R1t5_WL1_WS50'};
+stat_opts   = {'PC_S2t0','CNI_PC_S0tmRT_WL1_WS50','CNI_PC_D1tRT','CNI_PC_R1t5_WL1_WS50'};
 atlas_id    = 'Dx';
 % an_opts     = {'HGh_S_zbtS_trl2to151_fLog_sm0_stat15','HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1'};
-an_opts     = {'HGm_S2t251_zbtA_sm0_wn100'};%'HGm_S2t151_zbtA_sm0_wn100','HGm_R5t101_zbtA_sm0_wn100'};
-actv_opts   = {'actv_D1tRT'};%'actv_S0tmRT_mn1','actv_R1t5_mn1'};
+an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t151_zbtA_sm0_wn100','HGm_S2t251_zbtA_sm0_wn100','HGm_R5t101_zbtA_sm0_wn100'};
+actv_opts   = {'actv_S2t0_mn50','actv_S0tmRT_mn1','actv_D1tRT','actv_R1t5_mn1'};
 plt_id      = '';
 roi_id      = 'gROI';%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
 gm_thresh   = 0;
@@ -183,7 +183,7 @@ fig_vis     = 'on';
 fig_ftype   = 'png';
 save_fig    = 1;
 
-for an_ix = 1:numel(an_opts)
+for an_ix = 1%:numel(an_opts)
     if numel(an_opts)~=numel(stat_opts) || numel(an_opts)~=numel(actv_opts); error('fix opts!'); end
     % with SBJ scatter (for myself to understand)
     SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,proc_id,an_opts{an_ix},stat_opts{an_ix},...

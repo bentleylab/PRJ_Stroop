@@ -1,8 +1,8 @@
-function SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,proc_id,an_id,stat_id,actv_id,atlas_id,roi_id,...
+function SBJ10c_HFA_GRP_errbar_ROI_stat_comb(SBJs,proc_id,an_id,stat_id1,stat_id2,atlas_id,roi_id,...
                                                             gm_thresh,plt_id,plot_out,plot_scat,save_fig,fig_vis,fig_ftype)
-% Load HFA analysis results for active, RT correlation, and ANOVA epochs
+% Load HFA analysis results for two stat analyses, plot bars with error
 %   RT correlation: any significance in stat_lim
-%   ANOVA factors: any significance in stat_lim, after FDR correction
+%   ANOVA factors: any significance in stat_lim
 % OUTPUTS:
 %   Bar chart with % active, % deactivated, % RT correlations, % ANOVA factors
 % clear all; %close all;
