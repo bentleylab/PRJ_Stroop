@@ -49,6 +49,7 @@ else
     if ~strcmp(full{1}.w2.dimord,full{2}.w2.dimord); error('w2.dimord mismatch'); end
     if ~strcmp(full{1}.w2.dimord(end-3:end),'time'); error('w2 last dim not time'); end
     for grp_ix = 1:numel(full{1}.st.groups)
+        
         if ~all(full{1}.w2.design{grp_ix}==full{2}.w2.design{grp_ix})
             error('w2.design doesn''t match');
         end
@@ -59,7 +60,7 @@ end
 if strcmp(full{1}.st.model_lab,'actv')
     error('actv needs implementation');
 else
-    % Determine order to add w2
+    %% Determine order to add w2
     if ~all(strcmp(full{1}.st.evnt_lab,full{2}.st.evnt_lab))
         % S + R - put R last
         if any(strcmp(full{1}.st.evnt_lab,'R'))
@@ -74,37 +75,81 @@ else
         error('what combination is this?');
     end
     
-    % Combine stat info
-    st = full{order_idx(1)}.st;
+    %% Combine stat info
+    st = struct;
     st.combined_st = 1;                     % denote this is a combined st
-    if any([isfield(full{1}.st,'combined_st') isfield(full{2}.st,'combined_st')])
-        st.an_ids      = an_ids(order_idx);
-        st.stat_ids    = stat_ids(order_idx);
-    else
-        st.an_ids      = an_ids(order_idx);
-        st.stat_ids    = stat_ids(order_idx);
+    
+    % Add new info, being careful to handle previously combined stats well
+    comb_already = [isfield(full{1}.st,'combined_st') isfield(full{2}.st,'combined_st')];
+    st.an_ids = {}; st.stat_ids = {};
+    for st_ix = 1:2
+        if comb_already(order_idx(st_ix))
+            % Add in all previosuly combined an_ids and stat_ids
+            st.an_ids   = [st.an_ids full{order_idx(st_ix)}.st.an_ids{:}];
+            st.stat_ids = [st.stat_ids full{order_idx(st_ix)}.st.stat_ids];
+        else
+            st.an_ids   = [st.an_ids an_ids(order_idx(st_ix))];
+            st.stat_ids = [st.stat_ids stat_ids(order_idx(st_ix))];
+        end
     end
-    match_fields = {'alpha','model_lab','groups','rt_corr','regress_rt'};
-    fields = fieldnames(full{1}.st);
-    for f_ix = 1:numel(fields)
-        if ~any(strcmp(match_fields,fields{f_ix})) && ~any(strcmp(fields{f_ix},{'stat_lim','bad_trial_n'}))
-            if isnumeric(full{1}.st.(fields{f_ix}))
-                st.(fields{f_ix}) = [full{order_idx(1)}.st.(fields{f_ix})...
-                    full{order_idx(2)}.st.(fields{f_ix})];
+    
+    % Add shared fields (already compatibility checked)
+    shared_fields = {'alpha','model_lab','groups','rt_corr','regress_rt'};
+    for f_ix = 1:numel(shared_fields)
+        st.(shared_fields{f_ix}) = full{1}.st.(shared_fields{f_ix});
+    end
+    
+    % Add fields with single items
+    single_fields = {'cust_win','min_rt','win_len','win_step','n_boots'};
+    for f_ix = 1:numel(single_fields)
+        st.(single_fields{f_ix}) = [full{order_idx(1)}.st.(single_fields{f_ix}) ...
+                                    full{order_idx(2)}.st.(single_fields{f_ix})];
+    end
+    
+    % Add fields with multiple pieces of data (plus evnt_lab to avoid str cat)
+    st.bad_trial_n = {};
+    tuple_fields = {'lim_adj','stat_lim','evnt_lab'};
+    for f_ix = 1:numel(tuple_fields)
+        st.(tuple_fields{f_ix}) = {};
+        for st_ix = 1:2
+            if comb_already(order_idx(st_ix))
+                st.(tuple_fields{f_ix}) = [st.(tuple_fields{f_ix}) ...
+                    full{order_idx(st_ix)}.st.(tuple_fields{f_ix})];
             else
-                st.(fields{f_ix}) = {full{order_idx(1)}.st.(fields{f_ix})...
-                    full{order_idx(2)}.st.(fields{f_ix})};
+                st.(tuple_fields{f_ix}) = [st.(tuple_fields{f_ix}) ...
+                    {full{order_idx(st_ix)}.st.(tuple_fields{f_ix})}];
             end
         end
     end
     
-    % Concatenate w2 structs
+    % Variable fields (only .bad_trial_n for now...)
+    for st_ix = 1:2
+        if isfield(full{order_idx(st_ix)}.st,'bad_trial_n')
+            st.bad_trial_n = [st.bad_trial_n {full{order_idx(st_ix)}.st.bad_trial_n}];
+        else
+            st.bad_trial_n = [st.bad_trial_n {zeros([0 1])}];
+        end
+    end
+    
+    % Check if anything was missed
+    if ~isempty(setdiff(fieldnames(full{1}.st),fieldnames(st))) || ...
+       ~isempty(setdiff(fieldnames(full{2}.st),fieldnames(st)))
+       error('st missed fields!');
+    end
+    
+    %% Concatenate w2 structs
     w2 = full{order_idx(1)}.w2;
     w2.time      = [full{order_idx(1)}.w2.time full{order_idx(2)}.w2.time];
-    w2.win_lim   = {full{order_idx(1)}.w2.win_lim full{order_idx(2)}.w2.win_lim};
-    w2.win_lim_s = {full{order_idx(1)}.w2.win_lim_s full{order_idx(2)}.w2.win_lim_s};
-%     w2.(['win_lim_' stat_ids{add_ix}]) = full{add_ix}.w2.win_lim;
-%     w2.(['win_lim_s_' stat_ids{add_ix}]) = full{add_ix}.w2.win_lim_s;
+    w2.win_lim = {}; w2.win_lim_s = {};
+    for st_ix = 1:2
+        if comb_already(order_idx(st_ix))
+            w2.win_lim   = [w2.win_lim full{order_idx(st_ix)}.w2.win_lim];
+            w2.win_lim_s = [w2.win_lim_s full{order_idx(st_ix)}.w2.win_lim_s];
+        else
+            w2.win_lim   = [w2.win_lim {full{order_idx(st_ix)}.w2.win_lim}];
+            w2.win_lim_s = [w2.win_lim_s {full{order_idx(st_ix)}.w2.win_lim_s}];
+        end
+    end
     ts_fields = {'boot','trial','pval','qval','zscore','bootmean','bootstd'};
     for f_ix = 1:numel(ts_fields)
         w2.(ts_fields{f_ix}) = cat(3,full{order_idx(1)}.w2.(ts_fields{f_ix}),...
@@ -115,7 +160,7 @@ else
     cust_win_ts = cell([2 1]);
     for st_ix = 1:2
         if isfield(full{st_ix}.w2,'cust_win')
-            cust_win_ts{st_ix} = full{st_ix}.cust_win;
+            cust_win_ts{st_ix} = full{st_ix}.w2.cust_win;
         elseif full{st_ix}.st.cust_win==1
             cust_win_ts{st_ix} = ones(size(full{st_ix}.w2.time));
             if numel(full{st_ix}.w2.time)>1
