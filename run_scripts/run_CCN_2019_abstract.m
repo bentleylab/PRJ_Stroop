@@ -34,7 +34,7 @@ B00b_GRP_RT_violins_norm(SBJs,plt_id,save_fig,fig_vis,fig_ftype);
 
 %% Plot stacks with mean traces
 % conditions  = 'actv';%'CNI';%
-stat_id_b = 'PC_S2t0';
+stat_id_b = 'pCNI_PC_S2t0';
 stat_id_s = {'CNI_PC_S0tmRT_WL1_WS25','CNI_PC_S0tmRT_WL1_WS50'};
 stat_id_r = {'CNI_PC_R1t5_WL1_WS25','CNI_PC_R1t5_WL1_WS50'};
 proc_id   = 'main_ft';
@@ -47,26 +47,33 @@ actv_id_d = 'actv_D1tRT';
 actv_id_r = 'actv_R1t5_mn1';
 % an_id_s   = 'HGm_S_zbtA_trl2to151_sm0_wn100_stat15';%'HGh_S_zbtS_trl2to151_fLog_sm0_stat15';
 % an_id_r   = 'HGm_R_zbtA_trl5to101_sm0_wn100_stat5to1';%'HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1';
-plt_id    = 'ERPstack_S2to15_R5to10_evnt_c5';%'ts_S15R1_errbr_evnt';
-save_fig  = 0;
-fig_vis   = 'on';
+plt_id_s  = 'ERPstack_S2to15_evnt_c5';%'ts_S15R1_errbr_evnt';
+plt_id_sr = 'ERPstack_S2to15_R5to10_evnt_c5';%'ts_S15R1_errbr_evnt';
+save_fig  = 1;
+fig_vis   = 'off';
 fig_ftype = 'png';
 for s = 1:numel(SBJs)
-%     SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_b);
-%     SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_s);
-%     SBJ08ab_HFA_actv(SBJs{s},an_id_d,actv_id_d);
-%     SBJ08ab_HFA_actv(SBJs{s},an_id_r,actv_id_r);
-%     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,actv_id_s,actv_id_r,...
-%                                         plt_id,save_fig,fig_vis,fig_ftype)
+    %     SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_b);
+    %     SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_s);
+    %     SBJ08ab_HFA_actv(SBJs{s},an_id_d,actv_id_d);
+    %     SBJ08ab_HFA_actv(SBJs{s},an_id_r,actv_id_r);
+    %     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,actv_id_s,actv_id_r,...
+    %                                         plt_id,save_fig,fig_vis,fig_ftype)
+    %     close all;
+    %     for an_ix = 1:2
+    %         SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_s,an_id_r,stat_id_s{an_ix},stat_id_r{an_ix},...
+    %             plt_id,save_fig,fig_vis,fig_ftype)
+    %         close all;
+%     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'PC',an_id_s,an_id_r,stat_id_b,stat_id_r{2},...
+%         plt_id,save_fig,fig_vis,fig_ftype)
 %     close all;
-%     for an_ix = 1:2
-%         SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_s,an_id_r,stat_id_s{an_ix},stat_id_r{an_ix},...
-%             plt_id,save_fig,fig_vis,fig_ftype)
-%         close all;
-        SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'PC',an_id_s,an_id_r,stat_id_b,stat_id_r{2},...
-            plt_id,save_fig,fig_vis,fig_ftype)
-        close all;
-%     end
+    %     end
+    SBJ08b_HFA_plot_ERPstack_cond(SBJs{s},'pCNI',an_id_s,stat_id_b,...
+        plt_id_s,save_fig,fig_vis,fig_ftype)
+    close all;
+    SBJ08b_HFA_plot_ERPstack_cond(SBJs{s},'PC',an_id_s,stat_id_b,...
+        plt_id_s,save_fig,fig_vis,fig_ftype)
+    close all;
 end
 
 %% ================================================================================
@@ -100,8 +107,8 @@ an_id_s    = 'HGm_S2t151_zbtA_sm0_wn100';
 an_id_d    = 'HGm_S2t251_zbtA_sm0_wn100';
 an_id_r    = 'HGm_R5t101_zbtA_sm0_wn100';
 for s = 1:numel(SBJs)
-    SBJ10ab_combine_stats(SBJs{s},an_id_s,an_id_d,stat_id_s,stat_id_d);
-    SBJ10ab_combine_stats(SBJs{s},an_id_s,an_id_r,stat_id_sd,stat_id_r);
+%     SBJ10ab_combine_stats(SBJs{s},an_id_s,an_id_d,stat_id_s,stat_id_d);
+%     SBJ10ab_combine_stats(SBJs{s},an_id_s,an_id_r,stat_id_sd,stat_id_r);
 end
 
 %% Plot CNI sig elecs
@@ -130,9 +137,12 @@ end
 % end
 
 %% Plot overlap recons
-stat_opts   = {'PC_S2t0','CNI_PC_S0tmRT_WL1_WS50_D1tRT_R1t5_WL1_WS50'};
-an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t151_zbtA_sm0_wn100'};%,'HGm_R5t101_zbtA_sm0_wn100'};%'HGm_S2t251_zbtA_sm0_wn100',
-cond_opts   = {'PC','CNI'};
+% stat_opts   = {'PC_S2t0','CNI_PC_S0tmRT_WL1_WS50_D1tRT_R1t5_WL1_WS50'};
+% an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t151_zbtA_sm0_wn100'};%,'HGm_R5t101_zbtA_sm0_wn100'};%'HGm_S2t251_zbtA_sm0_wn100',
+% cond_opts   = {'PC','CNI'};
+stat_opts   = {'CNI_PC_S0tmRT_WL1_WS50','CNI_PC_D1tRT','CNI_PC_R1t5_WL1_WS50'};
+an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t251_zbtA_sm0_wn100','HGm_R5t101_zbtA_sm0_wn100'};%'HGm_S2t151_zbtA_sm0_wn100',
+cond_opts   = {'CNI','CNI','CNI'};
 
 proc_id   = 'main_ft';
 hemi_opts = {'r','l'};

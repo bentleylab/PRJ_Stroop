@@ -138,7 +138,7 @@ else
     for cond_ix = 1:length(cond_lab)
         % Get binary condition index
         cond_mat(logical(fn_condition_index(cond_lab{cond_ix},...
-            trial_info.condition_n))) = cond_ix;
+            trial_info.condition_n,'trial_info',trial_info))) = cond_ix;
     end
     
     % Create matrix of [cond_idx, rt, trial_ix]

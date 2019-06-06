@@ -287,9 +287,10 @@ for cond_ix1 = 1:numel(stat_conds);
                 'MarkerEdgeColor','k');
         leg_ix = leg_ix + 1;
         if cond_ix1==cond_ix2
-            venn_legend{leg_ix} = cond_ids{cond_ix1};
+            venn_legend{leg_ix} = [cond_ids{cond_ix1} num2str(cond_ix1)];
         else
-            venn_legend{leg_ix} = [cond_ids{cond_ix1} '+' cond_ids{cond_ix2}];
+            venn_legend{leg_ix} = [cond_ids{cond_ix1} num2str(cond_ix1) '+'...
+                                   cond_ids{cond_ix2} num2str(cond_ix2)];
         end
     end
 end
