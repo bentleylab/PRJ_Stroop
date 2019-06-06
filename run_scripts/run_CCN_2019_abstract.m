@@ -100,7 +100,7 @@ an_id_s    = 'HGm_S2t151_zbtA_sm0_wn100';
 an_id_d    = 'HGm_S2t251_zbtA_sm0_wn100';
 an_id_r    = 'HGm_R5t101_zbtA_sm0_wn100';
 for s = 1:numel(SBJs)
-%     SBJ10ab_combine_stats(SBJs{s},an_id_s,an_id_d,stat_id_s,stat_id_d);
+    SBJ10ab_combine_stats(SBJs{s},an_id_s,an_id_d,stat_id_s,stat_id_d);
     SBJ10ab_combine_stats(SBJs{s},an_id_s,an_id_r,stat_id_sd,stat_id_r);
 end
 
@@ -130,16 +130,17 @@ end
 % end
 
 %% Plot overlap recons
-stat_opts   = {'PC_S2t0','CNI_PC_S0tmRT_WL1_WS50_D1tRT','CNI_PC_R1t5_WL1_WS50'};
-an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t151_zbtA_sm0_wn100','HGm_R5t101_zbtA_sm0_wn100'};%'HGm_S2t251_zbtA_sm0_wn100',
-cond_opts   = {'PC','CNI','CNI'};
+stat_opts   = {'PC_S2t0','CNI_PC_S0tmRT_WL1_WS50_D1tRT_R1t5_WL1_WS50'};
+an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t151_zbtA_sm0_wn100'};%,'HGm_R5t101_zbtA_sm0_wn100'};%'HGm_S2t251_zbtA_sm0_wn100',
+cond_opts   = {'PC','CNI'};
 
+proc_id   = 'main_ft';
 hemi_opts = {'r','l'};
-roi_id   = 'gROI';
-atlas_id = 'Dx';
-reg_type = 'v';
-plot_out = 0;
-show_labels = 0;
+roi_id    = 'gROI';
+atlas_id  = 'Dx';
+reg_type  = 'v';
+plot_out  = 0;
+show_lab  = 0;
 
 % Build stat_conds
 stat_conds = cell(size(stat_opts));
@@ -147,7 +148,7 @@ for st_ix = 1:numel(stat_opts)
     stat_conds{st_ix} = {stat_opts{st_ix}, an_opts{st_ix}, cond_opts{st_ix}};
 end
 for hemi_ix = 1:numel(hemi_opts)
-    fn_view_recon_atlas_grp_stat_venn(SBJs, proc_id, stat_conds, reg_type, show_labels,...
+    fn_view_recon_atlas_grp_stat_venn(SBJs, proc_id, stat_conds, reg_type, show_lab,...
         hemi_opts{hemi_ix}, atlas_id, roi_id, plot_out)
 end
 

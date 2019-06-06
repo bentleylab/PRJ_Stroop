@@ -91,7 +91,7 @@ if ~exist(save_dir,'dir')
     [~] = mkdir(save_dir);
 end
 % Create report
-sig_report_fname = [save_dir 'GRP_' atlas_id '_' roi_id '_sig_report.txt'];
+sig_report_fname = [save_dir 'GRP_' atlas_id '_' roi_id '_' hemi '_sig_report.txt'];
 if exist(sig_report_fname)
     system(['mv ' sig_report_fname ' ' sig_report_fname(1:end-4) '_bck.txt']);
 end
@@ -216,7 +216,7 @@ for sbj_ix = 1:numel(SBJs)
                     sig_elecs{sig_ix} = elec_sbj{sbj_ix}.label{ch_ix};
                     % Select color
                     cond_ix = find(sig_mat{sbj_ix}(ch_ix,:));
-                    if numel(cond_ix)==numel(stat_conds)
+                    if numel(cond_ix)==numel(stat_conds) && numel(stat_conds) == 3
                         all_roi_colors{sbj_ix}(sig_ix,:) = all_color;
                     elseif numel(cond_ix)==2
                         all_roi_colors{sbj_ix}(sig_ix,:) = venn_colors{cond_ix(1),cond_ix(2)};
@@ -257,6 +257,7 @@ elec.roi_color = vertcat(all_roi_colors{:});    % appendsens strips that field
 mesh = fn_load_recon_mesh([],'mni',reg_type,hemi);
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
+% Plot venn recon
 plot_name = ['GRP_' strjoin(stat_ids,'-')];
 f = figure('Name',plot_name);
 
@@ -276,5 +277,28 @@ fprintf(['To reset the position of the camera light after rotating the figure,\n
     'make sure none of the figure adjustment tools (e.g., zoom, rotate) are active\n' ...
     '(i.e., uncheck them within the figure), and then hit ''l'' on the keyboard\n'])
 set(f, 'windowkeypressfcn',   @cb_keyboard);
+
+%% Plot legend in separate figure
+figure; hold on;
+venn_legend = {}; leg_ix = 0;
+for cond_ix1 = 1:numel(stat_conds);
+    for cond_ix2 = cond_ix1:numel(stat_conds);
+        scatter(cond_ix1,cond_ix2,500,'MarkerFaceColor',venn_colors{cond_ix1,cond_ix2},...
+                'MarkerEdgeColor','k');
+        leg_ix = leg_ix + 1;
+        if cond_ix1==cond_ix2
+            venn_legend{leg_ix} = cond_ids{cond_ix1};
+        else
+            venn_legend{leg_ix} = [cond_ids{cond_ix1} '+' cond_ids{cond_ix2}];
+        end
+    end
+end
+if numel(stat_conds)>2
+    scatter(numel(stat_conds),1,500,'MarkerFaceColor','w','MarkerEdgeColor','k');
+    venn_legend{leg_ix+1} = strjoin(cond_ids,'+');
+end
+xlim([0 numel(stat_conds)+1]);
+ylim([0 numel(stat_conds)+1]);
+legend(venn_legend);
 
 end
