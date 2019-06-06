@@ -29,11 +29,14 @@ end
 
 %% Check compatibility
 if ~all(strcmp(fieldnames(full{1}),fieldnames(full{2}))); error('different fields'); end
-if ~strcmp(full{1}.st.evnt_lab,full{2}.st.evnt_lab); error('st.evnt_lab mismatch'); end
 if full{1}.st.alpha~=full{2}.st.alpha; error('st.alpha mismatch'); end
 if ~strcmp(full{1}.st.model_lab,full{2}.st.model_lab); error('st.model_lab mismatch'); end
 if ~all(strcmp(full{1}.st.groups,full{2}.st.groups)); error('st.groups mismatch'); end
-if full{1}.st.rt_corr~=full{2}.st.rt_corr; error('st.alpha mismatch'); end
+if full{1}.st.regress_rt~=full{2}.st.regress_rt; error('st.regress_rt mismatch'); end
+if full{1}.st.rt_corr~=full{2}.st.rt_corr; error('st.rt_corr mismatch'); end
+if ~strcmp(full{1}.st.evnt_lab,full{2}.st.evnt_lab);
+    warning('CAREFUL: st.evnt_lab mismatch!');
+end
 
 if strcmp(full{1}.st.model_lab,'actv')
     error('actv needs implementation');
@@ -56,57 +59,92 @@ end
 if strcmp(full{1}.st.model_lab,'actv')
     error('actv needs implementation');
 else
-    % Choose stat with most time points as main struct basis
-    [~,main_ix] = max([numel(full{1}.w2.time),numel(full{2}.w2.time)]);
-    add_ix = setdiff([1 2],main_ix);
+    % Determine order to add w2
+    if ~all(strcmp(full{1}.st.evnt_lab,full{2}.st.evnt_lab))
+        % S + R - put R last
+        if any(strcmp(full{1}.st.evnt_lab,'R'))
+            order_idx = [2 1];
+        else
+            order_idx = [1 2];
+        end
+    elseif numel(full{1}.w2.time)==1 || numel(full{2}.w2.time)==1
+        % S + B/D - order by time
+        [~, order_idx] = sort([mean(full{1}.w2.time) mean(full{2}.w2.time)]);
+    else
+        error('what combination is this?');
+    end
     
     % Combine stat info
-    st = full{main_ix}.st;
-    st.(['st_' stat_ids{add_ix}]) = full{add_ix}.st;
-    st.(['an_' stat_ids{add_ix}]) = an_ids{add_ix};
-    
-    % Determine order to add w2
-    if numel(full{add_ix}.w2.time)>1
-        error('not ready to deal with multiple add ons yet!');
+    st = full{order_idx(1)}.st;
+    st.combined_st = 1;                     % denote this is a combined st
+    if any([isfield(full{1}.st,'combined_st') isfield(full{2}.st,'combined_st')])
+        st.an_ids      = an_ids(order_idx);
+        st.stat_ids    = stat_ids(order_idx);
+    else
+        st.an_ids      = an_ids(order_idx);
+        st.stat_ids    = stat_ids(order_idx);
     end
-    if full{add_ix}.w2.time < min(full{main_ix}.w2.time)
-        order_idx = [add_ix main_ix];
-    elseif full{add_ix}.w2.time > max(full{main_ix}.w2.time)
-        order_idx = [main_ix add_ix];
+    match_fields = {'alpha','model_lab','groups','rt_corr','regress_rt'};
+    fields = fieldnames(full{1}.st);
+    for f_ix = 1:numel(fields)
+        if ~any(strcmp(match_fields,fields{f_ix})) && ~any(strcmp(fields{f_ix},{'stat_lim','bad_trial_n'}))
+            if isnumeric(full{1}.st.(fields{f_ix}))
+                st.(fields{f_ix}) = [full{order_idx(1)}.st.(fields{f_ix})...
+                    full{order_idx(2)}.st.(fields{f_ix})];
+            else
+                st.(fields{f_ix}) = {full{order_idx(1)}.st.(fields{f_ix})...
+                    full{order_idx(2)}.st.(fields{f_ix})};
+            end
+        end
     end
     
     % Concatenate w2 structs
-    w2 = full{main_ix}.w2;
-    w2.time = [full{order_idx(1)}.w2.time full{order_idx(2)}.w2.time];
-    w2.(['win_lim_' stat_ids{add_ix}]) = full{add_ix}.w2.win_lim;
-    w2.(['win_lim_s_' stat_ids{add_ix}]) = full{add_ix}.w2.win_lim_s;
+    w2 = full{order_idx(1)}.w2;
+    w2.time      = [full{order_idx(1)}.w2.time full{order_idx(2)}.w2.time];
+    w2.win_lim   = {full{order_idx(1)}.w2.win_lim full{order_idx(2)}.w2.win_lim};
+    w2.win_lim_s = {full{order_idx(1)}.w2.win_lim_s full{order_idx(2)}.w2.win_lim_s};
+%     w2.(['win_lim_' stat_ids{add_ix}]) = full{add_ix}.w2.win_lim;
+%     w2.(['win_lim_s_' stat_ids{add_ix}]) = full{add_ix}.w2.win_lim_s;
     ts_fields = {'boot','trial','pval','qval','zscore','bootmean','bootstd'};
     for f_ix = 1:numel(ts_fields)
         w2.(ts_fields{f_ix}) = cat(3,full{order_idx(1)}.w2.(ts_fields{f_ix}),...
                                      full{order_idx(2)}.w2.(ts_fields{f_ix}));
     end
     
-    % Add field to adjust win_len for new data
-    w2.cust_win = zeros(size(w2.time));
-    w2.cust_win(w2.time==full{add_ix}.w2.time) = 1;
-    w2.cust_win_len = 0;
+    % Create time series to indicate which windows are custom
+    cust_win_ts = cell([2 1]);
+    for st_ix = 1:2
+        if isfield(full{st_ix}.w2,'cust_win')
+            cust_win_ts{st_ix} = full{st_ix}.cust_win;
+        elseif full{st_ix}.st.cust_win==1
+            cust_win_ts{st_ix} = ones(size(full{st_ix}.w2.time));
+            if numel(full{st_ix}.w2.time)>1
+                error('multiple custom windows???');
+            end
+        else
+            cust_win_ts{st_ix} = zeros(size(full{st_ix}.w2.time));
+        end
+    end
+    w2.cust_win = [cust_win_ts{order_idx(1)} cust_win_ts{order_idx(2)}];
 end
 
 %% Save stat
 % Find matching substring starting from beginning
-add_name = stat_ids{add_ix};
-for let_ix = 1:numel(stat_ids{add_ix})
-    if strcmp(stat_ids{main_ix}(1:let_ix),stat_ids{add_ix}(1:let_ix))
+add_name = stat_ids{order_idx(2)};
+for let_ix = 1:numel(stat_ids{order_idx(2)})
+    if strcmp(stat_ids{order_idx(1)}(1:let_ix),stat_ids{order_idx(2)}(1:let_ix))
         add_name = add_name(2:end);
+    else
+        break;
     end
 end
 
 % Save combined data
-new_name = [stat_ids{main_ix} '_' add_name];
+new_name = [stat_ids{order_idx(1)} '_' add_name];
 if strcmp(full{1}.st.model_lab,'actv')
     error('actv needs implementation');
 else
-    out_fname = [SBJ_vars.dirs.proc SBJ '_smANOVA_ROI_' new_name '_' an_id '.mat'];
+    out_fname = [SBJ_vars.dirs.proc SBJ '_smANOVA_ROI_' new_name '_' an_ids{order_idx(1)} '.mat'];
     if st.rt_corr
         save(out_fname,'-v7.3','w2','stat','st');
     else

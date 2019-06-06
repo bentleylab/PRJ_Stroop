@@ -94,14 +94,11 @@ end
 %% Combine S + D analyses
 stat_id_s  = 'CNI_PC_S0tmRT_WL1_WS50';%,'CNI_PC_R1t5_WL1_WS50'};%
 stat_id_d  = 'CNI_PC_D1tRT';
-stat_id_r  = 'CNI_PC_R1t5_WL1_WS50';
 stat_id_sd = 'CNI_PC_S0tmRT_WL1_WS50_D1tRT';
 an_id_s    = 'HGm_S2t151_zbtA_sm0_wn100';
 an_id_d    = 'HGm_S2t251_zbtA_sm0_wn100';
-an_id_r    = 'HGm_R5t101_zbtA_sm0_wn100';
 for s = 1:numel(SBJs)
-%     SBJ10ab_combine_stats(SBJs{s},an_id_s,an_id_d,stat_id_s,stat_id_d);
-    SBJ10ab_combine_stats(SBJs{s},an_id_s,an_id_r,stat_id_sd,stat_id_r);
+    SBJ10ab_combine_stats(SBJs{s},an_id_s,an_id_d,stat_id_s,stat_id_d);
 end
 
 %% Plot CNI sig elecs

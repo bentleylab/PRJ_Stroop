@@ -7,8 +7,8 @@ st.min_rt   = 0.35;
 st.alpha    = 0.05;
 
 % Sliding Window Parameters (in sec)
-st.win_len  = 0.1;
-st.win_step = 0.025;
+st.win_len  = NaN;
+st.win_step = NaN;
 
 % ANOVA Parameters
 st.model_lab   = 'CNI_PC';

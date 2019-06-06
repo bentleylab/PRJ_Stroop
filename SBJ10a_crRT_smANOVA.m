@@ -36,7 +36,7 @@ if numel(hfa.freq)>1
 end
 
 %% Check for RTs out of range
-if isfield(st,'min_rt')
+if st.min_rt
     % Find bad trials
     bad_rt_idx = trial_info.response_time<st.min_rt;
     st.bad_trial_n = trial_info.trial_n(bad_rt_idx);
@@ -65,7 +65,7 @@ end
 %% Select data in stat window
 cfg_trim = [];
 % Remove excluded trials
-if isfield(st,'min_rt')
+if st.min_rt
     cfg_trim.trials = ~bad_rt_idx;
 else
     cfg_trim.trials = 'all';

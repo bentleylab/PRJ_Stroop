@@ -3,6 +3,7 @@ st.evnt_lab = 'R';
 st.stat_lim = [-0.1 0.5];
 st.lim_adj  = {'', ''};
 st.cust_win = 0;            % custom windows per trials
+st.min_rt   = 0;
 st.alpha    = 0.05;
 
 % Sliding Window Parameters
