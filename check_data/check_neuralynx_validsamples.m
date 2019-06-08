@@ -25,6 +25,8 @@ if ~exist(directory,'dir')
             directory = '/home/knight/ecog/DATA_FOLDER/Irvine/IR69/Datafiles/IR69_Task_Data/';
         case 'IR75'
             directory = '/home/knight/ecog/DATA_FOLDER/Irvine/IR75/Data/IR75/';
+        case 'IR82'
+            directory = '/home/knight/ecog/DATA_FOLDER/Irvine/IR82/Datafiles/SU/';
         case 'IR84'
             directory = '/home/knight/ecog/DATA_FOLDER/Irvine/IR84/Datafiles/SU/';
         case 'IR85'
