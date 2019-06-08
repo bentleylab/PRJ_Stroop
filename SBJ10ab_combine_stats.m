@@ -170,7 +170,24 @@ else
             cust_win_ts{st_ix} = zeros(size(full{st_ix}.w2.time));
         end
     end
-    w2.cust_win = [cust_win_ts{order_idx(1)} cust_win_ts{order_idx(2)}];
+    w2.cust_win   = [cust_win_ts{order_idx(1)} cust_win_ts{order_idx(2)}];
+    
+    % Add stat_id info
+    w2.stat_ids = st.stat_ids; w2.an_ids = st.an_ids;
+    stat_id_ts = cell([2 1]);
+    for st_ix = 1:2
+        if isfield(full{st_ix}.w2,'stat_id_ts')
+            stat_id_ts{st_ix} = full{st_ix}.w2.stat_id_ts;
+            % Re-map stat_ids to new combination
+            old_st_idx = unique(full{st_ix}.w2.stat_id_ts);
+            for sub_ix = 1:numel(full{st_ix}.w2.stat_ids)
+                stat_id_ts{st_ix}(stat_id_ts{st_ix}==old_st_idx(sub_ix)) = find(strcmp(w2.stat_ids,full{st_ix}.w2.stat_ids{sub_ix}));
+            end
+        else
+            stat_id_ts{st_ix} = ones(size(full{st_ix}.w2.time))*find(strcmp(stat_ids{st_ix},st.stat_ids));
+        end
+    end
+    w2.stat_id_ts = [stat_id_ts{order_idx(1)} stat_id_ts{order_idx(2)}];
 end
 
 %% Save stat
