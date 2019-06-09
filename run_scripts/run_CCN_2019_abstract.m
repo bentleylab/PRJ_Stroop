@@ -145,18 +145,25 @@ an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t251_zbtA_sm0_wn100','HGm_R5t1
 cond_opts   = {'CNI','CNI','CNI'};
 
 proc_id   = 'main_ft';
-hemi_opts = {'r','l'};
 roi_id    = 'gROI';
 atlas_id  = 'Dx';
 reg_type  = 'v';
 plot_out  = 0;
 show_lab  = 0;
+save_fig  = 1;
+fig_ftype = 'png';
 
 % Build stat_conds
 stat_conds = cell(size(stat_opts));
 for st_ix = 1:numel(stat_opts)
     stat_conds{st_ix} = {stat_opts{st_ix}, an_opts{st_ix}, cond_opts{st_ix}};
 end
+
+% Plot Venn Diagrams
+SBJ10c_HFA_GRP_venn_stats_ROI(SBJs, proc_id, stat_conds, 'b', atlas_id, roi_id, plot_out, save_fig, fig_ftype)
+
+% Plot Recons
+hemi_opts = {'r','l'};
 for hemi_ix = 1:numel(hemi_opts)
     fn_view_recon_atlas_grp_stat_venn(SBJs, proc_id, stat_conds, reg_type, show_lab,...
         hemi_opts{hemi_ix}, atlas_id, roi_id, plot_out)
