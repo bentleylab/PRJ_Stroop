@@ -67,6 +67,7 @@ else
     reg_suffix = '';                % Patient space
 end
 
+%% Organize IDs
 if numel(stat_conds) < 2 || numel(stat_conds) > 3; error('why venn?'); end
 for st_ix = 2:numel(stat_conds)
     if numel(stat_conds{st_ix})~=3; error('need stat_id, an_id, cond in each stat_cond'); end
@@ -76,36 +77,12 @@ end
 venn_colors = fn_venn_colors(numel(stat_conds));
 all_color   = [1 1 1];
 
-%% Prep report
-% Organize IDs
 stat_ids = cell(size(stat_conds)); an_ids = cell(size(stat_conds)); cond_ids = cell(size(stat_conds));
 for st_ix = 1:numel(stat_conds)
     stat_ids{st_ix} = stat_conds{st_ix}{1};
     an_ids{st_ix}   = stat_conds{st_ix}{2};
     cond_ids{st_ix} = stat_conds{st_ix}{3};
 end
-% Create output dir
-save_dir = [root_dir 'PRJ_Stroop/results/HFA/GRP_overlap/' strjoin(stat_ids,'-')...
-            '/' strjoin(an_ids,'-') '/' strjoin(cond_ids,'-') '/'];
-if ~exist(save_dir,'dir')
-    [~] = mkdir(save_dir);
-end
-% Create report
-sig_report_fname = [save_dir 'GRP_' atlas_id '_' roi_id '_' hemi '_sig_report.txt'];
-if exist(sig_report_fname)
-    system(['mv ' sig_report_fname ' ' sig_report_fname(1:end-4) '_bck.txt']);
-end
-sig_report = fopen(sig_report_fname,'a');
-% Print IDs
-title_str = repmat('%-40s',[1 numel(stat_conds)]);
-fprintf(sig_report,[title_str '\n'],stat_ids{:});
-fprintf(sig_report,[title_str '\n'],an_ids{:});
-fprintf(sig_report,[title_str '\n'],cond_ids{:});
-fprintf(sig_report,[repmat('=',[1 40*numel(stat_conds)]) '\n']);
-% Print result headings
-fprintf(sig_report,[repmat('%-20s',[1 numel(stat_conds)+2]) '\n'],'label','ROI',cond_ids{:});
-fprintf(sig_report,[repmat('-',[1 40*numel(stat_conds)]) '\n']);
-result_str = ['%-20s%-20s' repmat('%-20i',[1 numel(stat_conds)]) '\n'];
 
 %% Load Data
 elec_sbj = cell([numel(SBJs) 1]);
@@ -191,12 +168,6 @@ for sbj_ix = 1:numel(SBJs)
             end
         end
         
-        % Report on significant electrodes for this SBJ (even if non-sig)
-        for ch_ix = 1:numel(elec_sbj{sbj_ix}.label)
-            fprintf(sig_report,result_str,elec_sbj{sbj_ix}.label{ch_ix},...
-                                          elec_sbj{sbj_ix}.roi{ch_ix},sig_mat{sbj_ix}(ch_ix,:));
-        end
-        
         %% Compile Statistics
         if any(sig_mat{sbj_ix}(:))
             print_nums = zeros([2 numel(stat_conds)]);
@@ -242,11 +213,6 @@ for sbj_ix = 1:numel(SBJs)
     end
     clear SBJ SBJ_vars SBJ_vars_cmd sig_elecs sig_ix cond_ix 
 end
-
-%% Finish report and save sig_mat
-fclose(sig_report);
-sig_elecs_fname = [save_dir 'GRP_' atlas_id '_' roi_id '_sig_elecs.mat'];
-save(sig_elecs_fname,'-v7.3','stat_conds','SBJs','elec_sbj','sig_mat');
 
 %% Combine elec structs
 elec = ft_appendsens([],elec_sbj{good_sbj});

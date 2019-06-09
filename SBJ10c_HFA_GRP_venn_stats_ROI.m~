@@ -141,7 +141,6 @@ for sbj_ix = 1:numel(SBJs)
                 error('RT not implemented');
             else    % ANOVA
                 load([SBJ_vars.dirs.proc SBJ '_smANOVA_ROI_' stat_ids{st_ix} '_' an_ids{st_ix} '.mat']);
-                ep_labs{st_ix} = st.ep_lab;
                 for ch_ix = 1:numel(elec_sbj{sbj_ix}.label)
                     stat_ch_ix = strcmp(w2.label,orig_labels{ch_ix});
                     if ~any(stat_ch_ix)

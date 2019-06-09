@@ -1,4 +1,5 @@
 % Time Parameters
+st.ep_lab   = 'B';
 st.evnt_lab = 'S';
 st.stat_lim = [-0.2 0];
 st.lim_adj  = {'', ''};

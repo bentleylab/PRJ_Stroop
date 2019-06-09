@@ -1,5 +1,6 @@
 % Time Parameters
 error('not ready yet, consider IR68 and IR41');
+st.ep_lab   = 'L';
 st.evnt_lab = 'R';
 st.stat_lim = [0.5 1.0];
 st.lim_adj  = {'', ''};
