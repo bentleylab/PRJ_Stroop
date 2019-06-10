@@ -34,14 +34,14 @@ B00b_GRP_RT_violins_norm(SBJs,plt_id,save_fig,fig_vis,fig_ftype);
 
 %% Plot stacks with mean traces
 % conditions  = 'actv';%'CNI';%
-stat_id_b = 'pCNI_PC_S2t0';
+stat_id_b = 'pCNI_PC_B2t0';
 stat_id_s = {'CNI_PC_S0tmRT_WL1_WS25','CNI_PC_S0tmRT_WL1_WS50'};
 stat_id_r = {'CNI_PC_R1t5_WL1_WS25','CNI_PC_R1t5_WL1_WS50'};
 proc_id   = 'main_ft';
 an_id_s   = 'HGm_S2t151_zbtA_sm0_wn100';
 an_id_d   = 'HGm_S2t251_zbtA_sm0_wn100';
 an_id_r   = 'HGm_R5t101_zbtA_sm0_wn100';
-actv_id_b = 'actv_S2t0_mn50';
+actv_id_b = 'actv_B2t0_mn50';
 actv_id_s = 'actv_S0tmRT_mn1';
 actv_id_d = 'actv_D1tRT';
 actv_id_r = 'actv_R1t5_mn1';
@@ -137,37 +137,46 @@ end
 % end
 
 %% Plot overlap recons
-% stat_opts   = {'PC_S2t0','CNI_PC_S0tmRT_WL1_WS50_D1tRT_R1t5_WL1_WS50'};
-% an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t151_zbtA_sm0_wn100'};%,'HGm_R5t101_zbtA_sm0_wn100'};%'HGm_S2t251_zbtA_sm0_wn100',
-% cond_opts   = {'PC','CNI'};
-stat_opts   = {'CNI_PC_S0tmRT_WL1_WS50','CNI_PC_D1tRT','CNI_PC_R1t5_WL1_WS50'};
-an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t251_zbtA_sm0_wn100','HGm_R5t101_zbtA_sm0_wn100'};%'HGm_S2t151_zbtA_sm0_wn100',
-cond_opts   = {'CNI','CNI','CNI'};
+stat_opts   = {'PC_B2t0','CNI_PC_S0tmRT_WL1_WS50_D1tRT','CNI_PC_R1t5_WL1_WS50'};
+an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t151_zbtA_sm0_wn100','HGm_R5t101_zbtA_sm0_wn100'};%'HGm_S2t251_zbtA_sm0_wn100',
+cond_opts   = {'PC','CNI','CNI'};
+% stat_opts   = {'CNI_PC_S0tmRT_WL1_WS50','CNI_PC_D1tRT','CNI_PC_R1t5_WL1_WS50'};
+% an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t251_zbtA_sm0_wn100','HGm_R5t101_zbtA_sm0_wn100'};%'HGm_S2t151_zbtA_sm0_wn100',
+% cond_opts   = {'CNI','CNI','CNI'};
 
 proc_id   = 'main_ft';
-hemi_opts = {'r','l'};
 roi_id    = 'gROI';
 atlas_id  = 'Dx';
+plt_id    = 'venn';
 reg_type  = 'v';
 plot_out  = 0;
 show_lab  = 0;
+save_fig  = 1;
+fig_ftype = 'png';
 
 % Build stat_conds
 stat_conds = cell(size(stat_opts));
 for st_ix = 1:numel(stat_opts)
     stat_conds{st_ix} = {stat_opts{st_ix}, an_opts{st_ix}, cond_opts{st_ix}};
 end
-for hemi_ix = 1:numel(hemi_opts)
-    fn_view_recon_atlas_grp_stat_venn(SBJs, proc_id, stat_conds, reg_type, show_lab,...
-        hemi_opts{hemi_ix}, atlas_id, roi_id, plot_out)
-end
+
+% Plot Venn Diagrams
+SBJ10c_HFA_GRP_venn_stats_ROI(SBJs, proc_id, stat_conds, 'b', atlas_id, roi_id,...
+                              plot_out, plt_id, save_fig, fig_ftype)
+
+% % Plot Recons
+% hemi_opts = {'r','l'};
+% for hemi_ix = 1:numel(hemi_opts)
+%     fn_view_recon_atlas_grp_stat_venn(SBJs, proc_id, stat_conds, reg_type, show_lab,...
+%         hemi_opts{hemi_ix}, atlas_id, roi_id, plot_out)
+% end
 
 %% Proportions of significant effects across ROI
-stat_opts   = {'PC_S2t0','CNI_PC_S0tmRT_WL1_WS50','CNI_PC_D1tRT','CNI_PC_R1t5_WL1_WS50'};
+stat_opts   = {'CNI_PC_S0tmRT_WL1_WS50_D1tRT_R1t5_WL1_WS50'};%'PC_B2t0','CNI_PC_S0tmRT_WL1_WS50','CNI_PC_D1tRT','CNI_PC_R1t5_WL1_WS50'};
 atlas_id    = 'Dx';
 % an_opts     = {'HGh_S_zbtS_trl2to151_fLog_sm0_stat15','HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1'};
-an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t151_zbtA_sm0_wn100','HGm_S2t251_zbtA_sm0_wn100','HGm_R5t101_zbtA_sm0_wn100'};
-actv_opts   = {'actv_S2t0_mn50','actv_S0tmRT_mn1','actv_D1tRT','actv_R1t5_mn1'};
+an_opts     = {'HGm_S2t151_zbtA_sm0_wn100'};%,'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t251_zbtA_sm0_wn100','HGm_R5t101_zbtA_sm0_wn100'};
+actv_opts   = {'actv_S0tmRT_mn1'};%'actv_B2t0_mn50','actv_S0tmRT_mn1','actv_D1tRT','actv_R1t5_mn1'};
 plt_id      = '';
 roi_id      = 'gROI';%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
 gm_thresh   = 0;
