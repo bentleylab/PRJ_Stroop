@@ -100,7 +100,7 @@ else
     end
     
     % Add fields with single items
-    single_fields = {'cust_win','min_rt','win_len','win_step','n_boots'};
+    single_fields = {'cust_win','min_rt','win_len','win_step','n_boots','ep_lab'};
     for f_ix = 1:numel(single_fields)
         st.(single_fields{f_ix}) = [full{order_idx(1)}.st.(single_fields{f_ix}) ...
                                     full{order_idx(2)}.st.(single_fields{f_ix})];

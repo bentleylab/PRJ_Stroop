@@ -28,7 +28,7 @@ eval(an_vars_cmd);
 
 % Get example condition info
 load([root_dir 'PRJ_Stroop/data/' SBJs{1} '/04_proc/' SBJs{1} '_smANOVA_ROI_' stat_id '_' an_id '.mat'],'st');
-evnt_lab = st.evnt_lab;
+ep_lab = st.ep_lab;
 [grp_lab, ~, ~] = fn_group_label_styles(st.model_lab);
 rt_grp = st.rt_corr;
 if rt_grp
@@ -48,7 +48,7 @@ grp_cnt   = zeros([numel(SBJs) numel(roi_list) numel(grp_lab)]);
 elec_cnt  = zeros([numel(SBJs) numel(roi_list)]);
 if rt_grp; rt_cnt = zeros([numel(SBJs) numel(roi_list)]); end
 
-if strcmp(evnt_lab,'S'); mean_RTs = NaN(size(SBJs)); end
+% if strcmp(evnt_lab,'S'); mean_RTs = NaN(size(SBJs)); end
 
 %% Load Results
 for sbj_ix = 1:numel(SBJs)
@@ -60,13 +60,13 @@ for sbj_ix = 1:numel(SBJs)
     
     % Load ANOVA
     load(strcat(SBJ_vars.dirs.proc,SBJ,'_smANOVA_ROI_',stat_id,'_',an_id,'.mat'));
-    if ~strcmp(st.evnt_lab,evnt_lab); error('mismatching evnt_lab in w2 stats'); end
+    if ~strcmp(st.ep_lab,ep_lab); error('mismatching evnt_lab in w2 stats'); end
     
     % Load actv stats
     actv_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'_',actv_id,'.mat');
     load(actv_fname,'actv');
     tmp = load(actv_fname,'st');
-    if ~strcmp(tmp.st.evnt_lab,evnt_lab); error('mismatching evnt_lab in actv stats'); end
+    if ~strcmp(tmp.st.ep_lab,ep_lab); error('mismatching evnt_lab in actv stats'); end
     if tmp.st.alpha~=st.alpha; error('mismatching alpha in actv stats'); end
     
     % Load HFA (to get sign of activation)
@@ -77,16 +77,16 @@ for sbj_ix = 1:numel(SBJs)
 %     tmp = load(CSE_filename,'stat'); cse = tmp.stat;
     
     % Compute mean RT
-    load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
-    if strcmp(evnt_lab,'S')
-        mean_RTs(sbj_ix) = mean(trial_info.response_time);
-    end
+%     load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
+%     if strcmp(evnt_lab,'S')
+%         mean_RTs(sbj_ix) = mean(trial_info.response_time);
+%     end
     
     % Restrict hfa to stat_lim (should obviate some of below comparisons)
-    cfg_lim = [];
-    cfg_lim.latency = st.stat_lim;
-    hfa = ft_selectdata(cfg_lim,hfa);
-    if rt_grp; stat = ft_selectdata(cfg_lim,stat); end
+%     cfg_lim = [];
+%     cfg_lim.latency = st.stat_lim;
+%     hfa = ft_selectdata(cfg_lim,hfa);
+%     if rt_grp; stat = ft_selectdata(cfg_lim,stat); end
 %     cse      = ft_selectdata(cfg_lim,cse);
     
     % Confirm channels and time axis are the same
@@ -177,17 +177,13 @@ for sbj_ix = 1:numel(SBJs)
             end
         end
     end
-    clear SBJ SBJ_vars w2 stat elec hfa actv_ch actv_ch_epochs tmp trial_info st %cse
+    clear SBJ SBJ_vars w2 stat elec hfa actv_ch actv_ch_epochs tmp st %cse trial_info 
 end
 
 %% Plot Percentage of Electrodes Active, Deactive, and Condition Sensitive
-if plot_scat
-    scat_suffix = '_SBJscat';
-else
-    scat_suffix = '';
-end
+if plot_scat; scat_suffix = '_SBJscat'; else; scat_suffix = ''; end;
 % Create and format the plot
-fig_name = ['GRP_HFA_errbar_perc_GMlim' num2str(gm_thresh*100) '_' stat_id '_' actv_id '_' roi_id '_' evnt_lab scat_suffix];
+fig_name = ['GRP_HFA_errbar_perc_GMlim' num2str(gm_thresh*100) '_' stat_id '_' actv_id '_' roi_id '_' ep_lab scat_suffix];
 figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.6],'Visible',fig_vis);
 hold on;
@@ -244,7 +240,7 @@ for cond_ix = 1:2+rt_grp+numel(grp_lab)
         end
     end
 end
-% if strcmp(st.evnt_lab,'S')
+% if strcmp(st.ep_lab,'S')
 %     leg_loc = 'northwest';
 % else
 %     leg_loc = 'northeast';

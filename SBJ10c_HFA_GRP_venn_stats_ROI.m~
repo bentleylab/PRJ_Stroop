@@ -302,11 +302,9 @@ for z_ix = 1:numel(sig_cnt)
     text(v_stats.ZoneCentroid(z_ix,1),v_stats.ZoneCentroid(z_ix,2),...
          num2str(sig_cnt(z_ix)),'FontSize',plt_vars.text_sz,'HorizontalAlignment','center');
 end
-axis(gca, plt_vars.axis_vis);
+axis(gca, 'off');
 title([atlas_id '-' roi_id ': # SBJ = ' num2str(numel(SBJs)) ', # Sig Elecs = '...
-       num2str(size(sig_all,1)) ' / ' num2str(size(vertcat(sig_mat{:}),1)) ...
-       ' (' num2str(size(sig_all,1)/size(vertcat(sig_mat{:}),1),'%.4f') ')'],...
-       'FontSize',plt_vars.title_sz);
+       num2str(size(sig_all,1)) ' / ' num2str(size(vertcat(sig_mat{:}),1))]);
 legend(v,venn_legend,'FontSize',plt_vars.legend_sz);
 
 if save_fig
@@ -363,9 +361,6 @@ for roi_ix = 1:numel(roi_list)
         else
             text_spacers = plt_vars.text_spacers{1};
         end
-        if ~any(sig_cnt_roi(grp_idx,roi_ix))
-            text_spacers = zeros(size(text_spacers));
-        end
     end
     
     % Plot text for numbers of electrodes in each zone
@@ -375,11 +370,9 @@ for roi_ix = 1:numel(roi_list)
             num2str(sig_cnt_roi(z_ix,roi_ix)),'FontSize',plt_vars.text_sz,...
             'HorizontalAlignment',plt_vars.text_align);
     end
-    axis equal; axis(gca, plt_vars.axis_vis);
+    axis equal; axis(gca, 'off');
     title([atlas_id '-' roi_id '-' roi_list{roi_ix} ': # SBJ = ' num2str(numel(SBJs)) ...
-        ', # Sig Elecs = ' num2str(sum(roi_all==roi_ix)) ' / ' num2str(sum(vertcat(roi_mat{:})==roi_ix)) ...
-       ' (' num2str(sum(roi_all==roi_ix)/sum(vertcat(roi_mat{:})==roi_ix),'%.4f') ')'],...
-       'FontSize',plt_vars.title_sz,'Color',roi_colors{roi_ix});
+        ', # Sig Elecs = ' num2str(sum(roi_all==roi_ix)) ' / ' num2str(sum(vertcat(roi_mat{:})==roi_ix))]);
     legend(v,venn_legend,'FontSize',plt_vars.legend_sz);
     
     if save_fig
