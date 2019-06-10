@@ -35,18 +35,37 @@ if numel(hfa.freq)>1
     error('HFA has more than one frequency, can''t run on that for now!');
 end
 
-%% Check for RTs out of range
+%% Exclude trials based on RT and trial type
+% Check for bad RTs
 if st.min_rt
-    % Find bad trials
     bad_rt_idx = trial_info.response_time<st.min_rt;
-    st.bad_trial_n = trial_info.trial_n(bad_rt_idx);
-    % Exclude those trials
-    ti_fields = fieldnames(trial_info);
-    orig_n_trials = numel(trial_info.trial_n);
-    for f_ix = 1:numel(ti_fields)
-        if numel(trial_info.(ti_fields{f_ix}))==orig_n_trials
-            trial_info.(ti_fields{f_ix}) = trial_info.(ti_fields{f_ix})(~bad_rt_idx);
-        end
+else
+    bad_rt_idx = zeros(size(trial_info.trial_n));
+end
+
+% Select trial types of interest
+if ~strcmp(st.trial_cond,'all')
+    good_cond_idx = zeros(size(trial_info.trial_n));
+    for cond_ix = 1:numel(st.trial_cond)
+        cond_idx = fn_condition_index(st.trial_cond{cond_ix}, trial_info.condition_n, 'trial_info', trial_info);
+        good_cond_idx(cond_idx) = 1;
+    end
+else
+    good_cond_idx = ones(size(trial_info.trial_n));
+end
+
+% Log combined bad trial types
+good_trl_idx = all([~bad_rt_idx good_cond_idx],2);
+st.bad_trials.all  = trial_info.trial_n(~good_trl_idx);
+st.bad_trials.rt   = trial_info.trial_n(bad_rt_idx);
+st.bad_trials.cond = trial_info.trial_n(~good_cond_idx);
+
+% Exclude bad trials
+ti_fields = fieldnames(trial_info);
+orig_n_trials = numel(trial_info.trial_n);
+for f_ix = 1:numel(ti_fields)
+    if numel(trial_info.(ti_fields{f_ix}))==orig_n_trials
+        trial_info.(ti_fields{f_ix}) = trial_info.(ti_fields{f_ix})(good_trl_idx);
     end
 end
 
@@ -64,12 +83,7 @@ end
 
 %% Select data in stat window
 cfg_trim = [];
-% Remove excluded trials
-if st.min_rt
-    cfg_trim.trials = ~bad_rt_idx;
-else
-    cfg_trim.trials = 'all';
-end
+cfg_trim.trials = good_trl_idx;
 
 % Adjust stat_lim if needed
 cfg_trim.latency = st.stat_lim;

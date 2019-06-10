@@ -1,7 +1,7 @@
 % Parameters for HFA actvation vs. baseline
 st.model_lab = 'actv';
 st.groups    = {'actv'};    % for compatibility
-st.trial_type  = {'all'};
+st.trial_cond  = {'all'};
 st.ep_lab   = 'B';
 st.evnt_lab = 'S';
 st.stat_lim = [-0.2 0];

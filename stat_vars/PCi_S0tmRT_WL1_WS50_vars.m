@@ -15,7 +15,7 @@ st.win_step = 0.05;
 st.model_lab   = 'PCi';
 st.regress_rt  = 0;    % regrees reaction time off before running ANOVA
 st.groups      = {'PC'};
-st.trial_type  = {'I'};
+st.trial_cond  = {'I'};
 st.n_boots     = 1000;
 
 % RT Correlation Parameters
