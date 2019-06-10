@@ -40,7 +40,7 @@ end
 if st.min_rt
     bad_rt_idx = trial_info.response_time<st.min_rt;
 else
-    bad_rt_idx = zeros(size(trial_info.trial_n));
+    bad_rt_idx = false(size(trial_info.trial_n));
 end
 
 % Select trial types of interest
@@ -51,7 +51,7 @@ if ~strcmp(st.trial_cond,'all')
         good_cond_idx(cond_idx) = 1;
     end
 else
-    good_cond_idx = ones(size(trial_info.trial_n));
+    good_cond_idx = true(size(trial_info.trial_n));
 end
 
 % Log combined bad trial types
