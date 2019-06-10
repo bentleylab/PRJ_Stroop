@@ -39,9 +39,6 @@ evnt_check = cell([2 1]);
 alpha_chk  = cell([2 1]);
 grp_check  = cell([2 1]);
 for sr_ix = 1:2
-    if ~isempty(strfind(stat_ids{sr_ix},'D1tRT'))
-        error('not ready to handle D analyses');
-    end
     % Load HFA
     hfa_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_ids{sr_ix},'.mat');
     tmp = load(hfa_fname,'hfa'); hfa{sr_ix} = tmp.hfa;
@@ -191,7 +188,8 @@ elseif any(strcmp(conditions,grp_lab))
                 if any(sig_chunks(sig_ix,:) > size(w2{sr_ix}.win_lim,1))
                     sig_chunks(sig_ix,sig_chunks(sig_ix,:) > size(w2{sr_ix}.win_lim,1)) = size(w2{sr_ix}.win_lim,1);
                 end
-                stat{sr_ix}.mask(ch_ix,[w2{sr_ix}.win_lim(sig_chunks(sig_ix,1),1):w2{sr_ix}.win_lim(sig_chunks(sig_ix,2),2)]+offset_ix-1) = 1;
+                stat{sr_ix}.mask(ch_ix,[w2{sr_ix}.win_lim(sig_chunks(sig_ix,1),1):...
+                                        w2{sr_ix}.win_lim(sig_chunks(sig_ix,2),2)]+offset_ix-1) = 1;
             end
         end
     end
@@ -206,7 +204,7 @@ if ~exist(sig_ln_dir,'dir')
 end
 
 % Create a figure for each channel
-for ch_ix = 2%1:numel(hfa{1}.label)
+for ch_ix = 1:numel(hfa{1}.label)
     sig_flag = 0;
     % Plot parameters
     fig_name = [SBJ '_' conditions '_SR_ERPstack_' hfa{1}.label{ch_ix}];

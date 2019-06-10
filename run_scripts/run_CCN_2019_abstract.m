@@ -35,8 +35,9 @@ B00b_GRP_RT_violins_norm(SBJs,plt_id,save_fig,fig_vis,fig_ftype);
 %% Plot stacks with mean traces
 % conditions  = 'actv';%'CNI';%
 stat_id_b = 'pCNI_PC_B2t0';
-stat_id_s = {'CNI_PC_S0tmRT_WL1_WS25','CNI_PC_S0tmRT_WL1_WS50'};
-stat_id_r = {'CNI_PC_R1t5_WL1_WS25','CNI_PC_R1t5_WL1_WS50'};
+stat_id_s = 'CNI_PC_S0tmRT_WL1_WS50';%{'CNI_PC_S0tmRT_WL1_WS25',};
+stat_id_sd= 'CNI_PC_S0tmRT_WL1_WS50_D1tRT';
+stat_id_r = 'CNI_PC_R1t5_WL1_WS50';%{'CNI_PC_R1t5_WL1_WS25',};
 proc_id   = 'main_ft';
 an_id_s   = 'HGm_S2t151_zbtA_sm0_wn100';
 an_id_d   = 'HGm_S2t251_zbtA_sm0_wn100';
@@ -53,10 +54,10 @@ save_fig  = 1;
 fig_vis   = 'off';
 fig_ftype = 'png';
 for s = 1:numel(SBJs)
-        SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_b);
-        SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_s);
-        SBJ08ab_HFA_actv(SBJs{s},an_id_d,actv_id_d);
-        SBJ08ab_HFA_actv(SBJs{s},an_id_r,actv_id_r);
+%         SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_b);
+%         SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_s);
+%         SBJ08ab_HFA_actv(SBJs{s},an_id_d,actv_id_d);
+%         SBJ08ab_HFA_actv(SBJs{s},an_id_r,actv_id_r);
     %     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,actv_id_s,actv_id_r,...
     %                                         plt_id,save_fig,fig_vis,fig_ftype)
     %     close all;
@@ -74,6 +75,9 @@ for s = 1:numel(SBJs)
 %     SBJ08b_HFA_plot_ERPstack_cond(SBJs{s},'PC',an_id_s,stat_id_b,...
 %         plt_id_s,save_fig,fig_vis,fig_ftype)
 %     close all;
+    SBJ08b_HFA_plot_ERPstack_cond(SBJs{s},'PC',an_id_s,stat_id_b,...
+        plt_id_s,save_fig,fig_vis,fig_ftype)
+    close all;
 end
 
 %% ================================================================================
@@ -99,10 +103,14 @@ end
 %   RECONS with EFFECTS
 %  =================================================================================
 %% Combine S + D analyses
-stat_id_s  = 'CNI_PC_S0tmRT_WL1_WS50';%,'CNI_PC_R1t5_WL1_WS50'};%
-stat_id_d  = 'CNI_PC_D1tRT';
-stat_id_r  = 'CNI_PC_R1t5_WL1_WS50';
-stat_id_sd = 'CNI_PC_S0tmRT_WL1_WS50_D1tRT';
+% stat_id_s  = 'CNI_PC_S0tmRT_WL1_WS50';%,'CNI_PC_R1t5_WL1_WS50'};%
+% stat_id_d  = 'CNI_PC_D1tRT';
+% stat_id_r  = 'CNI_PC_R1t5_WL1_WS50';
+% stat_id_sd = 'CNI_PC_S0tmRT_WL1_WS50_D1tRT';
+stat_id_s  = 'PCi_S0tmRT_WL1_WS50';%,'CNI_PC_R1t5_WL1_WS50'};%
+stat_id_d  = 'PCi_D1tRT';
+stat_id_r  = 'PCi_R1t5_WL1_WS50';
+stat_id_sd = 'PCi_S0tmRT_WL1_WS50_D1tRT';
 an_id_s    = 'HGm_S2t151_zbtA_sm0_wn100';
 an_id_d    = 'HGm_S2t251_zbtA_sm0_wn100';
 an_id_r    = 'HGm_R5t101_zbtA_sm0_wn100';

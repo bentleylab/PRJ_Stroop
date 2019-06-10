@@ -28,12 +28,19 @@ for st_ix = 1:2
 end
 
 %% Check compatibility
+shared_fields = {'alpha','model_lab','groups','rt_corr','regress_rt','trial_cond','bad_trials'};
+single_fields = {'cust_win','min_rt','win_len','win_step','n_boots','ep_lab'};
+tuple_fields  = {'lim_adj','stat_lim','evnt_lab'};
+
+% Compare field names
 if ~all(strcmp(fieldnames(full{1}),fieldnames(full{2}))); error('different fields'); end
-if full{1}.st.alpha~=full{2}.st.alpha; error('st.alpha mismatch'); end
-if ~strcmp(full{1}.st.model_lab,full{2}.st.model_lab); error('st.model_lab mismatch'); end
-if ~all(strcmp(full{1}.st.groups,full{2}.st.groups)); error('st.groups mismatch'); end
-if full{1}.st.regress_rt~=full{2}.st.regress_rt; error('st.regress_rt mismatch'); end
-if full{1}.st.rt_corr~=full{2}.st.rt_corr; error('st.rt_corr mismatch'); end
+% Check shared fields are equal
+for f_ix = 1:numel(shared_fields)
+    if ~isequaln(full{1}.st.(shared_fields{f_ix}),full{2}.st.(shared_fields{f_ix}))
+        error(['st.' shared_fields{f_ix} ' mismatch']);
+    end
+end
+% Warn for different events
 if ~strcmp(full{1}.st.evnt_lab,full{2}.st.evnt_lab);
     warning('CAREFUL: st.evnt_lab mismatch!');
 end
@@ -49,7 +56,6 @@ else
     if ~strcmp(full{1}.w2.dimord,full{2}.w2.dimord); error('w2.dimord mismatch'); end
     if ~strcmp(full{1}.w2.dimord(end-3:end),'time'); error('w2 last dim not time'); end
     for grp_ix = 1:numel(full{1}.st.groups)
-        
         if ~all(full{1}.w2.design{grp_ix}==full{2}.w2.design{grp_ix})
             error('w2.design doesn''t match');
         end
@@ -94,21 +100,18 @@ else
     end
     
     % Add shared fields (already compatibility checked)
-    shared_fields = {'alpha','model_lab','groups','rt_corr','regress_rt'};
     for f_ix = 1:numel(shared_fields)
         st.(shared_fields{f_ix}) = full{1}.st.(shared_fields{f_ix});
     end
     
     % Add fields with single items
-    single_fields = {'cust_win','min_rt','win_len','win_step','n_boots','ep_lab'};
     for f_ix = 1:numel(single_fields)
         st.(single_fields{f_ix}) = [full{order_idx(1)}.st.(single_fields{f_ix}) ...
                                     full{order_idx(2)}.st.(single_fields{f_ix})];
     end
     
     % Add fields with multiple pieces of data (plus evnt_lab to avoid str cat)
-    st.bad_trial_n = {};
-    tuple_fields = {'lim_adj','stat_lim','evnt_lab'};
+%     st.bad_trial_n = {};
     for f_ix = 1:numel(tuple_fields)
         st.(tuple_fields{f_ix}) = {};
         for st_ix = 1:2
@@ -122,19 +125,19 @@ else
         end
     end
     
-    % Variable fields (only .bad_trial_n for now...)
-    for st_ix = 1:2
-        if isfield(full{order_idx(st_ix)}.st,'bad_trial_n')
-            st.bad_trial_n = [st.bad_trial_n {full{order_idx(st_ix)}.st.bad_trial_n}];
-        else
-            st.bad_trial_n = [st.bad_trial_n {zeros([0 1])}];
-        end
-    end
+%     % Variable fields (only .bad_trial_n for now...)
+%     for st_ix = 1:2
+%         if isfield(full{order_idx(st_ix)}.st,'bad_trial_n')
+%             st.bad_trial_n = [st.bad_trial_n {full{order_idx(st_ix)}.st.bad_trial_n}];
+%         else
+%             st.bad_trial_n = [st.bad_trial_n {zeros([0 1])}];
+%         end
+%     end
     
     % Check if anything was missed
     if ~isempty(setdiff(fieldnames(full{1}.st),fieldnames(st))) || ...
        ~isempty(setdiff(fieldnames(full{2}.st),fieldnames(st)))
-       error('st missed fields!');
+       error('new st combination missed fields!');
     end
     
     %% Concatenate w2 structs
