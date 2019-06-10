@@ -38,15 +38,15 @@ if ~exist(directory,'dir')
         otherwise
             error(['Unknown directory is not valid dir or SBJ: ' directory]);
     end
+    fprintf('============== %s =========\n',directory);
 end
 
 ft_warning off % requires ft toolbox
 
-fprintf('============== %s =========\n',directory);
-total_len = zeros([1 0]);
-invalid_n = zeros([1 0]);
-srate     = zeros([1 0]);
-dset_ix   = 0;
+% total_len = zeros([1 0]);
+% invalid_n = zeros([1 0]);
+% srate     = zeros([1 0]);
+% dset_ix   = 0;
 list = dir(directory);
 for l = 1:numel(list) % list loop
   
@@ -64,22 +64,23 @@ for l = 1:numel(list) % list loop
     try
       ncs = read_neuralynx_ncs(full_directory);
       idx = find(ncs.NumValidSamp(1:end-1)<512); % find 'records' with fewer than 512 valid samples (excluding the final record)
-      dset_ix = dset_ix+1;
-      total_len(dset_ix) = ncs.NRecords*512;
-      invalid_n(dset_ix) = NaN;
-      srate(dset_ix) = ncs.hdr.SamplingFrequency;
+%       dset_ix = dset_ix+1;
+      total_len = ncs.NRecords*512;
+      invalid_n = zeros(size(idx));
+      srate = ncs.hdr.SamplingFrequency;
       if ~isempty(idx)
           for i = 1:numel(idx)
-              invalid_n(dset_ix) = 512-ncs.NumValidSamp(idx(i));
+              invalid_n(i) = 512-ncs.NumValidSamp(idx(i));
           end
-        fprintf(['>> ' full_directory ' contains ' num2str(numel(idx)) ' records with invalid samples <<\n']);
-        fprintf('%i / %i datasets are invalid / tested (%.4f%%)\n',...
-            sum(invalid_n>0),numel(total_len),sum(invalid_n>0)/numel(total_len));
-        fprintf('invalid lengths in samples: %.2f mean; %i min - %i max\n',...
-            nanmean(invalid_n),min(invalid_n),max(invalid_n));
-        invalid_len = invalid_n/srate;
-        fprintf('invalid lengths in time (s): %.2f mean; %i min - %i max\n',...
-            nanmean(invalid_len),min(invalid_len),max(invalid_len));
+%         fprintf(['>> ' full_directory ' contains ' num2str(numel(idx)) ' records with invalid samples <<\n']);
+%         fprintf('%i / %i datasets are invalid / tested (%.4f%%)\n',...
+%             sum(invalid_n>0),numel(total_len),sum(invalid_n>0)/numel(total_len));
+%         fprintf('invalid lengths in samples: %.2f mean; %i min - %i max\n',...
+%             nanmean(invalid_n),min(invalid_n),max(invalid_n));
+        invalid_len = invalid_n./srate;
+%         fprintf('invalid lengths in time (s): %.4f mean; %.4f min - %.4f max\n',...
+%             nanmean(invalid_len),min(invalid_len),max(invalid_len));
+        fprintf('%-10i%-10.4f%-10.4f\n',sum(invalid_n),sum(invalid_len),total_len/srate);
 %       else
 %         fprintf(['>> ' full_directory ' checked out okay <<\n']);
       end
@@ -97,7 +98,7 @@ for l = 1:numel(list) % list loop
                 idx = find(ncs.NumValidSamp(1:end-1)<512); % find 'records' with fewer than 512 valid samples (excluding the final record)
                 dset_ix = dset_ix+1;
                 total_len(dset_ix) = ncs.NRecords*512;
-                invalid_n(dset_ix) = 0;
+                invalid_n(dset_ix) = NaN;
                 srate(dset_ix) = ncs.hdr.SamplingFrequency;
                 if ~isempty(idx)
                     for i = 1:numel(idx)
@@ -105,12 +106,12 @@ for l = 1:numel(list) % list loop
                     end
                     fprintf(['>> ' new_dir ' contains ' num2str(numel(idx)) ' records with invalid samples <<\n']);
                     fprintf('%i / %i datasets are invalid / tested (%.4f%%)\n',...
-                        sum(invalid_n>0),size(total_len),sum(invalid_n>0)/size(total_len));
+                        sum(invalid_n>0),numel(total_len),sum(invalid_n>0)/numel(total_len));
                     fprintf('invalid lengths in samples: %.2f mean; %i min - %i max\n',...
-                        mean(invalid_n),min(invalid_n),max(invalid_n));
+                        nanmean(invalid_n),min(invalid_n),max(invalid_n));
                     invalid_len = invalid_n/srate;
-                    fprintf('invalid lengths in time (s): %.2f mean; %i min - %i max\n',...
-                        mean(invalid_len),min(invalid_len),max(invalid_len));
+                    fprintf('invalid lengths in time (s): %.4f mean; %.4f min - %.4f max\n',...
+                        nanmean(invalid_len),min(invalid_len),max(invalid_len));
 %                 else
 %                     fprintf(['>> ' new_dir ' checked out okay <<\n']);
                 end
