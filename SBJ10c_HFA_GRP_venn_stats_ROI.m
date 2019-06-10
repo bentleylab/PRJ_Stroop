@@ -6,6 +6,7 @@ function SBJ10c_HFA_GRP_venn_stats_ROI(SBJs, proc_id, stat_conds, hemi, atlas_id
 %   proc_id [str] - name of analysis pipeline, used to pick elec file
 %   stat_conds [cell array] - {{'stat_id1','an_id1','cond1'},...,{'stat_idn','an_idn','condn'}};
 %     stat_id_n [str] - ID of statistical analysis
+%     an_id [str] - analysis ID for preprocessing, filtering, etc.
 %     cond_n [str] - ID of condition/group to overlap with
 %       'actv': red for active, blue for deactive, yellow for both
 %       NOPE: 'CI': inc vs. con via ft statistics (not run for all patients!)
@@ -13,7 +14,6 @@ function SBJ10c_HFA_GRP_venn_stats_ROI(SBJs, proc_id, stat_conds, hemi, atlas_id
 %       'CNI': ANOVA of congruence (red for sig)
 %       'pCNI': ANOVA of previous trial congruence (red for sig)
 %       'PC': ANOVA of proportion congruence (red for sig)
-%     an_id [str] - analysis ID for preprocessing, filtering, etc.
 %   hemi [str] - {'l', 'r', 'b'} hemisphere to plot
 %   atlas_id [str] - {'DK','Dx','Yeo7','Yeo17'}
 %   roi_id [str] - ROI grouping by which to color the atlas ROIs
@@ -30,7 +30,7 @@ function SBJ10c_HFA_GRP_venn_stats_ROI(SBJs, proc_id, stat_conds, hemi, atlas_id
 
 %% Define default options
 if numel(stat_conds) < 2 || numel(stat_conds) > 3; error('why venn?'); end
-for st_ix = 2:numel(stat_conds)
+for st_ix = 1:numel(stat_conds)
     if numel(stat_conds{st_ix})~=3; error('need stat_id, an_id, cond in each stat_cond'); end
 end
 plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
@@ -89,6 +89,7 @@ roi_mat  = cell([numel(SBJs) 1]);
 % all_roi_colors = cell([numel(SBJs) 1]);
 for sbj_ix = 1:numel(SBJs)
     SBJ = SBJs{sbj_ix};
+    fprintf('================= Processing: %s =================\n',SBJ);
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
     eval(SBJ_vars_cmd);
     
@@ -98,11 +99,7 @@ for sbj_ix = 1:numel(SBJs)
     if exist([elec_fname(1:end-4) '_' roi_id '.mat'],'file')
         elec_fname = [elec_fname(1:end-4) '_' roi_id '.mat'];
     end
-    try
-        tmp = load(elec_fname); elec_sbj{sbj_ix} = tmp.elec;
-    catch
-        error([elec_fname 'doesnt exist, exiting...']);
-    end
+    tmp = load(elec_fname); elec_sbj{sbj_ix} = tmp.elec;
     
     % Append SBJ name to labels
     orig_labels = elec_sbj{sbj_ix}.label;

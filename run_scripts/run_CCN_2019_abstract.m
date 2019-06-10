@@ -53,10 +53,10 @@ save_fig  = 1;
 fig_vis   = 'off';
 fig_ftype = 'png';
 for s = 1:numel(SBJs)
-    %     SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_b);
-    %     SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_s);
-    %     SBJ08ab_HFA_actv(SBJs{s},an_id_d,actv_id_d);
-    %     SBJ08ab_HFA_actv(SBJs{s},an_id_r,actv_id_r);
+        SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_b);
+        SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_s);
+        SBJ08ab_HFA_actv(SBJs{s},an_id_d,actv_id_d);
+        SBJ08ab_HFA_actv(SBJs{s},an_id_r,actv_id_r);
     %     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,actv_id_s,actv_id_r,...
     %                                         plt_id,save_fig,fig_vis,fig_ftype)
     %     close all;
@@ -68,12 +68,12 @@ for s = 1:numel(SBJs)
 %         plt_id,save_fig,fig_vis,fig_ftype)
 %     close all;
     %     end
-    SBJ08b_HFA_plot_ERPstack_cond(SBJs{s},'pCNI',an_id_s,stat_id_b,...
-        plt_id_s,save_fig,fig_vis,fig_ftype)
-    close all;
-    SBJ08b_HFA_plot_ERPstack_cond(SBJs{s},'PC',an_id_s,stat_id_b,...
-        plt_id_s,save_fig,fig_vis,fig_ftype)
-    close all;
+%     SBJ08b_HFA_plot_ERPstack_cond(SBJs{s},'pCNI',an_id_s,stat_id_b,...
+%         plt_id_s,save_fig,fig_vis,fig_ftype)
+%     close all;
+%     SBJ08b_HFA_plot_ERPstack_cond(SBJs{s},'PC',an_id_s,stat_id_b,...
+%         plt_id_s,save_fig,fig_vis,fig_ftype)
+%     close all;
 end
 
 %% ================================================================================
@@ -137,12 +137,10 @@ end
 % end
 
 %% Plot overlap recons
-stat_opts   = {'PC_B2t0','CNI_PC_S0tmRT_WL1_WS50_D1tRT','CNI_PC_R1t5_WL1_WS50'};
-an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t151_zbtA_sm0_wn100','HGm_R5t101_zbtA_sm0_wn100'};%'HGm_S2t251_zbtA_sm0_wn100',
-cond_opts   = {'PC','CNI','CNI'};
-% stat_opts   = {'CNI_PC_S0tmRT_WL1_WS50','CNI_PC_D1tRT','CNI_PC_R1t5_WL1_WS50'};
-% an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t251_zbtA_sm0_wn100','HGm_R5t101_zbtA_sm0_wn100'};%'HGm_S2t151_zbtA_sm0_wn100',
-% cond_opts   = {'CNI','CNI','CNI'};
+stat_conds = {{'PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'},...
+              {'CNI_PC_S0tmRT_WL1_WS50','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
+              {'CNI_PC_D1tRT','HGm_S2t251_zbtA_sm0_wn100','CNI'},...
+              {'CNI_PC_R1t5_WL1_WS50','HGm_R5t101_zbtA_sm0_wn100','CNI'}};
 
 proc_id   = 'main_ft';
 roi_id    = 'gROI';
@@ -153,12 +151,6 @@ plot_out  = 0;
 show_lab  = 0;
 save_fig  = 1;
 fig_ftype = 'png';
-
-% Build stat_conds
-stat_conds = cell(size(stat_opts));
-for st_ix = 1:numel(stat_opts)
-    stat_conds{st_ix} = {stat_opts{st_ix}, an_opts{st_ix}, cond_opts{st_ix}};
-end
 
 % Plot Venn Diagrams
 SBJ10c_HFA_GRP_venn_stats_ROI(SBJs, proc_id, stat_conds, 'b', atlas_id, roi_id,...
@@ -172,13 +164,17 @@ SBJ10c_HFA_GRP_venn_stats_ROI(SBJs, proc_id, stat_conds, 'b', atlas_id, roi_id,.
 % end
 
 %% Proportions of significant effects across ROI
-stat_opts   = {'CNI_PC_S0tmRT_WL1_WS50_D1tRT_R1t5_WL1_WS50'};%'PC_B2t0','CNI_PC_S0tmRT_WL1_WS50','CNI_PC_D1tRT','CNI_PC_R1t5_WL1_WS50'};
+stat_conds = {{'PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'},...
+              {'CNI_PC_S0tmRT_WL1_WS50_D1tRT_R1t5_WL1_WS50','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
+              {'CNI_PC_S0tmRT_WL1_WS50','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
+              {'CNI_PC_D1tRT','HGm_S2t251_zbtA_sm0_wn100','CNI'},...
+              {'CNI_PC_R1t5_WL1_WS50','HGm_R5t101_zbtA_sm0_wn100','CNI'}};
+%               {'actv_D1tRT','HGm_S2t251_zbtA_sm0_wn100','actv'},...
+
+proc_id     = 'main_ft';
 atlas_id    = 'Dx';
-% an_opts     = {'HGh_S_zbtS_trl2to151_fLog_sm0_stat15','HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1'};
-an_opts     = {'HGm_S2t151_zbtA_sm0_wn100'};%,'HGm_S2t151_zbtA_sm0_wn100','HGm_S2t251_zbtA_sm0_wn100','HGm_R5t101_zbtA_sm0_wn100'};
-actv_opts   = {'actv_S0tmRT_mn1'};%'actv_B2t0_mn50','actv_S0tmRT_mn1','actv_D1tRT','actv_R1t5_mn1'};
-plt_id      = '';
-roi_id      = 'gROI';%{'gROI','thryROI'};%,'LPFC','MPFC','INS','OFC','thryROI'};
+plt_id      = 'errbar';
+roi_id      = 'gROI';
 gm_thresh   = 0;
 plot_out    = 0;
 plot_scat   = 0;
@@ -186,16 +182,19 @@ fig_vis     = 'on';
 fig_ftype   = 'png';
 save_fig    = 1;
 
-for an_ix = 1%:numel(an_opts)
-    if numel(an_opts)~=numel(stat_opts) || numel(an_opts)~=numel(actv_opts); error('fix opts!'); end
-    % with SBJ scatter (for myself to understand)
-    SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,proc_id,an_opts{an_ix},stat_opts{an_ix},...
-        actv_opts{an_ix},atlas_id,roi_id,gm_thresh,plt_id,plot_out,1,save_fig,fig_vis,fig_ftype);
-    % with just errbr (for nice plot)
-%     SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,proc_id,an_opts{an_ix},stat_id{an_ix},...
-%         actv_id{an_ix},atlas_id,roi_id,gm_thresh,plt_id,plot_out,1,save_fig,fig_vis,fig_ftype);
-end
+% with SBJ scatter (for myself to understand)
+SBJ10c_HFA_GRP_errbar_ROI_stat_comb(SBJs,proc_id,stat_conds,atlas_id,roi_id,...
+            gm_thresh,plt_id,plot_out,1,save_fig,fig_vis,fig_ftype);
+% Pretty plot (no scatter)
+SBJ10c_HFA_GRP_errbar_ROI_stat_comb(SBJs,proc_id,stat_conds,atlas_id,roi_id,...
+            gm_thresh,plt_id,plot_out,0,save_fig,fig_vis,fig_ftype);
 
+%% Redux
+stat_id = 'CNI_PC_S0tmRT_WL1_WS50';
+an_id   = 'HGm_S2t151_zbtA_sm0_wn100';
+actv_id = 'actv_S0tmRT_mn1';
+SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,proc_id,an_id,stat_id,actv_id,atlas_id,roi_id,...
+                                                            gm_thresh,plt_id,plot_out,1,save_fig,fig_vis,fig_ftype)
 %% ROLs
 % proc_id = 'main_ft';
 % an_id = 'HGm_S_zbtS_trl2to251_sm0_wn100_stat0';
