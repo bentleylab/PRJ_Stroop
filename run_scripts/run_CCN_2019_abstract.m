@@ -35,9 +35,12 @@ B00b_GRP_RT_violins_norm(SBJs,plt_id,save_fig,fig_vis,fig_ftype);
 %% Plot stacks with mean traces
 % conditions  = 'actv';%'CNI';%
 stat_id_b = 'pCNI_PC_B2t0';
-stat_id_s = 'CNI_PC_S0tmRT_WL1_WS50';%{'CNI_PC_S0tmRT_WL1_WS25',};
-stat_id_sd= 'CNI_PC_S0tmRT_WL1_WS50_D1tRT';
-stat_id_r = 'CNI_PC_R1t5_WL1_WS50';%{'CNI_PC_R1t5_WL1_WS25',};
+stat_id_s = 'PCi_S0tmRT_WL1_WS50';%{'CNI_PC_S0tmRT_WL1_WS25',};
+stat_id_sd= 'PCi_S0tmRT_WL1_WS50_D1tRT';
+stat_id_r = 'PCi_R1t5_WL1_WS50';%{'CNI_PC_R1t5_WL1_WS25',};
+% stat_id_s = 'CNI_PC_S0tmRT_WL1_WS50';%{'CNI_PC_S0tmRT_WL1_WS25',};
+% stat_id_sd= 'CNI_PC_S0tmRT_WL1_WS50_D1tRT';
+% stat_id_r = 'CNI_PC_R1t5_WL1_WS50';%{'CNI_PC_R1t5_WL1_WS25',};
 proc_id   = 'main_ft';
 an_id_s   = 'HGm_S2t151_zbtA_sm0_wn100';
 an_id_d   = 'HGm_S2t251_zbtA_sm0_wn100';
@@ -49,7 +52,7 @@ actv_id_r = 'actv_R1t5_mn1';
 % an_id_s   = 'HGm_S_zbtA_trl2to151_sm0_wn100_stat15';%'HGh_S_zbtS_trl2to151_fLog_sm0_stat15';
 % an_id_r   = 'HGm_R_zbtA_trl5to101_sm0_wn100_stat5to1';%'HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1';
 plt_id_s  = 'ERPstack_S2to15_evnt_c5';%'ts_S15R1_errbr_evnt';
-plt_id_sr = 'ERPstack_S2to15_R5to10_evnt_c5';%'ts_S15R1_errbr_evnt';
+plt_id_sr = 'ERPstack_S2to25_R5to10_evnt_c5';%'ts_S15R1_errbr_evnt';
 save_fig  = 1;
 fig_vis   = 'off';
 fig_ftype = 'png';
@@ -61,23 +64,21 @@ for s = 1:numel(SBJs)
     %     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,actv_id_s,actv_id_r,...
     %                                         plt_id,save_fig,fig_vis,fig_ftype)
     %     close all;
-    %     for an_ix = 1:2
-    %         SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_s,an_id_r,stat_id_s{an_ix},stat_id_r{an_ix},...
-    %             plt_id,save_fig,fig_vis,fig_ftype)
-    %         close all;
+    SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'PC',an_id_d,an_id_r,stat_id_sd,stat_id_r,...
+        plt_id_sr,save_fig,fig_vis,fig_ftype);
+%     close all;
 %     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'PC',an_id_s,an_id_r,stat_id_b,stat_id_r{2},...
 %         plt_id,save_fig,fig_vis,fig_ftype)
 %     close all;
-    %     end
 %     SBJ08b_HFA_plot_ERPstack_cond(SBJs{s},'pCNI',an_id_s,stat_id_b,...
 %         plt_id_s,save_fig,fig_vis,fig_ftype)
 %     close all;
 %     SBJ08b_HFA_plot_ERPstack_cond(SBJs{s},'PC',an_id_s,stat_id_b,...
 %         plt_id_s,save_fig,fig_vis,fig_ftype)
 %     close all;
-    SBJ08b_HFA_plot_ERPstack_cond(SBJs{s},'PC',an_id_s,stat_id_b,...
-        plt_id_s,save_fig,fig_vis,fig_ftype)
-    close all;
+%     SBJ08b_HFA_plot_ERPstack_cond(SBJs{s},'PC',an_id_s,stat_id_b,...
+%         plt_id_s,save_fig,fig_vis,fig_ftype)
+%     close all;
 end
 
 %% ================================================================================
@@ -103,14 +104,14 @@ end
 %   RECONS with EFFECTS
 %  =================================================================================
 %% Combine S + D analyses
-% stat_id_s  = 'CNI_PC_S0tmRT_WL1_WS50';%,'CNI_PC_R1t5_WL1_WS50'};%
-% stat_id_d  = 'CNI_PC_D1tRT';
-% stat_id_r  = 'CNI_PC_R1t5_WL1_WS50';
-% stat_id_sd = 'CNI_PC_S0tmRT_WL1_WS50_D1tRT';
-stat_id_s  = 'PCi_S0tmRT_WL1_WS50';%,'CNI_PC_R1t5_WL1_WS50'};%
-stat_id_d  = 'PCi_D1tRT';
-stat_id_r  = 'PCi_R1t5_WL1_WS50';
-stat_id_sd = 'PCi_S0tmRT_WL1_WS50_D1tRT';
+stat_id_s  = 'CNI_PC_S0tmRT_WL1_WS50';%,'CNI_PC_R1t5_WL1_WS50'};%
+stat_id_d  = 'CNI_PC_D1tRT';
+stat_id_r  = 'CNI_PC_R1t5_WL1_WS50';
+stat_id_sd = 'CNI_PC_S0tmRT_WL1_WS50_D1tRT';
+% stat_id_s  = 'PCi_S0tmRT_WL1_WS50';%,'CNI_PC_R1t5_WL1_WS50'};%
+% stat_id_d  = 'PCi_D1tRT';
+% stat_id_r  = 'PCi_R1t5_WL1_WS50';
+% stat_id_sd = 'PCi_S0tmRT_WL1_WS50_D1tRT';
 an_id_s    = 'HGm_S2t151_zbtA_sm0_wn100';
 an_id_d    = 'HGm_S2t251_zbtA_sm0_wn100';
 an_id_r    = 'HGm_R5t101_zbtA_sm0_wn100';

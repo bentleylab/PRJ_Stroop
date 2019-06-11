@@ -48,6 +48,9 @@ for sr_ix = 1:2
         stat_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_ids{sr_ix},'_',stat_ids{sr_ix},'.mat');
         tmp = load(stat_fname,'actv'); actv{sr_ix} = tmp.actv;
     elseif any(strcmp(conditions,{'CNI','pCNI','PC'}))
+        if ~isempty(strfind(stat_ids{sr_ix},'D1tRT')) && ~isempty(strfind(stat_ids{sr_ix},'S0tmRT'))
+            an_ids{sr_ix} = strrep(an_ids{sr_ix},'S2t251','S2t151');
+        end
         stat_fname = [SBJ_vars.dirs.proc SBJ '_smANOVA_ROI_' stat_ids{sr_ix} '_' an_ids{sr_ix} '.mat'];
         tmp = load(stat_fname,'w2'); w2{sr_ix} = tmp.w2;
     elseif strcmp(conditions,'RT')
@@ -176,20 +179,27 @@ elseif any(strcmp(conditions,grp_lab))
         stat{sr_ix} = rmfield(hfa{sr_ix},{'powspctrm','freq','cumtapcnt'});
         stat{sr_ix}.mask = zeros([numel(w2{sr_ix}.label) size(hfa{sr_ix}.time,2)]);
         
-        % Get time offset
-        [~, offset_ix] = min(abs(hfa{sr_ix}.time-(w2{sr_ix}.time(1)-st.win_len/2)));
-        
+%         % Get time offset
+%         [~, offset_ix] = min(abs(hfa{sr_ix}.time-(w2{sr_ix}.time(1)-st.win_len/2)));
+%         
         for ch_ix = 1:numel(stat{1}.label)
             % Add significant epochs for condition of interest to mask
             sig_chunks = fn_find_chunks(squeeze(w2{sr_ix}.qval(grp_ix,ch_ix,:))<st.alpha);
             sig_chunks(squeeze(w2{sr_ix}.qval(grp_ix,ch_ix,sig_chunks(:,1)))>st.alpha,:) = [];
             for sig_ix = 1:size(sig_chunks,1)
-                % If last window is cut off due to 10ms over, just go to end of trial
-                if any(sig_chunks(sig_ix,:) > size(w2{sr_ix}.win_lim,1))
-                    sig_chunks(sig_ix,sig_chunks(sig_ix,:) > size(w2{sr_ix}.win_lim,1)) = size(w2{sr_ix}.win_lim,1);
+                sig_time_ix = zeros([1 2]); sig_time_err = zeros([1 2]);
+                [sig_time_err(1),sig_time_ix(1)] = min(abs(stat{sr_ix}.time-w2{sr_ix}.win_lim_s(sig_chunks(sig_ix,1),1)));
+                [sig_time_err(1),sig_time_ix(2)] = min(abs(stat{sr_ix}.time-w2{sr_ix}.win_lim_s(sig_chunks(sig_ix,2),2)));
+                if any(sig_time_err>0.0001)
+                    error('exact stat time not found in hfa!');
                 end
-                stat{sr_ix}.mask(ch_ix,[w2{sr_ix}.win_lim(sig_chunks(sig_ix,1),1):...
-                                        w2{sr_ix}.win_lim(sig_chunks(sig_ix,2),2)]+offset_ix-1) = 1;
+                stat{sr_ix}.mask(ch_ix,sig_time_ix(1):sig_time_ix(2)) = 1;
+%                 % If last window is cut off due to 10ms over, just go to end of trial
+%                 if any(sig_chunks(sig_ix,:) > size(w2{sr_ix}.win_lim,1))
+%                     sig_chunks(sig_ix,sig_chunks(sig_ix,:) > size(w2{sr_ix}.win_lim,1)) = size(w2{sr_ix}.win_lim,1);
+%                 end
+%                 stat{sr_ix}.mask(ch_ix,[w2{sr_ix}.win_lim(sig_chunks(sig_ix,1),1):...
+%                                         w2{sr_ix}.win_lim(sig_chunks(sig_ix,2),2)]+offset_ix-1) = 1;
             end
         end
     end
@@ -204,7 +214,7 @@ if ~exist(sig_ln_dir,'dir')
 end
 
 % Create a figure for each channel
-for ch_ix = 1:numel(hfa{1}.label)
+for ch_ix = 1:2%numel(hfa{1}.label)
     sig_flag = 0;
     % Plot parameters
     fig_name = [SBJ '_' conditions '_SR_ERPstack_' hfa{1}.label{ch_ix}];
@@ -223,6 +233,8 @@ for ch_ix = 1:numel(hfa{1}.label)
         else
             ch_data{sr_ix} = NaN([numel(hfa{sr_ix}.trial) numel(hfa{sr_ix}.time{1})]);
             for t_ix = 1:numel(hfa{sr_ix}.trial)
+                % if strcmp(evnt_lab{sr_ix},'S')
+                %  [~,trl_end_ix] = min(abs(hfa{sr_ix}.time-trial_info.response_time(t_ix)));
                 ch_data{sr_ix}(t_ix,:) = squeeze(hfa{sr_ix}.trial{t_ix}(ch_ix,:));
             end
         end
@@ -232,8 +244,8 @@ for ch_ix = 1:numel(hfa{1}.label)
         
         % Condition specific mean, variance
         for cond_ix = 1:numel(cond_lab)
-            ch_mean{sr_ix,cond_ix} = mean(ch_data{sr_ix}(cond_mat(cond_mat(:,1)==cond_ix,3),:),1);
-            ch_var{sr_ix,cond_ix}  = squeeze(std(ch_data{sr_ix}(cond_mat(cond_mat(:,1)==cond_ix,3),:),[],1)./...
+            ch_mean{sr_ix,cond_ix} = nanmean(ch_data{sr_ix}(cond_mat(cond_mat(:,1)==cond_ix,3),:),1);
+            ch_var{sr_ix,cond_ix}  = squeeze(nanstd(ch_data{sr_ix}(cond_mat(cond_mat(:,1)==cond_ix,3),:),[],1)./...
                 sqrt(sum(cond_mat(:,1)==cond_ix)))';
             max_var = max([max_var max(ch_var{sr_ix,cond_ix})]);
         end

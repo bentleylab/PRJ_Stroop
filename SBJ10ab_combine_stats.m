@@ -142,17 +142,19 @@ else
     
     %% Concatenate w2 structs
     w2 = full{order_idx(1)}.w2;
-    w2.time      = [full{order_idx(1)}.w2.time full{order_idx(2)}.w2.time];
-    w2.win_lim = {}; w2.win_lim_s = {};
+    % Keep win_lim separate to know exactly which data
+    w2.win_lim = {};
     for st_ix = 1:2
         if comb_already(order_idx(st_ix))
             w2.win_lim   = [w2.win_lim full{order_idx(st_ix)}.w2.win_lim];
-            w2.win_lim_s = [w2.win_lim_s full{order_idx(st_ix)}.w2.win_lim_s];
         else
             w2.win_lim   = [w2.win_lim {full{order_idx(st_ix)}.w2.win_lim}];
-            w2.win_lim_s = [w2.win_lim_s {full{order_idx(st_ix)}.w2.win_lim_s}];
         end
     end
+    
+    % Concatenate time series data
+    w2.time = [full{order_idx(1)}.w2.time full{order_idx(2)}.w2.time];
+    w2.win_lim_s = [full{order_idx(1)}.w2.win_lim_s; full{order_idx(2)}.w2.win_lim_s];
     ts_fields = {'boot','trial','pval','qval','zscore','bootmean','bootstd'};
     for f_ix = 1:numel(ts_fields)
         w2.(ts_fields{f_ix}) = cat(3,full{order_idx(1)}.w2.(ts_fields{f_ix}),...
