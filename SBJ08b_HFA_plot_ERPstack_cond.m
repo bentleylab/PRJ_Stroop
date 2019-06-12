@@ -153,19 +153,16 @@ elseif any(strcmp(conditions,grp_lab))
     stat = rmfield(hfa,{'powspctrm','freq','cumtapcnt'});
     stat.mask = zeros([numel(w2.label) size(hfa.time,2)]);
     
-    % Get time offset
-    [~, offset_ix] = min(abs(hfa.time-(w2.time(1)-st.win_len/2)));
-    
     for ch_ix = 1:numel(stat.label)
         % Add significant epochs for condition of interest to mask
         sig_chunks = fn_find_chunks(squeeze(w2.qval(grp_ix,ch_ix,:))<st.alpha);
         sig_chunks(squeeze(w2.qval(grp_ix,ch_ix,sig_chunks(:,1)))>st.alpha,:) = [];
         for sig_ix = 1:size(sig_chunks,1)
-            % If last window is cut off due to 10ms over, just go to end of trial
-            if any(sig_chunks(sig_ix,:) > size(w2.win_lim,1))
-                sig_chunks(sig_ix,sig_chunks(sig_ix,:) > size(w2.win_lim,1)) = size(w2.win_lim,1);
-            end
-            stat.mask(ch_ix,[w2.win_lim(sig_chunks(sig_ix,1),1):w2.win_lim(sig_chunks(sig_ix,2),2)]+offset_ix-1) = 1;
+            sig_time_ix = zeros([1 2]); sig_time_err = zeros([1 2]);
+            [sig_time_err(1),sig_time_ix(1)] = min(abs(stat.time-w2.win_lim_s(sig_chunks(sig_ix,1),1)));
+            [sig_time_err(2),sig_time_ix(2)] = min(abs(stat.time-w2.win_lim_s(sig_chunks(sig_ix,2),2)));
+            if any(sig_time_err>0.0001); error('exact stat time not found in hfa!'); end
+            stat.mask(ch_ix,sig_time_ix(1):sig_time_ix(2)) = 1;
         end
     end
 end
@@ -205,8 +202,8 @@ for ch_ix = 1:numel(hfa.label)
     
     % Condition specific mean, variance
     for cond_ix = 1:numel(cond_lab)
-        ch_mean{cond_ix} = mean(ch_data(cond_mat(cond_mat(:,1)==cond_ix,3),:),1);
-        ch_var{cond_ix}  = squeeze(std(ch_data(cond_mat(cond_mat(:,1)==cond_ix,3),:),[],1)./...
+        ch_mean{cond_ix} = nanmean(ch_data(cond_mat(cond_mat(:,1)==cond_ix,3),:),1);
+        ch_var{cond_ix}  = squeeze(nanstd(ch_data(cond_mat(cond_mat(:,1)==cond_ix,3),:),[],1)./...
             sqrt(sum(cond_mat(:,1)==cond_ix)))';
         max_var = max([max_var max(ch_var{cond_ix})]);
     end
