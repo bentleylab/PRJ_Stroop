@@ -34,7 +34,7 @@ B00b_GRP_RT_violins_norm(SBJs,plt_id,save_fig,fig_vis,fig_ftype);
 
 %% Plot stacks with mean traces
 % conditions  = 'actv';%'CNI';%
-stat_id_b = 'pCNI_PC_B2t0';
+stat_id_b = 'PC_B2t0';%pCNI_
 % stat_id_s = 'PCi_S0tmRT_WL1_WS50';%{'CNI_PC_S0tmRT_WL1_WS25',};
 % stat_id_sd= 'PCi_S0tmRT_WL1_WS50_D1tRT';
 % stat_id_r = 'PCi_R1t5_WL1_WS50';%{'CNI_PC_R1t5_WL1_WS25',};
@@ -56,7 +56,7 @@ plt_id_sr = 'ERPstack_S2to25_R5to10_evnt_c5';%'ts_S15R1_errbr_evnt';
 save_fig  = 1;
 fig_vis   = 'off';
 fig_ftype = 'png';
-for s = 6:numel(SBJs)
+for s = 1:numel(SBJs)
 %         SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_b);
 %         SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_s);
 %         SBJ08ab_HFA_actv(SBJs{s},an_id_d,actv_id_d);
@@ -64,8 +64,8 @@ for s = 6:numel(SBJs)
     %     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,actv_id_s,actv_id_r,...
     %                                         plt_id,save_fig,fig_vis,fig_ftype)
     %     close all;
-    SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_d,an_id_r,stat_id_sd,stat_id_r,...
-        plt_id_sr,save_fig,fig_vis,fig_ftype);
+%     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_d,an_id_r,stat_id_sd,stat_id_r,...
+%         plt_id_sr,save_fig,fig_vis,fig_ftype);
 %     close all;
 %     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'PC',an_id_s,an_id_r,stat_id_b,stat_id_r{2},...
 %         plt_id,save_fig,fig_vis,fig_ftype)
@@ -73,12 +73,10 @@ for s = 6:numel(SBJs)
 %     SBJ08b_HFA_plot_ERPstack_cond(SBJs{s},'pCNI',an_id_s,stat_id_b,...
 %         plt_id_s,save_fig,fig_vis,fig_ftype)
 %     close all;
-%     SBJ08b_HFA_plot_ERPstack_cond(SBJs{s},'PC',an_id_s,stat_id_b,...
-%         plt_id_s,save_fig,fig_vis,fig_ftype)
-%     close all;
-%     SBJ08b_HFA_plot_ERPstack_cond(SBJs{s},'PC',an_id_s,stat_id_b,...
-%         plt_id_s,save_fig,fig_vis,fig_ftype)
-%     close all;
+    % PC - B
+    SBJ08b_HFA_plot_ERPstack_cond(SBJs{s},'PC',an_id_s,stat_id_b,...
+        plt_id_s,save_fig,fig_vis,fig_ftype)
+    close all;
 end
 
 %% ================================================================================
@@ -151,10 +149,10 @@ stat_conds = {...
     {'PCi_S0tmRT_WL1_WS50_D1tRT','HGm_S2t151_zbtA_sm0_wn100','PC'},...
     {'CNI_PC_S0tmRT_WL1_WS50_D1tRT_R1t5_WL1_WS50','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
     };
-%     {'PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'},...
 %     {'CNI_PC_S0tmRT_WL1_WS50','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
 %     {'CNI_PC_D1tRT','HGm_S2t251_zbtA_sm0_wn100','CNI'},...
 %     {'CNI_PC_R1t5_WL1_WS50','HGm_R5t101_zbtA_sm0_wn100','CNI'}...
+%     {'PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'},...
 %     {'CNI_PC_S0tmRT_WL1_WS50_D1tRT_R1t5_WL1_WS50','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
 %     {'CNI_PC_S0tmRT_WL1_WS50_D1tRT','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
 
@@ -168,16 +166,16 @@ show_lab  = 0;
 save_fig  = 1;
 fig_ftype = 'png';
 
-% Plot Venn Diagrams
-SBJ10c_HFA_GRP_venn_stats_ROI(SBJs, proc_id, stat_conds, 'b', atlas_id, roi_id,...
-                              plot_out, plt_id, save_fig, fig_ftype)
+% % Plot Venn Diagrams
+% SBJ10c_HFA_GRP_venn_stats_ROI(SBJs, proc_id, stat_conds, 'b', atlas_id, roi_id,...
+%                               plot_out, plt_id, save_fig, fig_ftype)
 
-% % Plot Recons
-% hemi_opts = {'r','l'};
-% for hemi_ix = 1:numel(hemi_opts)
-%     fn_view_recon_atlas_grp_stat_venn(SBJs, proc_id, stat_conds, reg_type, show_lab,...
-%         hemi_opts{hemi_ix}, atlas_id, roi_id, plot_out)
-% end
+% Plot Recons
+hemi_opts = {'r','l'};
+for hemi_ix = 1:numel(hemi_opts)
+    fn_view_recon_atlas_grp_stat_venn(SBJs, proc_id, stat_conds, reg_type, show_lab,...
+        hemi_opts{hemi_ix}, atlas_id, roi_id, plot_out)
+end
 
 %% Proportions of significant effects across ROI
 stat_conds = {...
