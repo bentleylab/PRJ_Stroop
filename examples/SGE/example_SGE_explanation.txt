@@ -1,0 +1,30 @@
+example_SGE_submit_command.sh:
+    You could copy paste that line into the terminal on the HWNI cluster,
+    or you could type `bash example_SGE_submit_command.sh`
+example_SGE_MATLAB_submit_script.sh:
+    This is the main script that will start MATLAB and run your script inside the job.
+example_SGE_input_list.txt:
+    This is where you specify the different inputs you want each job to run the script with.
+    One input per line, nothing else. One job will start for each input.
+example_SGE_options.txt:
+    This is not necessary, so you could run the submit command without the -o flag.
+    -o tells SGE where to put the text output of the job (should be a directory)
+        This file contained whatever MATLAB would spit out in the command window,
+        as well as the output of the echo commands in the .sh script (e.g., stdout)
+        default: your home directory, which can get crowded if you run a bunch of jobs
+    -e tells SGE where to put the error text output of the job (hopefully empty!)
+        This file would contain any errors (e.g., stderr)
+        Default: your home directory
+    -v defines some variables that you can use in the .sh script, which you could use
+        to define other inputs to your MATLAB script.
+        NOTE: all of these variables will be strings inside your MATLAB script, so if
+        you want a number input to MATLAB, add a line to the start of your MATLAB script
+        the converts the variable from string to whatever you need it to be
+    -l can be used to request larger amounts of memory for a job
+        NOTE: If you ask for a lot of memory, it may take a while for your job to start
+        while the cluster waits for a machine with that much memory to open up. If you
+        don't request enough memory though, SGE will kill your job.
+        Default: 2GB
+    -n will be the name of your job, which appears if you check it with qstat
+        It can only be up to 10 characters.
+        Default: the name of your MATLAB script (I think...)

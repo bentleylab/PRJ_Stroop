@@ -90,7 +90,7 @@ atlas_id = 'Dx';
 roi_id = 'gROI';
 reg_type = 'v';
 show_lab = 0;
-roi_opts = {{'l','TMP'},{'r','TMP'}};%{{'l','lat'},{'r','lat'},{'l','MPFC'},{'r','MPFC'},{'l','deep'},{'r','deep'},{'b','OFC'}};
+roi_opts = {{'l','PAR'},{'r','PAR'}};%{{'l','lat'},{'r','lat'},{'l','MPFC'},{'r','MPFC'},{'l','deep'},{'r','deep'},{'b','OFC'}};
 
 for roi_ix = 1:numel(roi_opts)
     fn_view_recon_atlas_grp_ROI(SBJs, proc_id, reg_type, show_lab,...
