@@ -1,8 +1,9 @@
 function fn_convert_elec_struct(SBJ,proc_id,view_space,reg_type,reref)
-%% Compile ROI info (biggest changes are from single electrodes into bipolar pairs)
-%   Goes from smallest to largest (ELEC1-ELEC2, ELEC2-ELEC3, etc.)
-%   Pairs are drawn from imported data labels, then preprocessing logic is applied
-%
+%% Convert recon pipeline elec struct to personal format
+%   Fix labels, select imported channels, sort alphanumerically
+%   Rereference: if 1, does bipolar (no difference for ECoG)
+%       Goes from smallest to largest (ELEC1-ELEC2, ELEC2-ELEC3, etc.)
+%   adds channel type, hemisphere
 % INPUTS:
 %   SBJ [str] - name of subject
 %   proc_id [str] - name of analysis pipeline
@@ -22,39 +23,19 @@ eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
 eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' proc_id '_vars.m']);
 
 %% Load Elec struct
-if strcmp(view_space,'pat')
-    if ~isempty(reg_type)
-        warning(['view_space = "' view_space '" does not require reg_type; ignoring reg_type = ' reg_type]);
+[elec] = fn_load_elec_orig(SBJ,view_space,reg_type);
+
+% Create correct extension for saving
+elec_ext = view_space;
+if ~isempty(reg_type)
+    if strcmp(view_space,'pat')
+        error('pat view_space should have empty reg_type');
     end
-    elec_ext = view_space;
-    elec_name = SBJ_vars.recon.elec_pat;
-elseif strcmp(view_space,'mni')
-    elec_ext = [view_space '_' reg_type];
-    if strcmp(reg_type,'v') % volume based
-        elec_name = SBJ_vars.recon.elec_mni_v;
-    elseif strcmp(reg_type,'s') %surface based
-        elec_name = SBJ_vars.recon.elec_mni_s;
-        if isempty(elec_name)
-            warning(['WARNING!!! elec_mni_s does not exist for ' SBJ ', nothing being compiled.']);
-            return
-        end
-    else
-        error(['Unknown reg_type: ' reg_type]);
-    end
-else
-    error(['Unknown view_space: ' view_space]);
+    elec_ext = [elec_ext '_' reg_type];
 end
 if ~reref
     elec_ext = [elec_ext '_orig'];
 end
-
-slash = strfind(elec_name,'/'); elec_suffix = elec_name(slash(end)+numel(SBJ)+2:end-4);
-tmp = load(elec_name);
-elec_var_name = fieldnames(tmp);
-if ~strcmp(elec_var_name,elec_suffix)
-    warning(['\t!!!! ' SBJ ' elec names in variable and file names do not match! file=' elec_suffix '; var=' elec_var_name{1}]);
-end
-eval(['elec = tmp.' elec_var_name{1} ';']); clear tmp;
 
 %% Channel Label Corrections
 % Strip Pre/Suffix if Necessary

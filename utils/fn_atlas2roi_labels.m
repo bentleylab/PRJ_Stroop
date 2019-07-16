@@ -8,7 +8,7 @@ function roi_labels = fn_atlas2roi_labels(labels, atlas_id, roi_id)
 
 %% Read in Atlas to ROI mappings
 tsv_filename = [root_dir 'PRJ_Stroop/data/atlases/atlas_mappings/atlas_ROI_mappings_' atlas_id '.tsv'];
-fprintf('\tReading roi csv file: %s\n', tsv_filename);
+% fprintf('\tReading roi csv file: %s\n', tsv_filename);
 roi_file = fopen(tsv_filename, 'r');
 % roi.csv contents:
 %   atlas_label, gROI_label, ROI_label, Notes (not read in)
