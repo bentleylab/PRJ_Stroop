@@ -1,5 +1,5 @@
-function fn_save_elec_atlas(SBJ, proc_id, view_space, reg_type, atlas_id, reref)
-%% Plot a reconstruction with electrodes
+function fn_match_elec_atlas_ROI_tiss(SBJ, proc_id, view_space, reg_type, atlas_id, reref)
+%% Match elec_orig to atlas ROIs and tissue
 % INPUTS:
 %   SBJ [str] - subject ID to plot
 %   proc_id [str] - name of analysis pipeline, used to pick elec file

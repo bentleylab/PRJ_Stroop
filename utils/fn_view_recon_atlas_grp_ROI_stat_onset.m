@@ -405,6 +405,7 @@ cfg.maxsurf     = 0;
 cfg.tissue      = 'brain';
 cfg.numvertices = 100000;
 cfg.smooth      = 3;
+cfg.spmversion  = 'spm12';
 roi_mesh = ft_prepare_mesh(cfg, seg);
 if exist('mtl_seg','var')
     mtl_mesh = ft_prepare_mesh(cfg, mtl_seg);

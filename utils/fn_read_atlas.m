@@ -14,13 +14,13 @@ switch atlas_id
             'Yeo2011_7Networks_ColorLUT.txt'];
         value = 1:7;
         label = {
-            '7Networks_1'
-            '7Networks_2'
-            '7Networks_3'
-            '7Networks_4'
-            '7Networks_5'
-            '7Networks_6'
-            '7Networks_7'
+            'Visual'%'7Networks_1'
+            'Somatomotor'%'7Networks_2'
+            'Dorsal Attention'%'7Networks_3'
+            'Ventral Attention'%7Networks_4'
+            'Limbic'%7Networks_5'
+            'Frontoparietal'%7Networks_6'
+            'Default'%7Networks_7'
             };
         colors = [
             120  18 134;
@@ -38,23 +38,23 @@ switch atlas_id
             'Yeo2011_7Networks_ColorLUT.txt'];
         value = 1:17;
         label = {
-            '17Networks_1'
-            '17Networks_2'
-            '17Networks_3'
-            '17Networks_4'
-            '17Networks_5'
-            '17Networks_6'
-            '17Networks_7'
-            '17Networks_8'
-            '17Networks_9'
-            '17Networks_10'
-            '17Networks_11'
-            '17Networks_12'
-            '17Networks_13'
-            '17Networks_14'
-            '17Networks_15'
-            '17Networks_16'
-            '17Networks_17'
+            'Visual A'%'17Networks_1'
+            'Visual B'%'17Networks_2'
+            'Somatomotor A'%'17Networks_3'
+            'Somatomotor B'%'17Networks_4'
+            'Temporal Parietal'%'17Networks_5'
+            'Dorsal Attention A'%'17Networks_6'
+            'Dorsal Attention B'%'17Networks_7'
+            'Salience A'%'17Networks_8'
+            'Salience B'%'17Networks_9'
+            'Control A'%'17Networks_10'
+            'Control B'%17Networks_11'
+            'Control C'%17Networks_12'
+            'Default A'%'17Networks_13'
+            'Default B'%'17Networks_14'
+            'Default C'%'17Networks_15'
+            'Limbic A'%'17Networks_16'
+            'Limbic B'%'17Networks_17'
             };
         colors = [
             120  18 134;

@@ -1,14 +1,15 @@
 function fn_compile_elec_atlas(SBJ,proc_id,view_space,reg_type,atlas_id)
-%% Compile ROI info (biggest changes are from single electrodes into bipolar pairs)
-%   Goes from smallest to largest (ELEC1-ELEC2, ELEC2-ELEC3, etc.)
-%   Pairs are drawn from imported data labels, then preprocessing logic is applied
-%
+%% Compile atlas ROI and tissue info (adjust for BP reref)
+%   Main logic is by fn_combine_ROI_bipolar_logic
 % INPUTS:
 %   SBJ [str] - name of subject
 %   proc_id [str] - name of analysis pipeline
 %   view_space [str] - {'pat','mni'} select patient native or mni group space
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
 %   atlas_id [str] - {'DK','Dx','Yeo7','Yeo17'}
+% OUTPUT:
+%   elec_atlas_full
+%   log for BP combination
 
 % Set up paths
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
@@ -22,9 +23,6 @@ eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
 eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' proc_id '_vars.m']);
 
 %% Load Elec struct
-if ~isempty(reg_type)
-    warning(['view_space = "' view_space '" does not require reg_type; ignoring reg_type = ' reg_type]);
-end
 if strcmp(reg_type,'v') || strcmp(reg_type,'s')
     reg_suffix = ['_' reg_type];
 else

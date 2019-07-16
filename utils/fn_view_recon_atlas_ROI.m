@@ -127,6 +127,7 @@ cfg.maxsurf     = 0;
 cfg.tissue      = 'brain';
 cfg.numvertices = 100000;
 cfg.smooth      = 3;
+cfg.spmversion  = 'spm12';
 roi_mesh = ft_prepare_mesh(cfg, seg);
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
