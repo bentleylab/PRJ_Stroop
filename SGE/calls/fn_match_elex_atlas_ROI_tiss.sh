@@ -7,15 +7,15 @@ cd /home/knight/hoycw/PRJ_Stroop/scripts/utils/
 SBJ="${SGE_TASK}"
 
 # define function
-FUNCTION='fn_save_elec_atlas'
+FUNCTION='fn_match_elec_atlas_ROI_tiss'
 
 # set up matlab function call
-func_call="${FUNCTION}('${SBJ}','${pipeline_id}','${view_space}','${reg_type}','${atlas_id}','${reref}')"
+func_call="${FUNCTION}('${SBJ}','${proc_id}','${view_space}','${reg_type}','${atlas_id}','${reref}')"
 
 # define commands to execute via SGE
 echo ${DATASET}
 echo ${func_call}
 echo $$
-echo ${func_call} > ../NotBackedUp/tmpSGE/fn_save_elec_atlas_${SBJ}.m
-time matlab -nodesktop -nosplash -nodisplay < ../NotBackedUp/tmpSGE/fn_save_elec_atlas_${SBJ}.m
-rm ../NotBackedUp/tmpSGE/fn_save_elec_atlas_${SBJ}.m
+echo ${func_call} > ../NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}.m
+time matlab -nodesktop -nosplash -nodisplay < ../NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}.m
+rm ../NotBackedUp/tmpSGE/${FUNCTION}_${SBJ}.m
