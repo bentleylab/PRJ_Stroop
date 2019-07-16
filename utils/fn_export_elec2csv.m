@@ -20,6 +20,8 @@ load(elec_fname);
 elec.groi = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'gROI');
 elec.roi  = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'ROI');
 
+% Bring in Yeo labels
+
 %% Print data to csv file
 csv_fname = [elec_fname(1:end-4) '.csv'];
 csv = fopen(csv_fname,'w');

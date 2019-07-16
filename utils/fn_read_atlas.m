@@ -14,13 +14,13 @@ switch atlas_id
             'Yeo2011_7Networks_ColorLUT.txt'];
         value = 1:7;
         label = {
-            'Visual'%'7Networks_1'
-            'Somatomotor'%'7Networks_2'
-            'Dorsal Attention'%'7Networks_3'
-            'Ventral Attention'%7Networks_4'
-            'Limbic'%7Networks_5'
-            'Frontoparietal'%7Networks_6'
-            'Default'%7Networks_7'
+            'Vis'%'7Networks_1'
+            'SM'%'7Networks_2'
+            'DAttn'%'7Networks_3'
+            'VAttn'%7Networks_4'
+            'Limb'%7Networks_5'
+            'FP'%7Networks_6'
+            'Def'%7Networks_7'
             };
         colors = [
             120  18 134;
@@ -38,23 +38,23 @@ switch atlas_id
             'Yeo2011_7Networks_ColorLUT.txt'];
         value = 1:17;
         label = {
-            'Visual A'%'17Networks_1'
-            'Visual B'%'17Networks_2'
-            'Somatomotor A'%'17Networks_3'
-            'Somatomotor B'%'17Networks_4'
-            'Temporal Parietal'%'17Networks_5'
-            'Dorsal Attention A'%'17Networks_6'
-            'Dorsal Attention B'%'17Networks_7'
-            'Salience A'%'17Networks_8'
-            'Salience B'%'17Networks_9'
-            'Control A'%'17Networks_10'
-            'Control B'%17Networks_11'
-            'Control C'%17Networks_12'
-            'Default A'%'17Networks_13'
-            'Default B'%'17Networks_14'
-            'Default C'%'17Networks_15'
-            'Limbic A'%'17Networks_16'
-            'Limbic B'%'17Networks_17'
+            'Vis_A'%'17Networks_1'
+            'Vis_B'%'17Networks_2'
+            'SM_A'%'17Networks_3'
+            'SM_B'%'17Networks_4'
+            'TmpPar'%'17Networks_5'
+            'DAttn_A'%'17Networks_6'
+            'DAttn_B'%'17Networks_7'
+            'Sal_A'%'17Networks_8'
+            'Sal_B'%'17Networks_9'
+            'Ctrl_A'%'17Networks_10'
+            'Ctrl_B'%17Networks_11'
+            'Ctrl_C'%17Networks_12'
+            'Def_A'%'17Networks_13'
+            'Def_B'%'17Networks_14'
+            'Def_C'%'17Networks_15'
+            'Limb_A'%'17Networks_16'
+            'Limb_B'%'17Networks_17'
             };
         colors = [
             120  18 134;
