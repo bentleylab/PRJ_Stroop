@@ -106,11 +106,4 @@ if isfield(elec_og, 'tra')
   elec = rmfield(elec, 'tra');
 end
 
-% Sort output by cfg.channel
-if iscell(cfg.channel) && numel(cfg.channel)==1 && strcmp(cfg.channel{1},'all')
-    elec = fn_reorder_elec(elec,'');
-else
-    elec = fn_reorder_elec(elec,cfg.channel);
-end
-
 end

@@ -2,7 +2,7 @@
 SBJs = {'CP24','IR21','IR26','IR31','IR32','IR35','IR39','IR41',...
         'IR52','IR54','IR57','IR61','IR65','IR67','IR68','IR72','IR74'};
 
-for s = 2:numel(SBJs)
+for s = 13:numel(SBJs)
     % Convert raw pipeline elec files to my SBJ_vars
     fn_convert_elec_struct(SBJs{s},'main_ft','pat','',0);
 %     fn_convert_elec_struct(SBJs{s},'main_ft','pat','',1);

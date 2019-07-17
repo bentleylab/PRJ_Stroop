@@ -140,6 +140,9 @@ cfgs = [];
 cfgs.channel = SBJ_vars.ch_lab.ROI;
 elec = fn_select_elec(cfgs,elec);
 
+% Sort Alphanumerically
+elec = fn_reorder_elec(elec,'');
+
 %% Add Channel Types
 elec.type = 'ieeg';
 for e = 1:numel(elec.chantype)
