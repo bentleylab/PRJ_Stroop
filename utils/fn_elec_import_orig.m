@@ -1,4 +1,4 @@
-function fn_convert_elec_struct(SBJ,proc_id,view_space,reg_type,reref)
+function fn_elec_import_orig(SBJ,proc_id,view_space,reg_type,reref)
 %% Convert recon pipeline elec struct to personal format
 %   Fix labels, select imported channels, sort alphanumerically
 %   Rereference: if 1, does bipolar (no difference for ECoG)

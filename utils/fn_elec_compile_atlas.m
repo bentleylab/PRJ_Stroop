@@ -1,4 +1,4 @@
-function fn_compile_elec_atlas(SBJ,proc_id,view_space,reg_type,atlas_id)
+function fn_elec_compile_atlas(SBJ,proc_id,view_space,reg_type,atlas_id)
 %% Compile atlas ROI and tissue info (adjust for BP reref)
 %   Main logic is by fn_combine_ROI_bipolar_logic
 % INPUTS:
@@ -45,6 +45,10 @@ if ~any(strcmp(SBJ_vars.ch_lab.ref_type,'BP'))
             elec.roi_flag(e) = 1;
         end
     end
+    
+    % Assign ROIs
+    elec.gROI = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'gROI');
+    elec.ROI  = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'ROI');
     
     % Check if elec.cfg.previous got ridiculously large, and keep only first
     var_stats = whos('elec');
@@ -147,6 +151,10 @@ for f = 1:numel(fields)
         end
     end
 end
+
+%% Assign ROIs
+elec.gROI = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'gROI');
+elec.ROI  = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'ROI');
 
 %% Save data
 % Check if elec.cfg.previosu got ridiculously large, and keep only first

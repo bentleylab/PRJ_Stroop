@@ -1,4 +1,4 @@
-function fn_view_elec_ROI_assignment(SBJ, proc_id, view_space, reg_type, atlas_id)
+function fn_elec_check_ROIs(SBJ, proc_id, view_space, reg_type, atlas_id)
 %% Plot recons for each probe with pial, white matter, and inflated to check ROI assignments
 
 %% Load elec and get ROI labels
@@ -16,9 +16,7 @@ elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' view_space '_' reg_su
 load(elec_fname);
 
 % Assign ROIs
-elec.groi = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'gROI');
-elec.roi  = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'ROI');
-elec.color = fn_roi2color(elec.roi);
+elec.color = fn_roi2color(elec.ROI);
 
 %% Load meshes
 pial_l = fn_load_recon_mesh(SBJ,view_space,reg_type,'pial','l');
@@ -46,9 +44,15 @@ for p = 1:numel(SBJ_vars.ch_lab.probes)
     cfgs.channel = ft_channelselection([SBJ_vars.ch_lab.probes{p} '*'], elec.label);
     probe = fn_select_elec(cfgs, elec);
     
+    if strcmp(SBJ_vars.ch_lab.probe_type{p},'ecog')
+        mesh_alpha = 0.8;
+    else
+        mesh_alpha = 0.3;
+    end
+    
     % Plot pial
-    p = figure('Name',[SBJ ' pial ' probe.hemi{2}]);
-    ft_plot_mesh(eval(['pial_' probe.hemi{2}]), 'vertexcolor', 'curv', 'facealpha', 0.5);
+    pial = figure('Name',[SBJ ' pial ' probe.label{1} ' : ' probe.label{end}]);
+    ft_plot_mesh(eval(['pial_' probe.hemi{2}]), 'vertexcolor', 'curv', 'facealpha', mesh_alpha);
     for e = 1:numel(probe.label)
         cfgs.channel = probe.label(e);
         tmp = fn_select_elec(cfgs, probe);
@@ -56,22 +60,24 @@ for p = 1:numel(SBJ_vars.ch_lab.probes)
     end
     material dull; lighting gouraud;
     l = camlight;
-    set(p, 'windowkeypressfcn',   @cb_keyboard);
+    set(pial, 'windowkeypressfcn',   @cb_keyboard);
     
     % Plot WM
-    w = figure('Name',[SBJ ' white ' probe.hemi{2}]);
-    ft_plot_mesh(eval(['wm_' probe.hemi{2}]), 'vertexcolor', 'curv', 'facealpha', 0.5);
-    for e = 1:numel(probe.label)
-        cfgs.channel = probe.label(e);
-        tmp = fn_select_elec(cfgs, probe);
-        ft_plot_sens(tmp, 'elecshape', 'sphere', 'facecolor', tmp.color);
+    if strcmp(SBJ_vars.ch_lab.probe_type,'seeg')
+        wm = figure('Name',[SBJ ' white ' probe.hemi{2}]);
+        ft_plot_mesh(eval(['wm_' probe.hemi{2}]), 'vertexcolor', 'curv', 'facealpha', 0.5);
+        for e = 1:numel(probe.label)
+            cfgs.channel = probe.label(e);
+            tmp = fn_select_elec(cfgs, probe);
+            ft_plot_sens(tmp, 'elecshape', 'sphere', 'facecolor', tmp.color);
+        end
+        material dull; lighting gouraud;
+        l = camlight;
+        set(wm, 'windowkeypressfcn',   @cb_keyboard);
     end
-    material dull; lighting gouraud;
-    l = camlight;
-    set(w, 'windowkeypressfcn',   @cb_keyboard);
 end
 
 %% Plot Elecs
-fn_view_recon(SBJ, pipeline_id, 'ortho', view_space, reg_type, 1, 'b', 1);
+fn_view_recon(SBJ, proc_id, 'ortho', view_space, reg_type, 1, 'b', 1);
 
 end

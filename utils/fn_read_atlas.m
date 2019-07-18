@@ -106,7 +106,7 @@ for k = 1:numel(value)
     sel = dat==value(k);
     if sum(sel(:))
         cnt = cnt+1;
-        fprintf('re-indexing label %s to a value of %d (was %d)\n', label{k}, cnt, value(k));
+        % fprintf('re-indexing label %s to a value of %d (was %d)\n', label{k}, cnt, value(k));
         rois(sel)      = cnt;
         roilabel{cnt,1} = label{k};
     end

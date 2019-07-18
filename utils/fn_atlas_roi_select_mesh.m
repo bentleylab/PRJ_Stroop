@@ -6,8 +6,8 @@ tsv_fname = [root_dir 'PRJ_Stroop/data/atlases/atlas_mappings/atlas_ROI_mappings
 fprintf('\tReading roi csv file: %s\n', tsv_fname);
 roi_file = fopen(tsv_fname, 'r');
 % roi.csv contents:
-%   atlas_label, gROI_label, ROI_label, Notes (not read in)
-roi_map = textscan(roi_file, '%s %s %s %s %s', 'HeaderLines', 1,...
+%   atlas_label, gROI_label, ROI_label, tissue, Known Variability, Alternative ROIs, Notes (not used)
+roi_map = textscan(roi_file, '%s %s %s %s %d %s %s', 'HeaderLines', 1,...
     'Delimiter', '\t', 'MultipleDelimsAsOne', 0);
 fclose(roi_file);
 

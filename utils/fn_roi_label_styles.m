@@ -8,7 +8,7 @@ function [labels, colors] = fn_roi_label_styles(roi_id)
 % if length(cond_lab) == 1
 switch roi_id
     case 'ROI'
-        load('~/PRJ_Stroop/data/full_roi_lists.mat');
+        load('~/PRJ_Stroop/data/atlases/full_roi_lists_Dx.mat');
         labels = all_rois;
         % Exclude FWM, '', OUT
         labels(strmatch('FWM',labels,'exact')) = [];
@@ -20,27 +20,29 @@ switch roi_id
     case 'Main3'
         labels = {'LPFC','MPFC','INS'};
     case 'mgROI'
-        labels = {'LPFC','MPFC','INS','OFC'};
+        labels = {'LPFC','MPFC','SM','INS','OFC'};
     case 'gROI'
-        labels = {'LPFC','MPFC','INS','OFC','PAR','TMP','AMG','HPC'};%,'OCC'};
+        labels = {'LPFC','MPFC','INS','SM','OFC','PAR','TMP','AMG','HPC'};%,'OCC'};
     case 'lat'
-        labels = {'LPFC','PAR','TMP','OCC'};
+        labels = {'LPFC','SM','PAR','TMP','OCC'};
     case 'deep'
         labels = {'INS','HPC','AMG'};
     case 'mnLPFC'
-        labels = {'DLPFC','VLPFC','PM','aMCC','preSMA','SMA'};
+        labels = {'dlPFC','vlPFC','PM','aMCC','preSMA','SMA'};
     case 'thryROI'
-        labels = {'DLPFC','VLPFC','PM','aMCC','preSMA','SMA','daINS','vaINS','FO'};
+        labels = {'dlPFC','vlPFC','PM','aMCC','preSMA','SMA','aINS','FO'};
+    case 'SM'
+        labels = {'M1','S1'};
     case 'PAR'
-        labels = {'S1','SPL','IPL','Precuneus'};
+        labels = {'SPL','IPL','PCC','PRC'};
     case 'TMP'
-        labels = {'STS'};
+        labels = {'PT','STG','STS','ITC','VTC'};
     case 'LPFC'
-        labels = {'FPC','DLPFC','VLPFC','PM','M1'};
+        labels = {'FPC','dlPFC','vlPFC','PM'};
     case 'MPFC'
         labels = {'ACC','preSMA','aMCC','SMA','pMCC'};
     case 'INS'
-        labels = {'vaINS','daINS','FO','mINS','pINS'};
+        labels = {'aINS','pINS'};
     case 'OFC'
         labels = {'mOFC','lOFC'};
     case 'MTL'
@@ -48,7 +50,7 @@ switch roi_id
     case {'tissue', 'tissueC'}
         labels = {'GM','WM','CSF','OUT'};
     case 'all'
-        load('~/PRJ_Stroop/data/full_roi_lists.mat');
+        load('~/PRJ_Stroop/data/atlases/full_roi_lists_Dx.mat');
         labels = all_rois;
     otherwise
         error(strcat('Unknown roi_id: ',roi_id));

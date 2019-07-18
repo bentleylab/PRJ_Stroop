@@ -1,4 +1,4 @@
-function fn_match_elec_atlas_ROI_tiss(SBJ, proc_id, view_space, reg_type, atlas_id, reref)
+function fn_elec_match_atlas(SBJ, proc_id, view_space, reg_type, atlas_id, reref)
 %% Match elec_orig to atlas ROIs and tissue
 % INPUTS:
 %   SBJ [str] - subject ID to plot

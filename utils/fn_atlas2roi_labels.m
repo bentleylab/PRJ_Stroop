@@ -11,8 +11,8 @@ tsv_filename = [root_dir 'PRJ_Stroop/data/atlases/atlas_mappings/atlas_ROI_mappi
 % fprintf('\tReading roi csv file: %s\n', tsv_filename);
 roi_file = fopen(tsv_filename, 'r');
 % roi.csv contents:
-%   atlas_label, gROI_label, ROI_label, Notes (not read in)
-roi_map = textscan(roi_file, '%s %s %s %s', 'HeaderLines', 1,...
+%   atlas_label, gROI_label, ROI_label, Tissue, Known Variability, Alternatiev ROIs
+roi_map = textscan(roi_file, '%s %s %s %s %d %s', 'HeaderLines', 1,...
     'Delimiter', '\t', 'MultipleDelimsAsOne', 0);
 fclose(roi_file);
 
@@ -22,7 +22,7 @@ switch roi_id
         map_ix = 2;
     case {'mgROI','gROI','main3','lat','deep'}
         map_ix = 2;
-    case {'ROI','thryROI','LPFC','MPFC','OFC','INS','TMP','PAR','MTL'}
+    case {'ROI','thryROI','LPFC','MPFC','SM','OFC','INS','TMP','PAR','MTL','OCC'}
         map_ix = 3;
     case {'tissue', 'tissueC'}
         map_ix = 4;

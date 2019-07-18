@@ -25,7 +25,7 @@ if ~isempty(atlas_id)
         [roi_list, ~] = fn_roi_label_styles(roi_id);
         roi_match = zeros([numel(elec.label) numel(roi_list)]);
         for roi_ix = 1:numel(roi_list)
-            roi_match(:,roi_ix) = strcmp(elec.roi,roi_list(roi_ix));
+            roi_match(:,roi_ix) = strcmp(elec.(roi_id),roi_list(roi_ix));
         end
         lab_match = all([lab_match any(roi_match,2)],2);
     else

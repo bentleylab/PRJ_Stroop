@@ -1,4 +1,4 @@
-function fn_copy_elec_atlas_pat2mni(SBJ,proc_id,reg_type,atlas_id,varargin)
+function fn_elec_copy_atlas_pat2mni(SBJ,proc_id,reg_type,atlas_id,varargin)
 %% Copy atlas+tissue info from patient space elec to mni space elec
 % INPUTS:
 %   SBJ [str] - name of subject
