@@ -1,5 +1,9 @@
-function fn_elec_check_ROIs(SBJ, proc_id, view_space, reg_type, atlas_id)
+function fn_elec_check_ROIs(SBJ)%, proc_id, view_space, reg_type, atlas_id)
 %% Plot recons for each probe with pial, white matter, and inflated to check ROI assignments
+proc_id = 'main_ft';
+view_space  = 'pat';
+reg_type    = '';
+atlas_id    = 'Dx';
 
 %% Load elec and get ROI labels
 % Check which root directory
@@ -12,7 +16,7 @@ if strcmp(reg_type,'v') || strcmp(reg_type,'s')
 else
     reg_suffix = '';
 end
-elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' view_space '_' reg_suffix atlas_id '_full.mat'];
+elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' view_space '_' reg_suffix atlas_id '_compiled.mat'];
 load(elec_fname);
 
 % Assign ROIs
@@ -78,6 +82,8 @@ for p = 1:numel(SBJ_vars.ch_lab.probes)
 end
 
 %% Plot Elecs
-fn_view_recon(SBJ, proc_id, 'ortho', view_space, reg_type, 1, 'b', 1);
+if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
+    fn_view_recon(SBJ, proc_id, 'ortho', view_space, reg_type, 1, 'b', 1);
+end
 
 end

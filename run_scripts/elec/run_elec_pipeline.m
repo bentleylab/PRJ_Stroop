@@ -4,11 +4,12 @@ SBJs = {'CP24','IR21','IR26','IR31','IR32','IR35','IR39','IR41',...
 
 for s = 1:numel(SBJs)
     % Convert raw pipeline elec files to my SBJ_vars
-%     fn_convert_elec_struct(SBJs{s},'main_ft','pat','',0);
-%     fn_convert_elec_struct(SBJs{s},'main_ft','pat','',1);
+%     fn_elec_import_orig(SBJs{s},'main_ft','pat','',0);
+%     fn_elec_import_orig(SBJs{s},'main_ft','pat','',1);
+%     fn_elec_import_orig(SBJs{s},'main_ft','mni','v',1);
     
     % Match elec to atlas labels + tissue (ONLY orig!)
-    % run in SGE: fn_match_elec_atlas_ROI_tiss(SBJs{s},'main_ft','pat','','Dx',0);
+    % run in SGE: fn_elec_match_atlas(SBJs{s},'main_ft','pat','','Dx',0);
     
     % Compile orig elec atlas match to reref
     fn_elec_compile_atlas(SBJs{s},'main_ft','pat','','Dx');
@@ -16,13 +17,18 @@ for s = 1:numel(SBJs)
     % Export reref atlas info to CSV for manual adjustments
     fn_elec_export_csv(SBJs{s},'main_ft','pat','','Dx');
     
+end
+
+%%
+for s = 1:numel(SBJs)
     % Manual adjustments
     % fn_elec_check_ROIs();
     
-    % Reimport ???
+    % Reimport manual adjustments
+    fn_elec_import_manual_tsv(SBJs{s}, 'main_ft', 'pat', '', 'Dx');
     
     % Copy corrected labels to MNI elec files
-    % check this: fn_copy_elec_atlas_pat2mni(SBJs{s},'main_ft','v','Dx');
+    fn_elec_copy_atlas_pat2mni(SBJs{s},'main_ft','v','Dx');
 end
 
 %% MNI Check ???

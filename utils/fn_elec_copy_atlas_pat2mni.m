@@ -1,4 +1,4 @@
-function fn_elec_copy_atlas_pat2mni(SBJ,proc_id,reg_type,atlas_id,varargin)
+function fn_elec_copy_atlas_pat2mni(SBJ,proc_id,reg_type,atlas_id)%,varargin)
 %% Copy atlas+tissue info from patient space elec to mni space elec
 % INPUTS:
 %   SBJ [str] - name of subject
@@ -13,16 +13,16 @@ addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
 addpath(ft_dir);
 ft_defaults
 
-%% Variable input handling
-if ~isempty(varargin)
-    for v = 1:2:numel(varargin)
-        if strcmp(varargin{v},'roi_id')
-            roi_id = varargin{v+1};
-        else
-            error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
-        end
-    end
-end
+% %% Variable input handling
+% if ~isempty(varargin)
+%     for v = 1:2:numel(varargin)
+%         if strcmp(varargin{v},'roi_id')
+%             roi_id = varargin{v+1};
+%         else
+%             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
+%         end
+%     end
+% end
 
 %% Load variables
 eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
@@ -35,15 +35,15 @@ else
     error('reg_type must be selected for mni space');
 end
 
-pat_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_pat','_',atlas_id,'_full.mat'];
+pat_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_pat','_',atlas_id,'_man.mat'];
 mni_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_mni',reg_suffix,'.mat'];
-out_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_mni',reg_suffix,'_',atlas_id,'_full.mat'];
-if exist('roi_id','var')
-    if exist([pat_fname(1:end-4) '_' roi_id '.mat'],'file')
-        pat_fname = [pat_fname(1:end-4) '_' roi_id '.mat'];
-        out_fname = [out_fname(1:end-4) '_' roi_id '.mat'];
-    end
-end
+out_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_mni',reg_suffix,'_',atlas_id,'_man.mat'];
+% if exist('roi_id','var')
+%     if exist([pat_fname(1:end-4) '_' roi_id '.mat'],'file')
+%         pat_fname = [pat_fname(1:end-4) '_' roi_id '.mat'];
+%         out_fname = [out_fname(1:end-4) '_' roi_id '.mat'];
+%     end
+% end
 load(pat_fname); pat = elec;
 load(mni_fname);
 
@@ -58,6 +58,7 @@ if ~all(strcmp(elec.label,pat.label))
 end
 
 %% Add Back Stripped Fields Channel Types
+!!! start here
 fields = fieldnames(pat);
 fields = setdiff(fields,fieldnames(elec));
 fields = [fields; {'hemi'}];        % add this back to include any manual edits made to pat_full

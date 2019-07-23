@@ -8,7 +8,7 @@ function fn_elec_compile_atlas(SBJ,proc_id,view_space,reg_type,atlas_id)
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
 %   atlas_id [str] - {'DK','Dx','Yeo7','Yeo17'}
 % OUTPUT:
-%   elec_atlas_full
+%   elec_atlas_compiled
 %   log for BP combination
 
 % Set up paths
@@ -30,7 +30,7 @@ else
 end
 
 elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,'_orig_',atlas_id,'.mat'];
-out_fname  = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,'_',atlas_id,'_full.mat'];
+out_fname  = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,'_',atlas_id,'_compiled.mat'];
 load(elec_fname);
 
 %% For grids/strips only, add GM weight and exit
