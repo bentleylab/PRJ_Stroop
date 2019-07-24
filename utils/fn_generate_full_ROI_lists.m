@@ -21,7 +21,7 @@ all_grois = unique(roi_map{2});
 all_rois  = unique(roi_map{3});
 % Add in ROIs that don't have specific Dx label region (need manual adjustments)
 all_grois = sort([all_grois; {'TWM'}]);
-all_rois = sort([all_rois; {'SMA';'preSMA';'dmPFC';'TWM'}]);
+all_rois = sort([all_rois; {'SMC';'dmPFC';'TWM';'FO'}]);
 
 % Save new lists
 out_fname = [root_dir 'PRJ_Stroop/data/atlases/full_roi_lists_' atlas_id '.mat'];

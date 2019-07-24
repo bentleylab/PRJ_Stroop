@@ -58,6 +58,7 @@ if ~all(strcmp(elec.label,pat.label))
 end
 
 %% Add Back Stripped Fields Channel Types
+!!! start here
 fields = fieldnames(pat);
 fields = setdiff(fields,fieldnames(elec));
 % Overwrite fields that were manually editted
@@ -69,7 +70,7 @@ for f = 1:numel(fields)
 end
 
 %% Save data
-% Check if elec.cfg.previous got ridiculously large, and keep only first
+% Check if elec.cfg.previosu got ridiculously large, and keep only first
 var_stats = whos('elec');
 if var_stats.bytes>1000000
     elec.cfg = rmfield(elec.cfg,'previous');

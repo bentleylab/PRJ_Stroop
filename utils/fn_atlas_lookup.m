@@ -48,7 +48,7 @@ cfg.minqueryrange      = min_qry_rng;
 cfg.maxqueryrange      = max_qry_rng;
 cfg.querymethod        = 'sphere';
 cfg.round2nearestvoxel = 'yes';
-for e = 1:numel(elec.label);
+for e = 1:numel(elec.label)
     % Search for this elec
     cfg.roi = elec.chanpos(e,:);
     report = ft_volumelookup(cfg,atlas);

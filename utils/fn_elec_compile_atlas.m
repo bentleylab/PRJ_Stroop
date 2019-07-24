@@ -114,6 +114,9 @@ cfgs = [];
 cfgs.channel = SBJ_vars.ch_lab.ROI;
 elec = fn_select_elec(cfgs,elec);
 
+% Re-order alphanumerically
+elec = fn_reorder_elec(elec,'');
+
 %% Add Back Stripped Fields Channel Types
 elec.atlas_id      = atlas_id;
 elec.type          = 'ieeg';
@@ -122,8 +125,8 @@ elec.reref         = 1;
 
 % fields = fieldnames(elec_reref{1});
 % fields = setdiff(fields,fieldnames(elec));   % still included: 'chanposold', 'labelold', 'tra'
-fields = {'atlas_lab', 'atlas_lab2', 'gm_weight', 'hemi', 'inputs',...
-            'roi_flag', 'tissue', 'tissue2', 'tissue_prob'};
+fields = {'atlas_lab', 'atlas_prob', 'atlas_lab2', 'atlas_qryrng', ...
+            'gm_weight', 'hemi', 'inputs', 'roi_flag', 'tissue', 'tissue2', 'tissue_prob'};
 for f = 1:numel(fields)
     % Initialize to get column not row
     if iscell(elec_reref{p}.(fields{f}))

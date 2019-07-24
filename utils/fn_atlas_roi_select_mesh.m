@@ -18,15 +18,16 @@ switch roi_id
         roi_lab = [...
             roi_map{1}(strcmp(roi_map{2},'LPFC'));
             roi_map{1}(strcmp(roi_map{2},'OFC'));
-            roi_map{1}(strcmp(roi_map{2},'PAR'));
             roi_map{1}(strcmp(roi_map{2},'TMP'));
             roi_map{1}(strcmp(roi_map{2},'OCC'));
+            roi_map{1}(strcmp(roi_map{3},'SPL'));
+            roi_map{1}(strcmp(roi_map{3},'IPL'));
             'G_front_sup'; 'G_and_S_paracentral'];      % MPFC
     case 'deep'
         roi_lab = [...
             roi_map{1}(strcmp(roi_map{2},'INS'));
-            roi_map{1}(strcmp(roi_map{3},'AMG'));
-            roi_map{1}(strcmp(roi_map{3},'HPC'))];
+            %roi_map{1}(strcmp(roi_map{3},'AMG'));
+            %roi_map{1}(strcmp(roi_map{3},'HPC'))];
     case 'LPFC'
         roi_lab = [...
             roi_map{1}(strcmp(roi_map{2},'LPFC'));

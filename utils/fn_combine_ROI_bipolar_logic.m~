@@ -16,7 +16,7 @@ function elec = fn_combine_ROI_bipolar_logic(reref,report_fname,atlas)
 %% Set up log
 log_fname = [report_fname '_log.txt'];
 log = fopen(log_fname,'a');
-% fprintf('Opening log file %s\n',log_fname);
+fprintf('Opening log file %s\n',log_fname);
 fprintf(log,'%s\n',datestr(datetime));
 
 %% Create initial copy
@@ -159,7 +159,7 @@ for p = 1:numel(elec.label)
         new_labs = cell([2 1]); new_probs = cell([2 1]);
         for i = 1:2
             % Select 1st/2nd labels in order of which elec won logic above
-            if i==1; sel_ix = roi_ix; else sel_ix = roi_ix~=[1 2]; end
+            if i==1; sel_ix = roi_ix; else sel_ix = roi_ix~=[1 2]; end;
             
             % Check for secondary labels that are GM
             gm_match = strcmp(fn_atlas2roi_labels(reref.atlas_lab2{pair_ix(sel_ix)},reref.atlas_id,'tissue'),'GM');
@@ -176,17 +176,15 @@ for p = 1:numel(elec.label)
                 new_probs{i} = reref.atlas_prob(pair_ix(sel_ix));
             end
         end
-        elec.atlas_lab{p}    = new_labs{1};
-        elec.atlas_prob(p)   = new_probs{1};
-        elec.atlas_qryrng(p) = reref.atlas_qryrng(pair_ix(roi_ix));
-        elec.atlas_lab2{p}   = new_labs{2};
+        elec.atlas_lab{p}   = new_labs{1};
+        elec.atlas_prob(p)  = new_probs{1};
+        elec.atlas_lab2{p}  = new_labs{2};
     else
         % GM Label
-        elec.hemi{p}         = reref.hemi{pair_ix(roi_ix)};
-        elec.atlas_lab{p}    = reref.atlas_lab{pair_ix(roi_ix)};
-        elec.atlas_prob(p)   = reref.atlas_prob(pair_ix(roi_ix));
-        elec.atlas_qryrng(p) = reref.atlas_qryrng(pair_ix(roi_ix));
-        elec.atlas_lab2{p}   = reref.atlas_lab{pair_ix(roi_ix~=[1 2])};
+        elec.hemi{p}        = reref.hemi{pair_ix(roi_ix)};
+        elec.atlas_lab{p}   = reref.atlas_lab{pair_ix(roi_ix)};
+        elec.atlas_prob(p)  = reref.atlas_prob(pair_ix(roi_ix));
+        elec.atlas_lab2{p}  = reref.atlas_lab{pair_ix(roi_ix~=[1 2])};
     end
     
     %% Log Results

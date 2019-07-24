@@ -22,15 +22,15 @@ switch roi_id
     case 'mgROI'
         labels = {'LPFC','MPFC','SM','INS','OFC'};
     case 'gROI'
-        labels = {'LPFC','MPFC','INS','SM','OFC','PAR','TMP','AMG','HPC'};%,'OCC'};
+        labels = {'LPFC','MPFC','INS','SM','OFC','PAR','TMP'};%'AMG','HPC','OCC'};
     case 'lat'
         labels = {'LPFC','SM','PAR','TMP','OCC'};
     case 'deep'
-        labels = {'INS','HPC','AMG'};
+        labels = {'INS'};%'AMG','HPC'
     case 'mnLPFC'
-        labels = {'dlPFC','vlPFC','PM','aMCC','preSMA','SMA'};
+        labels = {'dlPFC','vlPFC','PM','aMCC','SMC'};
     case 'thryROI'
-        labels = {'dlPFC','vlPFC','PM','aMCC','preSMA','SMA','aINS','FO'};
+        labels = {'dlPFC','vlPFC','PM','aMCC','SMC','aINS','FO'};
     case 'SM'
         labels = {'M1','S1'};
     case 'PAR'
@@ -38,9 +38,9 @@ switch roi_id
     case 'TMP'
         labels = {'PT','STG','STS','ITC','VTC'};
     case 'LPFC'
-        labels = {'FPC','dlPFC','vlPFC','PM'};
+        labels = {'FPC','dlPFC','vlPFC','PM','FO'};
     case 'MPFC'
-        labels = {'ACC','preSMA','aMCC','SMA','pMCC'};
+        labels = {'ACC','dmPFC','SMC','aMCC','pMCC'};
     case 'INS'
         labels = {'aINS','pINS'};
     case 'OFC'
