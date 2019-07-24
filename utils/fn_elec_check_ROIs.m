@@ -48,11 +48,11 @@ for p = 1:numel(SBJ_vars.ch_lab.probes)
     cfgs.channel = ft_channelselection([SBJ_vars.ch_lab.probes{p} '*'], elec.label);
     probe = fn_select_elec(cfgs, elec);
     
-    if strcmp(SBJ_vars.ch_lab.probe_type{p},'ecog')
-        mesh_alpha = 0.8;
-    else
-        mesh_alpha = 0.3;
-    end
+%     if strcmp(SBJ_vars.ch_lab.probe_type{p},'ecog')
+    mesh_alpha = 0.8;
+%     else
+%         mesh_alpha = 0.3;
+%     end
     
     % Plot pial
     pial = figure('Name',[SBJ ' pial ' probe.label{1} ' : ' probe.label{end}]);
@@ -83,7 +83,7 @@ end
 
 %% Plot Elecs
 if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
-    fn_view_recon(SBJ, proc_id, 'ortho', view_space, reg_type, 1, 'b', 1);
+    fn_view_recon(SBJ, '', 'ortho', view_space, reg_type, 1, 'b', 1);
 end
 
 end

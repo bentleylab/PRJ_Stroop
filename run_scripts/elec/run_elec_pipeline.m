@@ -30,11 +30,11 @@ for s = 1:numel(SBJs)
     
 end
 
+%% Manual adjustments
+% fn_elec_check_ROIs(SBJ);
+
 %% Complete manual updates
 for s = 1:numel(SBJs)
-    % Manual adjustments
-    % fn_elec_check_ROIs();
-    
     % Reimport manual adjustments
     fn_elec_import_manual(SBJs{s}, 'main_ft', 'pat', '', 'Dx');
     

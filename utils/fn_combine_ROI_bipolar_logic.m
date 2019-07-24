@@ -52,7 +52,7 @@ for p = 1:numel(elec.label)
     elec.inputs{p}.tissue_prob = reref.tissue_prob(pair_ix,:);
     
     elec.tissue_prob(p,:) = mean(reref.tissue_prob(pair_ix,:),1);
-    [~,tiss_idx] = sort(elec.tissue_prob(p,:));
+    [~,tiss_idx] = sort(elec.tissue_prob(p,:),'descend');
     elec.tissue(p)  = elec.tissue_labels(tiss_idx(1));
     elec.tissue2(p) = elec.tissue_labels(tiss_idx(2));
     
@@ -156,7 +156,7 @@ for p = 1:numel(elec.label)
         % Both non-GM
         elec.hemi{p}       = reref.hemi{pair_ix(roi_ix)};
         % Search for GM labels
-        new_labs = cell([2 1]); new_probs = cell([2 1]);
+        new_labs = cell([2 1]); new_probs = zeros([2 1]);
         for i = 1:2
             % Select 1st/2nd labels in order of which elec won logic above
             if i==1; sel_ix = roi_ix; else sel_ix = roi_ix~=[1 2]; end
@@ -169,15 +169,15 @@ for p = 1:numel(elec.label)
                 % Narrow to only GM secondary labels
                 prob_idx = prob_idx(gm_match);
                 new_labs{i}  = reref.atlas_lab2{pair_ix(sel_ix)}{prob_idx(1)};
-                new_probs{i} = reref.atlas_prob2{pair_ix(sel_ix)}{prob_idx(1)};
+                new_probs(i) = reref.atlas_prob2{pair_ix(sel_ix)}(prob_idx(1));
             else
                 % If no GM secondary label found, go with main label
                 new_labs{i}  = reref.atlas_lab{pair_ix(sel_ix)};
-                new_probs{i} = reref.atlas_prob(pair_ix(sel_ix));
+                new_probs(i) = reref.atlas_prob(pair_ix(sel_ix));
             end
         end
         elec.atlas_lab{p}    = new_labs{1};
-        elec.atlas_prob(p)   = new_probs{1};
+        elec.atlas_prob(p)   = new_probs(1);
         elec.atlas_qryrng(p) = reref.atlas_qryrng(pair_ix(roi_ix));
         elec.atlas_lab2{p}   = new_labs{2};
     else
