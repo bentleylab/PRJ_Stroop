@@ -30,7 +30,7 @@ wm_r   = fn_load_recon_mesh(SBJ,view_space,reg_type,'wm','r');
 infl_l = fn_load_recon_mesh(SBJ,view_space,reg_type,'inflated','l');
 infl_r = fn_load_recon_mesh(SBJ,view_space,reg_type,'inflated','r');
 
-% Plot inflated (no elecs)
+%% Plot inflated (no elecs)
 i_l = figure('Name',[SBJ ' inflated L']);
 ft_plot_mesh(infl_l, 'vertexcolor', 'curv');
 material dull; lighting gouraud;

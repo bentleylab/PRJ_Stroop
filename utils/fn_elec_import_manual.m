@@ -18,11 +18,12 @@ end
 
 elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' view_space '_' reg_suffix atlas_id '_compiled.mat'];
 load(elec_fname);
-save_fname = [elec_fname(1:end-4) '_man.mat'];
+save_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' view_space '_' reg_suffix atlas_id '_man.mat'];
 
 %% Load manually adjusted TSV
 tsv_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' view_space '_' reg_suffix atlas_id '_man.tsv'];
 tsv_file = fopen(tsv_fname, 'r');
+headers = textscan(tsv_file, '%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s', 1);%, 'Delimiter', '\t', 'MultipleDelimsAsOne', 0);
 % Export order:
 %   label, atlas_lab, atlas_prob, atlas_lab2, atlas_qryrng, ...
 %   tissue, tissue_prob (4x), gm_weight, hemi, gROI, ROI, roi_flag,
@@ -33,14 +34,14 @@ fclose(tsv_file);
 
 %% Add data back to elec
 new_fields = {'tissue','hemi','gROI','ROI','man_adj','anat_notes'};
-man_adj_ix = [7 12 13 14 16 17];
 for f = 1:numel(new_fields)
+    man_adj_ix = find(strcmp([headers{:}], new_fields{f}));
     if strcmp(new_fields{f},'man_adj')
-        elec.man_adj = man_adj{man_adj_ix(f)};
+        elec.man_adj = man_adj{man_adj_ix};
     elseif strcmp(new_fields{f},'anat_notes')
-        elec.anat_notes = man_adj{man_adj_ix(f)};
+        elec.anat_notes = man_adj{man_adj_ix};
     else
-        elec.(new_fields{f}) = man_adj{man_adj_ix(f)};
+        elec.(new_fields{f}) = man_adj{man_adj_ix};
     end
 end
 

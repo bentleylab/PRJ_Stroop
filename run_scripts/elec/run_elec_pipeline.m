@@ -23,10 +23,11 @@ for s = 1:numel(SBJs)
     % run in SGE: fn_elec_match_atlas(SBJs{s},'main_ft','pat','','Dx',0);
     
     % Compile orig elec atlas match to reref
-    fn_elec_compile_atlas(SBJs{s},'main_ft','pat','','Dx');
+%     fn_elec_compile_atlas(SBJs{s},'main_ft','pat','','Dx');
     
     % Export reref atlas info to CSV for manual adjustments
-    fn_elec_export_csv(SBJs{s},'main_ft','pat','','Dx');
+%     fn_elec_export_csv(SBJs{s},'main_ft','pat','','Dx', 1);
+    fn_elec_export_csv(SBJs{s},'main_ft','pat','','Dx', 0);
     
 end
 

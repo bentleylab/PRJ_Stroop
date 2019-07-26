@@ -1,6 +1,6 @@
-function fn_elec_export_csv(SBJ, proc_id, view_space, reg_type, atlas_id)
-%% Export elec struct to CSV
-%   Adds gROI, ROI
+function fn_elec_export_csv(SBJ, proc_id, view_space, reg_type, atlas_id, reref)
+%% Export elec struct to CSV for manual edits on google spreadsheet
+%   If orig, adds gROI and ROI
 
 %% Load elec and get ROI labels
 % Check which root directory
@@ -13,8 +13,23 @@ if strcmp(reg_type,'v') || strcmp(reg_type,'s')
 else
     reg_suffix = '';
 end
-elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' view_space '_' reg_suffix atlas_id '_compiled.mat'];
+if reref
+    elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' view_space reg_suffix atlas_id '_compiled.mat'];
+else
+    elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_' proc_id '_',view_space,reg_suffix,'_orig_',atlas_id,'.mat'];
+end
 load(elec_fname);
+
+%% Add fields for orig elecs
+if ~reref
+    % ROI matching
+    elec.gROI = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'gROI');
+    elec.ROI  = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'ROI');
+    
+    % Fake reref fields
+    elec.gm_weight = elec.tissue_prob(:,strcmp('GM',elec.tissue_labels));
+    elec.roi_flag  = zeros(size(elec.label));
+end
 
 %% Print data to csv file
 csv_fname = [elec_fname(1:end-4) '.csv'];
@@ -22,7 +37,7 @@ fprintf('\tExporting %s...\n',csv_fname);
 csv = fopen(csv_fname,'w');
 
 % Export order:
-%   label, atlas_lab, atlas_prob, atlas_lab2, atlas_prob2, atlas_qryrng, ...
+%   label, atlas_lab, atlas_prob, atlas_lab2, atlas_qryrng, ...
 %   tissue, tissue_prob (4x), gm_weight, hemi, gROI, ROI, roi_flag
 for e = 1:numel(elec.label)
     if ~isempty(elec.atlas_lab2{e})

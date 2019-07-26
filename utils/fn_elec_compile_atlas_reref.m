@@ -1,5 +1,6 @@
-function fn_elec_compile_atlas(SBJ,proc_id,view_space,reg_type,atlas_id)
-%% Compile atlas ROI and tissue info on original elec files
+function fn_elec_compile_atlas_reref(SBJ,proc_id,view_space,reg_type,atlas_id)
+%% Compile atlas ROI and tissue info (adjust for BP reref)
+%   Main logic is by fn_combine_ROI_bipolar_logic
 % INPUTS:
 %   SBJ [str] - name of subject
 %   proc_id [str] - name of analysis pipeline
@@ -8,6 +9,7 @@ function fn_elec_compile_atlas(SBJ,proc_id,view_space,reg_type,atlas_id)
 %   atlas_id [str] - {'DK','Dx','Yeo7','Yeo17'}
 % OUTPUT:
 %   elec_atlas_compiled
+%   log for BP combination
 
 % Set up paths
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
