@@ -7,10 +7,10 @@ cd /home/knight/hoycw/PRJ_Stroop/scripts/utils/
 SBJ="${SGE_TASK}"
 
 # define function
-FUNCTION='fn_match_elec_atlas_ROI_tiss'
+FUNCTION='fn_elec_match_atlas'
 
 # set up matlab function call
-func_call="${FUNCTION}('${SBJ}','${proc_id}','${view_space}','${reg_type}','${atlas_id}','${reref}')"
+func_call="${FUNCTION}('${SBJ}','${proc_id}','${view_space}','${reg_type}','${atlas_id}')"
 
 # define commands to execute via SGE
 echo ${DATASET}
