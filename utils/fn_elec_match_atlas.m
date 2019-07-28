@@ -1,4 +1,4 @@
-function fn_elec_match_atlas(SBJ, proc_id, view_space, reg_type, atlas_id, reref)
+function fn_elec_match_atlas(SBJ, proc_id, view_space, reg_type, atlas_id)
 %% Match elec_orig to atlas ROIs and tissue
 % INPUTS:
 %   SBJ [str] - subject ID to plot
@@ -6,7 +6,6 @@ function fn_elec_match_atlas(SBJ, proc_id, view_space, reg_type, atlas_id, reref
 %   view_space [str] - {'pat', 'mni'}
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
 %   atlas_id [str] - {'DK','Dx','Yeo7','Yeo17'} are the only ones implemented so far
-%   reref [0/1] - rereferenced positions (1) or original (0)
 
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
@@ -23,16 +22,9 @@ if strcmp(reg_type,'v') || strcmp(reg_type,'s')
 else
     reg_suffix = '';
 end
-if ischar(reref); reref = str2num(reref); end
-if reref
-    error('WHY??? This should be run on orig positions then combined');
-    % reref_suffix = '';
-else
-    reref_suffix = '_orig';
-end
 
 %% Load elec struct
-load([SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,reref_suffix,'.mat']);
+load([SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,'_orig.mat']);
 
 %% Load Atlas
 atlas = fn_load_recon_atlas(SBJ,atlas_id);
@@ -75,7 +67,7 @@ if any(strcmp(atlas_id,{'DK','Dx'}))
 end
 
 %% Save elec strcut with atlas labels
-out_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,reref_suffix,'_',atlas_id,'.mat'];
+out_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,'_orig_',atlas_id,'.mat'];
 fprintf('Saving %s\n',out_fname);
 fprintf('==================================================================\n');
 save(out_fname,'-v7.3','elec');

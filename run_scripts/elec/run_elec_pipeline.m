@@ -20,7 +20,7 @@ for s = 1:numel(SBJs)
 %     fn_elec_import_orig(SBJs{s},'main_ft','mni','v',1);
     
     % Match elec to atlas labels + tissue (ONLY orig!)
-    % run in SGE: fn_elec_match_atlas(SBJs{s},'main_ft','pat','','Dx',0);
+    % run in SGE: fn_elec_match_atlas(SBJs{s},'main_ft','pat','','Dx');
     
     % Export reref atlas info to CSV for manual adjustments
     fn_elec_export_csv(SBJs{s},'main_ft','pat','','Dx', 0);
