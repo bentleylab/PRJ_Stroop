@@ -22,22 +22,25 @@ for s = 1:numel(SBJs)
     % Match elec to atlas labels + tissue (ONLY orig!)
     % run in SGE: fn_elec_match_atlas(SBJs{s},'main_ft','pat','','Dx',0);
     
-    % Compile orig elec atlas match to reref
-%     fn_elec_compile_atlas(SBJs{s},'main_ft','pat','','Dx');
-    
     % Export reref atlas info to CSV for manual adjustments
-%     fn_elec_export_csv(SBJs{s},'main_ft','pat','','Dx', 1);
     fn_elec_export_csv(SBJs{s},'main_ft','pat','','Dx', 0);
     
 end
 
-%% Manual adjustments
+%% Manual adjustments of orig elec
 % fn_elec_check_ROIs(SBJ);
+
+%% Compile manual orig into auto bipolar
+for s = 1:numel(SBJs)
+    fn_elec_import_manual(SBJs{s}, 'main_ft', 'pat', '', 'Dx', 0);
+    fn_elec_compile_man_reref(SBJs{s}, 'main_ft', 'pat', '', 'Dx');
+    fn_elec_export_csv(SBJs{s},'main_ft','pat','','Dx', 1);
+end
 
 %% Complete manual updates
 for s = 1:numel(SBJs)
     % Reimport manual adjustments
-    fn_elec_import_manual(SBJs{s}, 'main_ft', 'pat', '', 'Dx');
+    fn_elec_import_manual(SBJs{s}, 'main_ft', 'pat', '', 'Dx', 1);
     
     % Copy corrected labels to MNI elec files
     fn_elec_copy_atlas_pat2mni(SBJs{s},'main_ft','v','Dx');

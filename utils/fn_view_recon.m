@@ -9,6 +9,7 @@ function fn_view_recon(SBJ, proc_id, plot_type, view_space, reg_type,...
 %   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
 %   show_labels [0/1] - plot the electrode labels
 %   hemi [str] - {'l', 'r', 'b'} hemisphere to plot
+%   plot_out [0/1] - plot elecs out of the hemi
 
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 

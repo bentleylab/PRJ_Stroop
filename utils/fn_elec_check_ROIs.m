@@ -1,4 +1,4 @@
-function fn_elec_check_ROIs(SBJ)%, proc_id, view_space, reg_type, atlas_id)
+function fn_elec_check_ROIs(SBJ, reref)%, proc_id, view_space, reg_type, atlas_id)
 %% Plot recons for each probe with pial, white matter, and inflated to check ROI assignments
 proc_id = 'main_ft';
 view_space  = 'pat';
@@ -16,8 +16,18 @@ if strcmp(reg_type,'v') || strcmp(reg_type,'s')
 else
     reg_suffix = '';
 end
-elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' view_space '_' reg_suffix atlas_id '_compiled.mat'];
+if reref
+    elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' view_space reg_suffix '_' atlas_id '_man.mat'];
+else
+    elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' view_space reg_suffix '_orig_' atlas_id '.mat'];
+end
 load(elec_fname);
+
+%% Add fields for orig elecs
+if ~reref
+    elec.gROI = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'gROI');
+    elec.ROI  = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'ROI');
+end
 
 % Assign ROIs
 elec.color = fn_roi2color(elec.ROI);
@@ -44,12 +54,13 @@ l = camlight;
 set(i_r, 'windowkeypressfcn',   @cb_keyboard);
 
 %% Plot elecs + meshes
-for p = 1:numel(SBJ_vars.ch_lab.probes)
+p = 5;
+% for p = 1:numel(SBJ_vars.ch_lab.probes)
     cfgs.channel = ft_channelselection([SBJ_vars.ch_lab.probes{p} '*'], elec.label);
     probe = fn_select_elec(cfgs, elec);
     
 %     if strcmp(SBJ_vars.ch_lab.probe_type{p},'ecog')
-    mesh_alpha = 0.8;
+    mesh_alpha = 0.7;
 %     else
 %         mesh_alpha = 0.3;
 %     end
@@ -68,7 +79,7 @@ for p = 1:numel(SBJ_vars.ch_lab.probes)
     
     % Plot WM
     if strcmp(SBJ_vars.ch_lab.probe_type,'seeg')
-        wm = figure('Name',[SBJ ' white ' probe.hemi{2}]);
+        wm = figure('Name',[SBJ ' white ' probe.label{1} ' : ' probe.label{end}]);
         ft_plot_mesh(eval(['wm_' probe.hemi{2}]), 'vertexcolor', 'curv', 'facealpha', 0.5);
         for e = 1:numel(probe.label)
             cfgs.channel = probe.label(e);
@@ -79,11 +90,15 @@ for p = 1:numel(SBJ_vars.ch_lab.probes)
         l = camlight;
         set(wm, 'windowkeypressfcn',   @cb_keyboard);
     end
-end
+% end
 
 %% Plot Elecs
 if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
-    fn_view_recon(SBJ, '', 'ortho', view_space, reg_type, 1, 'b', 1);
+    if ~reref
+        fn_view_recon(SBJ, '', 'ortho', view_space, reg_type, 1, 'b', 1);
+    else
+        fn_view_recon(SBJ, 'main_ft', 'ortho', view_space, reg_type, 1, 'b', 1);
+    end
 end
 
 end

@@ -1,5 +1,5 @@
-function fn_elec_compile_atlas_reref(SBJ,proc_id,view_space,reg_type,atlas_id)
-%% Compile atlas ROI and tissue info (adjust for BP reref)
+function fn_elec_compile_man_reref(SBJ,proc_id,view_space,reg_type,atlas_id)
+%% Compile manually adjusted ROI and tissue info (adjust for BP reref)
 %   Main logic is by fn_combine_ROI_bipolar_logic
 % INPUTS:
 %   SBJ [str] - name of subject
@@ -29,27 +29,12 @@ else
     reg_suffix = '';
 end
 
-elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,'_orig_',atlas_id,'.mat'];
-out_fname  = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,'_',atlas_id,'_compiled.mat'];
+elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,'_orig_',atlas_id,'_man.mat'];
+out_fname  = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,'_',atlas_id,'_man.mat'];
 load(elec_fname);
 
-%% For grids/strips only, add GM weight and exit
+%% For grids/strips only, just copy over
 if ~any(strcmp(SBJ_vars.ch_lab.ref_type,'BP'))
-    % Add missing fields
-    elec.reref     = 1;
-    elec.gm_weight = ones(size(elec.label));
-    elec.inputs    = cell(size(elec.label));   % just empty
-    elec.roi_flag  = zeros(size(elec.label));
-    for e = 1:numel(elec.label)
-        if elec.tissue_prob(e,strcmp(elec.tissue_labels,'GM'))~=1
-            elec.roi_flag(e) = 1;
-        end
-    end
-    
-    % Assign ROIs
-    elec.gROI = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'gROI');
-    elec.ROI  = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'ROI');
-    
     % Check if elec.cfg.previous got ridiculously large, and keep only first
     var_stats = whos('elec');
     if var_stats.bytes>1000000
@@ -125,7 +110,7 @@ elec.reref         = 1;
 
 % fields = fieldnames(elec_reref{1});
 % fields = setdiff(fields,fieldnames(elec));   % still included: 'chanposold', 'labelold', 'tra'
-fields = {'atlas_lab', 'atlas_prob', 'atlas_lab2', 'atlas_qryrng', ...
+fields = {'atlas_lab', 'atlas_prob', 'atlas_lab2', 'atlas_qryrng', 'ROI', 'gROI', 'man_adj', 'par_vol',...
             'gm_weight', 'hemi', 'inputs', 'roi_flag', 'tissue', 'tissue2', 'tissue_prob'};
 for f = 1:numel(fields)
     % Initialize to get column not row
@@ -154,10 +139,6 @@ for f = 1:numel(fields)
         end
     end
 end
-
-%% Assign ROIs
-elec.gROI = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'gROI');
-elec.ROI  = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'ROI');
 
 %% Save data
 % Check if elec.cfg.previosu got ridiculously large, and keep only first

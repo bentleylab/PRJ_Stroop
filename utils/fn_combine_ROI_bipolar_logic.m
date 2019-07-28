@@ -1,6 +1,7 @@
 function elec = fn_combine_ROI_bipolar_logic(reref,report_fname,atlas)
-%                             roi1,groi1,tiss_p1,tiss_s1,roi2,groi2,tiss_p2,tiss_s2)
 % Logic to determine the properties assigned to a bipolar referenced pair of electrodes
+%   If already manually adjusted inputs, skips most comparison logic and
+%   just flags any non-matching neighbors for inspection.
 % INPUTS: 
 %   reref [struct] - output elec struct of ft_apply_montage
 %       .chanpos & .label should have new dimensions
@@ -45,6 +46,15 @@ elec.gm_weight    = zeros(size(elec.label));
 elec.tissue_prob  = zeros([numel(elec.label) numel(elec.tissue_labels)]);
 elec.roi_flag     = zeros(size(elec.label));             % to flag problematic cases
 elec.inputs       = cell(size(elec.label));              % keep the bipolar pair info to assess algorithm
+if isfield(reref,'man_adj')
+    manual = 1;
+    elec.gROI       = cell(size(elec.label));
+    elec.ROI        = cell(size(elec.label));
+    elec.man_adj    = zeros(size(elec.label));
+    elec.par_vol    = zeros(size(elec.label));
+else
+    manual = 0;
+end
 for p = 1:numel(elec.label)
     pair_ix = find(elec.tra(p,:)~=0);
     
@@ -64,6 +74,15 @@ for p = 1:numel(elec.label)
     
     elec.inputs{p}.gm_weight = [gm_weight1 gm_weight2];
     
+    % Manual adjustment fields
+    if manual
+        elec.inputs{p}.ROI        = [reref.ROI(pair_ix(1)) reref.ROI(pair_ix(2))];
+        elec.inputs{p}.gROI       = [reref.gROI(pair_ix(1)) reref.gROI(pair_ix(2))];
+        elec.inputs{p}.man_adj    = [reref.man_adj(pair_ix(1)) reref.man_adj(pair_ix(2))];
+        elec.inputs{p}.par_vol    = [reref.par_vol(pair_ix(1)) reref.par_vol(pair_ix(2))];
+        elec.inputs{p}.anat_notes = [reref.anat_notes(pair_ix(1)) reref.anat_notes(pair_ix(2))];
+    end
+    
     %% ROI Logic
     % 1. GM primary label
     %   1a. match a secondary label?
@@ -79,7 +98,49 @@ for p = 1:numel(elec.label)
     % Select based on GM label
     non_gm = 0;
     gm_ix  = strcmp(reref.tissue_labels,'GM');
-    if all(strcmp({reref.tissue{pair_ix(1)}, reref.tissue{pair_ix(2)}},'GM'))   % Both GM
+    if manual
+        elec.roi_flag(p) = 1;
+        if strcmp(reref.ROI{pair_ix(1)},reref.ROI{pair_ix(2)})  % Same ROI
+            roi_ix = 1;
+            elec.roi_flag(p) = 0;
+        elseif all(strcmp({reref.tissue{pair_ix(1)}, reref.tissue{pair_ix(2)}},'GM'))   % Both GM
+            % Check if only one is partial volume (pick other one)
+            if reref.par_vol(pair_ix(1)) && ~all(reref.par_vol(pair_ix))
+                roi_ix = 2;
+            elseif reref.par_vol(pair_ix(2)) && ~all(reref.par_vol(pair_ix))
+                roi_ix = 1;
+            % Compare gm_weights
+            elseif gm_weight1~=gm_weight2
+                [~,roi_ix] = max(reref.gm_weight(pair_ix));
+            else
+                roi_ix = 1; % Arbitrarily pick most medial, then fix later!
+                fprintf(2,'WARNING: GM Tie for %s between %s and %s!\n',elec.label{p},...
+                                    reref.ROI{pair_ix(1)}, reref.ROI{pair_ix(2)});
+                fprintf(log,'WARNING: GM Tie for %s between %s and %s!\n',elec.label{p},...
+                                    reref.ROI{pair_ix(1)}, reref.ROI{pair_ix(2)});
+            end
+        elseif strcmp(reref.tissue{pair_ix(1)},'GM')    % One is GM
+            roi_ix = 1;
+        elseif strcmp(reref.tissue{pair_ix(2)},'GM')    % One is GM
+            roi_ix = 2;
+        else                                            % Neither GM
+            error('How can I have neighboring non-GM that dont match ROI labels?');
+%             non_gm = 1;
+%             % Check if only one is partial volume (pick that one)
+%             if reref.par_vol(pair_ix(1)) && ~all(reref.par_vol(pair_ix))
+%                 roi_ix = 1;
+%             elseif reref.par_vol(pair_ix(2)) && ~all(reref.par_vol(pair_ix))
+%                 roi_ix = 2;
+%             % Compare gm_weights
+%             elseif reref.gm_weight(pair_ix(1))~=reref.gm_weight(pair_ix(2))
+%                 [~,roi_ix] = max(reref.gm_weight(pair_ix));
+%             else
+%                 roi_ix = 3;
+%                 fprintf(2,'WARNING: non-GM Tie for % s between %s and %s!\n',elec.label{p},...
+%                                     reref.ROI{pair_ix(1)}, reref.ROI{pair_ix(2)});
+%             end
+        end
+    elseif all(strcmp({reref.tissue{pair_ix(1)}, reref.tissue{pair_ix(2)}},'GM'))   % Both GM
         % Start using the ROIs identified using the optimal query range
         if strcmp(reref.atlas_lab{pair_ix(1)},reref.atlas_lab{pair_ix(2)}) || any(strcmp(reref.atlas_lab{pair_ix(1)},reref.atlas_lab2{pair_ix(2)}))
             % Both are the same ROI, or lab(1) matches secondary lab2(2)
@@ -94,7 +155,7 @@ for p = 1:numel(elec.label)
             elseif  reref.tissue_prob(pair_ix(1),gm_ix) > reref.tissue_prob(pair_ix(2),gm_ix)
                 roi_ix = 1;
             else    % TIE! choose whichever matches the middle position
-                fprintf(2,'WARNING: GM Tie for % s between %s and %s!\n',elec.label{p},...
+                fprintf(2,'WARNING: GM Tie for %s between %s and %s!\n',elec.label{p},...
                                     reref.atlas_lab{pair_ix(1)}, reref.atlas_lab{pair_ix(2)});
                 roi_ix = 3;
                 elec.roi_flag(p) = 1;
@@ -125,7 +186,7 @@ for p = 1:numel(elec.label)
         elec.roi_flag(p) = 1;
     end
     
-    %% Add selected atlas_labels
+    %% Add selected ROIs or atlas_labels
     if roi_ix==3
         % TIE
         if ~strcmp(reref.hemi{pair_ix(1)},reref.hemi{pair_ix(2)})
@@ -187,14 +248,29 @@ for p = 1:numel(elec.label)
         elec.atlas_prob(p)   = reref.atlas_prob(pair_ix(roi_ix));
         elec.atlas_qryrng(p) = reref.atlas_qryrng(pair_ix(roi_ix));
         elec.atlas_lab2{p}   = reref.atlas_lab{pair_ix(roi_ix~=[1 2])};
+        
+        % Manually adjusted fields
+        if manual
+            elec.ROI{p}     = reref.ROI{pair_ix(roi_ix)};
+            elec.gROI{p}    = reref.gROI{pair_ix(roi_ix)};
+            elec.man_adj(p) = mean([reref.man_adj(pair_ix(1)) reref.man_adj(pair_ix(2))]);
+            elec.par_vol(p) = mean([reref.par_vol(pair_ix(1)) reref.par_vol(pair_ix(2))]);
+        end
     end
     
     %% Log Results
-    fprintf(log,'%s = %s (%.3f | %s) [%.2f %.2f %.2f %.2f] vs %.2f; %s (%.2f) and %s (%.2f)\n',...
-        elec.label{p}, elec.atlas_lab{p}, elec.atlas_prob(p), elec.atlas_lab2{p},...
-        elec.tissue_prob(p,1), elec.tissue_prob(p,2), elec.tissue_prob(p,3), elec.tissue_prob(p,4),...
-        elec.gm_weight(p), elec.inputs{p}.atlas_lab{1}, elec.inputs{p}.atlas_prob(1),...
-        elec.inputs{p}.atlas_lab{2}, elec.inputs{p}.atlas_prob(2));
+    if manual
+        fprintf(log,'%s = %s (%s | %s) [%.2f %.2f %.2f %.2f] vs %.2f\n',...
+            elec.label{p}, elec.ROI{p}, elec.inputs{p}.ROI{1}, elec.inputs{p}.ROI{2},...
+            elec.tissue_prob(p,1), elec.tissue_prob(p,2), elec.tissue_prob(p,3), elec.tissue_prob(p,4),...
+            elec.gm_weight(p));
+    else
+        fprintf(log,'%s = %s (%.3f | %s) [%.2f %.2f %.2f %.2f] vs %.2f; %s (%.2f) and %s (%.2f)\n',...
+            elec.label{p}, elec.atlas_lab{p}, elec.atlas_prob(p), elec.atlas_lab2{p},...
+            elec.tissue_prob(p,1), elec.tissue_prob(p,2), elec.tissue_prob(p,3), elec.tissue_prob(p,4),...
+            elec.gm_weight(p), elec.inputs{p}.atlas_lab{1}, elec.inputs{p}.atlas_prob(1),...
+            elec.inputs{p}.atlas_lab{2}, elec.inputs{p}.atlas_prob(2));
+    end
 end
 
 fclose(log);

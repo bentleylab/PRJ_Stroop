@@ -14,9 +14,9 @@ else
     reg_suffix = '';
 end
 if reref
-    elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' view_space reg_suffix atlas_id '_compiled.mat'];
+    elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' view_space reg_suffix '_' atlas_id '_man.mat'];
 else
-    elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_' proc_id '_',view_space,reg_suffix,'_orig_',atlas_id,'.mat'];
+    elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' view_space reg_suffix '_orig_' atlas_id '.mat'];
 end
 load(elec_fname);
 
@@ -26,9 +26,15 @@ if ~reref
     elec.gROI = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'gROI');
     elec.ROI  = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'ROI');
     
-    % Fake reref fields
-    elec.gm_weight = elec.tissue_prob(:,strcmp('GM',elec.tissue_labels));
-    elec.roi_flag  = zeros(size(elec.label));
+    % reref fields
+    elec.roi_flag   = zeros(size(elec.label));
+    elec.gm_weight  = zeros(size(elec.label));
+    for e = 1:numel(elec.label)
+        elec.gm_weight(e) = fn_gm_weight(elec.tissue(e),reref.tissue2(e));
+        if any(strcmp(elec.tissue{e},{'CSF','OUT'}))
+            elec.roi_flag(e) = 1;
+        end
+    end
 end
 
 %% Print data to csv file
@@ -40,19 +46,26 @@ csv = fopen(csv_fname,'w');
 %   label, atlas_lab, atlas_prob, atlas_lab2, atlas_qryrng, ...
 %   tissue, tissue_prob (4x), gm_weight, hemi, gROI, ROI, roi_flag
 for e = 1:numel(elec.label)
-    if ~isempty(elec.atlas_lab2{e})
-        if ischar(elec.atlas_lab2{e})
-            atlas_lab2 = elec.atlas_lab2{e};
+    if ~reref
+        if ~isempty(elec.atlas_lab2{e})
+            if ischar(elec.atlas_lab2{e})
+                atlas_lab2 = elec.atlas_lab2{e};
+            else
+                atlas_lab2 = strjoin(elec.atlas_lab2{e},'+');
+            end
         else
-            atlas_lab2 = strjoin(elec.atlas_lab2{e},'+');
+            atlas_lab2 = '';
         end
+        fprintf(csv,'%s,%s,%.3f,%s,%d,%s,%.3f,%.3f,%.3f,%.3f,%.1f,%s,%s,%s,%d\n',...
+            elec.label{e},elec.atlas_lab{e},elec.atlas_prob(e),atlas_lab2,elec.atlas_qryrng(e),...
+            elec.tissue{e},elec.tissue_prob(e,:),elec.gm_weight(e),elec.hemi{e},...
+            elec.gROI{e},elec.ROI{e},elec.roi_flag(e));
     else
-        atlas_lab2 = '';
+        fprintf(csv,'%s,%s,%.2f,%.1f,%s,%.2f,%.1f,%s,%.1f,%s,%s,%s,%d\n',...
+            elec.label{e},elec.inputs{e}.ROI{1},elec.inputs{e}.gm_weight(1),elec.inputs{e}.par_vol(1),...
+            elec.inputs{e}.ROI{2},elec.inputs{e}.gm_weight(2),elec.inputs{e}.par_vol(2),elec.tissue{e},...
+            elec.man_adj(e),elec.hemi{e},elec.gROI{e},elec.ROI{e},elec.roi_flag(e));
     end
-    fprintf(csv,'%s,%s,%.3f,%s,%d,%s,%.3f,%.3f,%.3f,%.3f,%.1f,%s,%s,%s,%d\n',...
-        elec.label{e},elec.atlas_lab{e},elec.atlas_prob(e),atlas_lab2,elec.atlas_qryrng(e),...
-        elec.tissue{e},elec.tissue_prob(e,:),elec.gm_weight(e),elec.hemi{e},...
-        elec.gROI{e},elec.ROI{e},elec.roi_flag(e));
 end
 
 fclose(csv);
