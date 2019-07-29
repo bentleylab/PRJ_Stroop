@@ -74,6 +74,7 @@ for f = 1:numel(new_fields)
 end
 
 %% Save new elec
+fprintf('Saving %s\n',save_fname);
 save(save_fname,'-v7.3','elec');
 
 end

@@ -1,4 +1,5 @@
 function fn_elec_compile_atlas(SBJ,proc_id,view_space,reg_type,atlas_id)
+error('this shouldnt be run, only compile manual edits from orig_Dx_man');
 %% Compile atlas ROI and tissue info on original elec files
 % INPUTS:
 %   SBJ [str] - name of subject

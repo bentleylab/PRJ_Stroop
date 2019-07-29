@@ -60,7 +60,7 @@ if any(strcmp(atlas_id,{'DK','Dx'}))
         end
         
         % Add gm_weight
-        elec.gm_weight(e) = fn_gm_weight(elec.tissue(e),elec.tissue2(e));
+        elec.gm_weight(e) = fn_gm_weight(elec.tissue{e},elec.tissue2{e});
         
         % Add roi_flag for non-GM/WM
         if any(strcmp(elec.tissue{e},{'CSF','OUT'}))

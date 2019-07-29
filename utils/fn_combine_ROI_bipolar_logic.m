@@ -66,13 +66,9 @@ for p = 1:numel(elec.label)
     elec.tissue(p)  = elec.tissue_labels(tiss_idx(1));
     elec.tissue2(p) = elec.tissue_labels(tiss_idx(2));
     
-    
     % Manual computation
-    gm_weight1 = fn_gm_weight(reref.tissue(pair_ix(1)),reref.tissue2(pair_ix(1)));
-    gm_weight2 = fn_gm_weight(reref.tissue(pair_ix(2)),reref.tissue2(pair_ix(2)));
-    elec.gm_weight(p) = mean([gm_weight1 gm_weight2]);
-    
-    elec.inputs{p}.gm_weight = [gm_weight1 gm_weight2];
+    elec.inputs{p}.gm_weight = [reref.gm_weight(pair_ix(1)) reref.gm_weight(pair_ix(2))];
+    elec.gm_weight(p) = mean(elec.inputs{p}.gm_weight);
     
     % Manual adjustment fields
     if manual
