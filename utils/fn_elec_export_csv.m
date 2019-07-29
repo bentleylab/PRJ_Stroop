@@ -20,23 +20,6 @@ else
 end
 load(elec_fname);
 
-%% Add fields for orig elecs
-if ~reref
-    % ROI matching
-    elec.gROI = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'gROI');
-    elec.ROI  = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'ROI');
-    
-    % reref fields
-    elec.roi_flag   = zeros(size(elec.label));
-    elec.gm_weight  = zeros(size(elec.label));
-    for e = 1:numel(elec.label)
-        elec.gm_weight(e) = fn_gm_weight(elec.tissue(e),reref.tissue2(e));
-        if any(strcmp(elec.tissue{e},{'CSF','OUT'}))
-            elec.roi_flag(e) = 1;
-        end
-    end
-end
-
 %% Print data to csv file
 csv_fname = [elec_fname(1:end-4) '.csv'];
 fprintf('\tExporting %s...\n',csv_fname);

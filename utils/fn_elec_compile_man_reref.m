@@ -35,6 +35,19 @@ load(elec_fname);
 
 %% For grids/strips only, just copy over
 if ~any(strcmp(SBJ_vars.ch_lab.ref_type,'BP'))
+    % Add functions to fill "bipolar" adjustments
+    for e = 1:numel(elec.label)
+        elec.inputs{e}.par_vol = [elec.par_vol(e) elec.par_vol(e)];
+        elec.inputs{e}.gm_weight = [elec.gm_weight(e) elec.gm_weight(e)];
+        elec.inputs{e}.gROI = [elec.gROI(e) elec.gROI(e)];
+        elec.inputs{e}.ROI = [elec.ROI(e) elec.ROI(e)];
+        if ~strcmp(elec.tissue{e},'GM')
+            elec.roi_flag(e) = 1;
+        else
+            elec.roi_flag(e) = 0;
+        end
+    end
+    
     % Check if elec.cfg.previous got ridiculously large, and keep only first
     var_stats = whos('elec');
     if var_stats.bytes>1000000

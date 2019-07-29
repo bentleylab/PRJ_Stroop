@@ -54,7 +54,7 @@ l = camlight;
 set(i_r, 'windowkeypressfcn',   @cb_keyboard);
 
 %% Plot elecs + meshes
-p = 5;
+p = 9;
 % for p = 1:numel(SBJ_vars.ch_lab.probes)
     cfgs.channel = ft_channelselection([SBJ_vars.ch_lab.probes{p} '*'], elec.label);
     probe = fn_select_elec(cfgs, elec);
@@ -66,7 +66,9 @@ p = 5;
 %     end
     
     % Plot pial
-    pial = figure('Name',[SBJ ' pial ' probe.label{1} ' : ' probe.label{end}]);
+    pial = figure('Name',[SBJ ' pial ' probe.label{1} ' : ' probe.label{end}],...
+                    'Units','normalized');
+    set(pial,'OuterPosition',[0 0 0.5 1]);
     ft_plot_mesh(eval(['pial_' probe.hemi{2}]), 'vertexcolor', 'curv', 'facealpha', mesh_alpha);
     for e = 1:numel(probe.label)
         cfgs.channel = probe.label(e);
@@ -79,7 +81,9 @@ p = 5;
     
     % Plot WM
     if strcmp(SBJ_vars.ch_lab.probe_type,'seeg')
-        wm = figure('Name',[SBJ ' white ' probe.label{1} ' : ' probe.label{end}]);
+        wm = figure('Name',[SBJ ' white ' probe.label{1} ' : ' probe.label{end}],...
+                    'Units','normalized');
+        set(wm, 'OuterPosition', [0.5 0 0.5 1]);
         ft_plot_mesh(eval(['wm_' probe.hemi{2}]), 'vertexcolor', 'curv', 'facealpha', 0.5);
         for e = 1:numel(probe.label)
             cfgs.channel = probe.label(e);
@@ -93,12 +97,12 @@ p = 5;
 % end
 
 %% Plot Elecs
-if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
-    if ~reref
-        fn_view_recon(SBJ, '', 'ortho', view_space, reg_type, 1, 'b', 1);
-    else
-        fn_view_recon(SBJ, 'main_ft', 'ortho', view_space, reg_type, 1, 'b', 1);
-    end
+% if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
+if ~reref
+    fn_view_recon(SBJ, '', 'ortho', view_space, reg_type, 1, 'b', 1);
+else
+    fn_view_recon(SBJ, 'main_ft', 'ortho', view_space, reg_type, 1, 'b', 1);
 end
+% end
 
 end

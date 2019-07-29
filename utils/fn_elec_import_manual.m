@@ -36,15 +36,17 @@ load(elec_fname);
 %% Load manually adjusted TSV
 tsv_file = fopen(tsv_fname, 'r');
 if ~reref
-    headers = textscan(tsv_file, '%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s', 1);
+    % Original Elecs
+    headers = textscan(tsv_file, '%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s', 1);
     % Import order:
     %   label, atlas_lab, atlas_prob, atlas_lab2, atlas_qryrng, ...
     %   tissue, tissue_prob (4x), gm_weight, hemi, gROI, ROI, roi_flag,
-    %   man_adj, par_vol, anatomy notes
-    man_adj = textscan(tsv_file, '%s %s %f %s %d %s %f %f %f %f %f %s %s %s %d %d %d %s', 'HeaderLines', 1,...
+    %   man_adj, par_vol, WM_ref, anatomy notes
+    man_adj = textscan(tsv_file, '%s %s %f %s %d %s %f %f %f %f %f %s %s %s %d %d %d %d %s', 'HeaderLines', 1,...
         'Delimiter', '\t', 'MultipleDelimsAsOne', 0);
-    new_fields = {'tissue','hemi','gROI','ROI','man_adj','par_vol','anat_notes'};
+    new_fields = {'tissue','hemi','gROI','ROI','man_adj','par_vol','WM_ref','anat_notes'};
 else
+    % Rereferenced Elecs
     headers = textscan(tsv_file, '%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s', 1);
     % Import order:
     %   label, ROI1, gm_weight1, par_vol1, ROI2, gm_weight2, par_vol2, ...

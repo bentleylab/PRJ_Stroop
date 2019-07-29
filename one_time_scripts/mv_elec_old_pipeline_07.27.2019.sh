@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Move to scripts directory 
-root_dir="/home/knight/hoycw/PRJ_Stroop/"
+root_dir="/Volumes/hoycw_clust/PRJ_Stroop/"
 cd $root_dir/scripts/
 
 declare -a SBJs

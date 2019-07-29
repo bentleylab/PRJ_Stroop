@@ -33,38 +33,45 @@ atlas = fn_load_recon_atlas(SBJ,atlas_id);
 elec = fn_atlas_lookup(elec,atlas,'min_qry_rng',1,'max_qry_rng',5);
 
 %% Match elecs to atlas tissue compartments
+elec.roi_flag   = zeros(size(elec.label));
 if any(strcmp(atlas_id,{'DK','Dx'}))
     tiss = fn_atlas_lookup(elec,atlas,'min_qry_rng',5,'max_qry_rng',5);
     
     %% Convert atlas labels and probabilities to GM probability
     % usedqueryrange search sizes: 1 = 1; 3 = 7; 5 = 33
-    tiss.tissue_labels = {'GM','WM','CSF','OUT'};
-    tiss.tissue_prob = zeros([numel(tiss.label) numel(tiss.tissue_labels)]);
+    elec.tissue_labels = {'GM','WM','CSF','OUT'};
+    elec.tissue_prob = zeros([numel(elec.label) numel(elec.tissue_labels)]);
     
     % Assign atlas labels to tissue type
-    tiss.tissue  = fn_atlas2roi_labels(tiss.atlas_lab,atlas_id,'tissue');
-    tiss.tissue2 = cell(size(tiss.tissue));
-    for e = 1:numel(tiss.label)
+    elec.tissue    = fn_atlas2roi_labels(tiss.atlas_lab,atlas_id,'tissue');
+    elec.tissue2   = cell(size(elec.tissue));
+    elec.gm_weight = zeros(size(elec.label));
+    for e = 1:numel(elec.label)
         % Compute Probability of Tissue Types {GM, WM, CSF, OUT}
-        tiss.tissue_prob(e,strcmp(tiss.tissue{e},tiss.tissue_labels)) = ...
-            tiss.tissue_prob(e,strcmp(tiss.tissue{e},tiss.tissue_labels)) + tiss.atlas_prob(e);
+        elec.tissue_prob(e,strcmp(elec.tissue{e},elec.tissue_labels)) = tiss.atlas_prob(e);
         
         % Check for secondary matches and add to total
         if ~isempty(tiss.atlas_lab2{e})
-            tiss.tissue2{e} = fn_atlas2roi_labels(tiss.atlas_lab2{e},atlas_id,'tissue');
-            for roi = 1:numel(tiss.tissue2{e})
-                tiss.tissue_prob(e,strcmp(tiss.tissue2{e}{roi},tiss.tissue_labels)) = ...
-                    tiss.tissue_prob(e,strcmp(tiss.tissue2{e}{roi},tiss.tissue_labels)) + tiss.atlas_prob2{e}(roi);
+            elec.tissue2{e} = fn_atlas2roi_labels(tiss.atlas_lab2{e},atlas_id,'tissue');
+            for roi = 1:numel(elec.tissue2{e})
+                elec.tissue_prob(e,strcmp(elec.tissue2{e}{roi},elec.tissue_labels)) = ...
+                    elec.tissue_prob(e,strcmp(elec.tissue2{e}{roi},elec.tissue_labels)) + tiss.atlas_prob2{e}(roi);
             end
         end
+        
+        % Add gm_weight
+        elec.gm_weight(e) = fn_gm_weight(elec.tissue(e),elec.tissue2(e));
+        
+        % Add roi_flag for non-GM/WM
+        if any(strcmp(elec.tissue{e},{'CSF','OUT'}))
+            elec.roi_flag(e) = 1;
+        end
     end
-    
-    %% Add tissue info to atlas ROI elec struct
-    elec.tissue_labels = tiss.tissue_labels;
-    elec.tissue        = tiss.tissue;
-    elec.tissue2       = tiss.tissue2;
-    elec.tissue_prob   = tiss.tissue_prob;
 end
+
+%% Add ROI and gROI
+elec.gROI = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'gROI');
+elec.ROI  = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,'ROI');
 
 %% Save elec strcut with atlas labels
 out_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,'_orig_',atlas_id,'.mat'];
