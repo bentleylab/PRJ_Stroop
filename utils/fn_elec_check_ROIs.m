@@ -54,7 +54,7 @@ l = camlight;
 set(i_r, 'windowkeypressfcn',   @cb_keyboard);
 
 %% Plot elecs + meshes
-p = 9;
+p = 6;
 % for p = 1:numel(SBJ_vars.ch_lab.probes)
     cfgs.channel = ft_channelselection([SBJ_vars.ch_lab.probes{p} '*'], elec.label);
     probe = fn_select_elec(cfgs, elec);
@@ -88,7 +88,7 @@ p = 9;
         for e = 1:numel(probe.label)
             cfgs.channel = probe.label(e);
             tmp = fn_select_elec(cfgs, probe);
-            ft_plot_sens(tmp, 'elecshape', 'sphere', 'facecolor', tmp.color);
+            ft_plot_sens(tmp, 'elecshape', 'sphere', 'facecolor', tmp.color, 'label', 'label');
         end
         material dull; lighting gouraud;
         l = camlight;

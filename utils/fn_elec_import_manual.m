@@ -68,6 +68,12 @@ for f = 1:numel(new_fields)
         elec.border = man_adj{man_adj_ix};
     elseif strcmp(new_fields{f},'anat_notes')
         elec.anat_notes = man_adj{man_adj_ix};
+        % If anat_notes is empty, last line isn't read
+        if numel(elec.anat_notes)==numel(elec.label)-1
+            elec.anat_notes{numel(elec.label)} = '';
+        elseif numel(elec.anat_notes)~=numel(elec.label)
+            error('anat_notes isnt matching up');
+        end
     else
         elec.(new_fields{f}) = man_adj{man_adj_ix};
     end

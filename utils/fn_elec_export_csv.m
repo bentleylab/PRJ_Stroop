@@ -25,9 +25,6 @@ csv_fname = [elec_fname(1:end-4) '.csv'];
 fprintf('\tExporting %s...\n',csv_fname);
 csv = fopen(csv_fname,'w');
 
-% Export order:
-%   label, atlas_lab, atlas_prob, atlas_lab2, atlas_qryrng, ...
-%   tissue, tissue_prob (4x), gm_weight, hemi, gROI, ROI, roi_flag
 for e = 1:numel(elec.label)
     if ~reref
         if ~isempty(elec.atlas_lab2{e})
@@ -39,15 +36,21 @@ for e = 1:numel(elec.label)
         else
             atlas_lab2 = '';
         end
+        % Export order:
+        %   label, atlas_lab, atlas_prob, atlas_lab2, atlas_qryrng, ...
+        %   tissue, tissue_prob (4x), gm_weight, hemi, gROI, ROI, roi_flag
         fprintf(csv,'%s,%s,%.3f,%s,%d,%s,%.3f,%.3f,%.3f,%.3f,%.1f,%s,%s,%s,%d\n',...
             elec.label{e},elec.atlas_lab{e},elec.atlas_prob(e),atlas_lab2,elec.atlas_qryrng(e),...
             elec.tissue{e},elec.tissue_prob(e,:),elec.gm_weight(e),elec.hemi{e},...
             elec.gROI{e},elec.ROI{e},elec.roi_flag(e));
     else
-        fprintf(csv,'%s,%s,%.2f,%.1f,%s,%.2f,%.1f,%s,%.1f,%s,%s,%s,%d\n',...
+        % Export order:
+        %   label, ROI1, gm_weight1, par_vol1, ROI2, gm_weight2, par_vol2,
+        %   tissue, man_adj, hemi, gROI, ROI, roi_flag, re_adj (0), border (0), anat_notes
+        fprintf(csv,'%s,%s,%.2f,%.1f,%s,%.2f,%.1f,%s,%.1f,%s,%s,%s,%d,0,0,%s\n',...
             elec.label{e},elec.inputs{e}.ROI{1},elec.inputs{e}.gm_weight(1),elec.inputs{e}.par_vol(1),...
             elec.inputs{e}.ROI{2},elec.inputs{e}.gm_weight(2),elec.inputs{e}.par_vol(2),elec.tissue{e},...
-            elec.man_adj(e),elec.hemi{e},elec.gROI{e},elec.ROI{e},elec.roi_flag(e));
+            elec.man_adj(e),elec.hemi{e},elec.gROI{e},elec.ROI{e},elec.roi_flag(e),elec.anat_notes{e});
     end
 end
 

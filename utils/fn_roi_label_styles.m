@@ -5,10 +5,12 @@ function [labels, colors] = fn_roi_label_styles(roi_id)
 %
 % einfo_col = 2 for specific ROIs, 3 for general ROIs
 
+[root_dir, ~] = fn_get_root_dir();
+
 % if length(cond_lab) == 1
 switch roi_id
     case 'ROI'
-        load('~/PRJ_Stroop/data/atlases/full_roi_lists_Dx.mat');
+        load([root_dir 'PRJ_Stroop/data/atlases/full_roi_lists_Dx.mat']);
         labels = all_rois;
         % Exclude FWM, '', OUT
         labels(strmatch('FWM',labels,'exact')) = [];
@@ -50,7 +52,7 @@ switch roi_id
     case {'tissue', 'tissueC'}
         labels = {'GM','WM','CSF','OUT'};
     case 'all'
-        load('~/PRJ_Stroop/data/atlases/full_roi_lists_Dx.mat');
+        load([root_dir 'PRJ_Stroop/data/atlases/full_roi_lists_Dx.mat']);
         labels = all_rois;
     otherwise
         error(strcat('Unknown roi_id: ',roi_id));

@@ -30,6 +30,8 @@ if ~isempty(varargin)
             view_angle = varargin{v+1};
         elseif strcmp(varargin{v},'mesh_alpha') && varargin{v+1}>0 && varargin{v+1}<=1
             mesh_alpha = varargin{v+1};
+        elseif strcmp(varargin{v},'mesh_type') && ischar(varargin{v+1})
+            mesh_type = varargin{v+1};
         else
             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
         end
@@ -39,6 +41,9 @@ end
 % Define default options
 if ~exist('view_angle','var')
     view_angle = fn_get_view_angle(hemi,roi_id);
+end
+if ~exist('mesh_type','var')
+    mesh_type = 'pial';
 end
 if ~exist('mesh_alpha','var')
     if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
@@ -57,9 +62,9 @@ if strcmp(reg_type,'v') || strcmp(reg_type,'s')
 else
     reg_suffix = '';                % Patient space
 end
-if strcmp(proc_id,'full') || any(strcmp(roi_id,{'tissueC','tisue'}))
+if strcmp(proc_id,'final') || any(strcmp(roi_id,{'tissueC','tisue'}))
     proc_id = 'main_ft';
-    elec_suffix = '_full';
+    elec_suffix = '_final';
 else
     elec_suffix = '';
 end
@@ -89,26 +94,26 @@ if ~plot_out
 end
 
 %% Load brain recon
-mesh = fn_load_recon_mesh(SBJ,view_space,reg_type,hemi);
+mesh = fn_load_recon_mesh(SBJ,view_space,reg_type,mesh_type,hemi);
 
 %% Match elecs to atlas ROIs
 fprintf('Using atlas: %s\n',atlas_id);
 if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
-    if ~isfield(elec,'man_adj')
-        elec.roi       = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,roi_id);
+    if ~isfield(elec,roi_id)
+        elec.ROI       = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,roi_id);
     end
     if strcmp(roi_id,'tissueC')
-        elec.roi_color = fn_tissue2color(elec);
+        elec.color = fn_tissue2color(elec);
     elseif strcmp(atlas_id,'Yeo7')
-        elec.roi_color = fn_atlas2color(atlas_id,elec.roi);
+        elec.color = fn_atlas2color(atlas_id,elec.ROI);
     else
-        elec.roi_color = fn_roi2color(elec.roi);
+        elec.color = fn_roi2color(elec.ROI);
     end
 elseif any(strcmp(atlas_id,{'Yeo17'}))
-    if ~isfield(elec,'man_adj')
-        elec.roi       = elec.atlas_lab;
+    if ~isfield(elec,roi_id)
+        elec.ROI       = elec.atlas_lab;
     end
-    elec.roi_color = fn_atlas2color(atlas_id,elec.roi);
+    elec.color = fn_atlas2color(atlas_id,elec.ROI);
 end
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
@@ -118,18 +123,18 @@ h = figure;
 ft_plot_mesh(mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
 
 % Plot electrodes on top
-% [roi_list, roi_colors] = fn_roi_label_styles(roi_id);
+% [roi_list, colors] = fn_roi_label_styles(roi_id);
 cfgs = [];
 for e = 1:numel(elec.label)
     cfgs.channel = elec.label(e);
     elec_tmp = fn_select_elec(cfgs, elec);
-    ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', elec_tmp.roi_color, 'label', lab_arg);
+    ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', elec_tmp.color, 'label', lab_arg);
 end
 % for roi_ix = 1:numel(roi_list)
-%     if any(strcmp(elec.roi,roi_list{roi_ix}))
-%         cfgs.channel = elec.label(strcmp(elec.roi,roi_list{roi_ix}));
+%     if any(strcmp(elec.ROI,roi_list{roi_ix}))
+%         cfgs.channel = elec.label(strcmp(elec.ROI,roi_list{roi_ix}));
 %         elec_tmp = fn_select_elec(cfgs, elec);
-%         ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', roi_colors{roi_ix},...
+%         ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', colors{roi_ix},...
 %             'label', lab_arg);
 %     end
 % end

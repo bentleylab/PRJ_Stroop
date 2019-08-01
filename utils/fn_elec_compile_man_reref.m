@@ -41,7 +41,7 @@ if ~any(strcmp(SBJ_vars.ch_lab.ref_type,'BP'))
         elec.inputs{e}.gm_weight = [elec.gm_weight(e) elec.gm_weight(e)];
         elec.inputs{e}.gROI = [elec.gROI(e) elec.gROI(e)];
         elec.inputs{e}.ROI = [elec.ROI(e) elec.ROI(e)];
-        if ~strcmp(elec.tissue{e},'GM')
+        if ~strcmp(elec.tissue{e},'GM') || elec.par_vol(e)
             elec.roi_flag(e) = 1;
         else
             elec.roi_flag(e) = 0;

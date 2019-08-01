@@ -24,6 +24,8 @@ if ~isempty(varargin)
             view_angle = varargin{v+1};
         elseif strcmp(varargin{v},'mesh_alpha') && varargin{v+1}>0 && varargin{v+1}<=1
             mesh_alpha = varargin{v+1};
+        elseif strcmp(varargin{v},'mesh_type') && ischar(varargin{v+1})
+            mesh_type = varargin{v+1};
         else
             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
         end
@@ -33,6 +35,9 @@ end
 % Define default options
 if ~exist('view_angle','var')
     view_angle     = [-90 0];
+end
+if ~exist('mesh_type','var')
+    mesh_type = 'pial';
 end
 if ~exist('mesh_alpha','var')
     if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
@@ -70,7 +75,7 @@ end
 
 %% Load brain recon
 if strcmp(plot_type,'3d')
-    mesh = fn_load_recon_mesh(SBJ,view_space,reg_type,hemi);
+    mesh = fn_load_recon_mesh(SBJ,view_space,reg_type,mesh_type,hemi);
 elseif strcmp(plot_type,'ortho')
     mri = fn_load_recon_mri(SBJ,view_space,reg_type);
 else
