@@ -124,7 +124,7 @@ elec.reref         = 1;
 % fields = fieldnames(elec_reref{1});
 % fields = setdiff(fields,fieldnames(elec));   % still included: 'chanposold', 'labelold', 'tra'
 fields = {'atlas_lab', 'atlas_prob', 'atlas_lab2', 'atlas_qryrng', 'ROI', 'gROI', 'man_adj', 'par_vol',...
-            'gm_weight', 'hemi', 'inputs', 'roi_flag', 'tissue', 'tissue2', 'tissue_prob'};
+            'gm_weight', 'hemi', 'inputs', 'roi_flag', 'tissue', 'tissue2', 'tissue_prob', 'anat_notes'};
 for f = 1:numel(fields)
     % Initialize to get column not row
     if iscell(elec_reref{p}.(fields{f}))
@@ -134,7 +134,7 @@ for f = 1:numel(fields)
     else
         elec.(fields{f}) = zeros(size(elec.label));
     end
-    % Retrieve info from indivdiual reref probes
+    % Retrieve info from individual reref probes
     for p = 1:numel(SBJ_vars.ch_lab.probes)
         for p_e = 1:numel(elec_reref{p}.label)
             e_ix = strcmp(elec.label,elec_reref{p}.label{p_e});

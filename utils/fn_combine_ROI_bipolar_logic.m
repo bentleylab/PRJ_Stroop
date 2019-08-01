@@ -251,6 +251,21 @@ for p = 1:numel(elec.label)
             elec.gROI{p}    = reref.gROI{pair_ix(roi_ix)};
             elec.man_adj(p) = mean([reref.man_adj(pair_ix(1)) reref.man_adj(pair_ix(2))]);
             elec.par_vol(p) = mean([reref.par_vol(pair_ix(1)) reref.par_vol(pair_ix(2))]);
+            % Concatenate notes while documenting which came for which
+            note_str = cell([2 1]);
+            for e = 1:2
+                note_str{e} = elec.inputs{p}.anat_notes{e};
+                if ~isempty(elec.inputs{p}.anat_notes{e})
+                    note_str{e} = [num2str(e) ': ' note_str{e}];
+                end
+            end
+            % Add separter if both have str
+            if ~isempty(note_str{1}) && ~isempty(note_str{2})
+                note_sep = '; ';
+            else
+                note_sep = '';
+            end
+            elec.anat_notes{p} = [note_str{1} note_sep note_str{2}];
         end
     end
     
