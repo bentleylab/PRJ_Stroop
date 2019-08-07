@@ -54,7 +54,7 @@ l = camlight;
 set(i_r, 'windowkeypressfcn',   @cb_keyboard);
 
 %% Plot elecs + meshes
-p = 6;
+p = 5;
 % for p = 1:numel(SBJ_vars.ch_lab.probes)
     cfgs.channel = ft_channelselection([SBJ_vars.ch_lab.probes{p} '*'], elec.label);
     probe = fn_select_elec(cfgs, elec);

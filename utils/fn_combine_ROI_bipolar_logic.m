@@ -106,7 +106,7 @@ for p = 1:numel(elec.label)
             elseif reref.par_vol(pair_ix(2)) && ~all(reref.par_vol(pair_ix))
                 roi_ix = 1;
             % Compare gm_weights
-            elseif gm_weight1~=gm_weight2
+            elseif reref.gm_weight(pair_ix(1))~=reref.gm_weight(pair_ix(2))
                 [~,roi_ix] = max(reref.gm_weight(pair_ix));
             else
                 roi_ix = 1; % Arbitrarily pick most medial, then fix later!
