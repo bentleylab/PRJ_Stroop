@@ -124,7 +124,7 @@ elec.reref         = 1;
 % fields = fieldnames(elec_reref{1});
 % fields = setdiff(fields,fieldnames(elec));   % still included: 'chanposold', 'labelold', 'tra'
 fields = {'atlas_lab', 'atlas_prob', 'atlas_lab2', 'atlas_qryrng', 'ROI', 'gROI', 'man_adj', 'par_vol',...
-            'gm_weight', 'hemi', 'inputs', 'roi_flag', 'tissue', 'tissue2', 'tissue_prob', 'anat_notes'};
+            'gm_weight', 'hemi', 'inputs', 'roi_flag', 'tissue', 'tissue_prob', 'anat_notes'};%'tissue2', 
 for f = 1:numel(fields)
     % Initialize to get column not row
     if iscell(elec_reref{p}.(fields{f}))
