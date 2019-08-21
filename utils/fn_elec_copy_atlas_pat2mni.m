@@ -35,9 +35,9 @@ else
     error('reg_type must be selected for mni space');
 end
 
-pat_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_pat','_',atlas_id,'_man.mat'];
+pat_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_pat','_',atlas_id,'_final.mat'];
 mni_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_mni',reg_suffix,'.mat'];
-out_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_mni',reg_suffix,'_',atlas_id,'_man.mat'];
+out_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_mni',reg_suffix,'_',atlas_id,'_final.mat'];
 % if exist('roi_id','var')
 %     if exist([pat_fname(1:end-4) '_' roi_id '.mat'],'file')
 %         pat_fname = [pat_fname(1:end-4) '_' roi_id '.mat'];
