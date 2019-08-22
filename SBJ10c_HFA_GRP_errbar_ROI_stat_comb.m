@@ -99,7 +99,17 @@ for sbj_ix = 1:numel(SBJs)
         gm_elecs = elec.label;
     end
     
-    cfgs = []; cfgs.channel = intersect(roi_elecs,gm_elecs);
+    % Get z_threshold
+    if z_thresh>0
+        sdr_w2 = load([SBJ_vars.dirs.proc SBJ ...
+            '_smANOVA_ROI_CNI_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25' ...
+            '_HGm_S2t151_zbtA_sm0_wn100.mat'],'w2');
+        z_elecs  = elec.label(sdr_w2.w2.max_hfa_z>=z_thresh);
+    else
+        z_elecs = elec.label;
+    end
+    
+    cfgs = []; cfgs.channel = intersect(intersect(roi_elecs,gm_elecs),z_elecs);
     elec = fn_select_elec(cfgs,elec);
     
     % Count elecs
@@ -156,7 +166,8 @@ for st_ix = 1:numel(stat_conds)
 end
 if plot_scat; scat_suffix = '_SBJscat'; else scat_suffix = ''; end;
 % Create and format the plot
-fig_name = ['GRP_HFA_errbar_GM' num2str(gm_thresh*100) '_' atlas_id '_' roi_id '_' strjoin(cond_eps,'-') scat_suffix];
+fig_name = ['GRP_HFA_errbar_GM' num2str(gm_thresh*100) '_z' num2str(z_thresh) '_'...
+            atlas_id '_' roi_id '_' strjoin(cond_eps,'-') scat_suffix];
 figure('Name',fig_name,'units','normalized',...
         'outerposition',plt.fig_pos,'Visible',fig_vis);
 hold on;

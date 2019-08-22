@@ -102,10 +102,10 @@ end
 %   RECONS with EFFECTS
 %  =================================================================================
 %% Combine S + D analyses
-stat_id_s  = 'CNI_PC_S0tmRT_WL1_WS50';%,'CNI_PC_R1t5_WL1_WS50'};%
+stat_id_s  = 'CNI_PC_S0tmRT_WL1_WS25';%,'CNI_PC_R1t5_WL1_WS50'};%
 stat_id_d  = 'CNI_PC_D1tRT';
-stat_id_r  = 'CNI_PC_R1t5_WL1_WS50';
-stat_id_sd = 'CNI_PC_S0tmRT_WL1_WS50_D1tRT';
+stat_id_r  = 'CNI_PC_R1t5_WL1_WS25';
+stat_id_sd = 'CNI_PC_S0tmRT_WL1_WS25_D1tRT';
 % stat_id_s  = 'PCi_S0tmRT_WL1_WS50';%,'CNI_PC_R1t5_WL1_WS50'};%
 % stat_id_d  = 'PCi_D1tRT';
 % stat_id_r  = 'PCi_R1t5_WL1_WS50';
@@ -181,8 +181,8 @@ end
 stat_conds = {...
     {'PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'},...
     {'PCi_S0tmRT_WL1_WS50_D1tRT','HGm_S2t151_zbtA_sm0_wn100','PC'},...
-    {'CNI_PC_S0tmRT_WL1_WS50_D1tRT_R1t5_WL1_WS50','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
-              {'actv_D1tRT','HGm_S2t251_zbtA_sm0_wn100','actv'},...
+    {'CNI_PC_S0tmRT_WL1_WS50_D1tRT_R1t5_WL1_WS50','HGm_S2t151_zbtA_sm0_wn100','CNI'}...
+%               {'actv_D1tRT','HGm_S2t251_zbtA_sm0_wn100','actv'},...
 %     {'CNI_PC_S0tmRT_WL1_WS50','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
 %     {'CNI_PC_D1tRT','HGm_S2t251_zbtA_sm0_wn100','CNI'},...
 %     {'CNI_PC_S0tmRT_WL1_WS50_D1tRT','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
@@ -193,6 +193,7 @@ proc_id     = 'main_ft';
 atlas_id    = 'Dx';
 plt_id      = 'errbar';
 roi_id      = 'gROI';
+z_thresh    = 1.5;
 gm_thresh   = 0;
 plot_out    = 0;
 plot_scat   = 0;
@@ -202,10 +203,10 @@ save_fig    = 1;
 
 % with SBJ scatter (for myself to understand)
 SBJ10c_HFA_GRP_errbar_ROI_stat_comb(SBJs,proc_id,stat_conds,atlas_id,roi_id,...
-            gm_thresh,plt_id,plot_out,1,save_fig,fig_vis,fig_ftype);
+            gm_thresh,z_thresh,plt_id,plot_out,1,save_fig,fig_vis,fig_ftype);
 % Pretty plot (no scatter)
 SBJ10c_HFA_GRP_errbar_ROI_stat_comb(SBJs,proc_id,stat_conds,atlas_id,roi_id,...
-            gm_thresh,plt_id,plot_out,0,save_fig,fig_vis,fig_ftype);
+            gm_thresh,z_thresh,plt_id,plot_out,0,save_fig,fig_vis,fig_ftype);
 
 %% Redux (old version of SBJ10c bar plots
 % stat_id = 'CNI_PC_S0tmRT_WL1_WS50';

@@ -161,6 +161,9 @@ else
                                      full{order_idx(2)}.w2.(ts_fields{f_ix}));
     end
     
+    % Take max z value across HFA analyses
+    w2.max_hfa_z = max(full{1}.w2.max_hfa_z,full{2}.w2.max_hfa_z);
+    
     % Create time series to indicate which windows are custom
     cust_win_ts = cell([2 1]);
     for st_ix = 1:2
