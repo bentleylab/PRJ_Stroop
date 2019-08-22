@@ -1,5 +1,5 @@
 function SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,proc_id,an_id,roi_id,...
-                                                    atlas_id,gm_thresh,plt_id,save_fig,fig_vis,fig_ftype)
+                                                    atlas_id,gm_thresh,z_thresh,plt_id,save_fig,fig_vis,fig_ftype)
 % Load HFA analysis results for active and condition-differentiating
 %   epochs, plot a summary of those time period per electrode
 % Normalize all onset times by mean(RT)
@@ -89,7 +89,7 @@ for sbj_ix = 1:numel(SBJs)
     %% Aggregate results per ROI
     for ch_ix = 1:numel(w2.label)
         % If elec matches roi_list and is in GM, get stats
-        if any(strcmp(elec.(roi_field){ch_ix},roi_list))% && gm_bin(ch_ix)
+        if any(strcmp(elec.(roi_field){ch_ix},roi_list)) && w2.max_hfa_z(ch_ix)>=z_thresh% && gm_bin(ch_ix)
             roi_ix = find(strcmp(elec.(roi_field){ch_ix},roi_list));
             % Get ANOVA group onsets
             for grp_ix = 1:numel(st.groups)
@@ -183,7 +183,7 @@ end
 for cond_ix = 1:numel(st.groups)
     % Create and format the plot
     fig_name = ['GRP' plt_vars.grp_metric '_HFA_onsets_' st.groups{cond_ix} '_' roi_id '_' st.ep_lab...
-        '_GM' num2str(gm_thresh) '_normRTout'];
+        '_GM' num2str(gm_thresh) '_z' num2str(z_thresh) '_normRTout'];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.6],'Visible',fig_vis);
     fprintf('Printing %i onsets across %i groups in %s\n',sum(sum(~isnan(plot_onsets{cond_ix}(:,good_roi_map{cond_ix})))),...
