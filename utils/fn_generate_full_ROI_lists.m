@@ -20,7 +20,7 @@ fclose(roi_file);
 all_grois = unique(roi_map{2});
 all_rois  = unique(roi_map{3});
 % Add in ROIs that don't have specific Dx label region (need manual adjustments)
-all_grois = sort([all_grois; {'TWM'}]);
+all_grois = sort([all_grois]);
 all_rois = sort([all_rois; {'SMC';'dmPFC';'TWM';'FO'}]);
 
 % Save new lists

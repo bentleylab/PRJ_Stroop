@@ -22,7 +22,7 @@ switch roi_id
         map_ix = 2;
     case {'mgROI','gROI','main3','lat','deep'}
         map_ix = 2;
-    case {'ROI','thryROI','LPFC','MPFC','SM','OFC','INS','TMP','PAR','MTL','OCC'}
+    case {'ROI','thryROI','LPFC','MPFC','SM','OFC','INS','TMP','PAR','MTL','OCC','WM'}
         map_ix = 3;
     case {'tissue', 'tissueC'}
         map_ix = 4;

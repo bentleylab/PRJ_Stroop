@@ -81,6 +81,22 @@ for grp_ix = 1:numel(st.groups)
     end
 end
 
+%% Compute max z score per condition (for later exclusions)
+z_max = zeros(size(hfa.label));
+cfg_avg = [];
+cfg_avg.avgoverrpt = 'yes';
+for grp_ix = 1:numel(st.groups)
+    for level_ix = 1:numel(levels{grp_ix})
+        % Average within condition
+        cfg_avg.trials = find(design{grp_ix}==level_ix);
+        tmp_avg = ft_selectdata(cfg_avg,hfa);
+        % Binarize channels by average HFA vs. threshold
+        z_max = max(z_max,max(squeeze(tmp_avg.powspctrm),2)]);
+    end
+end
+% Keep anything that passed threshold on any condition
+z_max = z_max > 0;
+
 %% Select data in stat window
 cfg_trim = [];
 cfg_trim.trials = good_trl_idx;
@@ -100,20 +116,6 @@ for lim_ix = find(~cellfun(@isempty,st.lim_adj))
     end
 end
 hfa = ft_selectdata(cfg_trim,hfa);
-
-%% Compute max z score per condition (for later exclusions)
-max_z = zeros(size(hfa.label));
-cfg_avg = [];
-cfg_avg.avgoverrpt = 'yes';
-for grp_ix = 1:numel(st.groups)
-    for level_ix = 1:numel(levels{grp_ix})
-        % Average within condition
-        cfg_avg.trials = find(design{grp_ix}==level_ix);
-        tmp_avg = ft_selectdata(cfg_avg,hfa);
-        % Binarize channels by average HFA vs. threshold
-        max_z = max(max_z,max(squeeze(tmp_avg.powspctrm),[],2));
-    end
-end
 
 %% Run correlations with RT
 if st.rt_corr
@@ -183,7 +185,6 @@ w2.time      = hfa.time(win_center);
 w2.win_lim   = win_lim;
 w2.label     = hfa.label;
 w2.dimord    = 'rpt_chan_time';
-w2.max_hfa_z = max_z;
 % w2.trial     = zeros([numel(w2.cond) length(hfa.label) length(w2.time)]);
 w2.boot      = zeros([numel(w2.cond) length(hfa.label) length(w2.time) st.n_boots]);
 % w2.pval      = w2.trial;

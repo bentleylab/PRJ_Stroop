@@ -48,6 +48,11 @@ end
 
 % Load all ROI info
 [roi_list, roi_colors] = fn_roi_label_styles(roi_id);
+if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep'}))
+    roi_field = 'gROI';
+else
+    roi_field = 'ROI';
+end
 
 % Organize IDs
 stat_ids = cell(size(stat_conds)); an_ids = cell(size(stat_conds));
@@ -69,19 +74,16 @@ for sbj_ix = 1:numel(SBJs)
     
     %% Prepare elec structs
     % Load elec struct
-    elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_pat_',atlas_id,'_full.mat'];
-    if exist([elec_fname(1:end-4) '_' roi_id '.mat'],'file')
-        elec_fname = [elec_fname(1:end-4) '_' roi_id '.mat'];
-    end
+    elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_pat_',atlas_id,'_final.mat'];
+%     if exist([elec_fname(1:end-4) '_' roi_id '.mat'],'file')
+%         elec_fname = [elec_fname(1:end-4) '_' roi_id '.mat'];
+%     end
     load(elec_fname);
     
     % Match elecs to atlas ROIs
-    if ~isfield(elec,'man_adj')
-        if strcmp(atlas_id,{'Yeo17'})
-            elec.roi = elec.atlas_lab;
-        else
-            elec.roi = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,roi_id);
-        end
+    if strcmp(atlas_id,{'Yeo17'})
+        error('dont use Yeo');
+        elec.ROI = elec.atlas_lab;
     end
     
     % Remove hemi and/or atlas elecs
@@ -102,7 +104,7 @@ for sbj_ix = 1:numel(SBJs)
     % Count elecs
     roi_idx = zeros(size(elec.label));
     for roi_ix = 1:numel(roi_list)
-        roi_idx(strcmp(elec.roi,roi_list{roi_ix})) = roi_ix;
+        roi_idx(strcmp(elec.(roi_field),roi_list{roi_ix})) = roi_ix;
         elec_cnt(sbj_ix,roi_ix) = sum(roi_idx==roi_ix);
     end
     
