@@ -95,7 +95,7 @@ for sbj_ix = 1:numel(SBJs)
     
     %% Prepare elec structs
     % Load elec struct
-    elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_pat_',atlas_id,'_full.mat'];
+    elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_pat_',atlas_id,'_final.mat'];
     if exist([elec_fname(1:end-4) '_' roi_id '.mat'],'file')
         elec_fname = [elec_fname(1:end-4) '_' roi_id '.mat'];
     end
@@ -109,21 +109,18 @@ for sbj_ix = 1:numel(SBJs)
     
     % Match elecs to atlas ROIs
     if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
-        if ~isfield(elec_sbj{sbj_ix},'man_adj')
-            elec_sbj{sbj_ix}.roi       = fn_atlas2roi_labels(elec_sbj{sbj_ix}.atlas_lab,atlas_id,roi_id);
-        end
         if strcmp(roi_id,'tissueC')
             elec_sbj{sbj_ix}.roi_color = fn_tissue2color(elec_sbj{sbj_ix});
         elseif strcmp(atlas_id,'Yeo7')
-            elec_sbj{sbj_ix}.roi_color = fn_atlas2color(atlas_id,elec_sbj{sbj_ix}.roi);
+            elec_sbj{sbj_ix}.roi_color = fn_atlas2color(atlas_id,elec_sbj{sbj_ix}.(roi_id));
         else
-            elec_sbj{sbj_ix}.roi_color = fn_roi2color(elec_sbj{sbj_ix}.roi);
+            elec_sbj{sbj_ix}.roi_color = fn_roi2color(elec_sbj{sbj_ix}.(roi_id));
         end
     elseif any(strcmp(atlas_id,{'Yeo17'}))
         if ~isfield(elec_sbj{sbj_ix},'man_adj')
-            elec_sbj{sbj_ix}.roi       = elec_sbj{sbj_ix}.atlas_lab;
+            elec_sbj{sbj_ix}.(roi_id)       = elec_sbj{sbj_ix}.atlas_lab;
         end
-        elec_sbj{sbj_ix}.roi_color = fn_atlas2color(atlas_id,elec_sbj{sbj_ix}.roi);
+        elec_sbj{sbj_ix}.roi_color = fn_atlas2color(atlas_id,elec_sbj{sbj_ix}.(roi_id));
     end
     
     % Remove hemi and/or atlas elecs
@@ -168,9 +165,9 @@ for sbj_ix = 1:numel(SBJs)
         % Report on significant electrodes for this SBJ (even if non-sig)
         for ch_ix = 1:numel(elec_sbj{sbj_ix}.label)
             fprintf(sig_report,result_str,elec_sbj{sbj_ix}.label{ch_ix},...
-                                          elec_sbj{sbj_ix}.roi{ch_ix},sig_mat{sbj_ix}(ch_ix,:));
+                                          elec_sbj{sbj_ix}.(roi_id){ch_ix},sig_mat{sbj_ix}(ch_ix,:));
             % Grab roi_ix
-            roi_mat{sbj_ix}(ch_ix) = find(strcmp(roi_list,elec_sbj{sbj_ix}.roi{ch_ix}));
+            roi_mat{sbj_ix}(ch_ix) = find(strcmp(roi_list,elec_sbj{sbj_ix}.(roi_id){ch_ix}));
         end
         
 %         %% Compile Statistics
@@ -227,7 +224,7 @@ fclose(sig_report);
 %% Combine elec structs
 elec = ft_appendsens([],elec_sbj{good_sbj});
 % elec.roi_color = vertcat(all_roi_colors{:});    % appendsens strips that field
-% elec.roi       = all_roi_labels{cond_ix};    % appendsens strips that field
+% elec.(roi_id)       = all_roi_labels{cond_ix};    % appendsens strips that field
 
 sig_all = vertcat(sig_mat{:});
 sig_all = sig_all(any(sig_all,2),:);

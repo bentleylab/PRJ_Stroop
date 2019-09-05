@@ -57,6 +57,7 @@ end
 %% Load Results
 % Set up onset counts
 all_onsets  = cell([numel(SBJs) numel(roi_list) numel(st.groups)]);
+min_rt      = nan(size(SBJs));
 for sbj_ix = 1:numel(SBJs)
     SBJ = SBJs{sbj_ix};
     % Load variables
@@ -80,7 +81,6 @@ for sbj_ix = 1:numel(SBJs)
     if numel(elec.label)~=numel(w2.label) || ~all(strcmp(elec.label,w2.label))
         cfgs = []; cfgs.channel = stat.label;
         elec = fn_select_elec(cfgs,elec);
-%        elec.roi = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,roi_id);
     end
     
 %     % Get GM probability from tissue labels {'GM','WM','CSF','OUT'}
@@ -127,11 +127,15 @@ for sbj_ix = 1:numel(SBJs)
     
     % Normalize all onset times by mean reaction time
     if ~isempty(strfind(st.evnt_lab,'S'))
+        y_label = 'Time (% mean RT)';
+        min_rt(sbj_ix) = min(trial_info.response_time)/mean_RTs(sbj_ix);
         for roi_ix = 1:size(all_onsets,2)
             for cond_ix = 1:size(all_onsets,3)
                 all_onsets{sbj_ix,roi_ix,cond_ix} = all_onsets{sbj_ix,roi_ix,cond_ix}./mean_RTs(sbj_ix);
             end
         end
+    else
+        y_label = 'Time (sec)';
     end
     clear SBJ SBJ_vars hfa stat elec w2 trial_info
 end
@@ -216,6 +220,13 @@ for cond_ix = 1:numel(st.groups)
             % Change violin color to match ROI
             violins(roi_ix).ViolinColor = roi_colors{good_roi_map{cond_ix}(roi_ix)};
         end
+    end
+    
+    % Add label and min RT for perspective
+    ax = gca;
+    ax.YLabel.String = y_label;
+    if ~isempty(strfind(st.evnt_lab,'S'))
+        line(xlim,[mean(min_rt) mean(min_rt)]);%,'k--');
     end
     
     %% Save figure

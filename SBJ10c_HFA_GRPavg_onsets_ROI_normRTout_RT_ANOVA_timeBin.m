@@ -113,10 +113,10 @@ for sbj_ix = 1:numel(SBJs)
     
     %% Load ROI and GM/WM info
     if any(strcmp(atlas_id,{'DK','Dx'})) % these have tissue probabilities
-        elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' view_space '_' atlas_id '_full.mat'];
+        elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_' view_space '_' atlas_id '_final.mat'];
         load(elec_fname);
     else
-        error('use Dx_full!');
+        error('use Dx_final!');
 %         % Load tissue prob
 %         elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_pat_Dx_tis.mat'];
 %         load(elec_fname);
@@ -129,7 +129,6 @@ for sbj_ix = 1:numel(SBJs)
     % Sort elecs by stat labels
     cfgs = []; cfgs.channel = stat.label;
     elec = fn_select_elec(cfgs,elec);
-    elec.roi = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,roi_id);
     
 %     % Get GM probability from tissue labels {'GM','WM','CSF','OUT'}
 %     gm_bin  = elec.tissue_prob(:,1)>gm_thresh;
@@ -137,8 +136,8 @@ for sbj_ix = 1:numel(SBJs)
     %% Aggregate results per ROI
     for ch_ix = 1:numel(stat.label)
         % If elec matches roi_list and is in GM, get stats
-        if any(strcmp(elec.roi{ch_ix},roi_list))% && gm_bin(ch_ix)
-            roi_ix = find(strcmp(elec.roi{ch_ix},roi_list));
+        if any(strcmp(elec.(roi_id){ch_ix},roi_list))% && gm_bin(ch_ix)
+            roi_ix = find(strcmp(elec.(roi_id){ch_ix},roi_list));
             % Get ANOVA group onsets
             for cond_ix = 1:numel(cond_lab)               
                 % ANOVA conditions

@@ -98,7 +98,7 @@ for sbj_ix = 1:numel(SBJs)
     if strcmp(atlas_id,'Yeo7')
         elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_mni_v_' atlas_id '.mat'];
     else
-        elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_pat_' atlas_id '_full.mat'];
+        elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_pat_' atlas_id '_final.mat'];
     end
     load(elec_fname);
     
@@ -106,7 +106,6 @@ for sbj_ix = 1:numel(SBJs)
     % Sort elecs by hfa labels
     cfgs = []; cfgs.channel = hfa.label;
     elec = fn_select_elec(cfgs,elec);
-    elec.roi = fn_atlas2roi_labels(elec.atlas_lab,atlas_id,roi_id);
     
     % Exclude elecs not in atlas ROIs
     if ~plot_out
@@ -127,8 +126,8 @@ for sbj_ix = 1:numel(SBJs)
     %% Aggregate results per ROI
     for ch_ix = 1:numel(elec.label)
         % If elec matches roi_list, get stats
-        if any(strcmp(elec.roi{ch_ix},roi_list)) && gm_bin(ch_ix)
-            roi_ix = find(strcmp(elec.roi{ch_ix},roi_list));
+        if any(strcmp(elec.(roi_id){ch_ix},roi_list)) && gm_bin(ch_ix)
+            roi_ix = find(strcmp(elec.(roi_id){ch_ix},roi_list));
             elec_cnt(sbj_ix,roi_ix) = elec_cnt(sbj_ix,roi_ix)+1;
             
 %             if any(cse.mask(ch_ix,1,:))

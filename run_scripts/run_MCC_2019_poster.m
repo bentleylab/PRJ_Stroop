@@ -38,13 +38,14 @@ stat_id_b = 'PC_B2t0';%pCNI_
 % stat_id_s = 'PCi_S0tmRT_WL1_WS50';%{'CNI_PC_S0tmRT_WL1_WS25',};
 % stat_id_sd= 'PCi_S0tmRT_WL1_WS50_D1tRT';
 % stat_id_r = 'PCi_R1t5_WL1_WS50';%{'CNI_PC_R1t5_WL1_WS25',};
-stat_id_s = 'CNI_PC_S0tmRT_WL1_WS50';%{'CNI_PC_S0tmRT_WL1_WS25',};
-stat_id_sd= 'CNI_PC_S0tmRT_WL1_WS50_D1tRT';
-stat_id_r = 'CNI_PC_R1t5_WL1_WS50';%{'CNI_PC_R1t5_WL1_WS25',};
+stat_id_s = 'CNI_PC_S0tmRT_WL1_WS25';%{'CNI_PC_S0tmRT_WL1_WS50',};
+stat_id_d = 'CNI_PC_D1tRT';%WS50
+stat_id_sd= 'CNI_PC_S0tmRT_WL1_WS25_D1tRT';%WS50
+stat_id_r = 'CNI_PC_R1t5_WL1_WS25';%{'CNI_PC_R1t5_WL1_WS50',};
 proc_id   = 'main_ft';
-an_id_s   = 'HGm_S2t151_zbtA_sm0_wn100';
-an_id_d   = 'HGm_S2t251_zbtA_sm0_wn100';
-an_id_r   = 'HGm_R5t101_zbtA_sm0_wn100';
+an_id_s   = 'HGm_S2t151_zbtA_sm0_wn100';%wn200 --> nope
+an_id_d   = 'HGm_S2t251_zbtA_sm0_wn100';%wn200 --> nope
+an_id_r   = 'HGm_R5t101_zbtA_sm0_wn100';%wn200 --> nope
 actv_id_b = 'actv_B2t0_mn50';
 actv_id_s = 'actv_S0tmRT_mn1';
 actv_id_d = 'actv_D1tRT';
@@ -52,7 +53,7 @@ actv_id_r = 'actv_R1t5_mn1';
 % an_id_s   = 'HGm_S_zbtA_trl2to151_sm0_wn100_stat15';%'HGh_S_zbtS_trl2to151_fLog_sm0_stat15';
 % an_id_r   = 'HGm_R_zbtA_trl5to101_sm0_wn100_stat5to1';%'HGh_R_zbtS_trl5to101_fLog_sm0_stat5to1';
 plt_id_s  = 'ERPstack_S2to15_evnt_c5';%'ts_S15R1_errbr_evnt';
-plt_id_sr = 'ERPstack_S2to25_R5to10_evnt_c5';%'ts_S15R1_errbr_evnt';
+plt_id_sr = 'ERPstack_S2to15_R5to10_evnt_c5';%'ts_S15R1_errbr_evnt';
 save_fig  = 1;
 fig_vis   = 'off';
 fig_ftype = 'png';
@@ -61,12 +62,12 @@ for s = 1:numel(SBJs)
 %         SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_s);
 %         SBJ08ab_HFA_actv(SBJs{s},an_id_d,actv_id_d);
 %         SBJ08ab_HFA_actv(SBJs{s},an_id_r,actv_id_r);
-    %     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,actv_id_s,actv_id_r,...
-    %                                         plt_id,save_fig,fig_vis,fig_ftype)
-    %     close all;
-%     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_d,an_id_r,stat_id_sd,stat_id_r,...
-%         plt_id_sr,save_fig,fig_vis,fig_ftype);
-%     close all;
+    SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,actv_id_s,actv_id_r,...
+        plt_id_sr,save_fig,fig_vis,fig_ftype)
+    close all;
+    SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_s,an_id_r,stat_id_sd,stat_id_r,...
+        plt_id_sr,save_fig,fig_vis,fig_ftype);
+    close all;
 %     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'PC',an_id_s,an_id_r,stat_id_b,stat_id_r{2},...
 %         plt_id,save_fig,fig_vis,fig_ftype)
 %     close all;
@@ -74,8 +75,8 @@ for s = 1:numel(SBJs)
 %         plt_id_s,save_fig,fig_vis,fig_ftype)
 %     close all;
     % PC - B
-    SBJ08b_HFA_plot_ERPstack_cond(SBJs{s},'PC',an_id_s,stat_id_b,...
-        plt_id_s,save_fig,fig_vis,fig_ftype)
+%     SBJ08b_HFA_plot_ERPstack_cond(SBJs{s},'PC',an_id_s,stat_id_b,...
+%         plt_id_s,save_fig,fig_vis,fig_ftype)
     close all;
 end
 
@@ -180,20 +181,20 @@ end
 %% Proportions of significant effects across ROI
 stat_conds = {...
     {'PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'},...
-    {'PCi_S0tmRT_WL1_WS25_D1tRT','HGm_S2t151_zbtA_sm0_wn100','PC'},...
-    {'CNI_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS50','HGm_S2t151_zbtA_sm0_wn100','CNI'}...
+    {'PCi_S0tmRT_WL1_WS50_D1tRT','HGm_S2t151_zbtA_sm0_wn100','PC'},...
+    {'CNI_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
+    {'CNI_PC_S0tmRT_WL1_WS25_D1tRT','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
+    {'CNI_PC_R1t5_WL1_WS25','HGm_R5t101_zbtA_sm0_wn100','CNI'}...
 %               {'actv_D1tRT','HGm_S2t251_zbtA_sm0_wn100','actv'},...
 %     {'CNI_PC_S0tmRT_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
 %     {'CNI_PC_D1tRT','HGm_S2t251_zbtA_sm0_wn100','CNI'},...
-%     {'CNI_PC_S0tmRT_WL1_WS25_D1tRT','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
-%     {'CNI_PC_R1t5_WL1_WS25','HGm_R5t101_zbtA_sm0_wn100','CNI'}...
     };
 
 proc_id     = 'main_ft';
 atlas_id    = 'Dx';
 plt_id      = 'errbar';
-roi_id      = 'gROI';
-z_thresh    = 1.5;
+roi_id      = 'MPFC';
+z_thresh    = 0;%1.5;
 gm_thresh   = 0;
 plot_out    = 0;
 plot_scat   = 0;
@@ -280,7 +281,7 @@ an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_R5t101_zbtA_sm0_wn100'};%'HGm_R_
 z_thresh    = 1.5;
 gm_thresh   = 0;
 median_yn   = 0;
-roi_opts    = {'ROI'};
+roi_opts    = {'MPFC'};
 atlas_opts  = {'Dx'};
 plt_opts    = {'onsets_trl5to1_violin_allROI','onsets_trl5to1_violin_all'};%{'onsets_trl0to15_evnt_roi'},
 fig_ftype = 'png';

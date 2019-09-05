@@ -54,12 +54,11 @@ end
 if ~strcmp(an.evnt_lab,st.evnt_lab); error('evnt_lab mismatch'); end
 
 % Load elec
-elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_main_ft_pat_Dx_full.mat'];
+elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_main_ft_pat_Dx_final.mat'];
 load(elec_fname);
 % Sort elecs by stat labels
 cfgs = []; cfgs.channel = hfa.label;
 elec = fn_select_elec(cfgs,elec);
-elec.roi = fn_atlas2roi_labels(elec.atlas_lab,elec.atlas_id,'ROI');
 
 % %% Quality checks
 % % Check channel match between analyses
@@ -236,7 +235,7 @@ for ch_ix = 1:numel(hfa.label)
     % Stack Plotting parameters
     ax = gca;
     %         ax.legend = plt_vars.legend;
-    ax.Title.String  = [hfa.label{ch_ix} ' (' elec.roi{ch_ix} '): ' st.evnt_lab ' trials'];
+    ax.Title.String  = [hfa.label{ch_ix} ' (' elec.ROI{ch_ix} '): ' st.evnt_lab ' trials'];
     ax.XLim          = [0,size(ch_data,2)];
     ax.XTick         = 0:plt_vars.x_step_sz*srate:size(ch_data,2);
     ax.XTickLabel    = x_tick_lab;

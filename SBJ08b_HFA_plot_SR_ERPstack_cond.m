@@ -72,12 +72,11 @@ if alpha_chk{1}~=alpha_chk{2}; error('st.alpha mismatch'); end
 if ~all(strcmp(grp_check{1},grp_check{2})); error('model group mismatch'); end
 
 % Load elec
-elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_main_ft_pat_Dx_full.mat'];
+elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_main_ft_pat_Dx_final.mat'];
 load(elec_fname);
 % Sort elecs by stat labels
 cfgs = []; cfgs.channel = hfa{1}.label;
 elec = fn_select_elec(cfgs,elec);
-elec.roi = fn_atlas2roi_labels(elec.atlas_lab,elec.atlas_id,'ROI');
 
 %% Quality checks
 % Check channel match between analyses
@@ -270,7 +269,7 @@ for ch_ix = 1:numel(hfa{1}.label)
         % Stack Plotting parameters
         ax = gca;
 %         ax.legend = plt_vars.legend;
-        ax.Title.String  = [hfa{sr_ix}.label{ch_ix} ' (' elec.roi{ch_ix} '): ' evnt_lab{sr_ix} ' trials'];
+        ax.Title.String  = [hfa{sr_ix}.label{ch_ix} ' (' elec.ROI{ch_ix} '): ' evnt_lab{sr_ix} ' trials'];
         ax.XLim          = [0,size(ch_data{sr_ix},2)];
         ax.XTick         = 0:plt_vars.x_step_sz*srate:size(ch_data{sr_ix},2);
         ax.XTickLabel    = x_tick_lab;
