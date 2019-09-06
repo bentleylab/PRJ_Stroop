@@ -301,4 +301,66 @@ if save_fig
     end
 end
 
+%% Congruence Sequence Effects in Neutral Trials: cN vs. iN
+fig_name = [SBJ '_RT_violins_pCI_N'];
+figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.4 0.5],'Visible',fig_vis);
+hold on; ax = gca;
+
+% Compare only pC and pI within N trials
+c_ix = find(strcmp(cni_lab,'C'));
+n_ix = find(strcmp(cni_lab,'N'));
+i_ix = find(strcmp(cni_lab,'I'));
+pCI_lab = {'pC','pI'};
+pCI_colors = cni_colors([c_ix i_ix]);
+
+pCI_idx = zeros(size(trial_info.trial_n));
+for cond_ix = 1:numel(pCI_lab)
+    pCI_idx(logical(fn_condition_index(pCI_lab{cond_ix},trial_info.condition_n,'trial_info',trial_info))) = cond_ix;
+end
+
+% Separate data by PC
+rt_grps      = cell(size(pCI_lab));
+pCI_N_legend = cell(size(pCI_lab));
+for pCI_ix = 1:numel(pCI_lab)
+    rt_grps{pCI_ix} = rts(pCI_idx==pCI_ix & cni_idx==n_ix);
+    pCI_N_legend{pCI_ix} = [pCI_lab{pCI_ix} ' (n=' num2str(numel(rt_grps{pCI_ix})) ')'];
+end
+
+% Two-sample t-test (two tailed)
+[h, pval, ci, stats] = ttest2(rt_grps{strcmp(pCI_lab,'pC')},...
+                              rt_grps{strcmp(pCI_lab,'pI')});
+% % Two-sample t-test, MI RTs < MC RTs
+% [h, pval, ci, stats] = ttest2(rt_grps{strcmp(n_pc_lab,'MC')},...
+%                               rt_grps{strcmp(n_pc_lab,'MI')},'Tail','right');
+
+% Plot Violins
+violins = violinplot(padcat(rt_grps{:}), pCI_lab, 'ViolinAlpha', violin_alpha);
+
+% Adjust plot properties
+legend_obj = cell(size(pCI_lab));
+for pCI_ix = 1:numel(pCI_lab)
+    % Change scatter colors to mark condition
+    violins(pCI_ix).ViolinColor = pCI_colors{pCI_ix};
+    violins(pCI_ix).BoxPlot.FaceColor = pCI_colors{pCI_ix};
+    violins(pCI_ix).EdgeColor = pCI_colors{pCI_ix};
+    % Grab violin for legend
+    legend_obj{pCI_ix} = violins(pCI_ix).ViolinPlot;
+end
+ax.FontSize        = tick_sz;
+ax.YLabel.String   = 'Time (s)';
+ax.YLabel.FontSize = axis_sz;
+ax.Title.String    = ['N pCI RTs: p=' num2str(pval,'%.3f')];
+ax.Title.FontSize  = title_sz;
+legend([legend_obj{:}],pCI_N_legend,'FontSize',leg_sz,'Location','best');
+
+if save_fig
+    fig_fname = [fig_dir fig_name '.' fig_ftype];
+    fprintf('Saving %s\n',fig_fname);
+    if strcmp(fig_ftype,'eps')
+        eval(['export_fig ' fig_fname]);
+    else
+        saveas(gcf,fig_fname);
+    end
+end
+
 end

@@ -17,6 +17,7 @@ late_RT_cut = 0.6;      %ms window before next stim to eliminate
 
 [cni_lab, cni_colors, ~] = fn_condition_label_styles('CNI');
 [pc_lab, pc_colors, ~]   = fn_condition_label_styles('PC');
+[pCI_lab, pCI_colors, ~] = fn_condition_label_styles('pCI');
 
 % Process parameters
 fig_dir  = strcat([root_dir 'PRJ_Stroop/results/RTs/GRP/']);
@@ -27,6 +28,7 @@ end
 %% Load data
 cni_idx  = cell(size(SBJs));
 pc_idx   = cell(size(SBJs));
+pCI_idx  = cell(size(SBJs));
 rts      = cell(size(SBJs));
 late_idx = cell(size(SBJs));
 sbj_idx  = cell(size(SBJs));
@@ -51,6 +53,10 @@ for s_ix = 1:numel(SBJs)
         pc_idx{s_ix}(logical(fn_condition_index(pc_lab{cond_ix},...
                         trial_info.condition_n))) = cond_ix;
     end
+    pCI_idx{s_ix} = zeros(size(trial_info.trial_n));
+    for cond_ix = 1:numel(pCI_lab)
+        pCI_idx{s_ix}(logical(fn_condition_index(pCI_lab{cond_ix},trial_info.condition_n,'trial_info',trial_info))) = cond_ix;
+    end
     
     % Create SBJ factor for ANOVA
     sbj_idx{s_ix} = ones(size(rts{s_ix}))*s_ix;
@@ -66,9 +72,18 @@ for s_ix = 1:numel(SBJs)
     if any(late_idx{s_ix})
         fprintf('%s: %i late trials detected\n',SBJ,sum(late_idx{s_ix}));
     end
-    rts{s_ix}(late_idx{s_ix}) = [];
+    rts{s_ix}(late_idx{s_ix})     = [];
     cni_idx{s_ix}(late_idx{s_ix}) = [];
-    pc_idx{s_ix}(late_idx{s_ix}) = [];
+    pc_idx{s_ix}(late_idx{s_ix})  = [];
+    pCI_idx{s_ix}(late_idx{s_ix}) = [];
+    
+%     % Toss first trial of each block
+%     first_idx{s_ix} = false(size(rts{s_ix}));
+%     for t_ix = 1:numel(trial_info.resp_onset)
+%         % need actual first trial, not just first remaining after preproc
+%         % (e.g., could have tossed that one already, in which case I keep
+%         % all remaining)
+%     end
     clear trial_info
 end
 
@@ -414,6 +429,68 @@ ax.YLabel.FontSize = axis_sz;
 ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') RTs: N PC p=' num2str(pval(1),'%.3f')];
 ax.Title.FontSize  = title_sz;
 legend([legend_obj{:}],pc_legend,'FontSize',leg_sz,'Location','northwest');
+
+if save_fig
+    fig_fname = [fig_dir fig_name '.' fig_ftype];
+    fprintf('Saving %s\n',fig_fname);
+    if strcmp(fig_ftype,'eps')
+        eval(['export_fig ' fig_fname]);
+    else
+        saveas(gcf,fig_fname);
+    end
+end
+
+%% Congruence Sequence Effects in Neutral Trials: cCNI vs. iCNI
+fig_name = 'GRP_RT_violins_pCI_CNI';
+figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.8 0.5],'Visible',fig_vis);
+
+% Compare only pC and pI for C, N, and I trials
+for cni_ix = 1:3
+    subplot(1,3,cni_ix);
+    hold on; ax = gca;
+    % Separate data by pCI
+    rt_grps   = cell(size(pCI_lab));
+    sbj_n_idx = cell(size(pCI_lab));
+    pCI_design = cell(size(pCI_lab));
+    pCI_N_legend = cell(size(pCI_lab));
+    for pCI_ix = 1:numel(pCI_lab)
+        for s_ix = 1:numel(SBJs)
+            tmp_pCI_idx = pCI_idx{s_ix}==pCI_ix;
+            rt_grps{pCI_ix}   = [rt_grps{pCI_ix}; rts{s_ix}(tmp_pCI_idx & cni_idx{s_ix}==cni_ix)];
+            sbj_n_idx{pCI_ix} = [sbj_n_idx{pCI_ix}; sbj_idx{s_ix}(tmp_pCI_idx & cni_idx{s_ix}==cni_ix)];
+            pCI_design{pCI_ix}  = [pCI_design{pCI_ix}; pCI_idx{s_ix}(tmp_pCI_idx & cni_idx{s_ix}==cni_ix)];
+        end
+        pCI_N_legend{pCI_ix} = [pCI_lab{pCI_ix} ' (n=' num2str(numel(rt_grps{pCI_ix})) '; avg=' num2str(mean(rt_grps{pCI_ix}),'%.2f') ')'];
+    end
+    
+    % Run ANOVA on Neutral Trials
+    factor_lab = {'pCI','SBJ'};
+    [pval, table] = anovan(vertcat(rt_grps{:}),...
+        {vertcat(pCI_design{:}), vertcat(sbj_n_idx{:})},...
+        'model', 'interaction', 'random', 2,...%, 'sstype', 3% 'continuous', strmatch('RT',w2.cond),
+        'varnames', factor_lab, 'display', 'off');
+    
+    % Plot Violins
+    violins = violinplot(padcat(rt_grps{:}), pCI_lab,...
+        'ViolinAlpha', violin_alpha, 'ShowData', false);
+    
+    % Adjust plot propeties
+    legend_obj = cell(size(pCI_lab));
+    for pCI_ix = 1:numel(pCI_lab)
+        % Change scatter colors to mark condition
+        violins(pCI_ix).ViolinColor = pCI_colors{pCI_ix};
+        violins(pCI_ix).BoxPlot.FaceColor = pCI_colors{pCI_ix};
+        violins(pCI_ix).EdgeColor = pCI_colors{pCI_ix};
+        % Grab violin for legend
+        legend_obj{pCI_ix} = violins(pCI_ix).ViolinPlot;
+    end
+    ax.FontSize        = tick_sz;
+    ax.YLabel.String   = 'RT (z-score)';
+    ax.YLabel.FontSize = axis_sz;
+    ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') RTs: pCI ' cni_lab{cni_ix} ' p=' num2str(pval(1),'%.3f')];
+    ax.Title.FontSize  = title_sz;
+    legend([legend_obj{:}],pCI_N_legend,'FontSize',leg_sz,'Location','northwest');
+end
 
 if save_fig
     fig_fname = [fig_dir fig_name '.' fig_ftype];

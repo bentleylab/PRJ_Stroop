@@ -186,7 +186,9 @@ elseif any(strcmp(conditions,grp_lab))
                 sig_time_ix = zeros([1 2]); sig_time_err = zeros([1 2]);
                 [sig_time_err(1),sig_time_ix(1)] = min(abs(stat{sr_ix}.time-w2{sr_ix}.win_lim_s(sig_chunks(sig_ix,1),1)));
                 [sig_time_err(2),sig_time_ix(2)] = min(abs(stat{sr_ix}.time-w2{sr_ix}.win_lim_s(sig_chunks(sig_ix,2),2)));
-                if any(sig_time_err>0.0001); error('exact stat time not found in hfa!'); end
+                if any(sig_time_err>0.0001) && ~any(w2{sr_ix}.cust_win(sig_chunks(sig_ix,:))) % exception for D cust_win
+                    error('exact stat time not found in hfa!');
+                end
                 stat{sr_ix}.mask(ch_ix,sig_time_ix(1):sig_time_ix(2)) = 1;
             end
         end

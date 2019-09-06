@@ -1,8 +1,23 @@
-function SBJ10b_ANOVA_plot_SR_RTcorr_ROIcomb(SBJ,proc_id,stat_id,an_id_s,an_id_r,...
-                                        atlas_id,roi_id,plt_id,save_fig,fig_vis,fig_filetype)
-% Plots ANOVA results
-% clear all; %close all;
-% fig_filetype = 'png';
+function SBJ10b_ANOVA_plot_SR_RTcorr_ROIcomb(SBJ,proc_id,stat_id_s,stat_id_r,an_id_s,an_id_r,...
+                                        atlas_id,gm_thresh,z_thresh,plot_nsig,plt_id,save_fig,fig_vis,fig_ftype)
+% Plots smANOVA w2 time series by ROI groupings
+%   ROI version: one plot per gROI, subplots for ROI
+%   gROI version: one plot; subplots per gROI (lines still colored by ROI)
+% INPUTS:
+%   SBJ [str] - subject ID to plot
+%   proc_id [str] - name of analysis pipeline, used to pick elec file
+%   stat_id_s [str] - ID of S-locked statistical analysis
+%   stat_id_r [str] - ID of R-locked statistical analysis
+%   an_id_s [str] - analysis ID for S-locked preprocessing, filtering, etc.
+%   an_id_r [str] - analysis ID for S-locked preprocessing, filtering, etc.
+%   atlas_id [str] - {'DK','Dx','Yeo7','Yeo17'}
+%   gm_thresh [float] - threshold of GM % to include electrode (likely = 0)
+%   z_thresh [float] - threshold of HFA z score to include electrode
+%   plot_nsig [0/1] - plot electrodes with no significant epochs?
+%   plt_id [str] - ID of the plotting variables
+%   save_fig [0/1] - save this figure?
+%   fig_vis [str] - visible = 'on'/'off'
+%   fig_ftype [str] - file extension for figure saving
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Data Preparation
@@ -15,78 +30,86 @@ ft_defaults
 
 %% Load Results
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
-eval(SBJ_vars_cmd);plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
+eval(SBJ_vars_cmd);
+plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
-stat_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m'];
-eval(stat_vars_cmd);
 
-[grp_lab, grp_colors, grp_style] = fn_group_label_styles(model_lab);
-[rt_lab, rt_color, rt_style]     = fn_group_label_styles('RT');
-cond_lab = [grp_lab rt_lab];
-event_lab = {'stim', 'resp'};
-
-[roi_list, roi_colors, ~] = fn_roi_label_styles(roi_id);
-
-% Load RTs
+% Load sample rate
 load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
 srate = trial_info.sample_rate;
 
-f_name_s = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id_s '.mat'];
-f_name_r = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id_r '.mat'];
+% Load smANOVA results
+w2 = cell([1 2]); evnt_labs = cell([1 2]);
+f_name_s = [SBJ_vars.dirs.proc SBJ '_smANOVA_ROI_' stat_id_s '_' an_id_s '.mat'];
+f_name_r = [SBJ_vars.dirs.proc SBJ '_smANOVA_ROI_' stat_id_r '_' an_id_r '.mat'];
 tmp = load(f_name_s,'w2'); w2{1} = tmp.w2;
+tmp = load(f_name_s,'st'); evnt_labs{1} = tmp.st.evnt_lab{1};   % handles {'S'} or {'S' 'S'}
 tmp = load(f_name_r,'w2'); w2{2} = tmp.w2;
-% tmp = load(f_name_s,'hfa'); hfa{1} = tmp.hfa;
-% tmp = load(f_name_r,'hfa'); hfa{2} = tmp.hfa;
-tmp = load(f_name_s,'stat'); stat{1} = tmp.stat;
-tmp = load(f_name_r,'stat'); stat{2} = tmp.stat;
+tmp = load(f_name_r,'st'); evnt_labs{2} = tmp.st.evnt_lab;      % assumes {'R'}
 clear tmp
+load(f_name_s,'st');
 
-% Load ROI and GM/WM info
-elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_pat_' atlas_id '_tis.mat'];
-load(elec_tis_fname);
+% Convert to Percentages
+w2{1}.trial = w2{1}.trial.*100;
+w2{2}.trial = w2{2}.trial.*100;
 
-% Sort elecs by stat labels
-cfgs = []; cfgs.channel = stat{1}.label;
-elec    = fn_select_elec(cfgs,elec);
-roi_lab = fn_atlas2roi_labels(elec.atlas_label,atlas_id,roi_id);
-
-%% Prep Data
-% FDR correct pvalues for ANOVA
-win_lim = {}; win_center = {};
-qvals = {NaN(size(w2{1}.pval)) NaN(size(w2{2}.pval))};
+% Find significant channels
+sig_idx = false([2 numel(w2{1}.cond) numel(w2{1}.label)]);
 for sr_ix = 1:2
-    for ch_ix = 1:numel(stat{1}.label)
-        pvals = squeeze(w2{sr_ix}.pval(:,ch_ix,:));
-        [~, ~, ~, qvals{sr_ix}(:,ch_ix,:)] = fdr_bh(pvals);%,st.alpha,'pdep','yes');
+    for cond_ix = 1:numel(w2{sr_ix}.cond)
+        for ch_ix = 1:numel(w2{sr_ix}.label)
+            if any(squeeze(w2{sr_ix}.qval(cond_ix,ch_ix,:))<=st.alpha)
+                sig_idx(sr_ix,cond_ix,ch_ix) = true;
+            end
+        end
     end
-    
-    % Get Sliding Window Parameters
-    win_lim{sr_ix}    = fn_sliding_window_lim(stat{sr_ix}.time,round(st.win_len*srate),round(st.win_step*srate));
-    win_center{sr_ix} = round(mean(win_lim{sr_ix},2));
-    
-    % Convert % explained variance to 0-100 scale
-    w2{sr_ix}.trial = w2{sr_ix}.trial*100;
+end
+if ~plot_nsig
+    plot_elecs = w2{1}.label(squeeze(any(any(sig_idx,1),2)));
+    sig_suffix = '_sig';
+else
+    plot_elecs = w2{1}.label;
+    sig_suffix = '';
 end
 
-% Trim data to plotting epoch
-cfg_trim = [];
-cfg_trim.latency = plt_vars.plt_lim_S;
-% hfa{1}  = ft_selectdata(cfg_trim,hfa{1});
-stat{1} = ft_selectdata(cfg_trim,stat{1});
-cfg_trim.latency = plt_vars.plt_lim_R;
-% hfa{2}  = ft_selectdata(cfg_trim,hfa{2});
-stat{2} = ft_selectdata(cfg_trim,stat{2});
+%% Load ROI and GM/WM info
+% Get list of ROIs and colors
+[all_roi_list, all_roi_colors] = fn_roi_label_styles('ROI');
+[all_groi_list, ~] = fn_roi_label_styles('gROI');
 
-% % Compute mean RT per condition
-% RTs = round(1000*trial_info.response_time); % converts sec to ms
-% for cond_ix = 1:numel(grp_lab{congr_ix})
-%     RT_means{cond_ix} = mean(RTs(fn_condition_index([grp_lab{congr_ix}{cond_ix}], trial_info.condition_n)==1));
-%     % Add in the baseline offset to plot correctly
-%     RT_means{cond_ix} = RT_means{cond_ix}-plt_vars.plt_lim_S(1)*1000;
-% end
+% Load elec file
+elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_pat_',atlas_id,'_final.mat'];
+load(elec_fname);
+
+% Remove hemi and/or atlas elecs
+plot_elecs = intersect(plot_elecs,fn_select_elec_lab_match(elec, 'b', atlas_id, ''));
+
+% Get GM probability from tissue labels {'GM','WM','CSF','OUT'}
+if gm_thresh>0
+    plot_elecs  = intersect(plot_elecs,elec.label(elec.tissue_prob(:,1)>gm_thresh));
+end
+
+% Get z_threshold
+if z_thresh>0
+    sdr_w2 = load([SBJ_vars.dirs.proc SBJ ...
+        '_smANOVA_ROI_CNI_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25' ...
+        '_HGm_S2t151_zbtA_sm0_wn100.mat'],'w2');
+    plot_elecs = intersect(plot_elecs,elec.label(sdr_w2.w2.max_hfa_z>=z_thresh));
+end
+
+% Select elecs (significance, ROI, tissue, z-score)
+cfgs = []; cfgs.channel = plot_elecs;
+elec = fn_select_elec(cfgs,elec);
+
+% Add ROI plotting color
+elec.color  = cell(size(elec.label));
+for e_ix = 1:numel(elec.label)
+    elec.color(e_ix) = all_roi_colors(strcmp(elec.ROI{e_ix},all_roi_list));
+end
 
 %% Plot Results
-fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/' stat_id '/SR/' an_id_s '-' an_id_r '/ROIcomb/'];
+fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/smANOVA_ts/' stat_id_s...
+    '-' stat_id_r '/' an_id_s '-' an_id_r '/gROIcomb/'];
 if ~exist(fig_dir,'dir')
     [~] = mkdir(fig_dir);
 end
@@ -94,183 +117,85 @@ end
 % Find plot limits
 max_w2 = max([max(max(max(w2{1}.trial))) max(max(max(w2{2}.trial)))]);
 min_w2 = min([min(min(min(w2{1}.trial))) min(min(min(w2{2}.trial)))]);
-ylim1_fudge = (max_w2-min_w2)*plt_vars.ylim_fudge;
-ylims1  = [min_w2-ylim1_fudge max_w2+ylim1_fudge];
-yticks1 = 0:1:ylims1(2);
+ylim_fudge = (max_w2-min_w2)*plt_vars.ylim_fudge;
+ylims  = [min_w2-ylim_fudge max_w2+ylim_fudge];
+yticks = 0:1:ylims(2);
 
-max_rho = max([max(max(squeeze(stat{1}.rho))) max(max(squeeze(stat{2}.rho)))]);
-min_rho = min([min(min(squeeze(stat{1}.rho))) min(min(squeeze(stat{2}.rho)))]);
-ylims2  = [round(min_rho*10)/10-0.1 round(max_rho*10)/10+0.1]; % extra on top and bottom for StdErr
-yticks2 = ylims2(1):0.1:ylims2(2);
-y_sig = zeros([1 numel(grp_lab)+1]);
-y_sig(1) = mean([min_w2,max_w2]);
-for grp_ix = 2:numel(grp_lab)+2
-    y_sig(grp_ix) = y_sig(grp_ix-1)+ylim1_fudge;
-end
-
-% Create a figure for each statistic and each ROI
-for cond_ix = 1:numel(cond_lab)
-    %     sig_ch = cell([1+numel(grp_lab) 2]);
-    fig_name = [SBJ '_ANOVA_' stat_id '_SR_' cond_lab{cond_ix} '_' roi_id];
-    f = figure('Name',fig_name,'units','normalized',...
-        'outerposition',[0 0 1 0.5],'Visible',fig_vis); %twice as wide for the double plot
-    any_plot = 0;
-    for sr_ix = 1:2
-        ax = subplot(1,2,sr_ix);
-        hold on;
-        
-        for ch_ix = 1:numel(stat{sr_ix}.label)
-            roi_ix = find(strcmp(roi_list,roi_lab{ch_ix}));
-            %                 % Plot var_exp
-            %                 [axs,grp_lines,rt_line] = plotyy(...
-            %                     repmat(win_center{sr_ix},size(grp_lab)),squeeze(w2{sr_ix}.trial(:,ch_ix,:))',...
-            %                     1:numel(stat{sr_ix}.time),squeeze(stat{sr_ix}.rho(ch_ix,:,:))');
-            %                 for grp_ix = 1:numel(grp_lab)
-            %                     set(grp_lines(grp_ix),'Color',[grp_colors{grp_ix}],'LineStyle',grp_style{grp_ix});
-            %                 end
-            %                 set(rt_line,'Color',rt_color{1},'LineStyle',rt_style{1});
-            %                 main_lines = [main_lines grp_lines' rt_line];
-            %                 lgd_lab = {grp_lab{:} 'corr(RT)'};
-            
-            % Plot significant time periods
-            if cond_ix <= numel(grp_lab)
-                ylims = ylims1;
-                yticks = yticks1;
-                ylab = '% Variance Explained';
-                if any(squeeze(qvals{sr_ix}(cond_ix,ch_ix,:))<st.alpha) && ~isempty(roi_ix)
+% Create a figure for each condition and each gROI
+for cond_ix = 1:numel(w2{1}.cond)
+    for groi_ix = 1:numel(all_groi_list)
+        fig_name = [SBJ '_smANOVA_SR_' w2{1}.cond{cond_ix} '_' atlas_id '_' all_groi_list{groi_ix} sig_suffix];
+        f = figure('Name',fig_name,'units','normalized',...
+            'outerposition',[0 0 1 0.5],'Visible',fig_vis); %twice as wide for the double plot
+        any_plot = 0;
+        roi_list = unique(elec.ROI(strcmp(elec.gROI,all_groi_list{groi_ix})));
+        % Subplots for each ROI and event-locked epoch
+        for roi_ix = 1:numel(roi_list)
+            for sr_ix = 1:2
+                subplot_ix = fn_rowcol2subplot_ix(numel(roi_list),2,roi_ix,sr_ix);
+                ax = subplot(numel(roi_list),2,subplot_ix);
+                hold on;
+                ch_list = find(strcmp(elec.gROI,all_groi_list{groi_ix}) & strcmp(elec.ROI,roi_list{roi_ix}));
+                for e_ix = 1:numel(ch_list)
+                    ch_ix = find(strcmp(w2{sr_ix}.label,elec.label{ch_list(e_ix)}));
+                    % Plot significant time periods
                     any_plot = 1;
-                    plot(win_center{sr_ix},squeeze(w2{sr_ix}.trial(cond_ix,ch_ix,:))',...
-                        'Color',[roi_colors{roi_ix}],'LineStyle',grp_style{cond_ix});
-                    %                         % Track channels with significant var_exp
-                    %                         if ~iscell(sig_ch{cond_ix,sr_ix})
-                    %                             sig_ch{cond_ix,sr_ix} = {};
-                    %                         end
-                    %                         sig_ch{cond_ix,sr_ix} = {sig_ch{cond_ix,sr_ix}{:} stat{sr_ix}.label{ch_ix}};
-                    
-                    % Find significant periods
-                    if strcmp(plt_vars.sig_type,'bold')
-                        sig_chunks = fn_find_chunks(squeeze(qvals{sr_ix}(cond_ix,ch_ix,:))<st.alpha);
-                        sig_chunks(squeeze(qvals{sr_ix}(cond_ix,ch_ix,sig_chunks(:,1)))>st.alpha,:) = [];
-                        for sig_ix = 1:size(sig_chunks,1)
-                            line(win_center{sr_ix}(sig_chunks(sig_ix,1):sig_chunks(sig_ix,2)),...
-                                squeeze(w2{sr_ix}.trial(cond_ix,ch_ix,sig_chunks(sig_ix,1):sig_chunks(sig_ix,2))),...
-                                'Color',[roi_colors{roi_ix}],'LineStyle',plt_vars.sig_style,...
-                                'LineWidth',plt_vars.sig_width);
-                        end
-                    elseif strcmp(plt_vars.sig_type,'scatter')
-                        sig_times = win_center{sr_ix}(squeeze(qvals{sr_ix}(cond_ix,ch_ix,:))<st.alpha);
-                        scatter(sig_times,repmat(y_sig(cond_ix),size(sig_times)),...
-                            plt_vars.sig_scat_size,roi_colors{roi_ix},plt_vars.sig_scat_mrkr);
-                    elseif strcmp(plt_vars.sig_type,'patch')
-                        sig_chunks = fn_find_chunks(squeeze(qvals{sr_ix}(cond_ix,ch_ix,:))<st.alpha);
-                        sig_chunks(squeeze(qvals{sr_ix}(cond_ix,ch_ix,sig_chunks(:,1)))>st.alpha,:) = [];
-                        error('sig_type = patch needs sig_times variable!');
-                        % Plot Significance Shading
-                        fprintf('%s %s (%s) -- %i SIGNIFICANT CLUSTERS FOUND...\n',...
-                            stat{sr_ix}.label{ch_ix},grp_lab{cond_ix},event_lab{sr_ix},size(sig_chunks,1));
-                        for sig_ix = 1:size(sig_chunks,1)
-                            sig_times = win_lim{sr_ix}(sig_chunks(sig_ix,:),:);
-                            patch([sig_times(1,1) sig_times(1,1) sig_times(2,2) sig_times(2,2)], ...
-                                [ylims1(1) ylims1(2) ylims1(2) ylims1(1)],...
-                                roi_colors{roi_ix},'FaceAlpha',plt_vars.sig_alpha);
+                    plot(w2{sr_ix}.time,squeeze(w2{sr_ix}.trial(cond_ix,ch_ix,:))',...
+                        'Color',[elec.color{ch_list(e_ix)}]);%,'LineStyle',grp_style{cond_ix});
+                    if sig_idx(sr_ix,cond_ix,ch_ix)
+                        % Find significant periods
+                        sig_chunks = fn_find_chunks(squeeze(w2{sr_ix}.qval(cond_ix,ch_ix,:))<=st.alpha);
+                        sig_chunks(squeeze(w2{sr_ix}.qval(cond_ix,ch_ix,sig_chunks(:,1)))>st.alpha,:) = [];
+                        if size(sig_chunks,1)==1 && sig_chunks(1,1)==sig_chunks(1,2)
+                            % Handle case of single significant window
+                            scatter(w2{sr_ix}.time(sig_chunks(1,1)),squeeze(w2{sr_ix}.trial(cond_ix,ch_ix,sig_chunks(1,1))),...
+                                50,elec.color{ch_list(e_ix)},'o','filled');
+                        else
+                            for sig_ix = 1:size(sig_chunks,1)
+                                line(w2{sr_ix}.time(sig_chunks(sig_ix,1):sig_chunks(sig_ix,2)),...
+                                    squeeze(w2{sr_ix}.trial(cond_ix,ch_ix,sig_chunks(sig_ix,1):sig_chunks(sig_ix,2))),...
+                                    'Color',[elec.color{ch_list(e_ix)}],...'LineStyle',plt_vars.sig_style,
+                                    'LineWidth',plt_vars.sig_width);
+                            end
                         end
                     end
-                    %                     else
-                    %                         fprintf('%s %s (%s) -- NO SIGNIFICANT CLUSTERS FOUND...\n',...
-                    %                             stat{sr_ix}.label{ch_ix},grp_lab{cond_ix},event_lab{sr_ix});
                 end
-            else
-                % RT correlation significant time periods
-                ylims = ylims2;
-                yticks = yticks2;
-                ylab = 'Correlation with RT';
-                if sum(stat{sr_ix}.mask(ch_ix,:))>0 && ~isempty(roi_ix)
-                    any_plot = 1;
-                    %                         % Track channels with significant var_exp
-                    %                         if ~iscell(sig_ch{cond_ix,sr_ix})
-                    %                             sig_ch{cond_ix,sr_ix} = {};
-                    %                         end
-                    %                         sig_ch{cond_ix,sr_ix} = {sig_ch{cond_ix,sr_ix}{:} stat{sr_ix}.label{ch_ix}};
-                    plot(1:numel(stat{sr_ix}.time),squeeze(stat{sr_ix}.rho(ch_ix,:,:))',...
-                        'Color',[roi_colors{roi_ix}],'LineStyle','-');
-                    
-                    sig_chunks = fn_find_chunks(squeeze(stat{sr_ix}.mask(ch_ix,:,:)));
-                    sig_chunks(squeeze(stat{sr_ix}.mask(ch_ix,:,sig_chunks(:,1)))==0,:) = [];
-                    sig_times = find(squeeze(stat{sr_ix}.mask(ch_ix,:,:)==1));
-                    if strcmp(plt_vars.sig_type,'bold')
-                        for sig_ix = 1:size(sig_chunks,1)
-                            sig_times = sig_chunks(sig_ix,1):sig_chunks(sig_ix,2);
-                            line(sig_times,squeeze(stat{sr_ix}.rho(ch_ix,:,sig_times)),...
-                                'Color',roi_colors{roi_ix},'LineStyle',plt_vars.sig_style,...
-                                'LineWidth',plt_vars.sig_width);
-                        end
-                    elseif strcmp(plt_vars.sig_type,'scatter')
-                        scatter(sig_times,repmat(y_sig(cond_ix),size(sig_times)),...
-                            plt_vars.sig_scat_size2,roi_colors{roi_ix},plt_vars.sig_scat_mrkr2);
-                    end
-                    fprintf('%s RT (%s) -- SIGNIFICANT CLUSTERS FOUND, plotting with significance shading...\n',...
-                        stat{sr_ix}.label{ch_ix},event_lab{sr_ix});%,size(sig_chunks,1));
-                    %                     else
-                    %                         fprintf('%s RT (%s) -- NO SIGNIFICANT CLUSTERS FOUND, plotting without significance shading...\n',...
-                    %                             stat{sr_ix}.label{ch_ix},event_lab{sr_ix});
+                
+                % Plot event
+                if strcmp(evnt_labs{sr_ix},'S')
+                    x_tick_lab       = plt_vars.plt_lim_S(1):plt_vars.x_step_sz:plt_vars.plt_lim_S(2);
+                else
+                    x_tick_lab       = plt_vars.plt_lim_R(1):plt_vars.x_step_sz:plt_vars.plt_lim_R(2);
+                    % Plot Response Marker
+                    event_line = line([0 0],ylims, 'LineWidth',plt_vars.evnt_width,...
+                                        'Color',plt_vars.evnt_color, 'LineStyle',plt_vars.evnt_style);
                 end
+                
+                % Plotting parameters
+                ax.Title.String  = [roi_list{roi_ix} ': ' evnt_labs{sr_ix}];
+                ax.Box           = 'off';
+                ax.YLim          = ylims;
+                ax.YTick         = yticks;
+                ax.YLabel.String = 'Omega^2';
+                ax.XLim          = eval(['plt_vars.plt_lim_' evnt_labs{sr_ix}]);%[min(w2{sr_ix}.win_lim_s(:,1)) max(w2{sr_ix}.win_lim_s(:,2))];
+%                 ax.XTick         = 0:plt_vars.x_step_sz*srate:size(w2{sr_ix}.time,2);
+                ax.XTick         = x_tick_lab;
+                ax.XLabel.String = 'Time (s)';
             end
         end
         
-        % Plot event
-        if strcmp(event_lab{sr_ix},'stim')
-            x_tick_lab       = plt_vars.plt_lim_S(1):plt_vars.x_step_sz:plt_vars.plt_lim_S(2);
+        % Save figure
+        if any_plot
+            if save_fig
+                fig_filename = [fig_dir fig_name '.' fig_ftype];
+                fprintf('Saving %s\n',fig_filename);
+                saveas(gcf,fig_filename);
+                %eval(['export_fig ' fig_filename]);
+            end
         else
-            x_tick_lab       = plt_vars.plt_lim_R(1):plt_vars.x_step_sz:plt_vars.plt_lim_R(2);
-            % Plot Response Marker
-            event_line = line([find(stat{sr_ix}.time==0) find(stat{sr_ix}.time==0)],ylims,...
-                'LineWidth',plt_vars.evnt_width, 'Color',plt_vars.evnt_color,...
-                'LineStyle',plt_vars.evnt_style);
-            %                 main_lines = [main_lines event_line];
-            %                 lgd_lab = {lgd_lab{:} 'RT'};
+            close(f);
         end
-        
-        % Plotting parameters
-        ax.Title.String  = [roi_id ': ' event_lab{sr_ix}];
-        ax.Box           = 'off';
-        ax.YLim          = ylims;
-        ax.YTick         = yticks;
-        ax.YLabel.String = ylab;
-        ax.XLim          = [0,size(stat{sr_ix}.time,2)];
-        ax.XTick         = 0:plt_vars.x_step_sz*srate:size(stat{sr_ix}.time,2);
-        ax.XTickLabel    = x_tick_lab;
-        ax.XLabel.String = 'Time (s)';
-        %             ax(2).YColor        = 'k';
-        %             legend(main_lines,lgd_lab{:},'Location',plt_vars.legend_loc);
-    end
-    
-    % Save figure
-    if any_plot
-        if save_fig
-            fig_filename = [fig_dir fig_name '.' fig_filetype];
-            fprintf('Saving %s\n',fig_filename);
-            saveas(gcf,fig_filename);
-            %eval(['export_fig ' fig_filename]);
-        end
-    else
-        close(f);
     end
 end
-
-%% Save out list of channels with significant differences
-% sig_report_filename = [fig_dir 'sig_ch_list.txt'];
-% sig_report = fopen(sig_report_filename,'a');
-% fprintf(sig_report,'%s: %s for %s - %s\n',SBJ,stat_id,an_id_s,an_id_r);
-% for grp_ix = 1:numel(grp_lab)+1
-%     for sr_ix = 1:numel(event_lab)
-%         fprintf(sig_report,'%s, %s :\n',lgd_lab{grp_ix},event_lab{sr_ix});
-%         if ~isempty(sig_ch{grp_ix,sr_ix})
-%             fprintf(sig_report,'\t%s\n',strjoin(sig_ch{grp_ix,sr_ix},','));
-%         else
-%             fprintf(sig_report,'\n');
-%         end
-%     end
-% end
-% fclose(sig_report);
 
 end

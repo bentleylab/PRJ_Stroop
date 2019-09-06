@@ -25,9 +25,9 @@ plt_id   = 'rt_hist';
 save_fig = 1;
 fig_vis  = 'on';
 fig_ftype = 'png';
-% for s = 1:numel(SBJs)
-%     B00a_SBJ_RT_violins(SBJs{s},plt_id,fig_vis,save_fig,fig_ftype);
-% end
+for s = 1:numel(SBJs)
+    B00a_SBJ_RT_violins(SBJs{s},plt_id,fig_vis,save_fig,fig_ftype);
+end
 
 % RT behavior group level
 B00b_GRP_RT_violins_norm(SBJs,plt_id,save_fig,fig_vis,fig_ftype);
@@ -62,9 +62,9 @@ for s = 1:numel(SBJs)
 %         SBJ08ab_HFA_actv(SBJs{s},an_id_s,actv_id_s);
 %         SBJ08ab_HFA_actv(SBJs{s},an_id_d,actv_id_d);
 %         SBJ08ab_HFA_actv(SBJs{s},an_id_r,actv_id_r);
-    SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,actv_id_s,actv_id_r,...
-        plt_id_sr,save_fig,fig_vis,fig_ftype)
-    close all;
+%     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'actv',an_id_s,an_id_r,actv_id_s,actv_id_r,...
+%         plt_id_sr,save_fig,fig_vis,fig_ftype)
+%     close all;
     SBJ08b_HFA_plot_SR_ERPstack_cond(SBJs{s},'CNI',an_id_s,an_id_r,stat_id_sd,stat_id_r,...
         plt_id_sr,save_fig,fig_vis,fig_ftype);
     close all;
@@ -252,6 +252,33 @@ SBJ10c_HFA_GRP_errbar_ROI_stat_comb(SBJs,proc_id,stat_conds,atlas_id,roi_id,...
 % fn_view_recon_atlas_grp_stat_onset(SBJs, proc_id, stat_id, an_id, reg_type, show_labels,...
 %                                  'l', atlas_id, roi_id, tbin_id)
                              
+%% smANOVA time series by ROI
+stat_id_s = 'CNI_PC_S0tmRT_WL1_WS25';%{'CNI_PC_S0tmRT_WL1_WS50',};
+stat_id_d = 'CNI_PC_D1tRT';%WS50
+stat_id_sd= 'CNI_PC_S0tmRT_WL1_WS25_D1tRT';%WS50
+stat_id_r = 'CNI_PC_R1t5_WL1_WS25';%{'CNI_PC_R1t5_WL1_WS50',};
+an_id_s   = 'HGm_S2t151_zbtA_sm0_wn100';%wn200 --> nope
+an_id_d   = 'HGm_S2t251_zbtA_sm0_wn100';%wn200 --> nope
+an_id_r   = 'HGm_R5t101_zbtA_sm0_wn100';%wn200 --> nope
+plt_id_s  = 'ERPstack_S2to15_evnt_c5';%'ts_S15R1_errbr_evnt';
+plt_id_sr = 'ERPstack_S2to15_R5to10_evnt_c5';%'ts_S15R1_errbr_evnt';
+gm_thresh = 0;
+z_thresh  = 0;
+atlas_id  = 'Dx';
+plot_nsig = 0;
+save_fig  = 1;
+fig_vis   = 'on';
+fig_ftype = 'png';
+
+for s = 1:numel(SBJs)
+    SBJ10b_ANOVA_plot_SR_RTcorr_ROIcomb(SBJs{s},proc_id,stat_id_sd,stat_id_r,an_id_s,an_id_r,...
+                                        atlas_id,gm_thresh,z_thresh,plot_nsig,plt_id_sr,...
+                                        save_fig,fig_vis,fig_ftype)
+%     SBJ10b_ANOVA_plot_SR_RTcorr_gROIcomb(SBJs{s},proc_id,stat_id_sd,stat_id_r,an_id_s,an_id_r,...
+%                                         atlas_id,gm_thresh,z_thresh,plot_out,plt_id_sr,...
+%                                         save_fig,fig_vis,fig_ftype)
+end
+
 %% HG active examples
 % SBJ         = 'IR74';
 % conditions  = 'CNI';
