@@ -2,7 +2,6 @@ function SBJ10b_ANOVA_plot_SR_RTcorr_ROIcomb(SBJ,proc_id,stat_id_s,stat_id_r,an_
                                         atlas_id,gm_thresh,z_thresh,plot_nsig,plt_id,save_fig,fig_vis,fig_ftype)
 % Plots smANOVA w2 time series by ROI groupings
 %   ROI version: one plot per gROI, subplots for ROI
-%   gROI version: one plot; subplots per gROI (lines still colored by ROI)
 % INPUTS:
 %   SBJ [str] - subject ID to plot
 %   proc_id [str] - name of analysis pipeline, used to pick elec file
@@ -74,8 +73,8 @@ end
 
 %% Load ROI and GM/WM info
 % Get list of ROIs and colors
-[all_roi_list, all_roi_colors] = fn_roi_label_styles('ROI');
-[all_groi_list, ~] = fn_roi_label_styles('gROI');
+[all_roi_list, all_roi_colors] = fn_roi_label_styles('all');
+[all_groi_list, ~] = fn_roi_label_styles('all_gROI');
 
 % Load elec file
 elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_pat_',atlas_id,'_final.mat'];
@@ -109,7 +108,7 @@ end
 
 %% Plot Results
 fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/smANOVA_ts/' stat_id_s...
-    '-' stat_id_r '/' an_id_s '-' an_id_r '/gROIcomb/'];
+    '-' stat_id_r '/' an_id_s '-' an_id_r '/ROIcomb/'];
 if ~exist(fig_dir,'dir')
     [~] = mkdir(fig_dir);
 end

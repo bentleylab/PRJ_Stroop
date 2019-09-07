@@ -67,10 +67,14 @@ end
 
 % ROI info
 [roi_list, ~] = fn_roi_label_styles(roi_id);
+if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep'}))
+    roi_field = 'gROI';
+else
+    roi_field = 'ROI';
+end
 fprintf('Using atlas: %s\n',atlas_id);
 
 %% Process stat_id
-eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
 if strcmp(stat_id,'actv') || strcmp(stat_id,'CSE')
     cond_lab = stat_id;
 else%if strcmp(stat_id,'crRT_CNI_PC_WL200_WS50')
@@ -85,7 +89,7 @@ else%if strcmp(stat_id,'crRT_CNI_PC_WL200_WS50')
 end
 
 % Prep report
-out_dir = [root_dir 'PRJ_Stroop/results/HFA/GRP_reports/'];
+out_dir = [root_dir 'PRJ_Stroop/results/HFA/GRP_recons/'];
 sig_report_fname = [out_dir 'GRP_' stat_id '_' an_id '_' atlas_id '_' roi_id '_sig_report.txt'];
 if exist(sig_report_fname)
     system(['mv ' sig_report_fname ' ' sig_report_fname(1:end-4) '_bck.txt']);
@@ -104,10 +108,7 @@ for sbj_ix = 1:numel(SBJs)
     
     % Load elec struct
     try
-        elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_mni',reg_suffix,'_',atlas_id,'_full.mat'];
-        if exist([elec_fname(1:end-4) '_' roi_id '.mat'],'file')
-            elec_fname = [elec_fname(1:end-4) '_' roi_id '.mat'];
-        end
+        elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_mni',reg_suffix,'_',atlas_id,'_final.mat'];
         tmp = load(elec_fname); elec_sbj{sbj_ix,1} = tmp.elec;
     catch
         error([elec_fname 'doesnt exist, exiting...']);
@@ -116,27 +117,9 @@ for sbj_ix = 1:numel(SBJs)
     % Append SBJ name to labels
     for e_ix = 1:numel(elec_sbj{sbj_ix,1}.label)
         elec_sbj{sbj_ix,1}.label{e_ix} = [SBJs{sbj_ix} '_' elec_sbj{sbj_ix,1}.label{e_ix}];
+        elec_sbj{sbj_ix,1}.color{e_ix} = fn_roi2color(elec_sbj{sbj_ix,1}.(roi_field){e_ix});
     end
-    
-    % Match elecs to atlas ROIs
-    if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
-        if ~isfield(elec_sbj{sbj_ix,1},'man_adj')
-            elec_sbj{sbj_ix,1}.roi       = fn_atlas2roi_labels(elec_sbj{sbj_ix,1}.atlas_lab,atlas_id,roi_id);
-        end
-        if strcmp(roi_id,'tissueC')
-            elec_sbj{sbj_ix,1}.roi_color = fn_tissue2color(elec_sbj{sbj_ix,1});
-        elseif strcmp(atlas_id,'Yeo7')
-            elec_sbj{sbj_ix,1}.roi_color = fn_atlas2color(atlas_id,elec_sbj{sbj_ix,1}.roi);
-        else
-            elec_sbj{sbj_ix,1}.roi_color = fn_roi2color(elec_sbj{sbj_ix,1}.roi);
-        end
-    elseif any(strcmp(atlas_id,{'Yeo17'}))
-        if ~isfield(elec_sbj{sbj_ix,1},'man_adj')
-            elec_sbj{sbj_ix,1}.roi       = elec_sbj{sbj_ix,1}.atlas_lab;
-        end
-        elec_sbj{sbj_ix,1}.roi_color = fn_atlas2color(atlas_id,elec_sbj{sbj_ix,1}.roi);
-    end
-    
+        
     % Remove hemi and/or atlas elecs
     if ~plot_out
         % Remove electrodes that aren't in atlas ROIs & hemisphere

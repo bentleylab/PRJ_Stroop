@@ -19,12 +19,16 @@ switch roi_id
         labels(strmatch('',labels,'exact')) = [];
     case 'Yeo7'
         labels = {'Vis','SM','DAttn','VAttn','Limb','FP','Def'};
+    case 'PFC'
+        labels = {'FPC','dlPFC','vlPFC','PM','FO','ACC','dmPFC','SMC','aMCC','pMCC'};
     case 'Main3'
         labels = {'LPFC','MPFC','INS'};
     case 'mgROI'
         labels = {'LPFC','MPFC','SM','INS','OFC'};
     case 'gROI'
         labels = {'LPFC','MPFC','INS','SM','OFC','PAR','TMP'};%'AMG','HPC','OCC'};
+    case 'all_gROI'
+        labels = {'LPFC','MPFC','INS','SM','OFC','PAR','TMP','AMG','HPC','OCC','FWM','TWM'};
     case 'lat'
         labels = {'LPFC','SM','PAR','TMP','OCC'};
     case 'deep'
