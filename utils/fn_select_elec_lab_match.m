@@ -26,18 +26,24 @@ else
 end
 
 % Match Atlas
-if ~isempty(atlas_id)
-    if ~isempty(roi_id)
-        [roi_list, ~] = fn_roi_label_styles(roi_id);
-        roi_match = zeros([numel(elec.label) numel(roi_list)]);
-        for roi_ix = 1:numel(roi_list)
-            roi_match(:,roi_ix) = strcmp(elec.(roi_field),roi_list(roi_ix));
-        end
-        lab_match = all([lab_match any(roi_match,2)],2);
-    else
-        lab_match = all([lab_match ~strcmp(elec.ROI,'OUT')],2);
-%         lab_match = all([lab_match ~strcmp(elec.atlas_lab,'no_label_found')],2);
+if ~isempty(roi_id)
+    [roi_list, ~] = fn_roi_label_styles(roi_id);
+    roi_match = zeros([numel(elec.label) numel(roi_list)]);
+    for roi_ix = 1:numel(roi_list)
+        roi_match(:,roi_ix) = strcmp(elec.(roi_field),roi_list(roi_ix));
     end
+    lab_match = all([lab_match any(roi_match,2)],2);
+else
+    warning('No roi_id provided, tossing OUT elecs...');
+    lab_match = all([lab_match ~strcmp(elec.ROI,'OUT')],2);
+%     lab_match = all([lab_match ~strcmp(elec.atlas_lab,'no_label_found')],2);
+end
+
+if ~all(lab_match)
+    fprintf(2,'hemi (%s) and roi_id (%s): tossed %i/%i elecs\n',...
+               hemi,roi_id,sum(~lab_match),numel(elec.label));
+else
+    fprintf('hemi (%s) and roi_id (%s): keeping all elecs\n',hemi,roi_id);
 end
 
 good_lab = elec.label(lab_match);

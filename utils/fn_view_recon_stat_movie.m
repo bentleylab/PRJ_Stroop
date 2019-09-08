@@ -1,22 +1,33 @@
-function fn_view_recon_stat_movie(SBJ, proc_id, stat_id, an_id, view_space, reg_type, hemi, plot_out, plt_id, varargin)
-error('fix for new st.ANOVA params');
+function fn_view_recon_stat_movie(SBJ, proc_id, stat_cond, atlas_id, roi_id, hemi, plot_out, plt_id, varargin)
 %% Plot a reconstruction with electrodes colored according to statistics
-%   FUTURE 2: add option for stat_var to be a cell with 2nd stat for edge
-% INPUTS:
-%   SBJ [str] - subject ID to plot
-%   proc_id [str] - name of analysis pipeline, used to pick elec file
-%   stat_id [str] - ID of the stats
-%     current:
-%       'actv': HFA activation vs. baseline; red for active, blue for deactive, yellow for both
+%   PLT_VARS:
+%       color = +/- or ROI
+%       plot_nsig?
+%       3 items below
+%   FUTURE 2:
+%       add option for stat_var to be a cell with 2nd stat for edge
+%       gm_thresh [float] - threshold of GM % to include electrode (likely = 0)
+%       z_thresh [float] - threshold of HFA z score to include electrode
 %     future:
 %       'CI': inc vs. con via ft statistics (not run for all patients!)
 %       'RT': correlation with RT (red for significant)
 %       'CNI': ANOVA of congruence (red for sig)
 %       'PC': ANOVA of proportion congruence (red for sig)
-%   an_id [str] - analysis ID for preprocessing, filtering, etc.
-%   view_space [str] - {'pat', 'mni'}
-%   reg_type [str] - {'v', 's'} choose volume-based or surface-based registration
-%       '' (or anything not v/s) for patient space
+% INPUTS:
+%   SBJ [str] - subject ID to plot
+%   proc_id [str] - name of analysis pipeline, used to pick elec file
+%   stat_cond [cell array] - {'stat_id','an_id','cond'}
+%     stat_id [str] - ID of statistical analysis
+%     an_id   [str] - analysis ID for preprocessing, filtering, etc.
+%     cond    [str] - ID of condition/group to overlap with
+%       'actv': red for active, blue for deactive, yellow for both
+%       NOPE: 'CI': inc vs. con via ft statistics (not run for all patients!)
+%       'RT': correlation with RT (red for significant)
+%       'CNI': ANOVA of congruence (red for sig)
+%       'pCNI': ANOVA of previous trial congruence (red for sig)
+%       'PC': ANOVA of proportion congruence (red for sig)
+%   atlas_id [str] - {'DK','Dx','Yeo7','Yeo17'}
+%   roi_id [str] - ROI grouping by which to color the atlas ROIs
 %   hemi [str] - {'r','l','b'} for right, left, or both hemispheres (shouldn't be both here, too hard to see...)
 %   plot_out [0/1] - plot electrodes outside of the hemisphere or ROIs of interest?
 %   plt_id [str] - which set of plotting params
@@ -25,10 +36,6 @@ error('fix for new st.ANOVA params');
 %       mesh_alpha [float] - transparency of the surface mesh
 
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
-SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
-eval(SBJ_vars_cmd);
-plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
-eval(plt_vars_cmd);
 
 %% Process plotting params
 % Handle variable inputs
@@ -63,51 +70,70 @@ if ~exist('mesh_alpha','var')
         mesh_alpha = 0.8;
     end
 end
-if strcmp(reg_type,'v') || strcmp(reg_type,'s')
-    reg_suffix = ['_' reg_type];
-else
-    reg_suffix = '';
-end
 
 % SHEILA: move these to plt_vars
 ns_color = [0 0 0];
 vid_ext = '.mp4';
 vid_encoding = 'MPEG-4';
 
-%% Load elec struct
-load([SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_',view_space,reg_suffix,'.mat']);
+%% Prep variables
+for st_ix = 1:numel(stat_cond)
+    if numel(stat_cond)~=3; error('stat_cond must contain {stat_id, an_id, cond}'); end
+end
 
-%% Remove electrodes that aren't in hemisphere
+% Organize IDs
+stat_id = stat_cond{1};
+an_id   = stat_cond{2};
+cond_id = stat_cond{3};
+
+% Load all ROI info
+[roi_list, roi_colors] = fn_roi_label_styles(roi_id);
+if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep'}))
+    roi_field = 'gROI';
+else
+    roi_field = 'ROI';
+end
+
+% Set up vars
+SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+eval(SBJ_vars_cmd);
+plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
+eval(plt_vars_cmd);
+
+%% Load elec struct
+load([SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_pat_',atlas_id,'_final.mat']);
+
+% Remove electrodes that aren't in hemisphere
 if ~plot_out
     cfgs = [];
-    cfgs.channel = fn_select_elec_lab_match(elec, hemi, [], []);
+    cfgs.channel = fn_select_elec_lab_match(elec, hemi, atlas_id, []);
     elec = fn_select_elec(cfgs, elec);
 end
 
 %% Load brain recon
-mesh = fn_load_recon_mesh(SBJ,view_space,reg_type,hemi);
+mesh = fn_load_recon_mesh(SBJ,'pat','',hemi);
 
 %% Load Stats
 % Determine options: {'actv','CI','RT','CNI','PC'}
-if strcmp(stat_id,'actv')
-    hfa_fname = strcat(SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'.mat');
-    load(hfa_fname);
-
-    load([SBJ_vars.dirs.proc SBJ '_ROI_' an_id '_actv_mn100.mat']);
-    cfgs = []; cfgs.channel = actv_ch;
-    hfa = ft_selectdata(cfgs,hfa);
-    elec = fn_select_elec(cfgs,elec);
+if contains(stat_id,'actv')
+    % Load HFA and stat for colors and significance masking
+    load([SBJ_vars.dirs.proc SBJ '_ROI_' an_id '.mat']);
+    load([SBJ_vars.dirs.proc SBJ '_ROI_' an_id '_' stat_id '.mat']);
     
-    plot_dat = squeeze(mean(hfa.powspctrm,1));
-    % get clim
-    clim = [prctile(abs(hfa.powspctrm(:)),5) prctile(abs(hfa.powspctrm(:)),95)];
-    
-    sig_t_ix = cell(size(hfa.label));
-    for e = 1:numel(hfa.label)
-        for ep = 1:size(actv_ch_epochs{e},1)
-            sig_t_ix{e} = [sig_t_ix{e} find(hfa.time==actv_ch_epochs{e}(ep,1)):find(hfa.time==actv_ch_epochs{e}(ep,2))];
-        end
+    % Confirm stat covers movie_lim
+    if min(actv.time)>plt_vars.movie_lim(1) || max(actv.time)<plt_vars.movie_lim(2)-0.0001
+        error('stat.time does not cover move_lim!');
     end
+    
+    % Get plotting time and colors
+    plot_idx = all([actv.time>=plt_vars.movie_lim(1); actv.time<=plt_vars.movie_lim(2)],1);
+    clim = [prctile(actv.avg(:),5) prctile(actv.avg(:),95)];
+
+%     % Trim to channels and epoch
+%     cfgs = []; cfgs.channel = actv.label(any(actv.qval<=st.alpha,2));
+%     hfa  = ft_selectdata(cfgs,hfa);
+%     elec = fn_select_elec(cfgs,elec);
+    
 % elseif strcmp(stat_id,'CSE')
 %     error('no CSE yet');
 %     load([SBJ_vars.dirs.proc,SBJ,'_',stat_id,'_ROI_',an_id,'.mat']);
@@ -133,54 +159,56 @@ if strcmp(stat_id,'actv')
 %             elec_colors{ch_ix,1} = ns_color;
 %         end
 %     end    
-% else    % ANOVA
-%     error('no ANOVA yet)');
-%     eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
-%     [grp_lab, grp_colors, ~] = fn_group_label_styles(model_lab);
-%     [rt_lab, rt_color, ~]    = fn_group_label_styles('RT');
-%     % % Load RTs
-%     % load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
-%     
-%     f_name = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id '.mat'];
-%     load(f_name,'stat','w2');
-%     elec = fn_reorder_elec(elec,stat.label);
-%     
-%     % FDR correct pvalues for ANOVA
-% %     win_lim = {}; win_center = {};
-%     elec_colors = cell([numel(w2.label) numel(grp_lab)+1]);
-%     for ch_ix = 1:numel(stat.label)
-%         pvals = squeeze(w2.pval(:,ch_ix,:));
-%         [~, ~, ~, qvals] = fdr_bh(pvals);%,st.alpha,'pdep','yes');
-%         
-%         % Consolidate to binary sig/non-sig
-%         for grp_ix = 1:numel(grp_lab)
-%             if any(qvals(grp_ix,:)<st.alpha,2)
-%                 elec_colors{ch_ix,grp_ix} = grp_colors{grp_ix};  % sig
-%             else
-%                 elec_colors{ch_ix,grp_ix} = ns_color;  % non-sig
-%             end
-%         end
-%         if any(stat.mask(ch_ix,1,:))
-%             elec_colors{ch_ix,numel(grp_lab)+1} = rt_color{:};  % sig
-%         else
-%             elec_colors{ch_ix,numel(grp_lab)+1} = ns_color;  % non-sig
-%         end
-%     end
-%     
-% %     % Get Sliding Window Parameters
-% %     win_lim    = fn_sliding_window_lim(stat.time,win_len,win_step);
-% %     win_center = round(mean(win_lim,2));
-%     
-% %     % Convert % explained variance to 0-100 scale
-% %     w2.trial = w2.trial*100;
-%     
-%     
-% %     % Trim data to plotting epoch
-% %     %   NOTE: stat should be on stat_lim(1):stat_lim(2)+0.001 time axis
-% %     %   w2 should fit within that since it's averaging into a smaller window
-% %     cfg_trim = [];
-% %     cfg_trim.latency = plt_vars.plt_lim_SR;
-% %     stat = ft_selectdata(cfg_trim,stat);
+elseif contains(stat_id,'smANOVA')
+    error('no ANOVA yet)');
+    eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
+    [grp_lab, grp_colors, ~] = fn_group_label_styles(model_lab);
+    [rt_lab, rt_color, ~]    = fn_group_label_styles('RT');
+    % % Load RTs
+    % load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
+    
+    f_name = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id '.mat'];
+    load(f_name,'stat','w2');
+    elec = fn_reorder_elec(elec,stat.label);
+    
+    % FDR correct pvalues for ANOVA
+%     win_lim = {}; win_center = {};
+    elec_colors = cell([numel(w2.label) numel(grp_lab)+1]);
+    for ch_ix = 1:numel(stat.label)
+        pvals = squeeze(w2.pval(:,ch_ix,:));
+        [~, ~, ~, qvals] = fdr_bh(pvals);%,st.alpha,'pdep','yes');
+        
+        % Consolidate to binary sig/non-sig
+        for grp_ix = 1:numel(grp_lab)
+            if any(qvals(grp_ix,:)<st.alpha,2)
+                elec_colors{ch_ix,grp_ix} = grp_colors{grp_ix};  % sig
+            else
+                elec_colors{ch_ix,grp_ix} = ns_color;  % non-sig
+            end
+        end
+        if any(stat.mask(ch_ix,1,:))
+            elec_colors{ch_ix,numel(grp_lab)+1} = rt_color{:};  % sig
+        else
+            elec_colors{ch_ix,numel(grp_lab)+1} = ns_color;  % non-sig
+        end
+    end
+    
+%     % Get Sliding Window Parameters
+%     win_lim    = fn_sliding_window_lim(stat.time,win_len,win_step);
+%     win_center = round(mean(win_lim,2));
+    
+%     % Convert % explained variance to 0-100 scale
+%     w2.trial = w2.trial*100;
+    
+    
+%     % Trim data to plotting epoch
+%     %   NOTE: stat should be on stat_lim(1):stat_lim(2)+0.001 time axis
+%     %   w2 should fit within that since it's averaging into a smaller window
+%     cfg_trim = [];
+%     cfg_trim.latency = plt_vars.plt_lim_SR;
+%     stat = ft_selectdata(cfg_trim,stat);
+else
+    error(['unknown stat_id: ' stat_id]);
 end
 
 %% Load timing info

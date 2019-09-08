@@ -1,8 +1,8 @@
-plt_vars.movie_time = [-0.05 2.5];  % should take -50ms to end
+plt_vars.movie_lim = [0 2.5];  % should take -50ms to end
 plt_vars.play_speed = 0.5;
 
 % Event + Time lines
-plt_vars.evnt_type          = {'stim','resp'};
+plt_vars.evnt_type          = {'S','R'};
 plt_vars.evnt_len           = 0.1;  % time to reamin on screen
 plt_vars.evnt_str_pos       = [0 0 -110]; % X, Y, Z
 plt_vars.evnt_str_color     = 'k';
