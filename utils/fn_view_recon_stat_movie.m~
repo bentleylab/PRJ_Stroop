@@ -232,11 +232,6 @@ mesh = fn_load_recon_mesh(SBJ,'pat','','pial',hemi);
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
 plot_name = [SBJ '_' cond_id '_' stat_id '_' an_id '_' hemi];
-fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/movies/' cond_id '/'];
-if ~exist(fig_dir,'dir')
-    [~] = mkdir(fig_dir);
-end
-
 f = figure('Name',plot_name,'Visible',fig_vis); hold on;
 frames = struct('cdata',[],'colormap',[]); frame_ix = 0;
 
@@ -269,11 +264,11 @@ evnt_str = text(plt_vars.evnt_str_pos(1), plt_vars.evnt_str_pos(2), plt_vars.evn
 if strcmp(cond_id,'actv')
     % Save base figure with colorbar
     cbar = colorbar; caxis(clim);
-    cbar_dir = [fig_dir 'cbar_snap/'];
-    if ~exist(cbar_dir,'dir')
-        [~] = mkdir(cbar_dir);
+    fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/movies/' cond_id '/'];
+    if ~exist([fig_dir 'cbar_snap/'],'dir')
+        [~] = mkdir([fig_dir 'cbar_snap/']);
     end
-    fig_fname = [cbar_dir plot_name '.svg'];
+    fig_fname = [fig_dir 'cbar_snap/' plot_name '.svg'];
     fprintf('Saving %s\n',fig_fname);
     saveas(gcf,fig_fname);
 end

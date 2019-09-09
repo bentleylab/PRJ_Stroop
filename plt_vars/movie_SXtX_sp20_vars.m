@@ -1,4 +1,4 @@
-plt_vars.movie_lim  = [-1 -1];  % should take -50ms to end
+plt_vars.movie_lim  = {-1 -1};  % should take -50ms to end
 plt_vars.play_speed = 0.2;
 
 % Electrode properties

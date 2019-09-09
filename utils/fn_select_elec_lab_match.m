@@ -40,7 +40,7 @@ else
 end
 
 if ~all(lab_match)
-    fprintf(2,'hemi (%s) and roi_id (%s): tossed %i/%i elecs\n',...
+    fprintf('\themi (%s) and roi_id (%s): tossed %i/%i elecs\n',...
                hemi,roi_id,sum(~lab_match),numel(elec.label));
 else
     fprintf('hemi (%s) and roi_id (%s): keeping all elecs\n',hemi,roi_id);
