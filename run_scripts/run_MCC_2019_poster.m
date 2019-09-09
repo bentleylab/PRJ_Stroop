@@ -231,12 +231,12 @@ SBJ10c_HFA_GRP_errbar_ROI_stat_comb(SBJs,proc_id,stat_conds,atlas_id,roi_id,...
             gm_thresh,z_thresh,plt_id,plot_out,0,save_fig,fig_vis,fig_ftype);
 
 %% Movies of significant effects
-stat_cond = {'CNI_PC_S0tmRT_WL1_WS25_D1tRT','HGm_S2t151_zbtA_sm0_wn100','CNI'};
+stat_cond = {'CNI_PC_R1t5_WL1_WS25','HGm_R5t101_zbtA_sm0_wn100','CNI'};
 %     actv:   {'actv_S0t150_mn1','HGm_S2t151_zbtA_sm0_wn100','actv'};
 %     CNI.S:  {'CNI_PC_S0tmRT_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','CNI'};
 %     CNI.SD: {'CNI_PC_S0tmRT_WL1_WS25_D1tRT','HGm_S2t151_zbtA_sm0_wn100','CNI'};
-%     CNI.R:  {'CNI_PC_R1t5_WL1_WS25','HGm_R5t101_zbtA_sm0_wn100','CNI'}...
-%     PB.B:   {'pCNI_PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'},...
+%     CNI.R:  {'CNI_PC_R1t5_WL1_WS25','HGm_R5t101_zbtA_sm0_wn100','CNI'};
+%     PB.B:   {'pCNI_PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'};
 
 %     {'pCNI_PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','pCNI'},...
 %     {'PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'},...
@@ -248,7 +248,7 @@ stat_cond = {'CNI_PC_S0tmRT_WL1_WS25_D1tRT','HGm_S2t151_zbtA_sm0_wn100','CNI'};
 
 proc_id     = 'main_ft';
 atlas_id    = 'Dx';
-plt_id      = 'movie_S0tD_sp20';%'movie_S0t15_sp20';
+plt_id      = 'movie_R1t5_sp20';%'movie_S0tD_sp20';%'movie_S0t15_sp20';
 roi_id      = 'gROI';
 hemi_opts   = {'l','r'};
 % z_thresh    = 0;%1.5;
