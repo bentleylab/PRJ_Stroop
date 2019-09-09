@@ -231,7 +231,9 @@ SBJ10c_HFA_GRP_errbar_ROI_stat_comb(SBJs,proc_id,stat_conds,atlas_id,roi_id,...
             gm_thresh,z_thresh,plt_id,plot_out,0,save_fig,fig_vis,fig_ftype);
 
 %% Movies of significant effects
-stat_cond = {'actv_S0tmRT_mn1','HGm_S2t151_zbtA_sm0_wn100','actv'};
+stat_cond = {'CNI_PC_S0tmRT_WL1_WS25_D1tRT','HGm_S2t151_zbtA_sm0_wn100','CNI'};
+%     {'actv_S0t150_mn1','HGm_S2t151_zbtA_sm0_wn100','actv'};
+
 %     {'pCNI_PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'},...
 %     {'pCNI_PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','pCNI'},...
 %     {'CNI_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','CNI'}...
@@ -245,15 +247,18 @@ stat_cond = {'actv_S0tmRT_mn1','HGm_S2t151_zbtA_sm0_wn100','actv'};
 
 proc_id     = 'main_ft';
 atlas_id    = 'Dx';
-plt_id      = 'movie_S2t25_sp50';
+plt_id      = 'movie_SXtX_sp50';
 roi_id      = 'gROI';
-hemi        = 'l';
+hemi_opts   = {'l','r'};
 % z_thresh    = 0;%1.5;
 % gm_thresh   = 0;
 plot_out    = 0;
+fig_vis     = 'on';
 
-fn_view_recon_stat_movie('IR35', proc_id, stat_cond, atlas_id, roi_id, hemi,...
-                         plot_out, plt_id)
+for h = 1:numel(hemi_opts)
+    fn_view_recon_stat_movie('IR35', proc_id, stat_cond, atlas_id, roi_id, hemi_opts{h},...
+                         plot_out, plt_id, fig_vis);
+end
 
 %% Redux (old version of SBJ10c bar plots
 % stat_id = 'CNI_PC_S0tmRT_WL1_WS50';

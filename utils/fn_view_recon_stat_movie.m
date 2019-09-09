@@ -1,4 +1,4 @@
-function fn_view_recon_stat_movie(SBJ, proc_id, stat_cond, atlas_id, roi_id, hemi, plot_out, plt_id, varargin)
+function fn_view_recon_stat_movie(SBJ, proc_id, stat_cond, atlas_id, roi_id, hemi, plot_out, plt_id, fig_vis, varargin)
 %% Plot a reconstruction with electrodes colored according to statistics
 %   PLT_VARS:
 %       color = +/- or ROI
@@ -51,37 +51,20 @@ if ~isempty(varargin)
     end
 end
 
-% Implement the default options
-if ~exist('view_angle','var')
-    if strcmp(hemi,'r')
-        view_angle = [60 30];
-    elseif strcmp(hemi,'l')
-        view_angle = [-60 30];
-    else
-        error(['unknown hemi: ' hemi]);
-    end
-elseif strcmp(hemi,'b')
-    error('no sense in making a both hemi movie!');
-end
-if ~exist('mesh_alpha','var')
-    if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
-        mesh_alpha = 0.3;
-    else
-        mesh_alpha = 0.8;
-    end
-end
-
-% SHEILA: move these to plt_vars
-ns_color = [0 0 0];
-vid_ext = '.mp4';
-vid_encoding = 'MPEG-4';
-
 %% Prep variables
+% Set up vars
+SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
+eval(SBJ_vars_cmd);
+plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
+eval(plt_vars_cmd);
+
+cmap = eval([plt_vars.cmap_name '(64);']);
+load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
+
+% Organize IDs
 for st_ix = 1:numel(stat_cond)
     if numel(stat_cond)~=3; error('stat_cond must contain {stat_id, an_id, cond}'); end
 end
-
-% Organize IDs
 stat_id = stat_cond{1};
 an_id   = stat_cond{2};
 cond_id = stat_cond{3};
@@ -94,11 +77,25 @@ else
     roi_field = 'ROI';
 end
 
-% Set up vars
-SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
-eval(SBJ_vars_cmd);
-plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
-eval(plt_vars_cmd);
+% Implement the default options
+if ~exist('view_angle','var')
+    if strcmp(hemi,'r')
+        view_angle = [120 30];
+    elseif strcmp(hemi,'l')
+        view_angle = [-120 30];
+    else
+        error(['unknown hemi: ' hemi]);
+    end
+elseif strcmp(hemi,'b')
+    error('no sense in making a both hemi movie!');
+end
+if ~exist('mesh_alpha','var')
+    if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
+        mesh_alpha = 0.4;
+    else
+        mesh_alpha = 0.8;
+    end
+end
 
 %% Load elec struct
 load([SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_pat_',atlas_id,'_final.mat']);
@@ -111,29 +108,25 @@ if ~plot_out
 end
 
 %% Load brain recon
-mesh = fn_load_recon_mesh(SBJ,'pat','',hemi);
+mesh = fn_load_recon_mesh(SBJ,'pat','','pial',hemi);
 
 %% Load Stats
 % Determine options: {'actv','CI','RT','CNI','PC'}
-if contains(stat_id,'actv')
+if strcmp(cond_id,'actv')
     % Load HFA and stat for colors and significance masking
     load([SBJ_vars.dirs.proc SBJ '_ROI_' an_id '.mat']);
     load([SBJ_vars.dirs.proc SBJ '_ROI_' an_id '_' stat_id '.mat']);
+    stat = actv;
     
-    % Confirm stat covers movie_lim
-    if min(actv.time)>plt_vars.movie_lim(1) || max(actv.time)<plt_vars.movie_lim(2)-0.0001
-        error('stat.time does not cover move_lim!');
-    end
-    
-    % Get plotting time and colors
-    plot_idx = all([actv.time>=plt_vars.movie_lim(1); actv.time<=plt_vars.movie_lim(2)],1);
-    clim = [prctile(actv.avg(:),5) prctile(actv.avg(:),95)];
-
-%     % Trim to channels and epoch
-%     cfgs = []; cfgs.channel = actv.label(any(actv.qval<=st.alpha,2));
-%     hfa  = ft_selectdata(cfgs,hfa);
+    % Trim to channels and epoch
+    cfgs = []; cfgs.latency = plt_vars.movie_lim;
+    hfa  = ft_selectdata(cfgs,hfa);
 %     elec = fn_select_elec(cfgs,elec);
     
+    % Two sided color and size maps
+    clim = [-max(abs(stat.avg(:))) max(abs(stat.avg(:)))];
+    sz_map = [linspace(plt_vars.sz_lim(2), plt_vars.sz_lim(1), size(cmap,1)/2)...
+              linspace(plt_vars.sz_lim(1), plt_vars.sz_lim(2), size(cmap,1)/2)];
 % elseif strcmp(stat_id,'CSE')
 %     error('no CSE yet');
 %     load([SBJ_vars.dirs.proc,SBJ,'_',stat_id,'_ROI_',an_id,'.mat']);
@@ -156,169 +149,191 @@ if contains(stat_id,'actv')
 %                 elec_colors{ch_ix,1} = cond_colors{2};
 %             end
 %         else
-%             elec_colors{ch_ix,1} = ns_color;
+%             elec_colors{ch_ix,1} = plt_vars.ns_color;
 %         end
 %     end    
-elseif contains(stat_id,'smANOVA')
-    error('no ANOVA yet)');
-    eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);
-    [grp_lab, grp_colors, ~] = fn_group_label_styles(model_lab);
-    [rt_lab, rt_color, ~]    = fn_group_label_styles('RT');
-    % % Load RTs
-    % load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
+elseif any(strcmp(cond_id,{'CNI','PC','pCNI','pCI'}))
+    stat_fname = [SBJ_vars.dirs.proc SBJ '_smANOVA_ROI_' stat_id '_' an_id '.mat'];
+    load(stat_fname,'w2','st');
     
-    f_name = [SBJ_vars.dirs.proc SBJ '_ANOVA_ROI_' stat_id '_' an_id '.mat'];
-    load(f_name,'stat','w2');
-    elec = fn_reorder_elec(elec,stat.label);
+    % Convert % explained variance to 0-100 scale
+    w2.trial = w2.trial*100;
+    stat = w2;
+    cond_ix = strcmp(st.groups,cond_id);
     
-    % FDR correct pvalues for ANOVA
-%     win_lim = {}; win_center = {};
-    elec_colors = cell([numel(w2.label) numel(grp_lab)+1]);
-    for ch_ix = 1:numel(stat.label)
-        pvals = squeeze(w2.pval(:,ch_ix,:));
-        [~, ~, ~, qvals] = fdr_bh(pvals);%,st.alpha,'pdep','yes');
-        
-        % Consolidate to binary sig/non-sig
-        for grp_ix = 1:numel(grp_lab)
-            if any(qvals(grp_ix,:)<st.alpha,2)
-                elec_colors{ch_ix,grp_ix} = grp_colors{grp_ix};  % sig
-            else
-                elec_colors{ch_ix,grp_ix} = ns_color;  % non-sig
-            end
-        end
-        if any(stat.mask(ch_ix,1,:))
-            elec_colors{ch_ix,numel(grp_lab)+1} = rt_color{:};  % sig
-        else
-            elec_colors{ch_ix,numel(grp_lab)+1} = ns_color;  % non-sig
-        end
-    end
+    % Convert to ms timing
+    win_times = 
+    stat.mask = squeeze(stat.qval(cond_ix,:,:)<=st.alpha);
     
-%     % Get Sliding Window Parameters
-%     win_lim    = fn_sliding_window_lim(stat.time,win_len,win_step);
-%     win_center = round(mean(win_lim,2));
+    % Get ROI colors
+    elec.color = fn_roi2color(elec.(roi_field));
     
-%     % Convert % explained variance to 0-100 scale
-%     w2.trial = w2.trial*100;
-    
-    
-%     % Trim data to plotting epoch
-%     %   NOTE: stat should be on stat_lim(1):stat_lim(2)+0.001 time axis
-%     %   w2 should fit within that since it's averaging into a smaller window
-%     cfg_trim = [];
-%     cfg_trim.latency = plt_vars.plt_lim_SR;
-%     stat = ft_selectdata(cfg_trim,stat);
+    % One sided color and size maps
+    all_w2 = stat.trial(cond_ix,:,:);
+%     clim = [prctile(all_w2(:),5) prctile(all_w2(:),95)];
+    clim = [min(all_w2(:)) max(all_w2(:))];
+    sz_map = linspace(plt_vars.sz_lim(1), plt_vars.sz_lim(2), size(cmap,1));
 else
     error(['unknown stat_id: ' stat_id]);
 end
 
-%% Load timing info
-evnt_times = cell(size(plt_vars.evnt_type));
-for evnt_ix = 1:numel(plt_vars.evnt_type)
-    if strcmp(plt_vars.evnt_type{evnt_ix},'S')
-        evnt_times{evnt_ix} = 0:1/sample_rate:plt_vars.evnt_len;
-    elseif strcmp(plt_vars.evnt_lab{evnt_ix},'R')
-        load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
-        evnt_times{evnt_ix} = mean(trial_info.response_time):1/sample_rate:mean(trial_info.response_time)+plt_vars.evnt_len;
-        %     % Compile cond_type, RT, trial_n
-        %     [cond_lab, cond_colors, ~] = fn_condition_label_styles('CI');
-        %     cond_RTs = zeros(size(cond_lab));
-        %     for cond_ix = 1:length(cond_lab)
-        %         cond_RTs(cond_ix) = mean(trial_info.response_time(logical(fn_condition_index(cond_lab{cond_ix},...
-        %             trial_info.condition_n))));
-        %     end
-        %     n_
+%% Prepare stat plotting
+% Confirm stat covers movie_lim
+if any(plt_vars.movie_lim==-1)
+    if plt_vars.movie_lim(1)==-1
+        plt_vars.movie_lim(1) = stat.time(1);
     end
+    if plt_vars.movie_lim(2)==-1
+        plt_vars.movie_lim(2) = stat.time(end);
+    end
+end
+if min(stat.time)>plt_vars.movie_lim(1)+0.0001 || max(stat.time)<plt_vars.movie_lim(2)-0.0001
+    error('stat.time does not cover move_lim!');
 end
 
-%% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
-if any(strcmp(stat_id,{'actv','CSE'}))
-    plot_name = [SBJ '_' stat_id '_' an_id];
-else
-    if grp_ix<=numel(grp_lab)
-        plot_name = [SBJ '_ANOVA_' grp_lab{grp_ix} '_' stat_id '_' an_id];
-    else
-        plot_name = [SBJ '_ANOVA_' rt_lab{1} '_' stat_id '_' an_id];
+% Get plotting time and colors
+plot_time_idx = all([stat.time>=plt_vars.movie_lim(1); stat.time<=plt_vars.movie_lim(2)],1);
+st_map = linspace(clim(1), clim(2), size(cmap,1));
+
+%% Load timing info
+evnt_time_idx = false([numel(plt_vars.evnt_type) numel(plot_time_idx)]);
+for evnt_ix = 1:numel(plt_vars.evnt_type)
+    if strcmp(plt_vars.evnt_type{evnt_ix},'S')
+        [~,start_ix] = min(abs(stat.time-0));
+        [~,end_ix]   = min(abs(stat.time-plt_vars.evnt_len));
+    elseif strcmp(plt_vars.evnt_type{evnt_ix},'R')
+        [~,start_ix] = min(abs(stat.time-mean(trial_info.response_time)));
+        [~,end_ix]   = min(abs(stat.time-(mean(trial_info.response_time)+plt_vars.evnt_len)));
     end
+    evnt_time_idx(evnt_ix,start_ix:end_ix) = true;
 end
-f = figure('Name',plot_name); hold on;
+% Check events don't overlap
+if size(evnt_time_idx,1)>1 && any(all(evnt_time_idx,1)); error('event label overlap!'); end
+
+%% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
+plot_name = [SBJ '_' cond_id '_' stat_id '_' an_id '_' hemi];
+f = figure('Name',plot_name,'Visible',fig_vis); hold on;
+frames = struct('cdata',[],'colormap',[]); frame_ix = 0;
 
 % Plot 3D mesh
 mesh_obj = ft_plot_mesh(mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
 %SHEILA: this would be the first of potentially more than one view_angle
 view(view_angle); material dull; lighting gouraud;
+l = camlight;
 
-[xsp, ysp, zsp] = sphere(100);
-
+[xsp, ysp, zsp] = sphere(250);
 
 % Plot Timing info
 % Text for time in sec (X,Y,Z in mm)
 time_str = text(plt_vars.time_str_pos(1), plt_vars.time_str_pos(2), plt_vars.time_str_pos(3),...
-    [num2str(hfa.time(1),'%.2f') ' s'], 'color', plt_vars.time_str_color,...
+    [num2str(stat.time(find(plot_time_idx,1)),'%.3f') ' s'], 'color', plt_vars.time_str_color,...
     'fontsize', plt_vars.time_str_size, 'horizontalalignment', plt_vars.time_str_horzalign);
 evnt_str = text(plt_vars.evnt_str_pos(1), plt_vars.evnt_str_pos(2), plt_vars.evnt_str_pos(3),...
-    plt_vars.evnt_lab{1}, 'color', plt_vars.evnt_str_color,...
+    plt_vars.evnt_type{1}, 'color', plt_vars.evnt_str_color,...
     'fontsize', plt_vars.evnt_str_size, 'horizontalalignment', plt_vars.evnt_str_horzalign,...
     'fontweight', plt_vars.evnt_str_weight);
 set(evnt_str,'Visible','off');
 
-%% Plot frames
-frames = struct('cdata',[],'colormap',[]);%cell(size(hfa.time));
-for t_ix = 1:numel(hfa.time)
-    % Plot electrodes on top
+if strcmp(cond_id,'actv')
+    % Save base figure with colorbar
+    cbar = colorbar; caxis(clim);
+    fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/movies/' cond_id '/'];
+    if ~exist(fig_dir,'dir')
+        [~] = mkdir(fig_dir);
+    end
+    fig_fname = [fig_dir plot_name '.svg'];
+    fprintf('Saving %s\n',fig_fname);
+    saveas(gcf,fig_fname);
+elseif any(strcmp(cond_id,{'CNI','PC','pCNI','pCI'})) && strcmp(plt_vars.evnt_type{1},'S')
+    frame_ix = frame_ix + 1;
+    % Plot electrodes at t = 0 (no actual stat for this, just for movie)
+    e_sphr = gobjects(size(elec.label));
     for e = 1:numel(elec.label)
-        % Sphere settings
-        %!!! SHEILA: move to plt_vars
-        reg_sz = 0.5;
-        cmap = colormap('parula');
-        elec_cmap = linspace(clim(1),clim(2),size(cmap,1));
-        
-        sz_lim = [0.5 5];       % radius (in mm) of spheres
-        % SHEILA STARTS HERE: sz_map = linspace(sz_lim(1),sz_lim(2), size(cmap,1));
-        e_sphr_ns = cell(size(elec.label));
-        % e_sphr_s    = cell(size(elec.label));
-        for e = 1:numel(elec.label)
-            % Create sphere
-            if any(sig_times{e}==t_ix)
-%                 <pick the right size>
-            else
-%                 <non-sig size>
-            end
-            e_sphr_ns{e} = surf(sz_lim(1)*xsp+elec.chanpos(e,1), sz_lim(1)*ysp+elec.chanpos(e,2), sz_lim(1)*zsp+elec.chanpos(e,3));
-            % Color sphere
-            % SHEILA: start from something like this: [~,cmap_ix] = min(abs(plot_dat(e,t_ix)-elec_cmap));
-            set(e_sphr_ns{e}, 'EdgeColor', appropriate_color);%, 'FaceColor', ns_color, 'EdgeAlpha', edgealpha, 'FaceAlpha', facealpha);
-        end
+        ch_ix = find(strcmp(stat.label,elec.label{e}));
+        % Create sphere
+        sz = plt_vars.ns_sz;
+        color = plt_vars.ns_color;
+        % Draw and color electrodes
+        e_sphr(e) = surf(sz*xsp+elec.chanpos(e,1), sz*ysp+elec.chanpos(e,2), sz*zsp+elec.chanpos(e,3));
+        set(e_sphr(e), 'EdgeColor', color);%, 'FaceColor', plt_vars.ns_color, 'EdgeAlpha', edgealpha, 'FaceAlpha', facealpha);
     end
     
-    %SHEILA: update view_angle, potentially lighting too
-    %view(view_angle(t_ix,:)); lighting gouraud;
-
+    % Grab t = 0 frame
+    time_str.String = [num2str(0,'%.3f') ' s'];
+    % Plot S event
+    evnt_str.String = plt_vars.evnt_type{1};
+    set(evnt_str,'Visible','on');
     
-    % Update time
-    time_str.String = [num2str(hfa.time(t_ix)) ' s'];
-    % Plot events
-    if any([evnt_times{:}]==t_ix)
-        for evnt_ix = 1:numel(plt_vars.evnt_types)
-            if any(evnt_times{evnt_ix}==t_ix)
-                evnt_str.String = plt_vars.evnt_types{evnt_ix};
-                set(evnt_str,'Visible','on');
-            end
-        end
-    else
-        set(evnt_str,'Visible','off');
+    %pause(plt_vars.frame_delay);
+    frames(frame_ix) = getframe;
+    
+    % Remove all spheres to plot next round
+    for e = 1:numel(elec.label)
+        delete(e_sphr(e));
     end
-    
-    %pause(0.04);
-    frames(t_ix) = getframe;
-    
-    % Remove all spheres
-    %for all sphere; delete(e_sphr{e}); end;
 end
 
+%% Plot frames
+fprintf('Starting frames (%i total):\n\t',sum(plot_time_idx)/plt_vars.frame_skip);
+tic;
+for t_ix = 1:plt_vars.frame_skip:numel(plot_time_idx)
+    if plot_time_idx(t_ix)
+        frame_ix = frame_ix + 1;
+        if mod(frame_ix,5)==0; fprintf('%i..',t_ix); end
+        if mod(frame_ix,100)==0; fprintf('\n\t'); end
+        % For plotting times, plot electrodes
+        e_sphr = gobjects(size(elec.label));
+        for e = 1:numel(elec.label)
+            ch_ix = find(strcmp(stat.label,elec.label{e}));
+            % Create sphere
+            if stat.mask(ch_ix,t_ix)
+                if strcmp(cond_id,'actv')
+                    [~,map_ix] = min(abs(st_map-stat.avg(ch_ix,t_ix)));
+                    color = cmap(map_ix,:);
+                else
+                    [~,map_ix] = min(abs(st_map-stat.trial(cond_ix,ch_ix,t_ix)));
+                    color = elec.color(e,:);
+                end
+                sz    = sz_map(map_ix);
+            else
+                sz = plt_vars.ns_sz;
+                color = plt_vars.ns_color;
+            end
+            % Draw and color electrodes
+            e_sphr(e) = surf(sz*xsp+elec.chanpos(e,1), sz*ysp+elec.chanpos(e,2), sz*zsp+elec.chanpos(e,3));
+            set(e_sphr(e), 'EdgeColor', color);%, 'FaceColor', plt_vars.ns_color, 'EdgeAlpha', edgealpha, 'FaceAlpha', facealpha);
+        end
+        
+        % Update view_angle and lighting
+        %view(view_angle(t_ix,:)); lighting gouraud;
+        
+        % Update time
+        time_str.String = [num2str(stat.time(t_ix),'%.3f') ' s'];
+        % Plot events
+        if any(evnt_time_idx(:,t_ix))
+            evnt_str.String = plt_vars.evnt_type{evnt_time_idx(:,t_ix)~=0};
+            set(evnt_str,'Visible','on');
+        else
+            set(evnt_str,'Visible','off');
+        end
+        
+        %pause(plt_vars.frame_delay);
+        frames(frame_ix) = getframe;
+        
+        % Remove all spheres to plot next round
+        if t_ix~=numel(plot_time_idx)
+            for e = 1:numel(elec.label)
+                delete(e_sphr(e));
+            end
+        end
+    end
+end
+fprintf('\nDONE: Elapsed time = %f\n',toc);
+
 %% Save movie
-fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/actv/'];
-vid_out = VideoWriter([fig_dir plot_name vid_ext],vid_encoding);
-vid_out.FrameRate = sample_rate*plt_vars.play_speed;
+frame_rate = 1/stat.time(2)-stat.time(1);
+vid_out = VideoWriter([fig_dir plot_name plt_vars.vid_ext],plt_vars.vid_encoding);
+vid_out.FrameRate = frame_rate*plt_vars.play_speed;
 open(vid_out);
 writeVideo(vid_out,frames);
 close(vid_out);

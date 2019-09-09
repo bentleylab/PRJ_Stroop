@@ -1,4 +1,4 @@
-plt_vars.movie_lim  = [0 1.5];  % should take -50ms to end
+plt_vars.movie_lim  = [-1 -1];  % should take -50ms to end
 plt_vars.play_speed = 0.5;
 
 % Electrode properties
@@ -8,7 +8,7 @@ plt_vars.ns_sz     = 0.5;           % radius of non-significant spheres
 plt_vars.sz_lim    = [1 5];         % radius (in mm) of spheres
 
 % Event + Time lines
-plt_vars.evnt_type          = {'S','R'};
+plt_vars.evnt_type          = {'S'};
 plt_vars.evnt_len           = 0.1;  % time to reamin on screen
 plt_vars.evnt_str_pos       = [0 0 -110]; % X, Y, Z
 plt_vars.evnt_str_color     = 'k';
