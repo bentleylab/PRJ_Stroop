@@ -35,9 +35,9 @@ B00b_GRP_RT_violins_norm(SBJs,plt_id,save_fig,fig_vis,fig_ftype);
 %% Plot HFA stacks with mean traces
 % conditions  = 'actv';%'CNI';%
 stat_id_b = 'PC_B2t0';%pCNI_
-% stat_id_s = 'PCi_S0tmRT_WL1_WS50';%{'CNI_PC_S0tmRT_WL1_WS25',};
-% stat_id_sd= 'PCi_S0tmRT_WL1_WS50_D1tRT';
-% stat_id_r = 'PCi_R1t5_WL1_WS50';%{'CNI_PC_R1t5_WL1_WS25',};
+% stat_id_s = 'PCi_S0tmRT_WL1_WS25';%{'CNI_PC_S0tmRT_WL1_WS25',};
+% stat_id_sd= 'PCi_S0tmRT_WL1_WS25_D1tRT';
+% stat_id_r = 'PCi_R1t5_WL1_WS25';%{'CNI_PC_R1t5_WL1_WS25',};
 stat_id_s = 'CNI_PC_S0tmRT_WL1_WS25';%{'CNI_PC_S0tmRT_WL1_WS50',};
 stat_id_d = 'CNI_PC_D1tRT';%WS50
 stat_id_sd= 'CNI_PC_S0tmRT_WL1_WS25_D1tRT';%WS50
@@ -95,7 +95,7 @@ end
 % SBJ10b_ANOVA_plot_SR_RTcorr(SBJ,stat_id,an_id_s,an_id_r,plt_id,save_fig,fig_vis,fig_ftype)
 % %% Plot ANOVA with RT correlation
 % SBJ = 'IR35';
-% stat_id = 'corrRT_CNI_PC_WL200_WS50';
+% stat_id = 'corrRT_CNI_PC_WL200_WS25';
 % an_id_s = 'HGm_S_zbtS_trl2to151_sm0_wn100_stat15';
 % an_id_r = 'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1';
 % plt_id  = 'ts_S0to15_R5to10_evnt_sigline';
@@ -124,14 +124,14 @@ end
 %   RECONS with EFFECTS
 %  =================================================================================
 %% Combine S + D analyses
-stat_id_s  = 'CNI_PC_S0tmRT_WL1_WS25';%,'CNI_PC_R1t5_WL1_WS50'};%
-stat_id_d  = 'CNI_PC_D1tRT';
-stat_id_r  = 'CNI_PC_R1t5_WL1_WS25';
-stat_id_sd = 'CNI_PC_S0tmRT_WL1_WS25_D1tRT';
-% stat_id_s  = 'PCi_S0tmRT_WL1_WS50';%,'CNI_PC_R1t5_WL1_WS50'};%
+stat_id_s  = 'rCNI_p_PC_S0tmRT_WL1_WS25';%,'CNI_PC_R1t5_WL1_WS50'};%
+stat_id_d  = 'rCNI_p_PC_D1tRT';
+stat_id_r  = 'rCNI_p_PC_R1t5_WL1_WS25';
+stat_id_sd = 'rCNI_p_PC_S0tmRT_WL1_WS25_D1tRT';
+% stat_id_s  = 'PCi_S0tmRT_WL1_WS25';%,'CNI_PC_R1t5_WL1_WS25'};%
 % stat_id_d  = 'PCi_D1tRT';
-% stat_id_r  = 'PCi_R1t5_WL1_WS50';
-% stat_id_sd = 'PCi_S0tmRT_WL1_WS50_D1tRT';
+% stat_id_r  = 'PCi_R1t5_WL1_WS25';
+% stat_id_sd = 'PCi_S0tmRT_WL1_WS25_D1tRT';
 an_id_s    = 'HGm_S2t151_zbtA_sm0_wn100';
 an_id_d    = 'HGm_S2t251_zbtA_sm0_wn100';
 an_id_r    = 'HGm_R5t101_zbtA_sm0_wn100';
@@ -141,7 +141,7 @@ for s = 1:numel(SBJs)
 end
 
 %% Plot CNI sig elecs
-stat_id = 'CNI_PC_S0tmRT_WL1_WS50_D1tRT_R1t5_WL1_WS50';
+stat_id = 'CNI_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25';
 an_opts = {'HGm_S2t151_zbtA_sm0_wn100'};
 hemi_opts = {'r','l'};
 roi_id   = 'gROI';
@@ -164,17 +164,14 @@ end
 
 %% Plot overlap recons
 stat_conds = {...
-    {'pCNI_PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'},...
-    {'pCNI_PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','pCNI'},...
-    {'CNI_PC_S0tmRT_WL1_WS50_D1tRT_R1t5_WL1_WS50','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
+    {'rCNI_p_PC_S0tmRT_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','CNI'}...
+    {'rCNI_p_PC_D1tRT','HGm_S2t251_zbtA_sm0_wn100','CNI'}...
+    {'rCNI_p_PC_R1t5_WL1_WS25','HGm_R5t101_zbtA_sm0_wn100','CNI'}...
     };
-%     {'PCi_S0tmRT_WL1_WS50_D1tRT','HGm_S2t151_zbtA_sm0_wn100','PC'},...
-%     {'CNI_PC_S0tmRT_WL1_WS50','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
-%     {'CNI_PC_D1tRT','HGm_S2t251_zbtA_sm0_wn100','CNI'},...
-%     {'CNI_PC_R1t5_WL1_WS50','HGm_R5t101_zbtA_sm0_wn100','CNI'}...
-%     {'PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'},...
-%     {'CNI_PC_S0tmRT_WL1_WS50_D1tRT_R1t5_WL1_WS50','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
-%     {'CNI_PC_S0tmRT_WL1_WS50_D1tRT','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
+%     {'rCNI_p_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','CNI'}...
+%     {'pCNI_PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','pCNI'}...
+%     {'pCNI_PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'}...
+%     {'PCi_S0tmRT_WL1_WS25_D1tRT','HGm_S2t151_zbtA_sm0_wn100','PC'}...
 
 proc_id   = 'main_ft';
 roi_id    = 'gROI';
@@ -199,17 +196,22 @@ SBJ10c_HFA_GRP_venn_stats_ROI(SBJs, proc_id, stat_conds, 'b', atlas_id, roi_id,.
 
 %% Proportions of significant effects across ROI
 stat_conds = {...
-    {'pCNI_PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'},...
-    {'pCNI_PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','pCNI'},...
-    {'CNI_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','CNI'}...
-%     {'PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'},...
-%     {'PCi_S0tmRT_WL1_WS50_D1tRT','HGm_S2t151_zbtA_sm0_wn100','PC'},...
-%     {'CNI_PC_S0tmRT_WL1_WS25_D1tRT','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
-%     {'CNI_PC_R1t5_WL1_WS25','HGm_R5t101_zbtA_sm0_wn100','CNI'}...
-%               {'actv_D1tRT','HGm_S2t251_zbtA_sm0_wn100','actv'},...
-%     {'CNI_PC_S0tmRT_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
-%     {'CNI_PC_D1tRT','HGm_S2t251_zbtA_sm0_wn100','CNI'},...
+    {'rCNI_p_PC_S0tmRT_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','CNI'}...  % rCNI_p_PC for S
+    {'rCNI_p_PC_D1tRT','HGm_S2t251_zbtA_sm0_wn100','CNI'}...            % rCNI_p_PC for D
+    {'rCNI_p_PC_R1t5_WL1_WS25','HGm_R5t101_zbtA_sm0_wn100','CNI'}...    % rCNI_p_PC for R
+%     {'rCNI_p_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','CNI'}...
+%     {'rCNI_p_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','pCNI'}...
+%     {'rCNI_p_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','PC'}...
+%     {'pCNI_PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','pCNI'}...
+%     {'pCNI_PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'}...
     };
+%     {'PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'}...
+%     {'PCi_S0tmRT_WL1_WS25_D1tRT','HGm_S2t151_zbtA_sm0_wn100','PC'}...
+%     {'CNI_PC_S0tmRT_WL1_WS25_D1tRT','HGm_S2t151_zbtA_sm0_wn100','CNI'}...
+%     {'CNI_PC_R1t5_WL1_WS25','HGm_R5t101_zbtA_sm0_wn100','CNI'}...
+%               {'actv_D1tRT','HGm_S2t251_zbtA_sm0_wn100','actv'}...
+%     {'CNI_PC_S0tmRT_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','CNI'}...
+%     {'CNI_PC_D1tRT','HGm_S2t251_zbtA_sm0_wn100','CNI'}...
 
 proc_id     = 'main_ft';
 atlas_id    = 'Dx';
@@ -231,7 +233,10 @@ SBJ10c_HFA_GRP_errbar_ROI_stat_comb(SBJs,proc_id,stat_conds,atlas_id,roi_id,...
             gm_thresh,z_thresh,plt_id,plot_out,0,save_fig,fig_vis,fig_ftype);
 
 %% Movies of significant effects
-stat_cond = {'CNI_PC_R1t5_WL1_WS25','HGm_R5t101_zbtA_sm0_wn100','CNI'};
+stat_conds = {...
+    {'CNI_PC_S0tmRT_WL1_WS25_D1tRT','HGm_S2t151_zbtA_sm0_wn100','CNI'}...
+    {'CNI_PC_R1t5_WL1_WS25','HGm_R5t101_zbtA_sm0_wn100','CNI'}...
+    };
 %     actv:   {'actv_S0t150_mn1','HGm_S2t151_zbtA_sm0_wn100','actv'};
 %     CNI.S:  {'CNI_PC_S0tmRT_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','CNI'};
 %     CNI.SD: {'CNI_PC_S0tmRT_WL1_WS25_D1tRT','HGm_S2t151_zbtA_sm0_wn100','CNI'};
@@ -240,7 +245,7 @@ stat_cond = {'CNI_PC_R1t5_WL1_WS25','HGm_R5t101_zbtA_sm0_wn100','CNI'};
 
 %     {'pCNI_PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','pCNI'},...
 %     {'PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'},...
-%     {'PCi_S0tmRT_WL1_WS50_D1tRT','HGm_S2t151_zbtA_sm0_wn100','PC'},...
+%     {'PCi_S0tmRT_WL1_WS25_D1tRT','HGm_S2t151_zbtA_sm0_wn100','PC'},...
 %     {'CNI_PC_S0tmRT_WL1_WS25_D1tRT','HGm_S2t151_zbtA_sm0_wn100','CNI'},...
 %               {'actv_D1tRT','HGm_S2t251_zbtA_sm0_wn100','actv'},...
 %     ,...
@@ -248,38 +253,77 @@ stat_cond = {'CNI_PC_R1t5_WL1_WS25','HGm_R5t101_zbtA_sm0_wn100','CNI'};
 
 proc_id     = 'main_ft';
 atlas_id    = 'Dx';
-plt_id      = 'movie_R1t5_sp20';%'movie_S0tD_sp20';%'movie_S0t15_sp20';
+plt_opts     = {'movie_S0tD' 'movie_R1t5'};%'movie_S0tD_sp20';%'movie_S0t15_sp20';
 roi_id      = 'gROI';
-hemi_opts   = {'l','r'};
+hemi        = 'l';
+mirror      = 1;
+plot_out    = 0;
 % z_thresh    = 0;%1.5;
 % gm_thresh   = 0;
-plot_out    = 0;
 fig_vis     = 'on';
 
-for h = 1:numel(hemi_opts)
-    fn_view_recon_stat_movie('IR35', proc_id, stat_cond, atlas_id, roi_id, hemi_opts{h},...
-                         plot_out, plt_id, fig_vis);
+for s = [6 11 14 15 16 17]%1:numel(SBJs)
+    for stat_ix = 1:numel(stat_conds)
+        fn_view_recon_stat_movie(SBJs{s}, proc_id, stat_conds{stat_ix},...
+            atlas_id, roi_id, hemi, mirror, plot_out, plt_opts{stat_ix}, fig_vis);
+    end
 end
 
-%% Redux (old version of SBJ10c bar plots
-% stat_id = 'CNI_PC_S0tmRT_WL1_WS50';
-% an_id   = 'HGm_S2t151_zbtA_sm0_wn100';
-% actv_id = 'actv_S0tmRT_mn1';
-% SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,proc_id,an_id,stat_id,actv_id,atlas_id,roi_id,...
-%                                                             gm_thresh,plt_id,plot_out,1,save_fig,fig_vis,fig_ftype)
-%% ROLs
-% proc_id = 'main_ft';
-% an_id = 'HGm_S_zbtS_trl2to251_sm0_wn100_stat0';
-% rol_id = 'rol';
-% plot_qa_trl = 1;
-% plot_qa_summary = 1;
-% plot_stack =1;
+%% smANOVA time series by ROI
+% stat_id_s = 'CNI_PC_S0tmRT_WL1_WS25';%{'CNI_PC_S0tmRT_WL1_WS25',};
+% stat_id_d = 'CNI_PC_D1tRT';%WS50
+% stat_id_sd= 'CNI_PC_S0tmRT_WL1_WS25_D1tRT';%WS50
+% stat_id_r = 'CNI_PC_R1t5_WL1_WS25';%{'CNI_PC_R1t5_WL1_WS25',};
+% an_id_s   = 'HGm_S2t151_zbtA_sm0_wn100';%wn200 --> nope
+% an_id_d   = 'HGm_S2t251_zbtA_sm0_wn100';%wn200 --> nope
+% an_id_r   = 'HGm_R5t101_zbtA_sm0_wn100';%wn200 --> nope
+% plt_id_sr = 'ERPstack_S0to10_R1to5_evnt_c5';%'ts_S15R1_errbr_evnt';
+% gm_thresh = 0;
+% z_thresh  = 0;
+% atlas_id  = 'Dx';
+% plot_nsig = 0;
+% save_fig  = 1;
+% fig_vis   = 'off';
 % fig_ftype = 'png';
-% fig_vis = 'off';
 % 
 % for s = 1:numel(SBJs)
-%     SBJ08d_HFA_ROL(SBJs{s}, an_id, rol_id, plot_qa_trl, plot_qa_summary, plot_stack, fig_vis, fig_ftype);
+%     SBJ10b_ANOVA_plot_SR_RTcorr_ROIcomb(SBJs{s},proc_id,stat_id_sd,stat_id_r,an_id_s,an_id_r,...
+%                                         atlas_id,gm_thresh,z_thresh,plot_nsig,plt_id_sr,...
+%                                         save_fig,fig_vis,fig_ftype)
+%     close all;
+%     SBJ10b_ANOVA_plot_SR_RTcorr_gROIcomb(SBJs{s},proc_id,stat_id_sd,stat_id_r,an_id_s,an_id_r,...
+%                                         atlas_id,gm_thresh,z_thresh,plot_nsig,plt_id_sr,...
+%                                         save_fig,fig_vis,fig_ftype)
+%     close all;
 % end
+
+%% Plot onsets of ANOVA+RT
+proc_id = 'main_ft';
+stat_opts   = {'rCNI_p_PC_S0tmRT_WL1_WS25_D1tRT','rCNI_p_PC_R1t5_WL1_WS25'};
+tbin_id     = 'cnts';
+an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_R5t101_zbtA_sm0_wn100'};%'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1','HGm_R_zbtA_trl5to101_sm0_wn100_stat5to1'};% stim?
+z_thresh    = 0;
+gm_thresh   = 0;
+median_yn   = 0;
+roi_opts    = {'gROI','PFC'};
+atlas_id    = 'Dx';
+plt_id      = 'onsets_trl5to1_violin_allROI';%,'onsets_trl5to1_violin_allROI'};%{'onsets_trl0to15_evnt_roi'},
+fig_ftype   = 'png';
+
+for roi_ix = 1:numel(roi_opts)
+    for an_ix = 1:numel(an_opts)
+            fprintf('roi: %s; an: %s; plt: %s\n',roi_opts{roi_ix},an_opts{an_ix},plt_id);
+%             % Violin Plots
+            SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_opts{an_ix},proc_id,an_opts{an_ix},roi_opts{roi_ix},...
+                                                    atlas_id,gm_thresh,z_thresh,plt_id,1,'on',fig_ftype)
+            % Music staff + histogram of onsets
+%             SBJ10c_HFA_GRP_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,proc_id,an_opts{an_ix},median_yn,roi_opts{roi_ix},...
+%                                                     atlas_opts{roi_ix},gm_thresh,plt_opts{an_ix},1,'on',fig_ftype)
+            % Pair differences
+%             SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,proc_id,an_opts{an_ix},roi_opts{roi_ix},...
+%                                                     atlas_id,0,plt_opts{1}{2},save_fig,fig_vis)
+    end
+end
 
 %% Plot CNI sig onsets on recon
 % stat_id  = 'corrRT_CNI_PC_WL200_WS50';
@@ -304,60 +348,27 @@ end
 % fn_view_recon_atlas_grp_stat_onset(SBJs, proc_id, stat_id, an_id, reg_type, show_labels,...
 %                                  'l', atlas_id, roi_id, tbin_id)
                              
-%% smANOVA time series by ROI
-stat_id_s = 'CNI_PC_S0tmRT_WL1_WS25';%{'CNI_PC_S0tmRT_WL1_WS50',};
-stat_id_d = 'CNI_PC_D1tRT';%WS50
-stat_id_sd= 'CNI_PC_S0tmRT_WL1_WS25_D1tRT';%WS50
-stat_id_r = 'CNI_PC_R1t5_WL1_WS25';%{'CNI_PC_R1t5_WL1_WS50',};
-an_id_s   = 'HGm_S2t151_zbtA_sm0_wn100';%wn200 --> nope
-an_id_d   = 'HGm_S2t251_zbtA_sm0_wn100';%wn200 --> nope
-an_id_r   = 'HGm_R5t101_zbtA_sm0_wn100';%wn200 --> nope
-plt_id_sr = 'ERPstack_S0to10_R1to5_evnt_c5';%'ts_S15R1_errbr_evnt';
-gm_thresh = 0;
-z_thresh  = 0;
-atlas_id  = 'Dx';
-plot_nsig = 0;
-save_fig  = 1;
-fig_vis   = 'off';
-fig_ftype = 'png';
-
-for s = 1:numel(SBJs)
-    SBJ10b_ANOVA_plot_SR_RTcorr_ROIcomb(SBJs{s},proc_id,stat_id_sd,stat_id_r,an_id_s,an_id_r,...
-                                        atlas_id,gm_thresh,z_thresh,plot_nsig,plt_id_sr,...
-                                        save_fig,fig_vis,fig_ftype)
-    close all;
-    SBJ10b_ANOVA_plot_SR_RTcorr_gROIcomb(SBJs{s},proc_id,stat_id_sd,stat_id_r,an_id_s,an_id_r,...
-                                        atlas_id,gm_thresh,z_thresh,plot_nsig,plt_id_sr,...
-                                        save_fig,fig_vis,fig_ftype)
-    close all;
-end
-
-%% Plot onsets of ANOVA+RT
-proc_id = 'main_ft';
-stat_opts   = {'CNI_PC_S0tmRT_WL1_WS25_D1tRT','CNI_PC_R1t5_WL1_WS25'};
-tbin_id     = 'cnts';
-an_opts     = {'HGm_S2t151_zbtA_sm0_wn100','HGm_R5t101_zbtA_sm0_wn100'};%'HGm_R_zbtS_trl5to101_sm0_wn100_stat5to1','HGm_R_zbtA_trl5to101_sm0_wn100_stat5to1'};% stim?
-z_thresh    = 0;
-gm_thresh   = 0;
-median_yn   = 0;
-roi_opts    = {'PFC'};
-atlas_opts  = {'Dx'};
-plt_opts    = {'onsets_trl5to1_violin_allROI','onsets_trl5to1_violin_all'};%{'onsets_trl0to15_evnt_roi'},
-fig_ftype = 'png';
-an_ix = 1;
-for roi_ix = 1%:numel(roi_opts)
-    for an_ix = 1:numel(an_opts)
-            fprintf('roi: %s; an: %s; plt: %s\n',roi_opts{roi_ix},an_opts{an_ix},plt_opts{an_ix});
-%             % Violin Plots
-            SBJ10c_HFA_GRPavg_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_opts{an_ix},proc_id,an_opts{an_ix},roi_opts{roi_ix},...
-                                                    atlas_opts{roi_ix},gm_thresh,z_thresh,plt_opts{an_ix},1,'on',fig_ftype)
-            % Music staff + histogram of onsets
-%             SBJ10c_HFA_GRP_onsets_ROI_normRTout_RT_ANOVA(SBJs,stat_id,proc_id,an_opts{an_ix},median_yn,roi_opts{roi_ix},...
-%                                                     atlas_opts{roi_ix},gm_thresh,plt_opts{an_ix},1,'on',fig_ftype)
-            % Pair differences
-%             SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,proc_id,an_opts{an_ix},roi_opts{roi_ix},...
-%                                                     atlas_id,0,plt_opts{1}{2},save_fig,fig_vis)
-    end
-end
+%% ===============================================================================================================
+% OLDER:
+%=================================================================================================================
+%% Redux (old version of SBJ10c bar plots
+% stat_id = 'CNI_PC_S0tmRT_WL1_WS25';
+% an_id   = 'HGm_S2t151_zbtA_sm0_wn100';
+% actv_id = 'actv_S0tmRT_mn1';
+% SBJ10c_HFA_GRP_summary_errbar_perc_GMlim_actv_RT_ANOVA_ROI(SBJs,proc_id,an_id,stat_id,actv_id,atlas_id,roi_id,...
+%                                                             gm_thresh,plt_id,plot_out,1,save_fig,fig_vis,fig_ftype)
+%% ROLs
+% proc_id = 'main_ft';
+% an_id = 'HGm_S_zbtS_trl2to251_sm0_wn100_stat0';
+% rol_id = 'rol';
+% plot_qa_trl = 1;
+% plot_qa_summary = 1;
+% plot_stack =1;
+% fig_ftype = 'png';
+% fig_vis = 'off';
+% 
+% for s = 1:numel(SBJs)
+%     SBJ08d_HFA_ROL(SBJs{s}, an_id, rol_id, plot_qa_trl, plot_qa_summary, plot_stack, fig_vis, fig_ftype);
+% end
 
 

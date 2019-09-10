@@ -1,4 +1,4 @@
-function fn_view_recon_stat_movie(SBJ, proc_id, stat_cond, atlas_id, roi_id, hemi, plot_out, plt_id, fig_vis, varargin)
+function fn_view_recon_stat_movie(SBJ, proc_id, stat_cond, atlas_id, roi_id, hemi, mirror, plot_out, plt_id, fig_vis, varargin)
 %% Plot a reconstruction with electrodes colored according to statistics
 %   PLT_VARS:
 %       color = +/- or ROI
@@ -27,7 +27,8 @@ function fn_view_recon_stat_movie(SBJ, proc_id, stat_cond, atlas_id, roi_id, hem
 %       'PC': ANOVA of proportion congruence (red for sig)
 %   atlas_id [str] - {'DK','Dx','Yeo7','Yeo17'}
 %   roi_id [str] - ROI grouping by which to color the atlas ROIs
-%   hemi [str] - {'r','l','b'} for right, left, or both hemispheres (shouldn't be both here, too hard to see...)
+%   hemi [str] - {'r','l'} for right or left hemispheres ('b' gives error)
+%   mirror [0/1] - plot the other hemi, 
 %   plot_out [0/1] - plot electrodes outside of the hemisphere or ROIs of interest?
 %   plt_id [str] - which set of plotting params
 %   varargin [cell]:
@@ -70,14 +71,14 @@ cond_id = stat_cond{3};
 %% Implement default input options
 if ~exist('view_angle','var')
     if strcmp(hemi,'r')
-        view_angle = [120 30];
+        view_angle = [120 10];
     elseif strcmp(hemi,'l')
-        view_angle = [-120 30];
+        view_angle = [-120 10];
+    elseif strcmp(hemi,'b')
+        error('no sense in making a both hemi movie! (use mirroring...)');
     else
         error(['unknown hemi: ' hemi]);
     end
-elseif strcmp(hemi,'b')
-    error('no sense in making a both hemi movie!');
 end
 if ~exist('mesh_alpha','var')
     if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
@@ -93,8 +94,17 @@ load([SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_pat_',atlas_id,'_final.mat']);
 % Remove electrodes that aren't in hemisphere
 if ~plot_out
     cfgs = [];
-    cfgs.channel = fn_select_elec_lab_match(elec, hemi, atlas_id, []);
+    if mirror
+        cfgs.channel = fn_select_elec_lab_match(elec, 'b', atlas_id, []);
+    else
+        cfgs.channel = fn_select_elec_lab_match(elec, hemi, atlas_id, []);
+    end
     elec = fn_select_elec(cfgs, elec);
+end
+
+% Mirror hemispheres
+if mirror
+    elec.chanpos(~strcmp(elec.hemi,hemi),1) = -elec.chanpos(~strcmp(elec.hemi,hemi),1);
 end
 
 %% Organize Movie Settings
@@ -280,30 +290,38 @@ end
 
 %% Plot frames
 fprintf('Starting frames (%i total):\n\t',numel(stat.time)/plt_vars.frame_skip);
+% frame_plot_times = zeros(size(stat.time));
 tic;
 for t_ix = 1:plt_vars.frame_skip:numel(stat.time)
     frame_ix = frame_ix + 1;
     if mod(frame_ix,5)==0; fprintf('%i..',t_ix); end
     if mod(frame_ix,100)==0; fprintf('\n\t'); end
-    for e = 1:numel(elec.label)
-        % Create sphere
-        if ~isnan(stat.data(e,t_ix))
-            [~,map_ix] = min(abs(st_map-stat.data(e,t_ix)));
-            sz    = sz_map(map_ix);
-            if strcmp(cond_id,'actv')
-                color = plt_vars.cmap(map_ix,:);
-            else
-                color = elec.color(e,:);
-            end
-        else
-            sz = plt_vars.ns_sz;
-            color = plt_vars.ns_color;
-        end
-        % Draw and color electrodes
-        e_sphr(e) = surf(sz*xsp+elec.chanpos(e,1), sz*ysp+elec.chanpos(e,2), sz*zsp+elec.chanpos(e,3));
-        set(e_sphr(e), 'EdgeColor', color);%, 'FaceColor', plt_vars.ns_color, 'EdgeAlpha', edgealpha, 'FaceAlpha', facealpha);
-    end
     
+    % Draw new elecs if first frame or change in data
+    if t_ix==1 || ~isequaln(stat.data(:,t_ix),stat.data(:,t_ix-1)) % ~= doesn't handle nans
+        % Remove all spheres to plot next round
+        % delete(e_sphr); e_sphr = gobjects(size(elec.label));
+        for e = 1:numel(elec.label)
+            if t_ix==1 || stat.data(e,t_ix)~=stat.data(e,t_ix-1)
+                % Create sphere
+                if ~isnan(stat.data(e,t_ix))
+                    [~,map_ix] = min(abs(st_map-stat.data(e,t_ix)));
+                    sz    = sz_map(map_ix);
+                    if strcmp(cond_id,'actv')
+                        color = plt_vars.cmap(map_ix,:);
+                    else
+                        color = elec.color(e,:);
+                    end
+                else
+                    sz = plt_vars.ns_sz;
+                    color = plt_vars.ns_color;
+                end
+                % Draw and color electrodes
+                e_sphr(e) = surf(sz*xsp+elec.chanpos(e,1), sz*ysp+elec.chanpos(e,2), sz*zsp+elec.chanpos(e,3));
+                set(e_sphr(e), 'EdgeColor', color);%, 'FaceColor', plt_vars.ns_color, 'EdgeAlpha', edgealpha, 'FaceAlpha', facealpha);
+            end
+        end
+    end
     % Update view_angle and lighting
     %view(view_angle(t_ix,:)); lighting gouraud;
     
@@ -313,11 +331,8 @@ for t_ix = 1:plt_vars.frame_skip:numel(stat.time)
     
     %pause(plt_vars.frame_delay);
     frames(frame_ix) = getframe;
-    
-    % Remove all spheres to plot next round
-    if t_ix~=numel(stat.time)
-        delete(e_sphr);
-    end
+%     frame_plot_times(t_ix) = toc;
+%     fprintf('\t%i (%i) = %f\n',t_ix,update,frame_plot_times(t_ix));
 end
 fprintf('\nDONE: Elapsed time = %f\n',toc);
 

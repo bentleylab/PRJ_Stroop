@@ -1,5 +1,5 @@
 plt_vars.movie_lim  = {-0.1 0.5};  % should take -50ms to end
-plt_vars.play_speed = 0.2;
+plt_vars.play_speed = 1;
 
 % Electrode properties
 plt_vars.cmap      = parula(64);    % colormap for electrodes

@@ -41,7 +41,7 @@ for f_ix = 1:numel(shared_fields)
     end
 end
 % Warn for different events
-if ~strcmp(full{1}.st.evnt_lab,full{2}.st.evnt_lab);
+if ~strcmp(full{1}.st.evnt_lab,full{2}.st.evnt_lab)
     warning('CAREFUL: st.evnt_lab mismatch!');
 end
 
@@ -56,7 +56,8 @@ else
     if ~strcmp(full{1}.w2.dimord,full{2}.w2.dimord); error('w2.dimord mismatch'); end
     if ~strcmp(full{1}.w2.dimord(end-3:end),'time'); error('w2 last dim not time'); end
     for grp_ix = 1:numel(full{1}.st.groups)
-        if ~all(full{1}.w2.design{grp_ix}==full{2}.w2.design{grp_ix})
+        if ~all(full{1}.w2.design{grp_ix}(~isnan(full{1}.w2.design{grp_ix}))==...
+                full{2}.w2.design{grp_ix}(~isnan(full{2}.w2.design{grp_ix})))
             error('w2.design doesn''t match');
         end
     end
