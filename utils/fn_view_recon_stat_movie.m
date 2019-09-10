@@ -105,6 +105,7 @@ end
 % Mirror hemispheres
 if mirror
     elec.chanpos(~strcmp(elec.hemi,hemi),1) = -elec.chanpos(~strcmp(elec.hemi,hemi),1);
+    hemi_str = [hemi 'b'];
 end
 
 %% Organize Movie Settings
@@ -241,7 +242,7 @@ st_map = linspace(clim(1), clim(2), size(plt_vars.cmap,1));
 mesh = fn_load_recon_mesh(SBJ,'pat','','pial',hemi);
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
-plot_name = [SBJ '_' cond_id '_' stat_id '_' an_id '_' hemi];
+plot_name = [SBJ '_' cond_id '_' stat_id '_' an_id '_' hemi_str];
 fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/movies/' cond_id '/'];
 if ~exist(fig_dir,'dir')
     [~] = mkdir(fig_dir);
@@ -289,20 +290,20 @@ if strcmp(cond_id,'actv')
 end
 
 %% Plot frames
-fprintf('Starting frames (%i total):\n\t',numel(stat.time)/plt_vars.frame_skip);
-% frame_plot_times = zeros(size(stat.time));
+fprintf('Starting frames (%i total):\n',numel(stat.time)/plt_vars.frame_skip);
+frame_plot_times = zeros(size(stat.time)); update_idx = zeros(size(stat.time));
 tic;
 for t_ix = 1:plt_vars.frame_skip:numel(stat.time)
     frame_ix = frame_ix + 1;
-    if mod(frame_ix,5)==0; fprintf('%i..',t_ix); end
-    if mod(frame_ix,100)==0; fprintf('\n\t'); end
-    
+%     if mod(frame_ix,5)==0; fprintf('%i..',t_ix); end
+%     if mod(frame_ix,100)==0; fprintf('\n\t'); end
     % Draw new elecs if first frame or change in data
     if t_ix==1 || ~isequaln(stat.data(:,t_ix),stat.data(:,t_ix-1)) % ~= doesn't handle nans
+        update_idx(t_ix) = 1;
         % Remove all spheres to plot next round
         % delete(e_sphr); e_sphr = gobjects(size(elec.label));
         for e = 1:numel(elec.label)
-            if t_ix==1 || stat.data(e,t_ix)~=stat.data(e,t_ix-1)
+            if t_ix==1 || ~isequaln(stat.data(e,t_ix),stat.data(e,t_ix-1))
                 % Create sphere
                 if ~isnan(stat.data(e,t_ix))
                     [~,map_ix] = min(abs(st_map-stat.data(e,t_ix)));
@@ -331,15 +332,26 @@ for t_ix = 1:plt_vars.frame_skip:numel(stat.time)
     
     %pause(plt_vars.frame_delay);
     frames(frame_ix) = getframe;
-%     frame_plot_times(t_ix) = toc;
-%     fprintf('\t%i (%i) = %f\n',t_ix,update,frame_plot_times(t_ix));
+    frame_plot_times(t_ix) = toc;
+    if t_ix==1
+        fprintf('\t%i (%.1f, %i) = %.1f\n',t_ix,100*t_ix/numel(stat.time),...
+            update_idx(t_ix),frame_plot_times(t_ix));
+    else
+        fprintf('\t%i (%.1f, %i) = %.1f (%.3f)\n',t_ix,100*t_ix/numel(stat.time),...
+            update_idx(t_ix),frame_plot_times(t_ix),frame_plot_times(t_ix)-frame_plot_times(t_ix-1));
+    end
 end
 fprintf('\nDONE: Elapsed time = %f\n',toc);
+fprintf('frame_times (mean, non-update, update - SD) = (%f, %f, %f)\n',...
+    mean(frame_plot_times), mean(frame_plot_times(update_idx==0)),...
+    mean(frame_plot_times(update_idx>0)), std(frame_plot_times(update_idx>0)));
+fprintf('updates (n, min, mean - SD, max) = (%i, %i, %.2f - %.3f, %i)\n',sum(update_idx>0),min(update_idx(update_idx>0)),...
+    mean(update_idx(update_idx>0)), std(update_idx(update_idx>0)), max(update_idx(update_idx>0)));
 
 %% Save movie
-frame_rate = proc.resample_freq;
+fprintf('Saving %s...\n',[fig_dir plot_name plt_vars.vid_ext]);
 vid_out = VideoWriter([fig_dir plot_name plt_vars.vid_ext],plt_vars.vid_encoding);
-vid_out.FrameRate = frame_rate*plt_vars.play_speed;
+vid_out.FrameRate = proc.resample_freq*plt_vars.play_speed;
 open(vid_out);
 writeVideo(vid_out,frames);
 close(vid_out);
