@@ -11,7 +11,7 @@ plt_vars.sphere_sz = 250;           % number of edges to create sphere
 % Event + Time lines
 %plt_vars.evnt_type          = {'S'};
 %plt_vars.evnt_len           = 0.1;  % time to reamin on screen
-plt_vars.evnt_str_pos       = [0 0 -70]; % X, Y, Z
+plt_vars.evnt_str_pos       = [0 -20 -60]; % X, Y, Z
 plt_vars.evnt_str_color     = 'k';
 plt_vars.evnt_str_size      = 12;
 plt_vars.evnt_str_horzalign = 'center';
@@ -22,7 +22,7 @@ plt_vars.evnt_str_weight    = 'bold';
 %plt_vars.time_ln_z     = -110;
 
 % Time String
-plt_vars.time_str_pos       = [0 0 -60]; % X, Y, Z
+plt_vars.time_str_pos       = [0 -20 -50]; % X, Y, Z
 plt_vars.time_str_color     = 'k';
 plt_vars.time_str_size      = 12;
 plt_vars.time_str_horzalign = 'center';

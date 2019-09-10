@@ -79,6 +79,7 @@ if ~exist('view_angle','var')
     else
         error(['unknown hemi: ' hemi]);
     end
+    view_str = 'def';
 end
 if ~exist('mesh_alpha','var')
     if any(strcmp(SBJ_vars.ch_lab.probe_type,'seeg'))
@@ -120,6 +121,16 @@ for lim_ix = 1:2
     end
 end
 stat.time = plt_vars.movie_lim{1}:1/proc.resample_freq:plt_vars.movie_lim{2};
+
+% Adjust view angle if custom
+if ischar(view_angle)
+    view_str = view_angle;
+    if (strcmp(hemi,'l') && strcmp(view_angle,'med')) || (strcmp(hemi,'r') && strcmp(view_angle,'lat'))
+        view_angle = [90 0];
+    elseif (strcmp(hemi,'l') && strcmp(view_angle,'lat')) || (strcmp(hemi,'r') && strcmp(view_angle,'med'))
+        view_angle = [-90 0];
+    end
+end
 
 %% Load Stats
 % Determine options: {'actv','CI','RT','CNI','PC'}
@@ -242,7 +253,7 @@ st_map = linspace(clim(1), clim(2), size(plt_vars.cmap,1));
 mesh = fn_load_recon_mesh(SBJ,'pat','','pial',hemi);
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
-plot_name = [SBJ '_' cond_id '_' stat_id '_' an_id '_' hemi_str];
+plot_name = [SBJ '_' cond_id '_' stat_id '_' an_id '_' hemi_str '_' view_str];
 fig_dir = [root_dir 'PRJ_Stroop/results/HFA/' SBJ '/movies/' cond_id '/'];
 if ~exist(fig_dir,'dir')
     [~] = mkdir(fig_dir);
@@ -253,8 +264,7 @@ frames = struct('cdata',[],'colormap',[]); frame_ix = 0;
 
 % Plot 3D mesh
 mesh_obj = ft_plot_mesh(mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
-view(view_angle); material dull; lighting gouraud;
-l = camlight;
+view(view_angle); material dull; lighting gouraud; camlight;
 
 % Plot elecs
 [xsp, ysp, zsp] = sphere(plt_vars.sphere_sz);
@@ -291,7 +301,9 @@ end
 
 %% Plot frames
 fprintf('Starting frames (%i total):\n',numel(stat.time)/plt_vars.frame_skip);
-frame_plot_times = zeros(size(stat.time)); update_idx = zeros(size(stat.time));
+frame_plot_times = zeros(size(stat.time));
+frame_plot_dur   = zeros(size(stat.time));
+update_idx       = zeros(size(stat.time));
 tic;
 for t_ix = 1:plt_vars.frame_skip:numel(stat.time)
     frame_ix = frame_ix + 1;
@@ -299,11 +311,11 @@ for t_ix = 1:plt_vars.frame_skip:numel(stat.time)
 %     if mod(frame_ix,100)==0; fprintf('\n\t'); end
     % Draw new elecs if first frame or change in data
     if t_ix==1 || ~isequaln(stat.data(:,t_ix),stat.data(:,t_ix-1)) % ~= doesn't handle nans
-        update_idx(t_ix) = 1;
         % Remove all spheres to plot next round
         % delete(e_sphr); e_sphr = gobjects(size(elec.label));
         for e = 1:numel(elec.label)
             if t_ix==1 || ~isequaln(stat.data(e,t_ix),stat.data(e,t_ix-1))
+                update_idx(t_ix) = update_idx(t_ix) + 1;
                 % Create sphere
                 if ~isnan(stat.data(e,t_ix))
                     [~,map_ix] = min(abs(st_map-stat.data(e,t_ix)));
@@ -319,13 +331,15 @@ for t_ix = 1:plt_vars.frame_skip:numel(stat.time)
                 end
                 % Draw and color electrodes
                 e_sphr(e) = surf(sz*xsp+elec.chanpos(e,1), sz*ysp+elec.chanpos(e,2), sz*zsp+elec.chanpos(e,3));
-                set(e_sphr(e), 'EdgeColor', color);%, 'FaceColor', plt_vars.ns_color, 'EdgeAlpha', edgealpha, 'FaceAlpha', facealpha);
+                set(e_sphr(e), 'EdgeColor', color, 'FaceColor', color);%, 'EdgeAlpha', edgealpha, 'FaceAlpha', facealpha);
             end
         end
     end
     % Update view_angle and lighting
-    %view(view_angle(t_ix,:)); lighting gouraud;
-    
+    % view(view_angle(t_ix,:)); lighting gouraud;
+    % delete(findall(h,'Type','light')) % shut out the lights
+    % camlight; lighting gouraud; % add a new light from the current camera position
+
     % Update time and event strings
     time_str.String = [num2str(stat.time(t_ix),'%.3f') ' s'];
     evnt_str.String = st.ep_lab(stat.evnt(t_ix));
@@ -334,19 +348,15 @@ for t_ix = 1:plt_vars.frame_skip:numel(stat.time)
     frames(frame_ix) = getframe;
     frame_plot_times(t_ix) = toc;
     if t_ix==1
+        frame_plot_dur(t_ix) = frame_plot_times(t_ix);
         fprintf('\t%i (%.1f, %i) = %.1f\n',t_ix,100*t_ix/numel(stat.time),...
-            update_idx(t_ix),frame_plot_times(t_ix));
+            update_idx(t_ix),frame_plot_dur(t_ix));
     else
+        frame_plot_dur(t_ix) = frame_plot_times(t_ix)-frame_plot_times(t_ix-1);
         fprintf('\t%i (%.1f, %i) = %.1f (%.3f)\n',t_ix,100*t_ix/numel(stat.time),...
-            update_idx(t_ix),frame_plot_times(t_ix),frame_plot_times(t_ix)-frame_plot_times(t_ix-1));
+            update_idx(t_ix),frame_plot_times(t_ix),frame_plot_dur(t_ix));
     end
 end
-fprintf('\nDONE: Elapsed time = %f\n',toc);
-fprintf('frame_times (mean, non-update, update - SD) = (%f, %f, %f)\n',...
-    mean(frame_plot_times), mean(frame_plot_times(update_idx==0)),...
-    mean(frame_plot_times(update_idx>0)), std(frame_plot_times(update_idx>0)));
-fprintf('updates (n, min, mean - SD, max) = (%i, %i, %.2f - %.3f, %i)\n',sum(update_idx>0),min(update_idx(update_idx>0)),...
-    mean(update_idx(update_idx>0)), std(update_idx(update_idx>0)), max(update_idx(update_idx>0)));
 
 %% Save movie
 fprintf('Saving %s...\n',[fig_dir plot_name plt_vars.vid_ext]);
@@ -355,5 +365,15 @@ vid_out.FrameRate = proc.resample_freq*plt_vars.play_speed;
 open(vid_out);
 writeVideo(vid_out,frames);
 close(vid_out);
+
+%% Print timing stats
+fprintf('\nDONE: Elapsed time = %f\n',toc);
+fprintf('frame_times (mean, non-update, update - SD) = (%.3f, %.3f, %.3f - %.3f)\n',...
+    mean(frame_plot_dur), mean(frame_plot_dur(update_idx==0)),...
+    mean(frame_plot_dur(update_idx>0)), std(frame_plot_dur(update_idx>0)));
+fprintf('updates (n, min, mean - SD, max) = (%i, %i, %.2f - %.3f, %i)\n',sum(update_idx>0),min(update_idx(update_idx>0)),...
+    mean(update_idx(update_idx>0)), std(update_idx(update_idx>0)), max(update_idx(update_idx>0)));
+figure;scatter(frame_plot_dur,update_idx);
+xlabel('time (s)'); ylabel('# elecs updated');
 
 end

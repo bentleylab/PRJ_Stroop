@@ -1,5 +1,5 @@
 function fn_view_recon_atlas_grp_stat(SBJs, proc_id, stat_id, an_id, reg_type, show_labels,...
-                                 hemi, atlas_id, roi_id, plot_out, varargin)
+                                 hemi, atlas_id, roi_id, plot_out, save_fig, varargin)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJs [cell array str] - subject IDs to plot
@@ -22,6 +22,7 @@ function fn_view_recon_atlas_grp_stat(SBJs, proc_id, stat_id, an_id, reg_type, s
 %       'Yeo7','Yeo17' - colored by Yeo networks
 %       'tissue','tissueC' - colored by tisseu compartment, e.g., GM vs WM vs OUT
 %   plot_out [0/1] - include electrodes that don't have an atlas label or in hemi?
+%   save_fig [0/1] - save the .fig file?
 
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 
@@ -39,7 +40,7 @@ if ~isempty(varargin)
     end
 end
 
-% Define default options
+%% Define default options
 % view_space = 'mni';
 if ~exist('view_angle','var')
     if strcmp(hemi,'l')
@@ -74,35 +75,29 @@ else
 end
 fprintf('Using atlas: %s\n',atlas_id);
 
-%% Process stat_id
-if strcmp(stat_id,'actv') || strcmp(stat_id,'CSE')
-    cond_lab = stat_id;
-else%if strcmp(stat_id,'crRT_CNI_PC_WL200_WS50')
-    % Get condition info
-    [grp_lab, ~, ~] = fn_group_label_styles(model_lab);
-    % if rt_correlation
-    [rt_lab, ~, ~]     = fn_group_label_styles('RT');
-    % end
-    cond_lab = [grp_lab rt_lab];
-% else
-%     error(['Unknown stat_id: ' stat_id]);
+%% Prep report
+out_dir = [root_dir 'PRJ_Stroop/results/HFA/GRP_recons/' stat_id '/' an_id '/'];
+if ~exist(out_dir,'dir')
+    [~,~] = mkdir(out_dir);
 end
-
-% Prep report
-out_dir = [root_dir 'PRJ_Stroop/results/HFA/GRP_recons/'];
-sig_report_fname = [out_dir 'GRP_' stat_id '_' an_id '_' atlas_id '_' roi_id '_sig_report.txt'];
+sig_report_fname = [out_dir 'GRP_' atlas_id '_' roi_id '_sig_report.txt'];
 if exist(sig_report_fname)
     system(['mv ' sig_report_fname ' ' sig_report_fname(1:end-4) '_bck.txt']);
 end
 sig_report = fopen(sig_report_fname,'a');
 
 %% Load Data
+% Get condition info
+load([root_dir,'PRJ_Stroop/data/',SBJs{1},'/04_proc/',SBJs{1},'_smANOVA_ROI_',stat_id,'_',an_id,'.mat'],'st');
+cond_lab = st.groups;
+
 elec_sbj = cell([numel(SBJs) numel(cond_lab)]);
 good_sbj = true([numel(SBJs) numel(cond_lab)]);
 all_roi_labels = cell([numel(cond_lab) 1]);
 all_roi_colors = cell([numel(cond_lab) 1]);
 for sbj_ix = 1:numel(SBJs)
     SBJ = SBJs{sbj_ix};
+    fprintf('\tLoading %s (%i / %i)...\n',SBJ,sbj_ix,numel(SBJs));
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
     eval(SBJ_vars_cmd);
     
@@ -115,6 +110,7 @@ for sbj_ix = 1:numel(SBJs)
     end
     
     % Append SBJ name to labels
+    elec_sbj{sbj_ix,1}.color = cell(size(elec_sbj{sbj_ix,1}.label));
     for e_ix = 1:numel(elec_sbj{sbj_ix,1}.label)
         elec_sbj{sbj_ix,1}.label{e_ix} = [SBJs{sbj_ix} '_' elec_sbj{sbj_ix,1}.label{e_ix}];
         elec_sbj{sbj_ix,1}.color{e_ix} = fn_roi2color(elec_sbj{sbj_ix,1}.(roi_field){e_ix});
@@ -137,33 +133,22 @@ for sbj_ix = 1:numel(SBJs)
     % Load Stats
     % Determine options: {'actv','CI','RT','CNI','PC'}
     sig_ch = cell(size(cond_lab));
-    if strcmp(stat_id,'actv')
-        load([SBJ_vars.dirs.proc SBJ '_ROI_' an_id '_actv_mn100.mat'],'actv_ch');
-        sig_ch{1} = actv_ch;
-        clear actv_ch
-    elseif strcmp(stat_id,'CSE')
-        load([SBJ_vars.dirs.proc,SBJ,'_ROI_',an_id,'_',stat_id,'.mat'],'stat');
-        for ch_ix = 1:numel(stat.label)
-            if any(stat.mask(ch_ix,1,:))
-                sig_ch{1} = [sig_ch{1} stat.label(ch_ix)];
-            end
-        end
-        clear stat
+    if contains(stat_id,'actv')
+        load([SBJ_vars.dirs.proc SBJ '_ROI_' an_id '_' stat_id '.mat'],'actv');
+        sig_ch{1} = actv.label(any(actv.mask,2));
+        clear actv
     else    % ANOVA
-        eval(['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m']);        
-        load([SBJ_vars.dirs.proc SBJ '_mANOVA_ROI_' stat_id '_' an_id '.mat']);
+        load([SBJ_vars.dirs.proc SBJ '_smANOVA_ROI_' stat_id '_' an_id '.mat'],'w2');
         
         for ch_ix = 1:numel(w2.label)
             % Consolidate to binary sig/non-sig
             for cond_ix = 1:numel(cond_lab)
-                if strcmp(cond_lab{cond_ix},'RT') && any(stat.mask(ch_ix,1,:))
-                    sig_ch{cond_ix} = [sig_ch{cond_ix} {[SBJs{sbj_ix} '_' stat.label{ch_ix}]}];
-                elseif any(strcmp(cond_lab{cond_ix},{'CNI','pCNI','PC'})) && any(squeeze(w2.qval(cond_ix,ch_ix,:))<st.alpha)
+                if any(squeeze(w2.qval(cond_ix,ch_ix,:))<=st.alpha)
                     sig_ch{cond_ix} = [sig_ch{cond_ix} {[SBJs{sbj_ix} '_' w2.label{ch_ix}]}];
                 end
             end
         end
-        clear stat w2 st
+        clear w2
     end
     
     % Select sig elecs
@@ -175,7 +160,7 @@ for sbj_ix = 1:numel(SBJs)
             100*numel(sig_ch{cond_ix})/numel(elec_sbj{sbj_ix,cond_ix}.label));
         for sig_ix = 1:numel(sig_ch{cond_ix})
             e_ix = find(strcmp(elec_sbj{sbj_ix,cond_ix}.label,sig_ch{cond_ix}{sig_ix}));
-            fprintf(sig_report,'%s - %s (%s)\n',sig_ch{cond_ix}{sig_ix},elec_sbj{sbj_ix,cond_ix}.atlas_lab{e_ix},...
+            fprintf(sig_report,'%s - %s (%s)\n',sig_ch{cond_ix}{sig_ix},elec_sbj{sbj_ix,cond_ix}.(roi_field){e_ix},...
                 elec_sbj{sbj_ix,cond_ix}.hemi{e_ix});
         end
         
@@ -185,14 +170,14 @@ for sbj_ix = 1:numel(SBJs)
         if numel(intersect(elec_sbj{sbj_ix,cond_ix}.label,good_elecs))==0
             elec_sbj{sbj_ix,cond_ix} = {};
             good_sbj(sbj_ix,cond_ix) = false;
-            warning('WARNING!!! All sig_ch are out of atlas and/or hemisphere!');
+            warning('WARNING!!! All sig_ch are out of hemisphere and/or ROI!');
             fprintf(sig_report,'\t!!! 0 sig_ch remain\n');
         else
             cfgs = [];
             cfgs.channel = good_elecs;
             elec_sbj{sbj_ix,cond_ix} = fn_select_elec(cfgs, elec_sbj{sbj_ix,cond_ix});
-            all_roi_labels{cond_ix} = [all_roi_labels{cond_ix}; elec_sbj{sbj_ix,cond_ix}.roi];
-            all_roi_colors{cond_ix} = [all_roi_colors{cond_ix}; elec_sbj{sbj_ix,cond_ix}.roi_color];
+            all_roi_labels{cond_ix} = [all_roi_labels{cond_ix}; elec_sbj{sbj_ix,cond_ix}.(roi_field)];
+            all_roi_colors{cond_ix} = [all_roi_colors{cond_ix}; elec_sbj{sbj_ix,cond_ix}.color];
             fprintf(sig_report,'\t%i sig_ch remain\n',numel(elec_sbj{sbj_ix,cond_ix}.label));
         end
         fprintf(sig_report,'---------------------------------------------------------------\n');
@@ -205,20 +190,20 @@ end
 elec = cell([numel(cond_lab) 1]);
 for cond_ix = 1:numel(cond_lab)
     elec{cond_ix} = ft_appendsens([],elec_sbj{good_sbj(:,cond_ix),cond_ix});
-    elec{cond_ix}.roi       = all_roi_labels{cond_ix};    % appendsens strips that field
-    elec{cond_ix}.roi_color = all_roi_colors{cond_ix};    % appendsens strips that field
+    elec{cond_ix}.(roi_field) = all_roi_labels{cond_ix};    % appendsens strips that field
+    elec{cond_ix}.color       = all_roi_colors{cond_ix};    % appendsens strips that field
 end
 
 %% Load brain recon
-mesh = fn_load_recon_mesh([],'mni',reg_type,hemi);
+mesh = fn_load_recon_mesh([],'mni',reg_type,'pial',hemi);
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
 f = cell(size(cond_lab));
 for cond_ix = 1:numel(cond_lab)
-    if strcmp(stat_id,'actv') || strcmp(stat_id,'CSE')
+    if contains(stat_id,'actv')
         plot_name = ['GRP_' stat_id '_' an_id];
     else
-        plot_name = ['GRP_ANOVA_' cond_lab{cond_ix} '_' stat_id '_' an_id];
+        plot_name = ['GRP_' cond_lab{cond_ix} '_' stat_id '_' an_id];
     end
     f{cond_ix} = figure('Name',plot_name);
     
@@ -229,7 +214,7 @@ for cond_ix = 1:numel(cond_lab)
     for e = 1:numel(elec{cond_ix}.label)
         cfgs = []; cfgs.channel = elec{cond_ix}.label(e);
         elec_tmp = fn_select_elec(cfgs,elec{cond_ix});
-        ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', elec_tmp.roi_color, 'label', lab_arg);
+        ft_plot_sens(elec_tmp, 'elecshape', 'sphere', 'facecolor', elec_tmp.color{1}, 'label', lab_arg);
     end
     
     view(view_angle); material dull; lighting gouraud;
@@ -238,6 +223,10 @@ for cond_ix = 1:numel(cond_lab)
         'make sure none of the figure adjustment tools (e.g., zoom, rotate) are active\n' ...
         '(i.e., uncheck them within the figure), and then hit ''l'' on the keyboard\n'])
     set(f{cond_ix}, 'windowkeypressfcn',   @cb_keyboard);
+    
+    if save_fig
+        saveas(f{cond_ix}, [out_dir plot_name '.fig']);
+    end
 end
 
 end

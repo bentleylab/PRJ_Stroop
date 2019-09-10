@@ -141,19 +141,33 @@ for s = 1:numel(SBJs)
 end
 
 %% Plot CNI sig elecs
-stat_id = 'CNI_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25';
-an_opts = {'HGm_S2t151_zbtA_sm0_wn100'};
-hemi_opts = {'r','l'};
-roi_id   = 'gROI';
-atlas_id = 'Dx';
-reg_type = 'v';
-plot_out = 0;
+stat_opts   = {'pCNI_PC_B2t0'
+               };
+%                'rCNI_p_PC_S0tmRT_WL1_WS25'
+%                'rCNI_p_PC_D1tRT'
+%                'rCNI_p_PC_R1t5_WL1_WS25'
+%                'rCNI_p_PC_S0tmRT_WL1_WS25_D1tRT'
+%                'rCNI_p_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25'
+an_opts     = {'HGm_S2t151_zbtA_sm0_wn100'
+               };
+%                'HGm_S2t151_zbtA_sm0_wn100'
+%                'HGm_S2t251_zbtA_sm0_wn100'
+%                'HGm_R5t101_zbtA_sm0_wn100'
+%                'HGm_S2t151_zbtA_sm0_wn100'
+%                'HGm_S2t151_zbtA_sm0_wn100'
+hemi_opts   = {'r','l'};
+roi_id      = 'gROI';
+atlas_id    = 'Dx';
+reg_type    = 'v';
+plot_out    = 0;
 show_labels = 0;
+save_fig    = 1;
 
-for an_ix = 1%:numel(an_opts)
+for st_ix = 4:numel(stat_opts)
     for hemi_ix = 1:numel(hemi_opts)
-        fn_view_recon_atlas_grp_stat(SBJs, proc_id, stat_id, an_opts{an_ix}, reg_type, show_labels,...
-                                 hemi_opts{hemi_ix}, atlas_id, roi_id, plot_out)
+        fn_view_recon_atlas_grp_stat(SBJs, proc_id, stat_opts{st_ix}, an_opts{st_ix}, reg_type, show_labels,...
+                                 hemi_opts{hemi_ix}, atlas_id, roi_id, plot_out, save_fig);
+        close all;
 %         fn_view_recon_atlas_grp_stat_venn(SBJs, proc_id, stat_id, an_opts{an_ix}, reg_type, show_labels,...
 %                                  hemi_opts{hemi_ix}, atlas_id, roi_id, plot_out)
 %         fn_view_recon_atlas_grp_stat_onset(SBJs, proc_id, stat_id, an_opts{an_ix}, reg_type, show_labels,...
@@ -234,8 +248,8 @@ SBJ10c_HFA_GRP_errbar_ROI_stat_comb(SBJs,proc_id,stat_conds,atlas_id,roi_id,...
 
 %% Movies of significant effects
 stat_conds = {...
-    {'CNI_PC_S0tmRT_WL1_WS25_D1tRT','HGm_S2t151_zbtA_sm0_wn100','CNI'}...
-    {'CNI_PC_R1t5_WL1_WS25','HGm_R5t101_zbtA_sm0_wn100','CNI'}...
+    {'CNI_p_PC_S0tmRT_WL1_WS25_D1tRT','HGm_S2t151_zbtA_sm0_wn100','CNI'}...
+    {'CNI_p_PC_R1t5_WL1_WS25','HGm_R5t101_zbtA_sm0_wn100','CNI'}...
     };
 %     actv:   {'actv_S0t150_mn1','HGm_S2t151_zbtA_sm0_wn100','actv'};
 %     CNI.S:  {'CNI_PC_S0tmRT_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','CNI'};
@@ -253,7 +267,8 @@ stat_conds = {...
 
 proc_id     = 'main_ft';
 atlas_id    = 'Dx';
-plt_opts     = {'movie_S0tD' 'movie_R1t5'};%'movie_S0tD_sp20';%'movie_S0t15_sp20';
+plt_opts    = {'movie_S0tD' 'movie_R1t5'};%'movie_S0tD_sp20';%'movie_S0t15_sp20';
+view_angles = {'med', 'lat'};
 roi_id      = 'gROI';
 hemi        = 'l';
 mirror      = 1;
@@ -262,10 +277,43 @@ plot_out    = 0;
 % gm_thresh   = 0;
 fig_vis     = 'on';
 
-for s = [6 11 14 15 16 17]%1:numel(SBJs)
+for s = [6 11 14 15 16 17]% 1 2 3 4 5 7 8 9 10 12 13]%1:numel(SBJs)
     for stat_ix = 1:numel(stat_conds)
-        fn_view_recon_stat_movie(SBJs{s}, proc_id, stat_conds{stat_ix},...
-            atlas_id, roi_id, hemi, mirror, plot_out, plt_opts{stat_ix}, fig_vis);
+        for v_ix = 1:numel(view_angles)
+            fn_view_recon_stat_movie(SBJs{s}, proc_id, stat_conds{stat_ix},...
+                atlas_id, roi_id, hemi, mirror, plot_out, plt_opts{stat_ix}, fig_vis,...
+                'view_angle', view_angles{v_ix});
+            close all;
+        end
+    end
+end
+
+stat_conds = {...
+    {'rCNI_p_PC_S0tmRT_WL1_WS25_D1tRT','HGm_S2t151_zbtA_sm0_wn100','CNI'}...
+    {'rCNI_p_PC_R1t5_WL1_WS25','HGm_R5t101_zbtA_sm0_wn100','CNI'}...
+    };
+for s = [6 11 14 15 16 17 1 2 3 4 5 7 8 9 10 12 13]%1:numel(SBJs)
+    for stat_ix = 1:numel(stat_conds)
+        for v_ix = 1:numel(view_angles)
+            fn_view_recon_stat_movie(SBJs{s}, proc_id, stat_conds{stat_ix},...
+                atlas_id, roi_id, hemi, mirror, plot_out, plt_opts{stat_ix}, fig_vis,...
+                'view_angle', view_angles{v_ix});
+            close all;
+        end
+    end
+end
+stat_conds = {...
+    {'actv_S0t150_mn1','HGm_S2t151_zbtA_sm0_wn100','actv'}
+    };
+plt_opts = {'movie_S0t15'};
+for s = [6 11 14 15 16 17]% 1 2 3 4 5 7 8 9 10 12 13]%1:numel(SBJs)
+    for stat_ix = 1:numel(stat_conds)
+        for v_ix = 1:numel(view_angles)
+            fn_view_recon_stat_movie(SBJs{s}, proc_id, stat_conds{stat_ix},...
+                atlas_id, roi_id, hemi, mirror, plot_out, plt_opts{stat_ix}, fig_vis,...
+                'view_angle', view_angles{v_ix});
+            close all;
+        end
     end
 end
 
