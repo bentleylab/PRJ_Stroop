@@ -112,12 +112,12 @@ atlas_id = 'Dx';
 roi_id = 'gROI';
 reg_type = 'v';
 show_lab = 0;
-roi_opts = {{'l','PAR'},{'r','PAR'}};%{{'l','lat'},{'r','lat'},{'l','MPFC'},{'r','MPFC'},{'l','deep'},{'r','deep'},{'b','OFC'}};
+roi_opts = {{'l','lat'},{'r','lat'},{'l','MPFC'},{'r','MPFC'},{'b','OFC'}};%,{'l','deep'},{'r','deep'}};%{{'l','PAR'},{'r','PAR'}};%
 
-for roi_ix = 1:numel(roi_opts)
+for roi_ix = 4:numel(roi_opts)
     fn_view_recon_atlas_grp_ROI(SBJs, proc_id, reg_type, show_lab,...
                                 roi_opts{roi_ix}{1}, atlas_id, roi_id, roi_opts{roi_ix}{2},...
-                                'save_fig', 0, 'fig_ftype', 'fig');
+                                'save_fig', 1, 'fig_ftype', 'png');
 end
 
 %% ================================================================================
@@ -141,20 +141,21 @@ for s = 1:numel(SBJs)
 end
 
 %% Plot CNI sig elecs
-stat_opts   = {'pCNI_PC_B2t0'
+stat_opts   = {
+%     'pCNI_PC_B2t0'
+               'CNI_p_PC_S0tmRT_WL1_WS25'
+               'CNI_p_PC_D1tRT'
+               'CNI_p_PC_R1t5_WL1_WS25'
+%                'CNI_p_PC_S0tmRT_WL1_WS25_D1tRT'
+%                'CNI_p_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25'
                };
-%                'rCNI_p_PC_S0tmRT_WL1_WS25'
-%                'rCNI_p_PC_D1tRT'
-%                'rCNI_p_PC_R1t5_WL1_WS25'
-%                'rCNI_p_PC_S0tmRT_WL1_WS25_D1tRT'
-%                'rCNI_p_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25'
 an_opts     = {'HGm_S2t151_zbtA_sm0_wn100'
+%                'HGm_S2t151_zbtA_sm0_wn100'
+               'HGm_S2t251_zbtA_sm0_wn100'
+               'HGm_R5t101_zbtA_sm0_wn100'
+% %                'HGm_S2t151_zbtA_sm0_wn100'
+%                'HGm_S2t151_zbtA_sm0_wn100'
                };
-%                'HGm_S2t151_zbtA_sm0_wn100'
-%                'HGm_S2t251_zbtA_sm0_wn100'
-%                'HGm_R5t101_zbtA_sm0_wn100'
-%                'HGm_S2t151_zbtA_sm0_wn100'
-%                'HGm_S2t151_zbtA_sm0_wn100'
 hemi_opts   = {'r','l'};
 roi_id      = 'gROI';
 atlas_id    = 'Dx';
@@ -163,7 +164,7 @@ plot_out    = 0;
 show_labels = 0;
 save_fig    = 1;
 
-for st_ix = 4:numel(stat_opts)
+for st_ix = 1:numel(stat_opts)
     for hemi_ix = 1:numel(hemi_opts)
         fn_view_recon_atlas_grp_stat(SBJs, proc_id, stat_opts{st_ix}, an_opts{st_ix}, reg_type, show_labels,...
                                  hemi_opts{hemi_ix}, atlas_id, roi_id, plot_out, save_fig);
@@ -210,14 +211,14 @@ SBJ10c_HFA_GRP_venn_stats_ROI(SBJs, proc_id, stat_conds, 'b', atlas_id, roi_id,.
 
 %% Proportions of significant effects across ROI
 stat_conds = {...
-    {'rCNI_p_PC_S0tmRT_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','CNI'}...  % rCNI_p_PC for S
-    {'rCNI_p_PC_D1tRT','HGm_S2t251_zbtA_sm0_wn100','CNI'}...            % rCNI_p_PC for D
-    {'rCNI_p_PC_R1t5_WL1_WS25','HGm_R5t101_zbtA_sm0_wn100','CNI'}...    % rCNI_p_PC for R
-%     {'rCNI_p_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','CNI'}...
-%     {'rCNI_p_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','pCNI'}...
-%     {'rCNI_p_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','PC'}...
-%     {'pCNI_PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','pCNI'}...
-%     {'pCNI_PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'}...
+%     {'rCNI_p_PC_S0tmRT_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','CNI'}...  % rCNI_p_PC for S
+%     {'rCNI_p_PC_D1tRT','HGm_S2t251_zbtA_sm0_wn100','CNI'}...            % rCNI_p_PC for D
+%     {'rCNI_p_PC_R1t5_WL1_WS25','HGm_R5t101_zbtA_sm0_wn100','CNI'}...    % rCNI_p_PC for R
+    {'CNI_p_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','CNI'}
+    {'CNI_p_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','pCNI'}
+%     {'rCNI_p_PC_S0tmRT_WL1_WS25_D1tRT_R1t5_WL1_WS25','HGm_S2t151_zbtA_sm0_wn100','PC'}
+    {'pCNI_PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','pCNI'}
+    {'pCNI_PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'}
     };
 %     {'PC_B2t0','HGm_S2t151_zbtA_sm0_wn100','PC'}...
 %     {'PCi_S0tmRT_WL1_WS25_D1tRT','HGm_S2t151_zbtA_sm0_wn100','PC'}...
@@ -229,7 +230,7 @@ stat_conds = {...
 
 proc_id     = 'main_ft';
 atlas_id    = 'Dx';
-plt_id      = 'errbar';
+plt_id      = 'errbar_y5';
 roi_id      = 'gROI';
 z_thresh    = 0;%1.5;
 gm_thresh   = 0;
@@ -240,8 +241,8 @@ fig_ftype   = 'png';
 save_fig    = 1;
 
 % with SBJ scatter (for myself to understand)
-SBJ10c_HFA_GRP_errbar_ROI_stat_comb(SBJs,proc_id,stat_conds,atlas_id,roi_id,...
-            gm_thresh,z_thresh,plt_id,plot_out,1,save_fig,fig_vis,fig_ftype);
+% SBJ10c_HFA_GRP_errbar_ROI_stat_comb(SBJs,proc_id,stat_conds,atlas_id,roi_id,...
+%             gm_thresh,z_thresh,plt_id,plot_out,1,save_fig,fig_vis,fig_ftype);
 % Pretty plot (no scatter)
 SBJ10c_HFA_GRP_errbar_ROI_stat_comb(SBJs,proc_id,stat_conds,atlas_id,roi_id,...
             gm_thresh,z_thresh,plt_id,plot_out,0,save_fig,fig_vis,fig_ftype);

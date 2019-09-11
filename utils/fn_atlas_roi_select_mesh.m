@@ -17,15 +17,15 @@ switch roi_id
     case 'lat'
         roi_lab = [...
             roi_map{1}(strcmp(roi_map{2},'LPFC'));
+            roi_map{1}(strcmp(roi_map{2},'SM'));
             roi_map{1}(strcmp(roi_map{2},'OFC'));
             roi_map{1}(strcmp(roi_map{2},'TMP'));
             roi_map{1}(strcmp(roi_map{2},'OCC'));
             roi_map{1}(strcmp(roi_map{3},'SPL'));
-            roi_map{1}(strcmp(roi_map{3},'IPL'));
-            'G_front_sup'; 'G_and_S_paracentral'];      % MPFC
+            roi_map{1}(strcmp(roi_map{3},'IPL'))];
     case 'deep'
         roi_lab = [...
-            roi_map{1}(strcmp(roi_map{2},'INS'));
+            roi_map{1}(strcmp(roi_map{2},'INS'))];
             %roi_map{1}(strcmp(roi_map{3},'AMG'));
             %roi_map{1}(strcmp(roi_map{3},'HPC'))];
     case 'LPFC'
@@ -38,8 +38,10 @@ switch roi_id
     case 'MPFC'
         roi_lab = [...
             roi_map{1}(strcmp(roi_map{2},'MPFC'));
+            'G_cingul-Post-dorsal';                                     % PAR
+            'S_cingul-Marginalis'; 'G_and_S_paracentral';               % SM
             'G_subcallosal'; 'G_rectus'; 'S_suborbital';                % OFC
-            'G_and_S_transv_frontopol'];                                % LPFC
+            'G_front_sup'; 'G_and_S_transv_frontopol'];                 % LPFC
 %             'S_subparietal'; 'G_precuneus'; 'G_cingul-Post-ventral';    % PAR
     case 'INS'
         roi_lab = roi_map{1}(strcmp(roi_map{2},'INS'));

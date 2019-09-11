@@ -201,9 +201,9 @@ mesh = fn_load_recon_mesh([],'mni',reg_type,'pial',hemi);
 f = cell(size(cond_lab));
 for cond_ix = 1:numel(cond_lab)
     if contains(stat_id,'actv')
-        plot_name = ['GRP_' stat_id '_' an_id];
+        plot_name = ['GRP_' stat_id '_' an_id '_' hemi];
     else
-        plot_name = ['GRP_' cond_lab{cond_ix} '_' stat_id '_' an_id];
+        plot_name = ['GRP_' cond_lab{cond_ix} '_' stat_id '_' an_id '_' hemi];
     end
     f{cond_ix} = figure('Name',plot_name);
     

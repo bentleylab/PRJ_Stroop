@@ -44,7 +44,7 @@ if ~exist('view_angle','var')
     view_angle = fn_get_view_angle(hemi,plot_roi);
 end
 if ~exist('fig_ftype','var')
-    fig_ftype = 'png';
+    fig_ftype = 'fig';
 end
 if ~exist('save_fig','var')
     save_fig = 0;
@@ -72,6 +72,12 @@ else
     plot_roi_list = {plot_roi};
 end
 
+if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep'}))
+    roi_field = 'gROI';
+else
+    roi_field = 'ROI';
+end
+
 [root_dir, ~] = fn_get_root_dir();
 out_dir = [root_dir 'PRJ_Stroop/results/recons/'];
 
@@ -85,44 +91,22 @@ for sbj_ix = 1:numel(SBJs)
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
     eval(SBJ_vars_cmd);
     
-    try
-        elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_mni',reg_suffix,'_',atlas_id,'_full.mat'];
-        if exist([elec_fname(1:end-4) '_' roi_id '.mat'],'file')
-            elec_fname = [elec_fname(1:end-4) '_' roi_id '.mat'];
-        end
-        tmp = load(elec_fname); elec{sbj_ix} = tmp.elec;
-    catch
-        error([elec_fname 'doesnt exist, exiting...']);
-    end
+    % Load elec
+    elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_mni',reg_suffix,'_',atlas_id,'_final.mat'];
+    tmp = load(elec_fname); elec{sbj_ix} = tmp.elec;
     
     % Append SBJ name to labels
     for e_ix = 1:numel(elec{sbj_ix}.label)
         elec{sbj_ix}.label{e_ix} = [SBJs{sbj_ix} '_' elec{sbj_ix}.label{e_ix}];
     end
     
-    % Match elecs to atlas ROIs
-    if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
-        if ~isfield(elec{sbj_ix},'man_adj')
-            elec{sbj_ix}.roi       = fn_atlas2roi_labels(elec{sbj_ix}.atlas_lab,atlas_id,roi_id);
-        end
-        if strcmp(roi_id,'tissueC')
-            elec{sbj_ix}.roi_color = fn_tissue2color(elec{sbj_ix});
-        elseif strcmp(atlas_id,'Yeo7')
-            elec{sbj_ix}.roi_color = fn_atlas2color(atlas_id,elec{sbj_ix}.roi);
-        else
-            elec{sbj_ix}.roi_color = fn_roi2color(elec{sbj_ix}.roi);
-        end
-    elseif any(strcmp(atlas_id,{'Yeo17'}))
-        if ~isfield(elec{sbj_ix},'man_adj')
-            elec{sbj_ix}.roi       = elec{sbj_ix}.atlas_lab;
-        end
-        elec{sbj_ix}.roi_color = fn_atlas2color(atlas_id,elec{sbj_ix}.roi);
-    end
+    % Match ROIs to colors
+    elec{sbj_ix}.color = fn_roi2color(elec{sbj_ix}.(roi_field));
     
     % Select elecs matching hemi, atlas, and plot_roi_list
     plot_elecs = zeros([numel(elec{sbj_ix}.label) numel(plot_roi_list)]);
     for roi_ix = 1:numel(plot_roi_list)
-        plot_elecs(:,roi_ix) = strcmp(elec{sbj_ix}.roi,plot_roi_list{roi_ix});
+        plot_elecs(:,roi_ix) = strcmp(elec{sbj_ix}.(roi_field),plot_roi_list{roi_ix});
     end
     good_elecs = intersect(fn_select_elec_lab_match(elec{sbj_ix}, hemi, atlas_id, roi_id),...
                              elec{sbj_ix}.label(any(plot_elecs,2)));
@@ -134,26 +118,33 @@ for sbj_ix = 1:numel(SBJs)
         cfgs = [];
         cfgs.channel = good_elecs;
         elec{sbj_ix} = fn_select_elec(cfgs, elec{sbj_ix});
-        all_roi_labels = [all_roi_labels; elec{sbj_ix}.roi];
-        all_roi_colors = [all_roi_colors; elec{sbj_ix}.roi_color];
+        all_roi_labels = [all_roi_labels; elec{sbj_ix}.(roi_field)];
+        all_roi_colors = [all_roi_colors; elec{sbj_ix}.color];
     end
     clear SBJ SBJ_vars SBJ_vars_cmd
 end
 
 %% Combine elec structs
 elec = ft_appendsens([],elec{good_sbj});
-elec.roi       = all_roi_labels;    % appendsens strips that field
-elec.roi_color = all_roi_colors;    % appendsens strips that field
+elec.roi   = all_roi_labels;    % appendsens strips that field
+elec.color = all_roi_colors;    % appendsens strips that field
 
 %% Load Atlas
 atlas = fn_load_recon_atlas([],atlas_id);
 
 % Get Atlas-ROI mapping
 atlas_labels = fn_atlas_roi_select_mesh(atlas_id, plot_roi, hemi);
-if strcmp(plot_roi,'deep')
+
+% Can't plot unconnected meshes (I think), so create two meshes
+if strcmp(plot_roi,'OFC')
+    % Treat R hemi as new ROI
+    r_ix = ~cellfun(@isempty,strfind(atlas_labels,'rh'));
+    r_labels = atlas_labels(r_ix);
+    atlas_labels = atlas_labels(~r_ix);
+elseif strcmp(plot_roi,'deep')
     mtl_ix = ~cellfun(@isempty,strfind(atlas_labels,'Hippocampus')) | ...
              ~cellfun(@isempty,strfind(atlas_labels,'Amygdala'));
-    mtl_labels = atlas_labels(mtl_ix);
+%     mtl_labels = atlas_labels(mtl_ix);
     atlas_labels = atlas_labels(~mtl_ix);
 end
 
@@ -166,8 +157,14 @@ roi_mask = ft_volumelookup(cfg,atlas);
 seg = keepfields(atlas, {'dim', 'unit','coordsys','transform'});
 seg.brain = roi_mask;
 
-if exist('mtl_labels','var')
-    cfg.roi = mtl_labels;
+if exist('r_labels','var')
+    cfg.roi = r_labels;
+    r_mask  = ft_volumelookup(cfg,atlas);
+    
+    r_seg = keepfields(atlas, {'dim', 'unit','coordsys','transform'});
+    r_seg.brain = r_mask;
+elseif exist('mtl_labels','var')
+    cfg.roi  = mtl_labels;
     mtl_mask = ft_volumelookup(cfg,atlas);
     
     mtl_seg = keepfields(atlas, {'dim', 'unit','coordsys','transform'});
@@ -183,7 +180,9 @@ cfg.numvertices = 100000;
 cfg.smooth      = 3;
 cfg.spmversion  = 'spm12';
 roi_mesh = ft_prepare_mesh(cfg, seg);
-if exist('mtl_seg','var')
+if exist('r_seg','var')
+    r_mesh = ft_prepare_mesh(cfg, r_seg);
+elseif exist('mtl_seg','var')
     mtl_mesh = ft_prepare_mesh(cfg, mtl_seg);
 end
 
@@ -193,7 +192,9 @@ h = figure('Name',fig_name);
 
 % Plot 3D mesh
 ft_plot_mesh(roi_mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
-if exist('mtl_mesh','var')
+if exist('r_mesh','var')
+    ft_plot_mesh(r_mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
+elseif exist('mtl_mesh','var')
     ft_plot_mesh(mtl_mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
 end
 
@@ -202,7 +203,7 @@ for e = 1:numel(elec.label)
     cfgs = []; cfgs.channel = elec.label(e);
     elec_tmp = fn_select_elec(cfgs,elec);
     ft_plot_sens(elec_tmp, 'elecshape', 'sphere',...
-                 'facecolor', elec_tmp.roi_color, 'label', lab_arg);
+                 'facecolor', elec_tmp.color, 'label', lab_arg);
 end
 
 view(view_angle); material dull; lighting gouraud;
@@ -212,3 +213,9 @@ fprintf(['To reset the position of the camera light after rotating the figure,\n
     '(i.e., uncheck them within the figure), and then hit ''l'' on the keyboard\n'])
 set(h, 'windowkeypressfcn',   @cb_keyboard);
 
+%% Save figure
+if save_fig
+    saveas(gcf, [out_dir fig_name '.' fig_ftype]);
+end
+
+end

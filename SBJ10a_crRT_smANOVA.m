@@ -35,6 +35,18 @@ if numel(hfa.freq)>1
     error('HFA has more than one frequency, can''t run on that for now!');
 end
 
+%% Build Design Matrix
+design = cell([1 numel(st.groups)]);
+levels = cell([1 numel(st.groups)]);
+for grp_ix = 1:numel(st.groups)
+    [levels{grp_ix}, ~, ~] = fn_condition_label_styles(st.groups{grp_ix});
+    design{grp_ix} = nan([numel(trial_info.trial_n) 1]);
+    for level_ix = 1:numel(levels{grp_ix})
+        trl_idx = fn_condition_index(levels{grp_ix}{level_ix}, trial_info.condition_n, 'trial_info', trial_info);
+        design{grp_ix}(trl_idx) = level_ix;
+    end
+end
+
 %% Exclude trials based on RT and trial type
 % Check for bad RTs
 if st.min_rt
@@ -61,23 +73,14 @@ st.bad_trials.rt   = trial_info.trial_n(bad_rt_idx);
 st.bad_trials.cond = trial_info.trial_n(~good_cond_idx);
 
 % Exclude bad trials
+for grp_ix = 1:numel(st.groups)
+    design{grp_ix} = design{grp_ix}(good_trl_idx);
+end
 ti_fields = fieldnames(trial_info);
 orig_n_trials = numel(trial_info.trial_n);
 for f_ix = 1:numel(ti_fields)
     if numel(trial_info.(ti_fields{f_ix}))==orig_n_trials
         trial_info.(ti_fields{f_ix}) = trial_info.(ti_fields{f_ix})(good_trl_idx);
-    end
-end
-
-%% Build Design Matrix
-design = cell([1 numel(st.groups)]);
-levels = cell([1 numel(st.groups)]);
-for grp_ix = 1:numel(st.groups)
-    [levels{grp_ix}, ~, ~] = fn_condition_label_styles(st.groups{grp_ix});
-    design{grp_ix} = nan([numel(trial_info.trial_n) 1]);
-    for level_ix = 1:numel(levels{grp_ix})
-        trl_idx = fn_condition_index(levels{grp_ix}{level_ix}, trial_info.condition_n, 'trial_info', trial_info);
-        design{grp_ix}(trl_idx) = level_ix;
     end
 end
 

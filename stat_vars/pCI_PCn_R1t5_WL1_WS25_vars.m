@@ -1,19 +1,19 @@
 % Time Parameters
-st.ep_lab   = 'S';
-st.evnt_lab = 'S';
-st.stat_lim = [0 0];
-st.lim_adj  = {'', 'min(RT)'};
+st.ep_lab   = 'R';
+st.evnt_lab = 'R';
+st.stat_lim = [-0.1 0.5];
+st.lim_adj  = {'', ''};
 st.cust_win = 0;            % custom windows per trials
 st.min_rt   = 0.35;
 st.alpha    = 0.05;
 
 % Sliding Window Parameters (in sec)
-st.win_len  = -1;
-st.win_step = 0;
+st.win_len  = 0.1;
+st.win_step = 0.025;
 
 % ANOVA Parameters
 st.model_lab   = 'pCI_PCn';
-st.regress_rt  = 1;    % regrees reaction time off before running ANOVA
+st.regress_rt  = 0;    % regrees reaction time off before running ANOVA
 st.groups      = {'pCI', 'PC'};
 st.trial_cond  = {'N'};
 st.n_boots     = 1000;
