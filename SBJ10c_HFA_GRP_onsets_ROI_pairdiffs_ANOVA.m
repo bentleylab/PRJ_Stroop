@@ -1,12 +1,12 @@
 function SBJ10c_HFA_GRP_onsets_ROI_pairdiffs_ANOVA(SBJs,stat_id,proc_id,an_id,roi_id,...
-                                                    atlas_id,gm_thresh,plt_id,save_fig,fig_vis) %,fig_ftype)
+                                                    atlas_id)%,gm_thresh,plt_id,save_fig,fig_vis) %,fig_ftype)
 % Load HFA analysis results for active and condition-differentiating
 %   epochs, plot a summary of those time period per electrode
 % clear all; %close all;
 % fig_ftype = 'png';
-label_spacer = 0;
-groi_label_spacer = '      ';
-if ischar(save_fig); save_fig = str2num(save_fig); end
+% label_spacer = 0;
+% groi_label_spacer = '      ';
+% if ischar(save_fig); save_fig = str2num(save_fig); end
 % if isnumeric(actv_win); actv_win = num2str(actv_win); end
 
 %% Data Preparation
@@ -18,27 +18,30 @@ addpath(ft_dir);
 ft_defaults
 
 %% Prep variables
-an_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m'];
-eval(an_vars_cmd);
-plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
-eval(plt_vars_cmd);
-stat_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/stat_vars/' stat_id '_vars.m'];
-eval(stat_vars_cmd);
+% an_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m'];
+% eval(an_vars_cmd);
+% plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
+% eval(plt_vars_cmd);
 
 % Get condition info
-[grp_lab, ~, ~] = fn_group_label_styles(model_lab);
-cond_lab = [grp_lab, {'corr(RT)'}];
+load([root_dir,'PRJ_Stroop/data/',SBJs{1},'/04_proc/',SBJs{1},'_smANOVA_ROI_',stat_id,'_',an_id,'.mat'],'st');
+cond_lab = st.groups;
 
 % Get event timing
 mean_RTs = zeros(size(SBJs));
 
 % Load all ROI info
 [roi_list, roi_colors] = fn_roi_label_styles(roi_id);
+if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep','gPFC'}))
+    roi_field = 'gROI';
+else
+    roi_field = 'ROI';
+end
 
 %% Load Results
 % Set up onset counts
-all_onsets          = cell([numel(SBJs) numel(roi_list) numel(grp_lab)+1]);
-all_onset_elec_lab  = cell([numel(SBJs) numel(roi_list) numel(grp_lab)+1]);
+all_onsets          = cell([numel(SBJs) numel(roi_list) numel(st.groups)]);
+all_onset_elec_lab  = cell([numel(SBJs) numel(roi_list) numel(st.groups)]);
 for sbj_ix = 1:numel(SBJs)
     SBJ = SBJs{sbj_ix};
     % Load variables
@@ -47,84 +50,90 @@ for sbj_ix = 1:numel(SBJs)
     load(strcat(SBJ_vars.dirs.events,SBJ,'_trial_info_final.mat'),'trial_info');
     srate = trial_info.sample_rate;
     
+    % Load data
+    load(strcat(SBJ_vars.dirs.proc,SBJ,'_smANOVA_ROI_',stat_id,'_',an_id,'.mat'));
     % Compute mean RT
-    if strcmp(event_type,'stim')
+    if strcmp(st.evnt_lab,'S')
         % Compute mean RT
         mean_RTs(sbj_ix) = mean(trial_info.response_time);
     end
-    % Load data
-    load(strcat(SBJ_vars.dirs.proc,SBJ,'_mANOVA_ROI_',stat_id,'_',an_id,'.mat'));
-    
-    % Get Sliding Window Parameters
-    win_lim    = fn_sliding_window_lim(stat.time,round(st.win_len*srate),round(st.win_step*srate));
-    win_center = round(mean(win_lim,2));
     
     %% Load ROI and GM/WM info
-    elec_tis_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_pat_' atlas_id '_final.mat'];
-    load(elec_tis_fname);
+    elec_fname = [SBJ_vars.dirs.recon SBJ '_elec_' proc_id '_pat_' atlas_id '_final.mat'];
+    load(elec_fname);
     
     % Sort elecs by stat labels
-    cfgs = []; cfgs.channel = stat.label;
-    elec = fn_select_elec(cfgs,elec);
+    if numel(elec.label)~=numel(w2.label) || ~all(strcmp(elec.label,w2.label))
+        error('elec w2 label mismatch');
+        cfgs = []; cfgs.channel = stat.label;
+        elec = fn_select_elec(cfgs,elec);
+    end
     
 %     % Get GM probability from tissue labels {'GM','WM','CSF','OUT'}
 %     gm_bin  = elec.tissue_prob(:,1)>gm_thresh;
         
     %% Aggregate results per ROI
-    for ch_ix = 1:numel(stat.label)
+    for ch_ix = 1:numel(w2.label)
         % If elec matches roi_list and is in GM, get stats
-        if any(strcmp(elec.(roi_id){ch_ix},roi_list))% && gm_bin(ch_ix)
+        if any(strcmp(elec.(roi_field){ch_ix},roi_list)) %&& w2.max_hfa_z(ch_ix)>=z_thresh% && gm_bin(ch_ix)
             roi_ix = find(strcmp(elec.(roi_id){ch_ix},roi_list));
             % Get ANOVA group onsets
-            for grp_ix = 1:numel(grp_lab)
-                if any(squeeze(w2.qval(grp_ix,ch_ix,:))<st.alpha)
-                    sig_onsets = stat.time(win_lim(squeeze(w2.qval(grp_ix,ch_ix,:))<st.alpha,1));
-                    if strcmp(event_type,'resp')% && (sig_onsets(1)<0)
-                        all_onsets{sbj_ix,roi_ix,grp_ix} = [all_onsets{sbj_ix,roi_ix,grp_ix} sig_onsets(1)];
-                        all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} = [all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} stat.label(ch_ix)];
-                    elseif strcmp(event_type,'stim') && (sig_onsets(1)<mean_RTs(sbj_ix))
-                        all_onsets{sbj_ix,roi_ix,grp_ix} = [all_onsets{sbj_ix,roi_ix,grp_ix} sig_onsets(1)];
-                        all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} = [all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} stat.label(ch_ix)];
+            for grp_ix = 1:numel(st.groups)
+                if any(squeeze(w2.qval(grp_ix,ch_ix,:))<=st.alpha)
+                    sig_onsets = w2.win_lim_s(squeeze(w2.qval(grp_ix,ch_ix,:))<=st.alpha,1);
+                    if strcmp(st.evnt_lab,'R')
+                        all_onsets{sbj_ix,roi_ix,grp_ix} = ...
+                            [all_onsets{sbj_ix,roi_ix,grp_ix} sig_onsets(1)];
+                        all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} = ...
+                            [all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} w2.label(ch_ix)];
+                    elseif ~isempty(strfind(st.ep_lab,'S')) && (sig_onsets(1)<mean_RTs(sbj_ix))
+                        all_onsets{sbj_ix,roi_ix,grp_ix} = ...
+                            [all_onsets{sbj_ix,roi_ix,grp_ix} sig_onsets(1)];
+                        all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} = ...
+                            [all_onset_elec_lab{sbj_ix,roi_ix,grp_ix} w2.label(ch_ix)];
+                    else
+                        error('st.ep_lab didnt match R or S*');
                     end
                 end
             end
             
-            % Get RT correlation onset
-            if sum(squeeze(stat.mask(ch_ix,1,:)))>0
-                mask_chunks = fn_find_chunks(squeeze(stat.mask(ch_ix,1,:)));
-                mask_chunks(squeeze(stat.mask(ch_ix,1,mask_chunks(:,1)))==0,:) = [];
-                % Convert the first onset of significance to time
-                onset_time = stat.time(mask_chunks(1,1));
-                % Exclude differences after the mean RT for this SBJ
-                if strcmp(event_type,'resp') && (onset_time<0)
-                    all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} = ...
-                        [all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} onset_time];
-                    all_onset_elec_lab{sbj_ix,roi_ix,numel(grp_lab)+1} = ...
-                        [all_onset_elec_lab{sbj_ix,roi_ix,numel(grp_lab)+1} stat.label(ch_ix)];
-                elseif strcmp(event_type,'stim') && (onset_time<mean_RTs(sbj_ix))
-                    all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} = ...
-                        [all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} onset_time];
-                    all_onset_elec_lab{sbj_ix,roi_ix,numel(grp_lab)+1} = ...
-                        [all_onset_elec_lab{sbj_ix,roi_ix,numel(grp_lab)+1} stat.label(ch_ix)];
-                end
-            end
+%             % Get RT correlation onset
+%             if sum(squeeze(stat.mask(ch_ix,1,:)))>0
+%                 mask_chunks = fn_find_chunks(squeeze(stat.mask(ch_ix,1,:)));
+%                 mask_chunks(squeeze(stat.mask(ch_ix,1,mask_chunks(:,1)))==0,:) = [];
+%                 % Convert the first onset of significance to time
+%                 onset_time = stat.time(mask_chunks(1,1));
+%                 % Exclude differences after the mean RT for this SBJ
+%                 if strcmp(event_type,'resp') && (onset_time<0)
+%                     all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} = ...
+%                         [all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} onset_time];
+%                     all_onset_elec_lab{sbj_ix,roi_ix,numel(grp_lab)+1} = ...
+%                         [all_onset_elec_lab{sbj_ix,roi_ix,numel(grp_lab)+1} stat.label(ch_ix)];
+%                 elseif strcmp(event_type,'stim') && (onset_time<mean_RTs(sbj_ix))
+%                     all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} = ...
+%                         [all_onsets{sbj_ix,roi_ix,numel(grp_lab)+1} onset_time];
+%                     all_onset_elec_lab{sbj_ix,roi_ix,numel(grp_lab)+1} = ...
+%                         [all_onset_elec_lab{sbj_ix,roi_ix,numel(grp_lab)+1} stat.label(ch_ix)];
+%                 end
+%             end
         end
     end
     
-    clear SBJ SBJ_vars hfa stat elec w2 st trial_info
+    clear SBJ SBJ_vars hfa rt elec w2 st trial_info
 end
 
 %% Compute median onsets and onset differences per ROI pair
 roi_pairs = nchoosek(1:numel(roi_list),2);
-median_onsets = NaN([numel(SBJs) numel(roi_list) numel(grp_lab)+1]);
-onset_diffs = cell([numel(SBJs) size(roi_pairs,1) numel(cond_lab)]);
+median_onsets = NaN([numel(SBJs) numel(roi_list) numel(cond_lab)]);
+onset_diffs   = cell([numel(SBJs) size(roi_pairs,1) numel(cond_lab)]);
 for sbj_ix = 1:numel(SBJs)
     for pair_ix = 1:size(roi_pairs,1)
         for grp_ix = 1:numel(cond_lab)
             median_onsets(sbj_ix,roi_ix,grp_ix) = nanmedian(all_onsets{sbj_ix,roi_ix,grp_ix});
             
             % If elecs in both ROIs
-            if any(all_onsets{sbj_ix,roi_pairs(pair_ix,1),grp_ix}) && any(all_onsets{sbj_ix,roi_pairs(pair_ix,2),grp_ix})
+            if ~isempty(all_onsets{sbj_ix,roi_pairs(pair_ix,1),grp_ix}) && ...
+               ~isempty(all_onsets{sbj_ix,roi_pairs(pair_ix,2),grp_ix})
                 roi1_elecs = all_onset_elec_lab{sbj_ix,roi_pairs(pair_ix,1),grp_ix};
                 roi2_elecs = all_onset_elec_lab{sbj_ix,roi_pairs(pair_ix,2),grp_ix};
                 if numel(roi1_elecs)~=numel(unique(roi1_elecs))

@@ -1,5 +1,5 @@
-function fn_view_recon_atlas_grp_stat(SBJs, proc_id, stat_id, an_id, reg_type, show_labels,...
-                                 hemi, atlas_id, roi_id, mirror, plot_out, save_fig, fig_ftype, varargin)
+function fn_view_recon_atlas_grp_stat_ROI(SBJs, proc_id, stat_id, an_id, reg_type, show_labels,...
+                                 hemi, atlas_id, roi_id, plot_roi, mirror, save_fig, fig_ftype, varargin)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJs [cell array str] - subject IDs to plot
@@ -21,14 +21,22 @@ function fn_view_recon_atlas_grp_stat(SBJs, proc_id, stat_id, an_id, reg_type, s
 %       'ROI','thryROI','LPFC','MPFC','OFC','INS' - specific ROIs (within these larger regions)
 %       'Yeo7','Yeo17' - colored by Yeo networks
 %       'tissue','tissueC' - colored by tisseu compartment, e.g., GM vs WM vs OUT
+%   plot_roi [str] - which surface mesh to plot
 %   mirror [0/1] - plot the other hemi, 
-%   plot_out [0/1] - include electrodes that don't have an atlas label or in hemi?
 %   save_fig [0/1] - save the .fig file?
 %   fig_ftype [str] - extension of saved figure
 
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 
 %% Handle variables
+% Error cases
+if strcmp(hemi,'b') && ~strcmp(plot_roi,'OFC')
+    error('hemi must be l or r for all non-OFC plots');
+end
+if ~any(strcmp(plot_roi,{'LPFC','MPFC','INS','OFC','TMP','PAR','lat','deep'}))
+    error('roi_id needs to be a lobe, "lat", or "deep"');
+end
+
 % Handle variable inputs
 if ~isempty(varargin)
     for v = 1:2:numel(varargin)
@@ -45,13 +53,7 @@ end
 %% Define default options
 % Add default view_angle if not defined
 if ~exist('view_angle','var')
-    if strcmp(hemi,'l')
-        view_angle = [-90 0];
-    elseif any(strcmp(hemi,{'r','b'}))
-        view_angle = [90 0];
-    else
-        error(['unknown hemi: ' hemi]);
-    end
+    view_angle = fn_get_view_angle(hemi,plot_roi);
     view_str = 'def';
 end
 % Adjust view angle if custom
@@ -79,7 +81,12 @@ else
 end
 
 % ROI info
-[roi_list, ~] = fn_roi_label_styles(roi_id);
+if any(strcmp(plot_roi,{'deep','lat'}))
+    [plot_roi_list, ~] = fn_roi_label_styles(plot_roi);
+else
+    plot_roi_list = {plot_roi};
+end
+
 if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep','gPFC'}))
     roi_field = 'gROI';
 else
@@ -124,22 +131,17 @@ for sbj_ix = 1:numel(SBJs)
         elec_sbj{sbj_ix,1}.color{e_ix} = fn_roi2color(elec_sbj{sbj_ix,1}.(roi_field){e_ix});
     end
         
-    % Remove hemi and/or atlas elecs
-    if ~plot_out
         % Remove electrodes that aren't in atlas ROIs & hemisphere
-        if mirror
-            roi_elecs = fn_select_elec_lab_match(elec_sbj{sbj_ix,1}, 'b', atlas_id, roi_id);
-        else
-            roi_elecs = fn_select_elec_lab_match(elec_sbj{sbj_ix,1}, hemi, atlas_id, roi_id);
-        end
-    else
-        % Remove electrodes that aren't in hemisphere
-        if mirror
-            roi_elecs = fn_select_elec_lab_match(elec_sbj{sbj_ix,1}, 'b', [], []);
-        else
-            roi_elecs = fn_select_elec_lab_match(elec_sbj{sbj_ix,1}, hemi, [], []);
-        end
+    plot_elecs = zeros([numel(elec_sbj{sbj_ix,1}.label) numel(plot_roi_list)]);
+    for roi_ix = 1:numel(plot_roi_list)
+        plot_elecs(:,roi_ix) = strcmp(elec_sbj{sbj_ix,1}.(roi_field),plot_roi_list{roi_ix});
     end
+    if mirror
+        roi_elecs = fn_select_elec_lab_match(elec_sbj{sbj_ix,1}, 'b', atlas_id, roi_id);
+    else
+        roi_elecs = fn_select_elec_lab_match(elec_sbj{sbj_ix,1}, hemi, atlas_id, roi_id);
+    end
+    plot_roi_elecs = intersect(roi_elecs, elec_sbj{sbj_ix,1}.label(any(plot_elecs,2)));
     
     % Mirror hemispheres
     if mirror
@@ -191,7 +193,7 @@ for sbj_ix = 1:numel(SBJs)
         
         % Select sig elecs && elecs matching atlas
         % fn_select_elec messes up if you try to toss all elecs
-        good_elecs = intersect(roi_elecs, sig_ch{cond_ix});
+        good_elecs = intersect(plot_roi_elecs, sig_ch{cond_ix});
         if numel(intersect(elec_sbj{sbj_ix,cond_ix}.label,good_elecs))==0
             elec_sbj{sbj_ix,cond_ix} = {};
             good_sbj(sbj_ix,cond_ix) = false;
@@ -219,21 +221,80 @@ for cond_ix = 1:numel(cond_lab)
     elec{cond_ix}.color       = all_roi_colors{cond_ix};    % appendsens strips that field
 end
 
-%% Load brain recon
-mesh = fn_load_recon_mesh([],'mni',reg_type,'pial',hemi);
+%% Load Atlas
+atlas = fn_load_recon_atlas([],atlas_id);
+
+% Get Atlas-ROI mapping
+atlas_labels = fn_atlas_roi_select_mesh(atlas_id, plot_roi, hemi);
+
+% Can't plot unconnected meshes (I think), so create two meshes
+if strcmp(plot_roi,'OFC')
+    % Treat R hemi as new ROI
+    r_ix = ~cellfun(@isempty,strfind(atlas_labels,'rh'));
+    r_labels = atlas_labels(r_ix);
+    atlas_labels = atlas_labels(~r_ix);
+elseif strcmp(plot_roi,'deep')
+    mtl_ix = ~cellfun(@isempty,strfind(atlas_labels,'Hippocampus')) | ...
+             ~cellfun(@isempty,strfind(atlas_labels,'Amygdala'));
+%     mtl_labels = atlas_labels(mtl_ix);
+    atlas_labels = atlas_labels(~mtl_ix);
+end
+
+%% Select ROI mesh
+cfg = [];
+cfg.inputcoord = atlas.coordsys;
+cfg.atlas = atlas;
+cfg.roi = atlas_labels;
+roi_mask = ft_volumelookup(cfg,atlas);
+seg = keepfields(atlas, {'dim', 'unit','coordsys','transform'});
+seg.brain = roi_mask;
+
+if exist('r_labels','var')
+    cfg.roi = r_labels;
+    r_mask  = ft_volumelookup(cfg,atlas);
+    
+    r_seg = keepfields(atlas, {'dim', 'unit','coordsys','transform'});
+    r_seg.brain = r_mask;
+elseif exist('mtl_labels','var')
+    cfg.roi  = mtl_labels;
+    mtl_mask = ft_volumelookup(cfg,atlas);
+    
+    mtl_seg = keepfields(atlas, {'dim', 'unit','coordsys','transform'});
+    mtl_seg.brain = mtl_mask;
+end
+
+cfg = [];
+cfg.method      = 'iso2mesh';   % surface toolbox Arjen found
+cfg.radbound    = 2;            % scalar indicating the radius of the target surface mesh element bounding sphere
+cfg.maxsurf     = 0;
+cfg.tissue      = 'brain';
+cfg.numvertices = 100000;
+cfg.smooth      = 3;
+cfg.spmversion  = 'spm12';
+roi_mesh = ft_prepare_mesh(cfg, seg);
+if exist('r_seg','var')
+    r_mesh = ft_prepare_mesh(cfg, r_seg);
+elseif exist('mtl_seg','var')
+    mtl_mesh = ft_prepare_mesh(cfg, mtl_seg);
+end
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
 f = cell(size(cond_lab));
 for cond_ix = 1:numel(cond_lab)
     if contains(stat_id,'actv')
-        plot_name = ['GRP_' stat_id '_' an_id '_' hemi_str '_' view_str];
+        plot_name = ['GRP_' stat_id '_' an_id '_' hemi_str];
     else
-        plot_name = ['GRP_' cond_lab{cond_ix} '_' stat_id '_' an_id '_' hemi_str '_' view_str];
+        plot_name = ['GRP_' cond_lab{cond_ix} '_' stat_id '_' an_id '_' hemi_str];
     end
     f{cond_ix} = figure('Name',plot_name);
     
     % Plot 3D mesh
-    ft_plot_mesh(mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
+    ft_plot_mesh(roi_mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
+    if exist('r_mesh','var')
+        ft_plot_mesh(r_mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
+    elseif exist('mtl_mesh','var')
+        ft_plot_mesh(mtl_mesh, 'facecolor', [0.781 0.762 0.664], 'EdgeColor', 'none', 'facealpha', mesh_alpha);
+    end
     
     % Plot electrodes on top
     for e = 1:numel(elec{cond_ix}.label)

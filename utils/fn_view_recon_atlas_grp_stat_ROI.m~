@@ -1,5 +1,5 @@
-function fn_view_recon_atlas_grp_stat(SBJs, proc_id, stat_id, an_id, reg_type, show_labels,...
-                                 hemi, atlas_id, roi_id, mirror, plot_out, save_fig, fig_ftype, varargin)
+function fn_view_recon_atlas_grp_stat_ROI(SBJs, proc_id, stat_id, an_id, reg_type, show_labels,...
+                                 hemi, atlas_id, roi_id, plot_roi, mirror, save_fig, fig_ftype, varargin)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJs [cell array str] - subject IDs to plot
@@ -21,14 +21,22 @@ function fn_view_recon_atlas_grp_stat(SBJs, proc_id, stat_id, an_id, reg_type, s
 %       'ROI','thryROI','LPFC','MPFC','OFC','INS' - specific ROIs (within these larger regions)
 %       'Yeo7','Yeo17' - colored by Yeo networks
 %       'tissue','tissueC' - colored by tisseu compartment, e.g., GM vs WM vs OUT
+%   plot_roi [str] - which surface mesh to plot
 %   mirror [0/1] - plot the other hemi, 
-%   plot_out [0/1] - include electrodes that don't have an atlas label or in hemi?
 %   save_fig [0/1] - save the .fig file?
 %   fig_ftype [str] - extension of saved figure
 
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 
 %% Handle variables
+% Error cases
+if strcmp(hemi,'b') && ~strcmp(plot_roi,'OFC')
+    error('hemi must be l or r for all non-OFC plots');
+end
+if ~any(strcmp(plot_roi,{'LPFC','MPFC','INS','OFC','TMP','PAR','lat','deep'}))
+    error('roi_id needs to be a lobe, "lat", or "deep"');
+end
+
 % Handle variable inputs
 if ~isempty(varargin)
     for v = 1:2:numel(varargin)
@@ -45,13 +53,7 @@ end
 %% Define default options
 % Add default view_angle if not defined
 if ~exist('view_angle','var')
-    if strcmp(hemi,'l')
-        view_angle = [-90 0];
-    elseif any(strcmp(hemi,{'r','b'}))
-        view_angle = [90 0];
-    else
-        error(['unknown hemi: ' hemi]);
-    end
+    view_angle = fn_get_view_angle(hemi,plot_roi);
     view_str = 'def';
 end
 % Adjust view angle if custom
@@ -79,7 +81,12 @@ else
 end
 
 % ROI info
-[roi_list, ~] = fn_roi_label_styles(roi_id);
+if any(strcmp(plot_roi,{'deep','lat'}))
+    [plot_roi_list, ~] = fn_roi_label_styles(plot_roi);
+else
+    plot_roi_list = {plot_roi};
+end
+
 if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep','gPFC'}))
     roi_field = 'gROI';
 else
@@ -124,22 +131,17 @@ for sbj_ix = 1:numel(SBJs)
         elec_sbj{sbj_ix,1}.color{e_ix} = fn_roi2color(elec_sbj{sbj_ix,1}.(roi_field){e_ix});
     end
         
-    % Remove hemi and/or atlas elecs
-    if ~plot_out
         % Remove electrodes that aren't in atlas ROIs & hemisphere
-        if mirror
-            roi_elecs = fn_select_elec_lab_match(elec_sbj{sbj_ix,1}, 'b', atlas_id, roi_id);
-        else
-            roi_elecs = fn_select_elec_lab_match(elec_sbj{sbj_ix,1}, hemi, atlas_id, roi_id);
-        end
-    else
-        % Remove electrodes that aren't in hemisphere
-        if mirror
-            roi_elecs = fn_select_elec_lab_match(elec_sbj{sbj_ix,1}, 'b', [], []);
-        else
-            roi_elecs = fn_select_elec_lab_match(elec_sbj{sbj_ix,1}, hemi, [], []);
-        end
+    plot_elecs = zeros([numel(elec_sbj{sbj_ix,1}.label) numel(plot_roi_list)]);
+    for roi_ix = 1:numel(plot_roi_list)
+        plot_elecs(:,roi_ix) = strcmp(elec_sbj{sbj_ix,1}.(roi_field),plot_roi_list{roi_ix});
     end
+    if mirror
+        roi_elecs = fn_select_elec_lab_match(elec_sbj{sbj_ix,1}, 'b', atlas_id, roi_id);
+    else
+        roi_elecs = fn_select_elec_lab_match(elec_sbj{sbj_ix,1}, hemi, atlas_id, roi_id);
+    end
+    good_elecs = intersect(roi_elecs, elec_sbj{sbj_ix,1}.label(any(plot_elecs,2)));
     
     % Mirror hemispheres
     if mirror

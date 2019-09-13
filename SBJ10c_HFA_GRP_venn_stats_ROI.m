@@ -29,31 +29,9 @@ function SBJ10c_HFA_GRP_venn_stats_ROI(SBJs, proc_id, stat_conds, hemi, atlas_id
 [root_dir, app_dir] = fn_get_root_dir(); ft_dir = [app_dir 'fieldtrip/'];
 
 %% Define default options
-if numel(stat_conds) < 2 || numel(stat_conds) > 3; error('why venn?'); end
-for st_ix = 1:numel(stat_conds)
-    if numel(stat_conds{st_ix})~=3; error('need stat_id, an_id, cond in each stat_cond'); end
-end
 plt_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 
-% Venn colors
-% venn_colors = fn_venn_colors(numel(stat_conds));
-venn_colors = cell(size(stat_conds));
-venn_colors{1} = plt_vars.cmap(1,:);
-if numel(stat_conds)==3;
-    venn_colors{2} = plt_vars.cmap(50,:);
-    venn_colors{3} = plt_vars.cmap(end,:);
-else
-    venn_colors{2} = plt_vars.cmap(end,:);
-end
-[roi_list, roi_colors] = fn_roi_label_styles(roi_id);
-if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep','gPFC'}))
-    roi_field = 'gROI';
-else
-    roi_field = 'ROI';
-end
-
-%% Prep report
 % Organize IDs
 stat_ids = cell(size(stat_conds)); an_ids = cell(size(stat_conds));
 cond_ids = cell(size(stat_conds)); ep_labs = cell(size(stat_conds));
@@ -62,6 +40,44 @@ for st_ix = 1:numel(stat_conds)
     an_ids{st_ix}   = stat_conds{st_ix}{2};
     cond_ids{st_ix} = stat_conds{st_ix}{3};
 end
+if numel(stat_conds) < 2 || numel(stat_conds) > 3; error('why venn?'); end
+for st_ix = 1:numel(stat_conds)
+    if numel(stat_conds{st_ix})~=3; error('need stat_id, an_id, cond in each stat_cond'); end
+end
+
+% Venn colors
+if strcmp(an_ids{1},'HGm_S2t151_zbtA_sm0_wn100') && ...
+        strcmp(an_ids{2},'HGm_S2t251_zbtA_sm0_wn100') && ...
+        strcmp(an_ids{3},'HGm_R5t101_zbtA_sm0_wn100') && ...
+        strcmp(cond_ids{1},cond_ids{2}) && strcmp(cond_ids{2},cond_ids{3})
+    color_id = 'SDR';
+elseif strcmp(cond_ids{1},'CNI') && strcmp(cond_ids{2},'pCNI') && strcmp(cond_ids{3},'PC')
+    color_id = 'ConCSPC';
+elseif strcmp(cond_ids{1},'pCNI') && strcmp(cond_ids{2},'PC')
+    color_id = 'CSPC';
+end
+if exist('color_id','var')
+    venn_colors = fn_venn_colors(numel(stat_conds), 'cond_id', color_id);
+else
+    venn_colors = fn_venn_colors(numel(stat_conds));
+end
+venn_colors = squeeze(venn_colors(logical(eye(size(venn_colors,1)))));
+% venn_colors = cell(size(stat_conds));
+% venn_colors{1} = plt_vars.cmap(1,:);
+% if numel(stat_conds)==3;
+%     venn_colors{2} = plt_vars.cmap(50,:);
+%     venn_colors{3} = plt_vars.cmap(end,:);
+% else
+%     venn_colors{2} = plt_vars.cmap(end,:);
+% end
+[roi_list, roi_colors] = fn_roi_label_styles(roi_id);
+if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep','gPFC'}))
+    roi_field = 'gROI';
+else
+    roi_field = 'ROI';
+end
+
+%% Prep report
 % Create output dir
 save_dir = [root_dir 'PRJ_Stroop/results/HFA/GRP_overlap/' strjoin(stat_ids,'-')...
             '/' strjoin(an_ids,'-') '/' strjoin(cond_ids,'-') '/'];
@@ -101,31 +117,13 @@ for sbj_ix = 1:numel(SBJs)
     %% Prepare elec structs
     % Load elec struct
     elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_pat_',atlas_id,'_final.mat'];
-    if exist([elec_fname(1:end-4) '_' roi_id '.mat'],'file')
-        elec_fname = [elec_fname(1:end-4) '_' roi_id '.mat'];
-    end
     tmp = load(elec_fname); elec_sbj{sbj_ix} = tmp.elec;
     
     % Append SBJ name to labels
     orig_labels = elec_sbj{sbj_ix}.label;
     for e_ix = 1:numel(elec_sbj{sbj_ix}.label)
         elec_sbj{sbj_ix}.label{e_ix} = [SBJs{sbj_ix} '_' elec_sbj{sbj_ix}.label{e_ix}];
-    end
-    
-    % Match elecs to atlas ROIs
-    if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
-        if strcmp(roi_id,'tissueC')
-            elec_sbj{sbj_ix}.roi_color = fn_tissue2color(elec_sbj{sbj_ix});
-        elseif strcmp(atlas_id,'Yeo7')
-            elec_sbj{sbj_ix}.roi_color = fn_atlas2color(atlas_id,elec_sbj{sbj_ix}.(roi_field));
-        else
-            elec_sbj{sbj_ix}.roi_color = fn_roi2color(elec_sbj{sbj_ix}.(roi_field));
-        end
-    elseif any(strcmp(atlas_id,{'Yeo17'}))
-        if ~isfield(elec_sbj{sbj_ix},'man_adj')
-            elec_sbj{sbj_ix}.(roi_field)       = elec_sbj{sbj_ix}.atlas_lab;
-        end
-        elec_sbj{sbj_ix}.roi_color = fn_atlas2color(atlas_id,elec_sbj{sbj_ix}.(roi_field));
+        % don't need individual elec colors here
     end
     
     % Remove hemi and/or atlas elecs
@@ -240,7 +238,7 @@ roi_all = roi_all(any(sig_all,2));
 % Find number of comparisons
 pairs = nchoosek(1:numel(stat_conds),2);
 n_groups = numel(stat_ids)+size(pairs,1);
-if numel(stat_conds)==3; n_groups = n_groups+1; end;
+if numel(stat_conds)==3; n_groups = n_groups+1; end
 
 sig_cnt     = zeros([n_groups 1]);
 sig_type    = zeros([n_groups 1]);

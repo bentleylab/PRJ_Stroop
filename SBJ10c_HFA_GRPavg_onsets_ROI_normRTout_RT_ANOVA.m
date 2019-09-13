@@ -79,6 +79,7 @@ for sbj_ix = 1:numel(SBJs)
     
     % Sort elecs by stat labels
     if numel(elec.label)~=numel(w2.label) || ~all(strcmp(elec.label,w2.label))
+        error('elec w2 label mismatch');
         cfgs = []; cfgs.channel = stat.label;
         elec = fn_select_elec(cfgs,elec);
     end
@@ -93,8 +94,8 @@ for sbj_ix = 1:numel(SBJs)
             roi_ix = find(strcmp(elec.(roi_field){ch_ix},roi_list));
             % Get ANOVA group onsets
             for grp_ix = 1:numel(st.groups)
-                if any(squeeze(w2.qval(grp_ix,ch_ix,:))<st.alpha)
-                    sig_onsets = w2.win_lim_s(squeeze(w2.qval(grp_ix,ch_ix,:))<st.alpha,1);
+                if any(squeeze(w2.qval(grp_ix,ch_ix,:))<=st.alpha)
+                    sig_onsets = w2.win_lim_s(squeeze(w2.qval(grp_ix,ch_ix,:))<=st.alpha,1);
                     if strcmp(st.evnt_lab,'R')
                         all_onsets{sbj_ix,roi_ix,grp_ix} = ...
                             [all_onsets{sbj_ix,roi_ix,grp_ix} sig_onsets(1)];
@@ -137,7 +138,7 @@ for sbj_ix = 1:numel(SBJs)
     else
         y_label = 'Time (sec)';
     end
-    clear SBJ SBJ_vars hfa stat elec w2 trial_info
+    clear SBJ SBJ_vars hfa elec w2 trial_info
 end
 
 %% Aggregate/Process onsets per gROI
