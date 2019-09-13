@@ -9,7 +9,7 @@ function SBJ10a_crRT_smANOVA(SBJ,an_id,stat_id)
 %   stat_id [str] - ID of the statistical parameters and design
 % OUTPUTS:
 %   w2 [struct] - pseudo-FT structure with main ANOVA output
-%   stat [FT struct] - output of correlation with RT if st.rt_corr==1
+%   rt [FT struct] - output of correlation with RT if st.rt_corr==1
 %   st [struct] - stat params loaded via stat_id
 
 %% Set up paths
@@ -123,7 +123,7 @@ if st.rt_corr
     fprintf('================== Running Correlation with RT =======================\n');
     cfg_rt.design           = zscore(trial_info.response_time);
     cfg_rt.ivar             = 1;
-    stat = ft_freqstatistics(cfg_rt, hfa);
+    rt = ft_freqstatistics(cfg_rt, hfa);
 end
 % OUTPUT:
 %   .rho   = correlation coefficients
@@ -146,7 +146,7 @@ end
 %       output is a .model struct that contains .powspctrm, .time, .trialinfo, etc.
 %   'residual' = Yclean = Y - X * X\Y (i.e., the residuals after subtracting the model off
 %       output is .powspctrm as normal
-% NOTE: .stat and .prob output if .statistics = 'yes', but DO NOT TRUST THEM!!! (e.g., p values of 2...)
+% NOTE: DO NOT TRUST .stat and .prob output if .statistics = 'yes'!!! (e.g., p values of 2...)
 
 %% Average HFA in Sliding Windows
 fprintf('================== Averaging HFA within Windows =======================\n');
@@ -246,9 +246,9 @@ fprintf(sig_report,[repmat('%-10s',[1 1+numel(cond_lab)]) '\n'],'label',cond_lab
 
 % Print summary lines (absolute)
 if st.rt_corr
-    fprintf(sig_report,result_str, 'count', sum(any(w2.qval(:,:,:)<st.alpha,3),2), sum(any(stat.mask(:,1,:),3)));
+    fprintf(sig_report,result_str, 'count', sum(any(w2.qval(:,:,:)<st.alpha,3),2), sum(any(rt.mask(:,1,:),3)));
     fprintf(sig_report,strrep(result_str,'i','.3f'), 'percent',...
-        [sum(any(w2.qval(:,:,:)<st.alpha,3),2)', sum(any(stat.mask(:,1,:),3))]./numel(w2.label));
+        [sum(any(w2.qval(:,:,:)<st.alpha,3),2)', sum(any(rt.mask(:,1,:),3))]./numel(w2.label));
 else
     fprintf(sig_report,result_str, 'count', sum(any(w2.qval(:,:,:)<st.alpha,3),2));
     fprintf(sig_report,strrep(result_str,'i','.3f'), 'percent',...
@@ -264,7 +264,7 @@ for ch_ix = 1:numel(w2.label)
             sig_mat(ch_ix,grp_ix) = 1;
         end
     end
-    if st.rt_corr && any(stat.mask(ch_ix,1,:))
+    if st.rt_corr && any(rt.mask(ch_ix,1,:))
         sig_mat(ch_ix,grp_ix) = 1;
     end
     
@@ -277,7 +277,7 @@ fclose(sig_report);
 %% Save Results
 out_fname = [SBJ_vars.dirs.proc SBJ '_smANOVA_ROI_' stat_id '_' an_id '.mat'];
 if st.rt_corr
-    save(out_fname,'-v7.3','w2','stat','st');
+    save(out_fname,'-v7.3','w2','rt','st');
 else
     save(out_fname,'-v7.3','w2','st');
 end

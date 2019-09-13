@@ -19,7 +19,7 @@ st.trial_cond  = {'all'};
 st.n_boots     = 1000;
 
 % RT Correlation Parameters
-st.rt_corr       = 0;
+st.rt_corr       = 1;
 cfg_rt = [];
 cfg_rt.parameter        = 'powspctrm';
 cfg_rt.statistic        = 'ft_statfun_correlationT';

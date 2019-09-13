@@ -34,7 +34,7 @@ mean_RTs = zeros(size(SBJs));
 
 % Load all ROI info
 [roi_list, roi_colors] = fn_roi_label_styles(roi_id);
-if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep'}))
+if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep','gPFC'}))
     roi_field = 'gROI';
 else
     roi_field = 'ROI';
@@ -227,6 +227,10 @@ for cond_ix = 1:numel(st.groups)
     ax.YLabel.String = y_label;
     if ~isempty(strfind(st.evnt_lab,'S'))
         line(xlim,[mean(min_rt) mean(min_rt)]);%,'k--');
+    end
+    
+    if isfield(plt_vars,'mirror') && plt_vars.mirror
+        view([90 -90]);
     end
     
     %% Save figure

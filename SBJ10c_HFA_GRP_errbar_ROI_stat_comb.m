@@ -49,7 +49,7 @@ end
 
 % Load all ROI info
 [roi_list, roi_colors] = fn_roi_label_styles(roi_id);
-if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep'}))
+if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep','gPFC'}))
     roi_field = 'gROI';
 else
     roi_field = 'ROI';

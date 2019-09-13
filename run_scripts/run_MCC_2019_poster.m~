@@ -107,8 +107,9 @@ B00b_GRP_RT_violins_norm(SBJs,plt_id,save_fig,fig_vis,fig_ftype);
 % fn_view_recon_atlas_grp(SBJs,proc_id,'v',0,'l','Dx','mgROI',0);
 % fn_view_recon_atlas_grp(SBJs,proc_id,'v',0,'r','Dx','mgROI',0);
 
-roi_opts  = {{'l','deep'},{'r','deep'},{'l','lat'},{'r','lat'},{'l','MPFC'},{'r','MPFC'},{'b','OFC'}};
+roi_opts  = {{'l','deep'},{'r','deep'}};%{'l','lat'},{'r','lat'},{'l','MPFC'},{'r','MPFC'},{'b','OFC'}};%,{{'l','PAR'},{'r','PAR'}};%
 atlas_id  = 'Dx';
+roi_id    = 'gROI';
 reg_type  = 'v';
 show_lab  = 0;
 save_fig  = 1;
@@ -117,9 +118,12 @@ fig_ftype = 'svg';
 for roi_ix = 1:numel(roi_opts)
     fn_view_recon_atlas_grp_ROI(SBJs, proc_id, reg_type, show_lab,...
                                 roi_opts{roi_ix}{1}, atlas_id, roi_id, roi_opts{roi_ix}{2},...
-                                'save_fig', save_fig, 'fig_ftype', fig_ftype);
+                                'save_fig', save_fig, 'fig_ftype', 'png');
 end
 
+fn_view_recon_atlas_grp(SBJs, proc_id, reg_type, show_lab,...
+                                roi_opts{roi_ix}{1}, atlas_id, roi_id, 0,...
+                                'save_fig', 1, 'fig_ftype', 'png');
 %% ================================================================================
 %   RECONS with EFFECTS
 %  =================================================================================

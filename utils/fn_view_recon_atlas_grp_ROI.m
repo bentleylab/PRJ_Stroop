@@ -72,7 +72,7 @@ else
     plot_roi_list = {plot_roi};
 end
 
-if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep'}))
+if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep','gPFC'}))
     roi_field = 'gROI';
 else
     roi_field = 'ROI';

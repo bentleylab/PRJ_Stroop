@@ -141,6 +141,9 @@ ax.YLabel.FontSize = axis_sz;
 ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') RTs: CNI p=' num2str(pval(1),'%.3f')];
 ax.Title.FontSize  = title_sz;
 legend([legend_obj{:}],cni_legend,'FontSize',leg_sz,'Location','northwest');
+if violin_horz
+    view([90 -90]);
+end
 
 % Save Figure
 fig_fname = [fig_dir,fig_name,'.',fig_ftype];
@@ -188,6 +191,9 @@ ax.YLabel.FontSize = axis_sz;
 ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') RTs: PC p=' num2str(pval(2),'%.3f')];
 ax.Title.FontSize  = title_sz;
 legend([legend_obj{:}],pc_legend,'FontSize',leg_sz,'Location','northwest');
+if violin_horz
+    view([90 -90]);
+end
 
 if save_fig
     fig_fname = [fig_dir fig_name '.' fig_ftype];
@@ -201,7 +207,12 @@ end
 
 %% Interaction Violins
 fig_name = 'GRP_RT_violins_CNI-PC_interaction';
-figure('Name',fig_name,'units','normalized','outerposition',[0 0 0.8 0.5],'Visible',fig_vis);
+if violin_horz
+    outerpos = [0 0 0.4 0.8];
+else
+    outerpos = [0 0 0.8 0.5];
+end
+figure('Name',fig_name,'units','normalized','outerposition',outerpos,'Visible',fig_vis);
 hold on; ax = gca;
 
 % Separate data by PC and CNI
@@ -262,6 +273,9 @@ ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') RTs: CNI p=' num2str(p
                       '; PC p=' num2str(pval(2),'%.3f') '; CNI*PC p='  num2str(pval(4),'%.3f')];
 ax.Title.FontSize  = title_sz;
 % legend([grp_object{real_grp_idx}],grp_legend{real_grp_idx},'FontSize',leg_sz,'Location','best');
+if violin_horz
+    view([90 -90]);
+end
 
 if save_fig
     fig_fname = [fig_dir fig_name '.' fig_ftype];
@@ -315,6 +329,9 @@ ax.YLabel.FontSize = axis_sz;
 ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') Stroop RT Effect by PC: p=' num2str(pval,'%.3f')];
 ax.Title.FontSize  = title_sz;
 legend([legend_obj{:}],pc_lab,'FontSize',leg_sz,'Location','southwest');
+if violin_horz
+    view([90 -90]);
+end
 
 if save_fig
     fig_fname = [fig_dir fig_name '.' fig_ftype];
@@ -429,6 +446,9 @@ ax.YLabel.FontSize = axis_sz;
 ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') RTs: N PC p=' num2str(pval(1),'%.3f')];
 ax.Title.FontSize  = title_sz;
 legend([legend_obj{:}],pc_legend,'FontSize',leg_sz,'Location','northwest');
+if violin_horz
+    view([90 -90]);
+end
 
 if save_fig
     fig_fname = [fig_dir fig_name '.' fig_ftype];
@@ -489,7 +509,10 @@ for cni_ix = 1:3
     ax.YLabel.FontSize = axis_sz;
     ax.Title.String    = ['Group (n=' num2str(numel(SBJs)) ') RTs: pCI ' cni_lab{cni_ix} ' p=' num2str(pval(1),'%.3f')];
     ax.Title.FontSize  = title_sz;
-    legend([legend_obj{:}],pCI_N_legend,'FontSize',leg_sz,'Location','northwest');
+    legend([legend_obj{:}],pCI_N_legend,'FontSize',leg_sz,'Location','best');
+    if violin_horz
+        view([90 -90]);
+    end
 end
 
 if save_fig

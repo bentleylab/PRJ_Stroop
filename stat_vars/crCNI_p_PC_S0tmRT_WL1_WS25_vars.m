@@ -1,8 +1,8 @@
 % Time Parameters
-st.ep_lab   = 'R';
-st.evnt_lab = 'R';
-st.stat_lim = [-0.1 0.5];
-st.lim_adj  = {'', ''};
+st.ep_lab   = 'S';
+st.evnt_lab = 'S';
+st.stat_lim = [0 0];
+st.lim_adj  = {'', 'min(RT)'};
 st.cust_win = 0;            % custom windows per trials
 st.min_rt   = 0.35;
 st.alpha    = 0.05;
@@ -19,7 +19,7 @@ st.trial_cond  = {'all'};
 st.n_boots     = 1000;
 
 % RT Correlation Parameters
-st.rt_corr       = 0;
+st.rt_corr       = 1;
 cfg_rt = [];
 cfg_rt.parameter        = 'powspctrm';
 cfg_rt.statistic        = 'ft_statfun_correlationT';

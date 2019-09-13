@@ -228,7 +228,7 @@ elseif any(strcmp(cond_id,{'CNI','PC','pCNI','pCI'}))
     end
     
     % Get ROI colors
-    if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep'}))
+    if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep','gPFC'}))
         elec.color = fn_roi2color(elec.gROI);
     else
         elec.color = fn_roi2color(elec.ROI);

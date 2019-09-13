@@ -19,7 +19,7 @@ if ~strcmp(hemi,'b')
     lab_match = all([lab_match strcmp(elec.hemi,hemi)],2);
 end
 
-if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep'}))
+if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep','gPFC'}))
     roi_field = 'gROI';
 else
     roi_field = 'ROI';

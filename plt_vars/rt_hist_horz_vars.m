@@ -7,7 +7,7 @@ line_style = '-';
 
 % Violin Plotting
 violin_alpha = 0.3;
-violin_horz  = 0; % plot the data along X, conditions on Y
+violin_horz  = 1; % plot the data along X, conditions on Y
 
 % Axis parameters
 title_sz = 16;

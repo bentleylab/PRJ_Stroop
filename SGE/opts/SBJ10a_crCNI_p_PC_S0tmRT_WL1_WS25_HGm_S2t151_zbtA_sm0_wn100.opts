@@ -1,5 +1,5 @@
 -o /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
 -e /home/knight/hoycw/PRJ_Stroop/scripts/NotBackedUp/SGEout
--v an_id="HGm_R5t101_zbtA_sm0_wn100",stat_id="rCNI_p_PC_R1t5_WL1_WS25"
+-v an_id="HGm_S2t151_zbtA_sm0_wn100",stat_id="crCNI_p_PC_S0tmRT_WL1_WS25"
 -l mem_free=4G
 -N ANOVAhfa

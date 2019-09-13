@@ -55,6 +55,11 @@ end
 % ROI info
 [roi_list, ~] = fn_roi_label_styles(roi_id);
 fprintf('Using atlas: %s\n',atlas_id);
+if any(strcmp(roi_id,{'mgROI','gROI','main3','lat','deep','gPFC'}))
+    roi_field = 'gROI';
+else
+    roi_field = 'ROI';
+end
 
 %% Load elec struct
 elec     = cell([numel(SBJs) 1]);
@@ -66,39 +71,16 @@ for sbj_ix = 1:numel(SBJs)
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];
     eval(SBJ_vars_cmd);
     
-    try
-        elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_mni',reg_suffix,'_',atlas_id,'_full.mat'];
-        if exist([elec_fname(1:end-4) '_' roi_id '.mat'],'file')
-            elec_fname = [elec_fname(1:end-4) '_' roi_id '.mat'];
-        end
-        tmp = load(elec_fname); elec{sbj_ix} = tmp.elec;
-    catch
-        error([elec_fname 'doesnt exist, exiting...']);
-    end
+    elec_fname = [SBJ_vars.dirs.recon,SBJ,'_elec_',proc_id,'_mni',reg_suffix,'_',atlas_id,'_final.mat'];
+    tmp = load(elec_fname); elec{sbj_ix} = tmp.elec;
     
     % Append SBJ name to labels
     for e_ix = 1:numel(elec{sbj_ix}.label)
         elec{sbj_ix}.label{e_ix} = [SBJs{sbj_ix} '_' elec{sbj_ix}.label{e_ix}];
     end
     
-    % Match elecs to atlas ROIs
-    if any(strcmp(atlas_id,{'DK','Dx','Yeo7'}))
-        if ~isfield(elec{sbj_ix},'man_adj')
-            elec{sbj_ix}.roi       = fn_atlas2roi_labels(elec{sbj_ix}.atlas_lab,atlas_id,roi_id);
-        end
-        if strcmp(roi_id,'tissueC')
-            elec{sbj_ix}.roi_color = fn_tissue2color(elec{sbj_ix});
-        elseif strcmp(atlas_id,'Yeo7')
-            elec{sbj_ix}.roi_color = fn_atlas2color(atlas_id,elec{sbj_ix}.roi);
-        else
-            elec{sbj_ix}.roi_color = fn_roi2color(elec{sbj_ix}.roi);
-        end
-    elseif any(strcmp(atlas_id,{'Yeo17'}))
-        if ~isfield(elec{sbj_ix},'man_adj')
-            elec{sbj_ix}.roi       = elec{sbj_ix}.atlas_lab;
-        end
-        elec{sbj_ix}.roi_color = fn_atlas2color(atlas_id,elec{sbj_ix}.roi);
-    end
+    % Match elecs to colors
+    elec{sbj_ix}.color = fn_atlas2color(atlas_id,elec{sbj_ix}.(roi_field));
     
     if ~plot_out
         % Remove electrodes that aren't in atlas ROIs & hemisphere
@@ -115,16 +97,16 @@ for sbj_ix = 1:numel(SBJs)
         cfgs = [];
         cfgs.channel = good_elecs;
         elec{sbj_ix} = fn_select_elec(cfgs, elec{sbj_ix});
-        all_roi_labels = [all_roi_labels; elec{sbj_ix}.roi];
-        all_roi_colors = [all_roi_colors; elec{sbj_ix}.roi_color];
+        all_roi_labels = [all_roi_labels; elec{sbj_ix}.(roi_field)];
+        all_roi_colors = [all_roi_colors; elec{sbj_ix}.color];
     end
     clear SBJ SBJ_vars SBJ_vars_cmd
 end
 
 %% Combine elec structs
 elec = ft_appendsens([],elec{good_sbj});
-elec.roi       = all_roi_labels;    % appendsens strips that field
-elec.roi_color = all_roi_colors;    % appendsens strips that field
+elec.(roi_field)       = all_roi_labels;    % appendsens strips that field
+elec.color = all_roi_colors;    % appendsens strips that field
 
 %% Load brain recon
 mesh = fn_load_recon_mesh([],'mni',reg_type,hemi);
@@ -140,7 +122,7 @@ for e = 1:numel(elec.label)
     cfgs = []; cfgs.channel = elec.label(e);
     elec_tmp = fn_select_elec(cfgs,elec);
     ft_plot_sens(elec_tmp, 'elecshape', 'sphere',...
-                 'facecolor', elec_tmp.roi_color, 'label', lab_arg);
+                 'facecolor', elec_tmp.color, 'label', lab_arg);
 end
 
 view(view_angle); material dull; lighting gouraud;
@@ -150,54 +132,8 @@ fprintf(['To reset the position of the camera light after rotating the figure,\n
     '(i.e., uncheck them within the figure), and then hit ''l'' on the keyboard\n'])
 set(h, 'windowkeypressfcn',   @cb_keyboard);
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SUBFUNCTION
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function cb_keyboard(h, eventdata)
-
-if isempty(eventdata)
-  % determine the key that corresponds to the uicontrol element that was activated
-  key = get(h, 'userdata');
-else
-  % determine the key that was pressed on the keyboard
-  key = parseKeyboardEvent(eventdata);
-end
-% get focus back to figure
-if ~strcmp(get(h, 'type'), 'figure')
-  set(h, 'enable', 'off');
-  drawnow;
-  set(h, 'enable', 'on');
+if save_fig
+    saveas(f{cond_ix}, [out_dir plot_name '.' fig_ftype]);
 end
 
-if strcmp(key, 'l') % reset the light position
-  delete(findall(h,'Type','light')) % shut out the lights
-  camlight; lighting gouraud; % add a new light from the current camera position
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SUBFUNCTION
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function key = parseKeyboardEvent(eventdata)
-
-key = eventdata.Key;
-% handle possible numpad events (different for Windows and UNIX systems)
-% NOTE: shift+numpad number does not work on UNIX, since the shift
-% modifier is always sent for numpad events
-if isunix()
-  shiftInd = match_str(eventdata.Modifier, 'shift');
-  if ~isnan(str2double(eventdata.Character)) && ~isempty(shiftInd)
-    % now we now it was a numpad keystroke (numeric character sent AND
-    % shift modifier present)
-    key = eventdata.Character;
-    eventdata.Modifier(shiftInd) = []; % strip the shift modifier
-  end
-elseif ispc()
-  if strfind(eventdata.Key, 'numpad')
-    key = eventdata.Character;d
-  end
-end
-
-if ~isempty(eventdata.Modifier)
-  key = [eventdata.Modifier{1} '+' key];
 end
