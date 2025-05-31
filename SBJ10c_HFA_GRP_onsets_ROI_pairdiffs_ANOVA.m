@@ -76,7 +76,7 @@ for sbj_ix = 1:numel(SBJs)
     for ch_ix = 1:numel(w2.label)
         % If elec matches roi_list and is in GM, get stats
         if any(strcmp(elec.(roi_field){ch_ix},roi_list)) %&& w2.max_hfa_z(ch_ix)>=z_thresh% && gm_bin(ch_ix)
-            roi_ix = find(strcmp(elec.(roi_id){ch_ix},roi_list));
+            roi_ix = find(strcmp(elec.(roi_field){ch_ix},roi_list));
             % Get ANOVA group onsets
             for grp_ix = 1:numel(st.groups)
                 if any(squeeze(w2.qval(grp_ix,ch_ix,:))<=st.alpha)

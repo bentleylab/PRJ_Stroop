@@ -50,7 +50,8 @@ if strcmp(full{1}.st.model_lab,'actv')
     % consider doing this with full{st_ix}.(st_name) since fileds should be
     % same names...
 elseif full{1}.st.rt_corr
-    error('not ready to combine rt_corr stats');
+    warning('RT corr detected, being concatenated but not processed!');
+    rt = {full{1}.rt full{2}.rt};
 else
     if ~all(strcmp(full{1}.w2.label,full{2}.w2.label)); error('w2.label mismatch'); end
     if ~strcmp(full{1}.w2.dimord,full{2}.w2.dimord); error('w2.dimord mismatch'); end
@@ -216,8 +217,9 @@ if strcmp(full{1}.st.model_lab,'actv')
     error('actv needs implementation');
 else
     out_fname = [SBJ_vars.dirs.proc SBJ '_smANOVA_ROI_' new_name '_' an_ids{order_idx(1)} '.mat'];
+    fprintf('Saving %s\n',out_fname);
     if st.rt_corr
-        save(out_fname,'-v7.3','w2','stat','st');
+        save(out_fname,'-v7.3','w2','rt','st');
     else
         save(out_fname,'-v7.3','w2','st');
     end

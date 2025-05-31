@@ -9,21 +9,22 @@ addpath(ft_dir);
 ft_defaults
 
 %% Full SBJ list (completed and ready to run)
-SBJs = {'CP24','IR21','IR26','IR31','IR32','IR35','IR39','IR41',...
-        'IR52','IR54','IR57','IR61','IR65','IR67','IR68','IR72','IR74'};
+SBJs = {'CP24','IR32','IR48'};%'IR37','IR75','IR79','IR82'};
+%'CP24','IR21','IR26','IR31','IR32','IR35','IR39','IR41',...
+        % 'IR52','IR54','IR57','IR61','IR65','IR67','IR68','IR72','IR74'};
 
 %% Prepare for inspections
 for s = 1:numel(SBJs)
     % Convert raw pipeline elec files to my SBJ_vars
-%     fn_elec_import_orig(SBJs{s},'main_ft','pat','',0);
-%     fn_elec_import_orig(SBJs{s},'main_ft','pat','',1);
-%     fn_elec_import_orig(SBJs{s},'main_ft','mni','v',1);
+    % fn_elec_import_orig(SBJs{s},'main_ft','pat','',0);
+    % fn_elec_import_orig(SBJs{s},'main_ft','pat','',1);
+    % fn_elec_import_orig(SBJs{s},'main_ft','mni','v',1);
     
     % Match elec to atlas labels + tissue (ONLY orig!)
     % run in SGE: fn_elec_match_atlas(SBJs{s},'main_ft','pat','','Dx');
     
     % Export reref atlas info to CSV for manual adjustments
-    fn_elec_export_csv(SBJs{s},'main_ft','pat','','Dx', 0);
+    % fn_elec_export_csv(SBJs{s},'main_ft','pat','','Dx', 0);
     
 end
 
@@ -31,7 +32,7 @@ end
 % fn_elec_check_ROIs(SBJ);
 
 %% Compile manual orig into auto bipolar
-for s = 1:numel(SBJs)
+for s = 3:numel(SBJs)
     fn_elec_import_manual(SBJs{s}, 'main_ft', 'pat', '', 'Dx', 0);
     fn_elec_compile_man_reref(SBJs{s}, 'main_ft', 'pat', '', 'Dx');
     fn_elec_export_csv(SBJs{s},'main_ft','pat','','Dx', 1);

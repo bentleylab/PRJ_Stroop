@@ -157,7 +157,7 @@ for sbj_ix = 1:numel(SBJs)
         elec_sbj{sbj_ix,cond_ix} = elec_sbj{sbj_ix,1};
     end
     
-    % Load Stats
+    %% Load Stats
     % Determine options: {'actv','CI','RT','CNI','PC'}
     sig_ch = cell(size(cond_lab));
     if contains(stat_id,'actv')
@@ -282,9 +282,9 @@ end
 f = cell(size(cond_lab));
 for cond_ix = 1:numel(cond_lab)
     if contains(stat_id,'actv')
-        plot_name = ['GRP_' stat_id '_' an_id '_' hemi_str];
+        plot_name = ['GRP_' stat_id '_' an_id '_' plot_roi '_' hemi_str];
     else
-        plot_name = ['GRP_' cond_lab{cond_ix} '_' stat_id '_' an_id '_' hemi_str];
+        plot_name = ['GRP_' cond_lab{cond_ix} '_' stat_id '_' an_id '_' plot_roi '_' hemi_str '_' view_str];
     end
     f{cond_ix} = figure('Name',plot_name);
     

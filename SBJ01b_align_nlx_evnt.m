@@ -1,7 +1,7 @@
 function SBJ01b_align_nlx_evnt(SBJ, proc_id, block_ix, save_it)
+% Load, resample, and align photodiode and microphone from neuralynx system to clinical data
 % save_it == 0: don't save plots, compare to raw data
 %         == 1: save plots and data, compare to import
-error('fix mic alignment for saving .wav!');
 if block_ix~=1
     error('SBJ01b not ready for multi-block runs yet!');
 end
@@ -20,61 +20,90 @@ ft_defaults
 
 %% SBJ vars
 eval(['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m']);
+if ~isfield(SBJ_vars.dirs,'nlx')
+    error([SBJ ' does not have NLX data, run only SBJ01a!']);
+end
+if numel(SBJ_vars.analysis_time{block_ix})>1
+    error('havent set up processing for multi block concat within a run!');
+end
+
+if numel(SBJ_vars.block_name)>1
+    block_suffix = ['_' SBJ_vars.block_name{block_ix}];
+else
+    block_suffix = SBJ_vars.block_name{block_ix};   % should just be ''
+end
+
 eval(['run ' root_dir 'PRJ_Stroop/scripts/proc_vars/' proc_id '_vars.m']);
+if length(SBJ_vars.ch_lab.nlx_nk_align)~=2, error('why not 2 NLX-NK align channels?'); end
 
 %% Read photodiode, NLX macro, clinical data
 % First check for invalid samples
 check_neuralynx_validsamples([SBJ_vars.dirs.nlx 'photo/']);
 
-% Neuralynx photodiode
-evnt       = ft_read_neuralynx_interp({[SBJ_vars.dirs.nlx 'photo/' ...
-                            SBJ_vars.ch_lab.photod{1} SBJ_vars.ch_lab.nlx_suffix '.ncs']});
-evnt_orig  = evnt;
-
-% Neuralynx mic
-mic       = ft_read_neuralynx_interp({[SBJ_vars.dirs.nlx 'mic/' ...
-                            SBJ_vars.ch_lab.mic{1} SBJ_vars.ch_lab.nlx_suffix '.ncs']});
-mic_orig  = mic;
-
-% Neuralynx macro channel
 macro_fnames = SBJ_vars.ch_lab.nlx_nk_align;
 for m_ix = 1:numel(macro_fnames)
     macro_fnames{m_ix} = [SBJ_vars.dirs.nlx 'macro/' SBJ_vars.ch_lab.nlx_nk_align{m_ix}...
-                            SBJ_vars.ch_lab.nlx_suffix '.ncs'];
+        SBJ_vars.ch_lab.nlx_suffix '.ncs'];
 end
-macro = ft_read_neuralynx_interp(macro_fnames);
+try
+    % Neuralynx photodiode
+    evnt       = ft_read_neuralynx_interp({[SBJ_vars.dirs.nlx 'photo/' ...
+        SBJ_vars.ch_lab.photod{block_ix} SBJ_vars.ch_lab.nlx_suffix '.ncs']});
+    % Neuralynx mic
+    mic       = ft_read_neuralynx_interp({[SBJ_vars.dirs.nlx 'mic/' ...
+        SBJ_vars.ch_lab.mic{block_ix} SBJ_vars.ch_lab.nlx_suffix '.ncs']});
+    % Neuralynx macro channel
+    macro = ft_read_neuralynx_interp(macro_fnames);
+catch ME
+    if strcmp(ME.message, 'Sample points must be unique.')
+        fprintf(2,'ft_read_neuralynx_interp error, trying ft_preprocessing...');
+        cfg_load = [];
+        cfg_load.dataset = [SBJ_vars.dirs.nlx 'photo/' ...
+            SBJ_vars.ch_lab.photod{block_ix} SBJ_vars.ch_lab.nlx_suffix '.ncs'];
+        evnt = ft_preprocessing(cfg_load);
+        % Neuralynx mic
+        cfg_load.dataset = [SBJ_vars.dirs.nlx 'mic/' ...
+            SBJ_vars.ch_lab.mic{block_ix} SBJ_vars.ch_lab.nlx_suffix '.ncs'];
+        mic       = ft_preprocessing(cfg_load);
+        % Neuralynx macro channel
+        cfg_load.dataset = macro_fnames{1};
+        macro1 = ft_preprocessing(cfg_load);
+        cfg_load.dataset = macro_fnames{2};
+        macro2 = ft_preprocessing(cfg_load);
+        macro = ft_appenddata([],macro1,macro2);
+    else % Re-throw the error if it's not the specific one you're looking for
+        rethrow(ME);
+    end
+end
 macro.label = SBJ_vars.ch_lab.nlx_nk_align;
-macro_orig  = macro;
+
+% Deal with multi-block within a run (error for now...)
+% if numel(SBJ_vars.analysis_time{block_ix})>1
+%     data_blocks = {};
+%     for block_ix = 1:numel(SBJ_vars.block_name)
+%         load([SBJ_vars.dirs.import SBJ '_' srate_str 'hz_' SBJ_vars.block_name{block_ix} '.mat']);
+%         data_blocks{block_ix} = data;
+%     end
+%     data = fn_concat_blocks(data_blocks);
+% end
 
 % Nihon Kohden clinical channel
 if ~save_it
     clin_fname = SBJ_vars.dirs.raw_filename{block_ix};
-    load(clin_fname);
 else
     if any(SBJ_vars.low_srate)
         srate_str = num2str(SBJ_vars.low_srate(block_ix));
     else
         srate_str = num2str(proc.resample_freq);
     end
-    if numel(SBJ_vars.raw_file)>1
-        error('only ready for single block SBJ');
-%         data_blocks = {};
-%         for block_ix = 1:numel(SBJ_vars.block_name)
-%             load([SBJ_vars.dirs.import SBJ '_' srate_str 'hz_' SBJ_vars.block_name{block_ix} '.mat']);
-%             data_blocks{block_ix} = data;
-%         end
-%         data = fn_concat_blocks(data_blocks);
-    else
-        block_suffix = SBJ_vars.block_name{block_ix};   % should just be ''
-        clin_fname = [SBJ_vars.dirs.import SBJ '_' srate_str 'hz' block_suffix '.mat'];
-        load(clin_fname);
-    end
+    clin_fname = [SBJ_vars.dirs.import SBJ '_' srate_str 'hz' block_suffix '.mat'];
 end
+load(clin_fname);
 
 cfgs         = [];
 cfgs.channel = SBJ_vars.ch_lab.nlx_nk_align;
 clin         = ft_selectdata(cfgs,data);
-clin_orig    = clin;
+% clin_orig    = clin;
 
 %% Preprocess
 % Cut NLX to nlx_analysis_time
@@ -83,7 +112,7 @@ if isfield(SBJ_vars,'nlx_analysis_time')
         error('not built to handle multiple cuts within a single nlx run!');
     end
     cfgs = [];
-    cfgs.latency = SBJ_vars.nlx_analysis_time{1}{1};
+    cfgs.latency = SBJ_vars.nlx_analysis_time{block_ix}{1};
     evnt  = ft_selectdata(cfgs, evnt);
     mic   = ft_selectdata(cfgs, mic);
     macro = ft_selectdata(cfgs, macro);
@@ -124,9 +153,9 @@ end
 % if numel(SBJ_vars.analysis_time{block_ix})>1
 %     error('havent set up processing for multi block concat!');
 % end
-% cfgs = []; cfgs.latency = SBJ_vars.analysis_time{block_ix}{1};
-% clin = ft_selectdata(cfgs,clin);
-% clin.time{1} = clin.time{1}-SBJ_vars.analysis_time{block_ix}{1}(1);
+cfgs = []; cfgs.latency = SBJ_vars.analysis_time{block_ix}{1};
+clin = ft_selectdata(cfgs,clin);
+clin.time{1} = clin.time{1}-SBJ_vars.analysis_time{block_ix}{1}(1);
 
 % Match sampling rates
 if macro.fsample > clin.fsample
@@ -163,7 +192,7 @@ end
 fn_plot_PSD_1by1_compare(clin.trial{1},macro.trial{1},clin.label,macro.label,...
     clin.fsample,'clinical','macro');
 if save_it
-    saveas(gcf,[SBJ_vars.dirs.import SBJ '_nlx_nk_PSD_compare_' macro.label{1} '.png']);
+    saveas(gcf,[SBJ_vars.dirs.import SBJ '_nlx_nk_PSD_compare_' macro.label{1} block_suffix '.png']);
 end
 
 %% Compute cross correlation at varying time lags

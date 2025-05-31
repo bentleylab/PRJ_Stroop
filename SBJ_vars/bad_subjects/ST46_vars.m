@@ -11,6 +11,7 @@ end
 SBJ_vars.SBJ = 'ST46';
 SBJ_vars.raw_file = {'E15-473_0022.edf'};
 SBJ_vars.block_name = {''};
+SBJ_vars.low_srate  = [0];
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -37,37 +38,54 @@ end
 
 SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw,SBJ_vars.raw_file);
 
-SBJ_vars.recon.surf_l     = [SBJ_vars.dirs.recon 'Surfaces/' SBJ_vars.SBJ '_cortex_lh.mat'];
-SBJ_vars.recon.surf_r     = [SBJ_vars.dirs.recon 'Surfaces/' SBJ_vars.SBJ '_cortex_rh.mat'];
-SBJ_vars.recon.elec_pat   = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_acpc_f.mat'];
-SBJ_vars.recon.elec_mni_v = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_mni_v.mat'];
-SBJ_vars.recon.elec_mni_s = [];
-SBJ_vars.recon.fs_T1      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_postop_T1.mgz'];
-SBJ_vars.recon.fs_DK      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_postop_DK.mgz'];
-SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_postop_Dx.mgz'];
+% SBJ_vars.recon.surf_l     = [SBJ_vars.dirs.recon 'Surfaces/' SBJ_vars.SBJ '_cortex_lh.mat'];
+% SBJ_vars.recon.surf_r     = [SBJ_vars.dirs.recon 'Surfaces/' SBJ_vars.SBJ '_cortex_rh.mat'];
+% SBJ_vars.recon.wm_l       = [SBJ_vars.dirs.recon 'Surfaces/' SBJ_vars.SBJ '_wm_lh.mat'];
+% SBJ_vars.recon.wm_r       = [SBJ_vars.dirs.recon 'Surfaces/' SBJ_vars.SBJ '_wm_rh.mat'];
+% SBJ_vars.recon.infl_l     = [SBJ_vars.dirs.recon 'Surfaces/' SBJ_vars.SBJ '_infl_lh.mat'];
+% SBJ_vars.recon.infl_r     = [SBJ_vars.dirs.recon 'Surfaces/' SBJ_vars.SBJ '_infl_rh.mat'];
+% SBJ_vars.recon.elec_pat   = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_acpc_....mat'];
+% SBJ_vars.recon.elec_mni_v = [SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_mni_frv.mat'];
+% SBJ_vars.recon.elec_mni_s = [];%[SBJ_vars.dirs.recon 'Electrodes/' SBJ_vars.SBJ '_elec_mni_s.mat'];
+% SBJ_vars.recon.fs_T1      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preop_T1.mgz'];
+% SBJ_vars.recon.fs_DK      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preop_aparc+aseg.mgz'];
+% SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preop_aparc.a2009s+aseg.mgz'];
 
 %--------------------------------------
 % Channel Selection
 %--------------------------------------
-%hdr = ft_read_header(SBJ_vars.dirs.raw_filename);
-%SBJ_vars.orig_n_ch = length(hdr.label);
-%SBJ_vars.orig_n_samples = hdr.nSamples;
-%SBJ_vars.orig_srate = hdr.Fs;
-%clear hdr;
-
-SBJ_vars.ch_lab.probes     = {};
-SBJ_vars.ch_lab.probe_type = {};
-SBJ_vars.ch_lab.ref_type   = {};
-SBJ_vars.ch_lab.ROI        = {};
+SBJ_vars.ch_lab.probes     = {'ROFC','RACC','RPFC','RINS','RAHP',...
+                              'LPFC','LOFC','LACC','LAHP'};
+SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg',...
+                              'seeg','seeg','seeg','seeg'};
+SBJ_vars.ch_lab.ref_type   = {'BP','BP','BP','BP','BP',...
+                              'BP','BP','BP','BP'};
+if ~all(numel(SBJ_vars.ch_lab.probes)==[numel(SBJ_vars.ch_lab.probe_type) numel(SBJ_vars.ch_lab.ref_type)]); error('probes ~= type+ref');end;
+SBJ_vars.ch_lab.ROI        = {'all'};
 SBJ_vars.ch_lab.eeg_ROI    = {};
 
-SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
+SBJ_vars.ch_lab.suffix = '-Ref';    % after every channel except 'EDF Annotations'
+%SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
+
+SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
+    'RAHP1','RAHP2','RAHP3',... % epileptic
+    'LAHP1',... % occassional spike
+    'LOFC1','LOFC2','LOFC3','LOFC4','LPFC1','LPFC2','LPFC3','LPFC4','LPFC5',... % OFC lesion
+    'ROFC1','ROFC2','ROFC3','ROFC4','ROFC5','RPFC1','RPFC2','RPFC3','RPFC4','RPFC5',... % OFC lesion
+    'RAHP10','LPFC10',... % out of brain
+    'DC03','DC04','E','EDF Annotations'... % junk
     };
+% bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
+SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
+SBJ_vars.ch_lab.bad_code = [1,1,1,2,repmat(2,1,19),3,3,0,0,0,0];
+if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {};
+% SBJ_vars.ch_lab.CZ_lap_ref = {};
 SBJ_vars.ch_lab.eog = {};
-SBJ_vars.ch_lab.photod = {};
-SBJ_vars.ch_lab.mic    = {};
+SBJ_vars.ch_lab.photod = {'DC01'};
+SBJ_vars.ch_lab.mic    = {'DC02'};
 
 %--------------------------------------
 % Line Noise Parameters

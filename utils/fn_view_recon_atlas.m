@@ -32,6 +32,8 @@ if ~isempty(varargin)
             mesh_alpha = varargin{v+1};
         elseif strcmp(varargin{v},'mesh_type') && ischar(varargin{v+1})
             mesh_type = varargin{v+1};
+        elseif strcmp(varargin{v},'plot_elec') && ischar(varargin{v+1})
+            plot_elec = varargin{v+1};
         else
             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
         end

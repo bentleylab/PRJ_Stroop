@@ -95,7 +95,7 @@ for b_ix = 1:numel(SBJ_vars.block_name)
         SBJ_vars.ch_lab.probes = sort(SBJ_vars.ch_lab.probes);  % keep alphabetical order
         for d = 1:numel(SBJ_vars.ch_lab.probes)
             cfg = [];
-            cfg.channel = ft_channelselection(strcat(SBJ_vars.ch_lab.probes{d},'*'), data.label);
+            cfg.channel = data.label(~cellfun('isempty', regexp(data.label, ['^' SBJ_vars.ch_lab.probes{d} '\d+$'])));
             probe_data = ft_selectdata(cfg,data);   % Grab data from this probe to plot in PSD comparison
             
             % Create referencing scheme

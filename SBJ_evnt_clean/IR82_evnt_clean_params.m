@@ -1,4 +1,4 @@
-%% Photodiode Trace Cleaning Parameters: IR69
+%% Photodiode Trace Cleaning Parameters: IR82
 % Mark trials to ignore e.g., interruptions
 ignore_trials = [];
 
@@ -9,7 +9,7 @@ bsln_val = -130;
 
 % Record epochs (in sec) with fluctuations that should be set to baseline
 bsln_times = {...
-    [0.0 14.0]...% initial offset (attaching to screen?)
+    [0.0 125.0]...% initial offset (attaching to screen?)
     };% curious, no extra blip at end of first block!
 
 % Record epochs (in sec) when baseline has shifted

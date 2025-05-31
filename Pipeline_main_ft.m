@@ -57,7 +57,7 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     [evnt, hdr] = fn_format_data_ft2KLA(evnt);
     
     % Plot event channels
-    plot(linspace(0,hdr.length_in_seconds,hdr.n_samples), evnt);
+    plot(linspace(0,hdr.length_in_seconds,hdr.n_samples), evnt(1,:));
     
     %% ========================================================================
     %   Step 4b- Manually Clean Photodiode Trace: Mark Sections to Correct
@@ -104,13 +104,7 @@ end
 %% ========================================================================
 %   Step 6- Create einfo based on ROIs
 %  ========================================================================
-% look at recon and create spreadsheet of general ROI, WM/GM, etc.
-%   save that as tsv
-fn_compile_elec_struct(SBJ,'main_ft','pat','',1);
-fn_compile_elec_struct(SBJ,'main_ft','mni','v',1);
-fn_save_elec_atlas(SBJ,'main_ft','pat','','DK',1);
-fn_save_elec_atlas(SBJ,'main_ft','pat','','Dx',1);
-% tissue compartments...
+% use run_script/run_elec_pipeline.m
 
 %% ========================================================================
 %   Step 7- Manually Correct Reaction Times
@@ -255,9 +249,9 @@ cfg.channel = SBJ_vars.ch_lab.ROI;
 data = ft_selectdata(cfg,data);
 
 % Segment into trials
-if strcmp(proc.event_type,'stim')
+if strcmp(proc.evnt_lab,'S')
     events = trial_info_clean.word_onset;
-elseif strcmp(proc.event_type,'resp')
+elseif strcmp(proc.evnt_lab,'R')
     events = trial_info_clean.resp_onset;
 else
     error(strcat('ERROR: unknown event_type ',proc.event_type));

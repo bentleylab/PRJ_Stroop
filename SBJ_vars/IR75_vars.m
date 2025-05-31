@@ -9,13 +9,13 @@ end
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'IR75';
-SBJ_vars.raw_file = {};%'IR75_raw_R1.mat'};
+SBJ_vars.raw_file = {'IR75_stroop_raw.mat'};
 SBJ_vars.block_name = {''};% there's a second block I don't want to process right now, so leaving blank here
 SBJ_vars.low_srate  = [0];
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Stroop/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
-SBJ_vars.dirs.SU      = [SBJ_vars.dirs.raw 'SU_2018-06-01_14-37-09/'];
+SBJ_vars.dirs.nlx     = [SBJ_vars.dirs.raw 'SU_2018-06-01_14-37-09/'];
 SBJ_vars.dirs.import  = [SBJ_vars.dirs.SBJ '01_import/'];
 SBJ_vars.dirs.preproc = [SBJ_vars.dirs.SBJ '02_preproc/'];
 SBJ_vars.dirs.events  = [SBJ_vars.dirs.SBJ '03_events/'];
@@ -55,12 +55,6 @@ SBJ_vars.recon.fs_Dx      = [SBJ_vars.dirs.recon 'Scans/' SBJ_vars.SBJ '_fs_preo
 %--------------------------------------
 % Channel Selection
 %--------------------------------------
-%hdr = ft_read_header(SBJ_vars.dirs.raw_filename);
-%SBJ_vars.orig_n_ch = length(hdr.label);
-%SBJ_vars.orig_n_samples = hdr.nSamples;
-%SBJ_vars.orig_srate = hdr.Fs;
-%clear hdr;
-
 SBJ_vars.ch_lab.probes     = {'RAM','RHH','RTH','RAP','RPP','RBH',...
                               'LAM','LHH','LTH','LAP','LPP','LBH'};
 SBJ_vars.ch_lab.probe_type = {'seeg','seeg','seeg','seeg','seeg','seeg',...
@@ -76,26 +70,32 @@ SBJ_vars.ch_lab.wires        = {'mram','mrhh','mrth','mlam','mlhh','mlth'};
 SBJ_vars.ch_lab.wire_type    = {'su','su','su','su','su','su'};
 SBJ_vars.ch_lab.wire_ref     = {'','','','','',''};
 SBJ_vars.ch_lab.wire_ROI     = {'all'};
-SBJ_vars.ch_lab.nlx_suffix   = '_0002';
-SBJ_vars.ch_lab.nlx_nk_align = {'LAP4'};%,'LAP5'};
+SBJ_vars.ch_lab.nlx_suffix   = '_0003';
+SBJ_vars.ch_lab.nlx_nk_align = {'LAP4','LAP5'};
+SBJ_vars.nlx_analysis_time   = {{[50 1050]}};
 SBJ_vars.nlx_macro_inverted  = 1;
 
 % SBJ_vars.ch_lab.prefix = 'POL ';    % before every channel except 'EDF Annotations'
-SBJ_vars.ch_lab.suffix = '_0003';    % after every channel except 'EDF Annotations'
+% SBJ_vars.ch_lab.suffix = '_0003';    % after every channel except 'EDF Annotations'
 % SBJ_vars.ch_lab.mislabel = {{'RLT12','FPG12'},{'IH;L8','IHL8'}};
 
 SBJ_vars.ch_lab.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.ch_lab.bad = {...
+    'LHH1','LHH2','LHH3','LAM1',... % epileptic (source)
+    'LTH1','LTH2','LTH3',... % spikes/spread
+    'LAP1','LAP2','LAP3','RBH1','RBH2','RBH3','RBH4','RPP1','RPP2','RPP3','RPP4',... % in the peri-ventricular heterotopias
+    'RAP1','RAP2','RAP3','LBH1','LBH2','LBH3','LPP1','LPP2','LPP3',... % in the peri-ventricular heterotopias
+    'LAP9','LAP10','RBH8','RBH9','RBH10','RPP8','RPP9','RPP10',...% out of brain
+    'RAP8','RAP9','RAP10','LBH9','LBH10','LPP8','LPP9','LPP10',...% out of brain
+    'EKG',...% EKG
+    'Mark1','Mark2','REF',...% not real data
+    'DC01','DC02','DC03','DC04','E','Events','G',...% not real data
     };
 % emodim .bad:
-%     'LHH1','LHH2','LHH3','LAM1',... % epileptic (source)
-%     'LAP1','LAP2','LAP3','RBH1','RBH2','RBH3','RBH4','RPP1','RPP2','RPP3','RPP4',... % in the peri-ventricular heterotopias
-%     'RAP1','RAP2','RAP3','LBH1','LBH2','LBH3','LPP1','LPP2','LPP3',... % in the peri-ventricular heterotopias
-%     'LAP9','LAP10','RBH8','RBH9','RBH10','RPP8','RPP9','RPP10',...% out of brain
-%     'RAP8','RAP9','RAP10','LBH9','LBH10','LPP8','LPP9','LPP10',...% out of brain
-%     'EKG',...% EKG
-%     'Mark1','Mark2','REF',...% not real data
-%     'DC01','DC02','DC03','DC04','E','Events','G',...% not real data
+% bad_codes: 1 = toss (epileptic or bad); 2 = suspicious; 3 = out of brain; 0 = junk
+SBJ_vars.ch_lab.bad_type = {'bad','sus','out'};
+SBJ_vars.ch_lab.bad_code = [1,1,1,1,2,2,2,repmat(2,1,20),repmat(3,1,16),repmat(0,1,11)];
+if numel(SBJ_vars.ch_lab.bad)~=numel(SBJ_vars.ch_lab.bad_code);error('bad ~= bad_code');end
 SBJ_vars.ch_lab.eeg = {'C3','C4','CZ','FZ','OZ'};
 SBJ_vars.ch_lab.eog = {'RUC','RLC','LLC','LUC'};
 SBJ_vars.ch_lab.photod  = {'Photo1'};
@@ -114,7 +114,7 @@ SBJ_vars.bs_width    = 2;
 %--------------------------------------
 % R1: ~67 to ~1040
 % R2: TBD...
-SBJ_vars.analysis_time = {{[56.0 1050.0]}};
+SBJ_vars.analysis_time = {{[50.0 1600.0]}};
 
 %--------------------------------------
 % Artifact Rejection Parameters

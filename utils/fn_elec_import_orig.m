@@ -89,7 +89,8 @@ name_holder = cell([2 numel(SBJ_vars.ch_lab.probes)]);
 elec_reref  = cell([1 numel(SBJ_vars.ch_lab.probes)]);
 for d = 1:numel(SBJ_vars.ch_lab.probes)
     cfg = [];
-    cfg.channel = ft_channelselection(strcat(SBJ_vars.ch_lab.probes{d},'*'), elec.label);
+    % cfg.channel = ft_channelselection(strcat(SBJ_vars.ch_lab.probes{d},'*'), elec.label);
+    cfg.channel = elec.label(~cellfun('isempty', regexp(elec.label, ['^' SBJ_vars.ch_lab.probes{d} '\d+$'])));
     probe_elec  = fn_select_elec(cfg,elec);
     %     probe_data = ft_selectdata(cfg,data);   % Grab data from this probe to plot in PSD comparison
     %     probe_data.elec = fn_elec_ch_select(elec,cfg.channel);
@@ -123,6 +124,13 @@ for d = 1:numel(SBJ_vars.ch_lab.probes)
 end
 
 % Recombine
+if strcmp(SBJ,'IR37') % add .tra to grids for combined ECoG+SEEG dataset
+    for d = 1:numel(SBJ_vars.ch_lab.probes)
+        if ~isfield(elec_reref{d},'tra')
+            elec_reref{d}.tra = eye(length(elec_reref{d}.label));
+        end
+    end
+end
 cfg = [];
 elec = ft_appendsens(cfg,elec_reref{:});
 
@@ -130,7 +138,8 @@ elec = ft_appendsens(cfg,elec_reref{:});
 if any(danger_name)
     for d_ix = find(danger_name)
         for s_ix = 1:numel(name_holder{2,d_ix})
-            elec.label{strcmp(elec.label,name_holder{2,2}{s_ix})} = name_holder{1,d_ix}{s_ix};
+            elec.label{strcmp(elec.label,name_holder{2,d_ix}{s_ix})} = name_holder{1,d_ix}{s_ix};
+            elec_labels{strcmp(elec_labels,name_holder{2,d_ix}{s_ix})} = name_holder{1,d_ix}{s_ix};
         end
     end
 end

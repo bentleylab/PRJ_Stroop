@@ -25,6 +25,8 @@ switch model_id
         labels = {'pCNI', 'PC'};
     case 'CNI_PC'
         labels = {'CNI', 'PC'};
+    case 'CNI_p_PC'
+        labels = {'CNI', 'pCNI', 'PC'};
     case 'PC'
         labels = {'PC'};
     case 'PCi'

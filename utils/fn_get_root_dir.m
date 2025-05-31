@@ -9,6 +9,9 @@ elseif exist('/Volumes/hoycw_clust/','dir')
 elseif exist('/Users/SCS22/','dir');
     root_dir='/Users/SCS22/Desktop/Knight_Lab/';
     app_dir='/Users/SCS22/Documents/MATLAB/';
+elseif exist('/Users/anaskhan/Desktop/','dir');
+    root_dir='/Users/anaskhan/Desktop/';
+    app_dir='/Users/anaskhan/Desktop/Apps/';
 else
     error('root directory not found. where are you running this?');
 end

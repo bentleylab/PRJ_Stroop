@@ -80,7 +80,7 @@ for sbj_ix = 1:numel(SBJs)
     end
     
     % Match elecs to colors
-    elec{sbj_ix}.color = fn_atlas2color(atlas_id,elec{sbj_ix}.(roi_field));
+    elec{sbj_ix}.color = fn_roi2color(elec{sbj_ix}.(roi_field));
     
     if ~plot_out
         % Remove electrodes that aren't in atlas ROIs & hemisphere

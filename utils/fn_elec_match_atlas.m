@@ -31,12 +31,19 @@ atlas = fn_load_recon_atlas(SBJ,atlas_id);
 
 %% Match elecs to atlas ROIs
 elec = fn_atlas_lookup(elec,atlas,'min_qry_rng',1,'max_qry_rng',5);
+% Change "Unknown" to "no_label_found" (maybe a fieldtrip version change?)
+elec.atlas_lab(strcmp(elec.atlas_lab,'Unknown')) = ...
+    repmat({'no_label_found'},sum(strcmp(elec.atlas_lab,'Unknown')),1);
 
 %% Match elecs to atlas tissue compartments
 elec.roi_flag   = zeros(size(elec.label));
 if any(strcmp(atlas_id,{'DK','Dx'}))
     tiss = fn_atlas_lookup(elec,atlas,'min_qry_rng',5,'max_qry_rng',5);
-    
+
+    % Change "Unknown" to "no_label_found" (maybe a fieldtrip version change?)
+    tiss.atlas_lab(strcmp(tiss.atlas_lab,'Unknown')) = ...
+        repmat({'no_label_found'},sum(strcmp(tiss.atlas_lab,'Unknown')),1);
+
     %% Convert atlas labels and probabilities to GM probability
     % usedqueryrange search sizes: 1 = 1; 3 = 7; 5 = 33
     elec.tissue_labels = {'GM','WM','CSF','OUT'};
@@ -52,6 +59,10 @@ if any(strcmp(atlas_id,{'DK','Dx'}))
         
         % Check for secondary matches and add to total
         if ~isempty(tiss.atlas_lab2{e})
+            % Change "Unknown" to "no_label_found" (maybe a fieldtrip version change?)
+            tiss.atlas_lab2{e}(strcmp(tiss.atlas_lab2{e},'Unknown')) = ...
+                repmat({'no_label_found'},sum(strcmp(tiss.atlas_lab2{e},'Unknown')),1);
+
             elec.tissue2{e} = fn_atlas2roi_labels(tiss.atlas_lab2{e},atlas_id,'tissue');
             for roi = 1:numel(elec.tissue2{e})
                 elec.tissue_prob(e,strcmp(elec.tissue2{e}{roi},elec.tissue_labels)) = ...

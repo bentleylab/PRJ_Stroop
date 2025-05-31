@@ -1,5 +1,5 @@
 function fn_view_recon_atlas_grp_ROI(SBJs, proc_id, reg_type, show_labels,...
-                                 hemi, atlas_id, roi_id, plot_roi, varargin)
+                                 hemi, atlas_id, roi_id, plot_roi, mirror, varargin)
 %% Plot a reconstruction with electrodes
 % INPUTS:
 %   SBJs [cell array str] - subject IDs to plot
@@ -12,6 +12,7 @@ function fn_view_recon_atlas_grp_ROI(SBJs, proc_id, reg_type, show_labels,...
 %   roi_id [str] - gROI grouping to pick mesh and color specific ROIs
 %       'LPFC','MPFC','OFC','INS','TMP','PAR'
 %   plot_roi [str] - which surface mesh to plot
+%   mirror [0/1] - plot the other hemi, 
 
 %% Handle variables
 % Error cases
@@ -42,6 +43,16 @@ end
 %% Define default options
 if ~exist('view_angle','var')
     view_angle = fn_get_view_angle(hemi,plot_roi);
+    view_str = 'def';
+end
+% Adjust view angle if custom
+if ischar(view_angle)
+    view_str = view_angle;
+    if (strcmp(hemi,'l') && strcmp(view_angle,'med')) || (strcmp(hemi,'r') && strcmp(view_angle,'lat'))
+        view_angle = [90 0];
+    elseif (strcmp(hemi,'l') && strcmp(view_angle,'lat')) || (strcmp(hemi,'r') && strcmp(view_angle,'med'))
+        view_angle = [-90 0];
+    end
 end
 if ~exist('fig_ftype','var')
     fig_ftype = 'fig';
@@ -108,8 +119,15 @@ for sbj_ix = 1:numel(SBJs)
     for roi_ix = 1:numel(plot_roi_list)
         plot_elecs(:,roi_ix) = strcmp(elec{sbj_ix}.(roi_field),plot_roi_list{roi_ix});
     end
-    good_elecs = intersect(fn_select_elec_lab_match(elec{sbj_ix}, hemi, atlas_id, roi_id),...
-                             elec{sbj_ix}.label(any(plot_elecs,2)));
+    % Remove electrodes that aren't in atlas ROIs & hemisphere
+    if mirror
+        roi_elecs = fn_select_elec_lab_match(elec{sbj_ix}, 'b', atlas_id, roi_id);
+        hemi_str = [hemi 'b'];
+    else
+        roi_elecs = fn_select_elec_lab_match(elec{sbj_ix}, hemi, atlas_id, roi_id);
+        hemi_str = hemi;
+    end
+    good_elecs = intersect(roi_elecs, elec{sbj_ix}.label(any(plot_elecs,2)));
     % fn_select_elec messes up if you try to toss all elecs
     if isempty(good_elecs)
         elec{sbj_ix} = {};
@@ -118,6 +136,13 @@ for sbj_ix = 1:numel(SBJs)
         cfgs = [];
         cfgs.channel = good_elecs;
         elec{sbj_ix} = fn_select_elec(cfgs, elec{sbj_ix});
+        
+        % Mirror hemispheres
+        if mirror
+            elec{sbj_ix}.chanpos(~strcmp(elec{sbj_ix}.hemi,hemi),1) = ...
+                -elec{sbj_ix}.chanpos(~strcmp(elec{sbj_ix}.hemi,hemi),1);
+        end
+        
         all_roi_labels = [all_roi_labels; elec{sbj_ix}.(roi_field)];
         all_roi_colors = [all_roi_colors; elec{sbj_ix}.color];
     end
@@ -187,7 +212,7 @@ elseif exist('mtl_seg','var')
 end
 
 %% 3D Surface + Grids (3d, pat/mni, vol/srf, 0/1)
-fig_name = ['GRP_' atlas_id '_' roi_id '_' plot_roi '_' hemi];
+fig_name = ['GRP_' atlas_id '_' roi_id '_' plot_roi '_' hemi_str '_' view_str];
 h = figure('Name',fig_name);
 
 % Plot 3D mesh

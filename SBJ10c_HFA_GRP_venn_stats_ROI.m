@@ -102,12 +102,10 @@ fprintf(sig_report,[repmat('-',[1 40*numel(stat_conds)]) '\n']);
 result_str = ['%-20s%-20s' repmat('%-20i',[1 numel(stat_conds)]) '\n'];
 
 %% Load Data
-elec_sbj = cell([numel(SBJs) 1]);
-good_sbj = true([numel(SBJs) 1]);
-sig_mat  = cell([numel(SBJs) 1]);
-roi_mat  = cell([numel(SBJs) 1]);
-% all_roi_labels = cell([numel(stat_conds) 1]);
-% all_roi_colors = cell([numel(SBJs) 1]);
+elec_sbj    = cell([numel(SBJs) 1]);
+good_sbj    = true([numel(SBJs) 1]);
+sig_roi_mat = cell([numel(SBJs) 1]);
+roi_mat     = cell([numel(SBJs) 1]);
 for sbj_ix = 1:numel(SBJs)
     SBJ = SBJs{sbj_ix};
     fprintf('================= Processing: %s =================\n',SBJ);
@@ -123,25 +121,29 @@ for sbj_ix = 1:numel(SBJs)
     orig_labels = elec_sbj{sbj_ix}.label;
     for e_ix = 1:numel(elec_sbj{sbj_ix}.label)
         elec_sbj{sbj_ix}.label{e_ix} = [SBJs{sbj_ix} '_' elec_sbj{sbj_ix}.label{e_ix}];
-        % don't need individual elec colors here
     end
     
     % Remove hemi and/or atlas elecs
     if ~plot_out
-        % Remove electrodes that aren't in atlas ROIs & hemisphere
+        % Check ROIs & hemisphere
         roi_elecs = fn_select_elec_lab_match(elec_sbj{sbj_ix}, hemi, atlas_id, roi_id);
     else
-        % Remove electrodes that aren't in hemisphere
+        % Check only hemisphere
         roi_elecs = fn_select_elec_lab_match(elec_sbj{sbj_ix}, hemi, [], []);
     end
-    cfgs = []; cfgs.channel = roi_elecs;
-    elec_sbj{sbj_ix} = fn_select_elec(cfgs,elec_sbj{sbj_ix});
+    
+    roi_mat{sbj_ix} = zeros([numel(elec_sbj{sbj_ix}.label) 1]);
+    for ch_ix = 1:numel(elec_sbj{sbj_ix}.label)
+        if any(strcmp(elec_sbj{sbj_ix}.label{ch_ix},roi_elecs))
+            roi_mat{sbj_ix}(ch_ix) = find(strcmp(roi_list,elec_sbj{sbj_ix}.(roi_field){ch_ix}));
+        end
+    end
     
     %% Load Stats
-    if ~isempty(roi_elecs)
-        sig_mat{sbj_ix} = zeros([numel(elec_sbj{sbj_ix}.label) numel(stat_conds)]);
-        roi_mat{sbj_ix} = zeros([numel(elec_sbj{sbj_ix}.label) 1]);
+    sig_mat = zeros([numel(elec_sbj{sbj_ix}.label) numel(stat_conds)]);
+    if any(roi_mat{sbj_ix})
         for st_ix = 1:numel(stat_conds)
+            % Load correct stat output structure, ensure match to elec
             if strcmp(cond_ids{st_ix},'actv')
                 error('not done actv yet');
                 % load([SBJ_vars.dirs.proc SBJ '_ROI_' an_id '_' stat_id '.mat'],'actv');
@@ -151,72 +153,40 @@ for sbj_ix = 1:numel(SBJs)
                 load([SBJ_vars.dirs.proc SBJ '_smANOVA_ROI_' stat_ids{st_ix} '_' an_ids{st_ix} '.mat']);
                 ep_labs{st_ix} = st.ep_lab;
                 if iscell(ep_labs{st_ix}); ep_labs{st_ix} = [ep_labs{st_ix}{:}]; end % unpack multi-epoch analyses
-                for ch_ix = 1:numel(elec_sbj{sbj_ix}.label)
-                    stat_ch_ix = strcmp(w2.label,orig_labels{ch_ix});
-                    if ~any(stat_ch_ix)
-                        fprintf(2,'\tWARNING: elec chan %s not found in w2!\n',elec_sbj{sbj_ix}.label{ch_ix});
-                    end
-                    % Consolidate to binary sig/non-sig
-                    if any(squeeze(w2.qval(strcmp(st.groups,cond_ids{st_ix}),stat_ch_ix,:))<st.alpha)
-                        sig_mat{sbj_ix}(ch_ix,st_ix) = 1;
-                    end
+                if numel(elec_sbj{sbj_ix}.label)~=numel(w2.label) || ~all(strcmp(orig_labels,w2.label))
+                    error('mismatched labels in elec and w2!');
                 end
-                clear w2 st actv
             end
+            % Consolidate to binary sig/non-sig
+            for ch_ix = 1:numel(elec_sbj{sbj_ix}.label)
+                if any(squeeze(w2.qval(strcmp(st.groups,cond_ids{st_ix}),ch_ix,:))<=st.alpha)
+                    sig_mat(ch_ix,st_ix) = 1;
+                end
+            end
+            clear w2 st actv
         end
         
-        % Report on significant electrodes for this SBJ (even if non-sig)
-        for ch_ix = 1:numel(elec_sbj{sbj_ix}.label)
-            fprintf(sig_report,result_str,elec_sbj{sbj_ix}.label{ch_ix},...
-                                          elec_sbj{sbj_ix}.(roi_field){ch_ix},sig_mat{sbj_ix}(ch_ix,:));
-            % Grab roi_ix
-            roi_mat{sbj_ix}(ch_ix) = find(strcmp(roi_list,elec_sbj{sbj_ix}.(roi_field){ch_ix}));
+        %% Keep intersection of significant and ROI matched electrodes
+        if any(any(sig_mat(roi_mat{sbj_ix}~=0,:),2))
+            sig_idx = any(sig_mat,2);
+            roi_idx = roi_mat{sbj_ix}~=0;
+            sig_roi_mat{sbj_ix} = sig_mat(roi_idx & sig_idx,:).*roi_mat{sbj_ix}(roi_idx & sig_idx);
+            fprintf('\t%s has %i sig channels in %s hemi %s\n',SBJ,size(sig_roi_mat{sbj_ix},1),atlas_id,hemi);
+        else
+            good_sbj(sbj_ix) = false;
+            fprintf(2,'\t%s has %i channels in %s hemi %s, but none are significant\n',...
+                SBJ,sum(roi_mat{sbj_ix}~=0),atlas_id,hemi);
         end
-        
-%         %% Compile Statistics
-%         if any(sig_mat{sbj_ix}(:))
-%             print_nums = zeros([2 numel(stat_conds)]);
-%             for st_ix = 1:numel(stat_conds)
-%                 print_nums(1,st_ix) = sum(sig_mat{sbj_ix}(:,st_ix));
-%                 print_nums(2,st_ix) = sum(sig_mat{sbj_ix}(:,st_ix))/size(sig_mat{sbj_ix},1);
-%             end
-%             fprintf(['%-10s' repmat('%-3i(%.3f)\t',[1 numel(stat_conds)]) '\n'],[SBJ ' sig:'],print_nums(:));
-%             
-%             % Select color and add to elec
-%             all_roi_colors{sbj_ix} = zeros([sum(any(sig_mat{sbj_ix},2)) 3]);
-%             sig_elecs = cell([sum(any(sig_mat{sbj_ix},2)) 1]);
-%             sig_ix = 0;
-%             for ch_ix = 1:numel(elec_sbj{sbj_ix}.label)
-%                 if any(sig_mat{sbj_ix}(ch_ix,:))
-%                     sig_ix = sig_ix + 1;
-%                     sig_elecs{sig_ix} = elec_sbj{sbj_ix}.label{ch_ix};
-%                     % Select color
-%                     cond_ix = find(sig_mat{sbj_ix}(ch_ix,:));
-%                     if numel(cond_ix)==numel(stat_conds) && numel(stat_conds) == 3
-%                         all_roi_colors{sbj_ix}(sig_ix,:) = all_color;
-%                     elseif numel(cond_ix)==2
-%                         all_roi_colors{sbj_ix}(sig_ix,:) = venn_colors{cond_ix(1),cond_ix(2)};
-%                     else
-%                         all_roi_colors{sbj_ix}(sig_ix,:) = venn_colors{cond_ix,cond_ix};
-%                     end
-%                 end
-%             end
-%             
-%             % Select sig elecs for plotting
-%             cfgs = []; cfgs.channel = sig_elecs;
-%             elec_sbj{sbj_ix} = fn_select_elec(cfgs, elec_sbj{sbj_ix});
-%         else
-%             % Print no significant elecs
-%             elec_sbj{sbj_ix} = {}; good_sbj(sbj_ix) = false;
-%             fprintf(2,'\t%s has no significant channels for any stat\n',SBJ);
-%         end
-        
     else
-        % Print no ROI match
-        elec_sbj{sbj_ix} = {}; good_sbj(sbj_ix) = false;
+        good_sbj(sbj_ix) = false;
         fprintf(2,'\t%s has no channels in %s hemi %s\n',SBJ,atlas_id,hemi);
     end
-    clear SBJ SBJ_vars SBJ_vars_cmd sig_elecs sig_ix cond_ix 
+    %% Report all elecs, even non-ROI and non-sig
+    for ch_ix = 1:numel(elec_sbj{sbj_ix}.label)
+        fprintf(sig_report,result_str,elec_sbj{sbj_ix}.label{ch_ix},...
+            elec_sbj{sbj_ix}.(roi_field){ch_ix},sig_mat(ch_ix,:));
+    end
+    clear SBJ SBJ_vars SBJ_vars_cmd sig_elecs sig_ix cond_ix sig_mat roi_idx sig_idx
 end
 
 % Finish report and save sig_mat
@@ -225,14 +195,11 @@ fclose(sig_report);
 % save(sig_elecs_fname,'-v7.3','stat_conds','SBJs','elec_sbj','sig_mat');
 
 %% Combine elec structs
-elec = ft_appendsens([],elec_sbj{good_sbj});
+% elec = ft_appendsens([],elec_sbj{good_sbj});
 % elec.roi_color = vertcat(all_roi_colors{:});    % appendsens strips that field
 % elec.(roi_field)       = all_roi_labels{cond_ix};    % appendsens strips that field
 
-sig_all = vertcat(sig_mat{:});
-sig_all = sig_all(any(sig_all,2),:);
-roi_all = vertcat(roi_mat{:});
-roi_all = roi_all(any(sig_all,2));
+sig_roi_all = vertcat(sig_roi_mat{:});
 
 %% Compute Stat Overlaps
 % Find number of comparisons
@@ -247,40 +214,40 @@ sig_cnt_roi = zeros([n_groups numel(roi_list)]);
 venn_legend = cell(size(stat_conds));
 % roi_legends = cell([numel(stat_conds) numel(roi_list)]);
 % Add main effects
-sig_ix = 0;
+grp_ix = 0;
 for main_ix = 1:numel(stat_conds)
-    sig_ix = sig_ix + 1;
-    sig_type(sig_ix) = 1;
-    sig_cnt(sig_ix) = sum(sig_all(:,main_ix));
-    sig_grps{sig_ix} = main_ix;
-    venn_legend{sig_ix} = [cond_ids{main_ix} '-' ep_labs{main_ix}];
+    grp_ix = grp_ix + 1;
+    sig_type(grp_ix) = 1;
+    sig_cnt(grp_ix) = sum(sig_roi_all(:,main_ix)~=0);
+    sig_grps{grp_ix} = main_ix;
+    venn_legend{grp_ix} = [cond_ids{main_ix} '-' ep_labs{main_ix}];
     for roi_ix = 1:numel(roi_list)
-        sig_cnt_roi(sig_ix,roi_ix) = sum(sig_all(roi_all==roi_ix,main_ix));
+        sig_cnt_roi(grp_ix,roi_ix) = sum(sig_roi_all(:,main_ix)==roi_ix);
     end
 end
 
 % Add pairs
 for p_ix = 1:size(pairs,1)
-    sig_ix = sig_ix + 1;
-    sig_type(sig_ix) = 2;
-    sig_grps{sig_ix} = pairs(p_ix,:);
-    sig_cnt(sig_ix) = sum(sig_all(:,pairs(p_ix,1))==1 & sig_all(:,pairs(p_ix,2))==1);
+    grp_ix = grp_ix + 1;
+    sig_type(grp_ix) = 2;
+    sig_grps{grp_ix} = pairs(p_ix,:);
+    sig_cnt(grp_ix) = sum(sig_roi_all(:,pairs(p_ix,1))~=0 & sig_roi_all(:,pairs(p_ix,2))~=0);
 %     venn_legend{sig_ix} = [cond_ids{pairs(p_ix,1)} '-' ep_labs{pairs(p_ix,1)} ' + '...
 %         cond_ids{pairs(p_ix,2)} '-' ep_labs{pairs(p_ix,2)} '(n=' num2str(sig_cnt(sig_ix)) ')'];
     for roi_ix = 1:numel(roi_list)
-        sig_cnt_roi(sig_ix,roi_ix) = sum(sig_all(roi_all==roi_ix,pairs(p_ix,1))==1 & ...
-                                  sig_all(roi_all==roi_ix,pairs(p_ix,2))==1);
+        sig_cnt_roi(grp_ix,roi_ix) = sum(sig_roi_all(:,pairs(p_ix,1))==roi_ix & ...
+                                  sig_roi_all(:,pairs(p_ix,2))==roi_ix);
     end
 end
 
 % Add triples
 if numel(stat_conds)==3
-    sig_cnt(end) = sum(all(sig_all,2));
+    sig_cnt(end) = sum(all(sig_roi_all,2));
     sig_type(end) = 3;
     sig_grps{end} = 1:3;
 %     venn_legend{end} = ['ALL (n=' num2str(sig_cnt(end)) ')'];
     for roi_ix = 1:numel(roi_list)
-        sig_cnt_roi(end,roi_ix) = sum(all(sig_all(roi_all==roi_ix,:),2));
+        sig_cnt_roi(end,roi_ix) = sum(all(sig_roi_all==roi_ix,2));
     end
 end
 
@@ -300,9 +267,9 @@ for z_ix = 1:numel(sig_cnt)
          num2str(sig_cnt(z_ix)),'FontSize',plt_vars.text_sz,'HorizontalAlignment','center');
 end
 axis(gca, plt_vars.axis_vis);
-title([atlas_id '-' roi_id ': # SBJ = ' num2str(numel(SBJs)) ', # Sig Elecs = '...
-       num2str(size(sig_all,1)) ' / ' num2str(size(vertcat(sig_mat{:}),1)) ...
-       ' (' num2str(size(sig_all,1)/size(vertcat(sig_mat{:}),1),'%.4f') ')'],...
+title([atlas_id '-' roi_id ': # SBJ = ' num2str(numel(SBJs)) ', # Sig+ROI Elecs = '...
+       num2str(size(sig_roi_all,1)) ' / ' num2str(size(vertcat(roi_mat{:}),1)) ...
+       ' (' num2str(size(sig_roi_all,1)/size(vertcat(roi_mat{:}),1),'%.4f') ')'],...
        'FontSize',plt_vars.title_sz);
 legend(v,venn_legend,'FontSize',plt_vars.legend_sz);
 
@@ -374,8 +341,8 @@ for roi_ix = 1:numel(roi_list)
     end
     axis equal; axis(gca, plt_vars.axis_vis);
     title([atlas_id '-' roi_id '-' roi_list{roi_ix} ': # SBJ = ' num2str(numel(SBJs)) ...
-        ', # Sig Elecs = ' num2str(sum(roi_all==roi_ix)) ' / ' num2str(sum(vertcat(roi_mat{:})==roi_ix)) ...
-       ' (' num2str(sum(roi_all==roi_ix)/sum(vertcat(roi_mat{:})==roi_ix),'%.4f') ')'],...
+        ', # Sig Elecs = ' num2str(sum(any(sig_roi_all==roi_ix,2))) ' / ' num2str(sum(vertcat(roi_mat{:})==roi_ix)) ...
+       ' (' num2str(sum(any(sig_roi_all==roi_ix,2))/sum(vertcat(roi_mat{:})==roi_ix),'%.4f') ')'],...
        'FontSize',plt_vars.title_sz,'Color',roi_colors{roi_ix});
     legend(v,venn_legend,'FontSize',plt_vars.legend_sz);
     

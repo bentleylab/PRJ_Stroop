@@ -19,7 +19,8 @@ function trial_info_clean = SBJ05_reject_behavior(SBJ,trial_info,proc_id)
 
 % Directories
 if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
-else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+elseif exist('/Volumes/hoycw_clust/','dir');root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';
+else root_dir='/Users/anaskhan/Desktop/';ft_dir=[root_dir 'Apps/fieldtrip/'];end
 addpath([root_dir 'PRJ_Stroop/scripts/']);
 addpath([root_dir 'PRJ_Stroop/scripts/utils/']);
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Stroop/scripts/SBJ_vars/' SBJ '_vars.m'];

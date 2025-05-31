@@ -41,6 +41,7 @@ if ~any(strcmp(SBJ_vars.ch_lab.ref_type,'BP'))
         elec.inputs{e}.gm_weight = [elec.gm_weight(e) elec.gm_weight(e)];
         elec.inputs{e}.gROI = [elec.gROI(e) elec.gROI(e)];
         elec.inputs{e}.ROI = [elec.ROI(e) elec.ROI(e)];
+        elec.inputs{e}.tissue = [elec.tissue(e) elec.tissue(e)];
         if ~strcmp(elec.tissue{e},'GM') || elec.par_vol(e)
             elec.roi_flag(e) = 1;
         else
@@ -68,9 +69,11 @@ left_out_ch = {};
 danger_name = false([1 numel(SBJ_vars.ch_lab.probes)]);
 name_holder = cell([2 numel(SBJ_vars.ch_lab.probes)]);
 elec_reref  = cell([1 numel(SBJ_vars.ch_lab.probes)]);
+good_probes = true([1 length(SBJ_vars.ch_lab.probes)]);
 for p = 1:numel(SBJ_vars.ch_lab.probes)
     cfg = [];
-    cfg.channel = ft_channelselection(strcat(SBJ_vars.ch_lab.probes{p},'*'), elec.label);
+    cfg.channel = elec.label(~cellfun('isempty', regexp(elec.label, ['^' SBJ_vars.ch_lab.probes{p} '\d+$'])));
+    if isempty(cfg.channel), good_probes(p) = false; continue; end % skip probes not in ch_lab.ROI
     probe_elec  = fn_select_elec(cfg,elec);
     
     % Check if the names of these elecs will cause problems
@@ -91,8 +94,25 @@ for p = 1:numel(SBJ_vars.ch_lab.probes)
         elec_reref{p} = fn_combine_ROI_bipolar_logic(elec_reref{p},out_fname(1:end-4),atlas);
     else
         elec_reref{p} = probe_elec;
+        % Add functions to fill "bipolar" adjustments
+        for e = 1:numel(elec_reref{p}.label)
+            elec_reref{p}.inputs{e}.par_vol = [elec_reref{p}.par_vol(e) elec_reref{p}.par_vol(e)];
+            elec_reref{p}.inputs{e}.gm_weight = [elec_reref{p}.gm_weight(e) elec_reref{p}.gm_weight(e)];
+            elec_reref{p}.inputs{e}.gROI = [elec_reref{p}.gROI(e) elec_reref{p}.gROI(e)];
+            elec_reref{p}.inputs{e}.ROI = [elec_reref{p}.ROI(e) elec_reref{p}.ROI(e)];
+            elec_reref{p}.inputs{e}.tissue = [elec_reref{p}.tissue(e) elec_reref{p}.tissue(e)];
+            if ~strcmp(elec_reref{p}.tissue{e},'GM') || elec_reref{p}.par_vol(e)
+                elec_reref{p}.roi_flag(e) = 1;
+            else
+                elec_reref{p}.roi_flag(e) = 0;
+            end
+        end
     end
+    if ~isfield(elec_reref{p},'tra'), elec_reref{p}.tra = eye(length(elec_reref{p}.label)); end
 end
+danger_name = danger_name(good_probes);
+name_holder = name_holder(good_probes);
+elec_reref  = elec_reref(good_probes);
 
 %% Recombine
 cfg = [];
@@ -127,7 +147,7 @@ fields = {'atlas_lab', 'atlas_prob', 'atlas_lab2', 'atlas_qryrng', 'ROI', 'gROI'
             'gm_weight', 'hemi', 'inputs', 'roi_flag', 'tissue', 'tissue_prob', 'anat_notes'};%'tissue2', 
 for f = 1:numel(fields)
     % Initialize to get column not row
-    if iscell(elec_reref{p}.(fields{f}))
+    if iscell(elec_reref{1}.(fields{f}))
         elec.(fields{f}) = cell(size(elec.label));
     elseif strcmp(fields{f},'tissue_prob')
         elec.(fields{f}) = zeros([numel(elec.label) numel(elec.tissue_labels)]);
@@ -135,7 +155,8 @@ for f = 1:numel(fields)
         elec.(fields{f}) = zeros(size(elec.label));
     end
     % Retrieve info from individual reref probes
-    for p = 1:numel(SBJ_vars.ch_lab.probes)
+    sbj_var_probe_ix = find(good_probes);
+    for p = 1:numel(SBJ_vars.ch_lab.probes(good_probes))
         for p_e = 1:numel(elec_reref{p}.label)
             e_ix = strcmp(elec.label,elec_reref{p}.label{p_e});
             if any(e_ix)   % check if removed by SBJ_vars.ch_lab.ROI
@@ -147,7 +168,7 @@ for f = 1:numel(fields)
                     elec.(fields{f})(e_ix) = elec_reref{p}.(fields{f})(p_e);
                 end
                 
-                elec.chantype{e_ix} = SBJ_vars.ch_lab.probe_type{p};
+                elec.chantype{e_ix} = SBJ_vars.ch_lab.probe_type{sbj_var_probe_ix(p)};
             end
         end
     end
