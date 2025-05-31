@@ -1,0 +1,6437 @@
+
+fn_elec_match_atlas('IR68','main_ft','pat','','Dx')
+5401
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2015 The MathWorks, Inc.
+                   R2015a (8.5.0.197613) 64-bit (glnxa64)
+                             February 12, 2015
+
+ 
+To get started, type one of these: helpwin, helpdesk, or demo.
+For product information, visit www.mathworks.com.
+ 
+
+	Academic License
+
+>> Using atlas: Dx
+[Warning: the estimated units are not very decisive, assuming that the units are
+"mm"] 
+ In '/home/knight/hoycw/Apps/fieldtrip/fileio/private/ft_estimate_units.m' at line 56
+ In '/home/knight/hoycw/Apps/fieldtrip/fileio/private/ft_determine_units.m' at line 107
+ In '/home/knight/hoycw/Apps/fieldtrip/fileio/ft_read_mri.m' at line 462
+ In '/home/knight/hoycw/Apps/fieldtrip/fileio/ft_read_atlas.m' at line 1722
+
+subselecting 193 labels from the total list of 501
+re-indexing label Left-Cerebral-White-Matter to a value of 1 (was 2)
+re-indexing label Left-Lateral-Ventricle to a value of 2 (was 4)
+re-indexing label Left-Inf-Lat-Vent to a value of 3 (was 5)
+re-indexing label Left-Cerebellum-White-Matter to a value of 4 (was 7)
+re-indexing label Left-Cerebellum-Cortex to a value of 5 (was 8)
+re-indexing label Left-Thalamus-Proper to a value of 6 (was 10)
+re-indexing label Left-Caudate to a value of 7 (was 11)
+re-indexing label Left-Putamen to a value of 8 (was 12)
+re-indexing label Left-Pallidum to a value of 9 (was 13)
+re-indexing label 3rd-Ventricle to a value of 10 (was 14)
+re-indexing label 4th-Ventricle to a value of 11 (was 15)
+re-indexing label Brain-Stem to a value of 12 (was 16)
+re-indexing label Left-Hippocampus to a value of 13 (was 17)
+re-indexing label Left-Amygdala to a value of 14 (was 18)
+re-indexing label CSF to a value of 15 (was 24)
+re-indexing label Left-Accumbens-area to a value of 16 (was 26)
+re-indexing label Left-VentralDC to a value of 17 (was 28)
+re-indexing label Left-vessel to a value of 18 (was 30)
+re-indexing label Left-choroid-plexus to a value of 19 (was 31)
+re-indexing label Right-Cerebral-White-Matter to a value of 20 (was 41)
+re-indexing label Right-Lateral-Ventricle to a value of 21 (was 43)
+re-indexing label Right-Inf-Lat-Vent to a value of 22 (was 44)
+re-indexing label Right-Cerebellum-White-Matter to a value of 23 (was 46)
+re-indexing label Right-Cerebellum-Cortex to a value of 24 (was 47)
+re-indexing label Right-Thalamus-Proper to a value of 25 (was 49)
+re-indexing label Right-Caudate to a value of 26 (was 50)
+re-indexing label Right-Putamen to a value of 27 (was 51)
+re-indexing label Right-Pallidum to a value of 28 (was 52)
+re-indexing label Right-Hippocampus to a value of 29 (was 53)
+re-indexing label Right-Amygdala to a value of 30 (was 54)
+re-indexing label Right-Accumbens-area to a value of 31 (was 58)
+re-indexing label Right-VentralDC to a value of 32 (was 60)
+re-indexing label Right-vessel to a value of 33 (was 62)
+re-indexing label Right-choroid-plexus to a value of 34 (was 63)
+re-indexing label 5th-Ventricle to a value of 35 (was 72)
+re-indexing label WM-hypointensities to a value of 36 (was 77)
+re-indexing label non-WM-hypointensities to a value of 37 (was 80)
+re-indexing label Optic-Chiasm to a value of 38 (was 85)
+re-indexing label CC_Posterior to a value of 39 (was 251)
+re-indexing label CC_Mid_Posterior to a value of 40 (was 252)
+re-indexing label CC_Central to a value of 41 (was 253)
+re-indexing label CC_Mid_Anterior to a value of 42 (was 254)
+re-indexing label CC_Anterior to a value of 43 (was 255)
+re-indexing label ctx-lh-unknown to a value of 44 (was 1000)
+re-indexing label ctx-rh-unknown to a value of 45 (was 2000)
+re-indexing label ctx_lh_G_and_S_frontomargin to a value of 46 (was 11101)
+re-indexing label ctx_lh_G_and_S_occipital_inf to a value of 47 (was 11102)
+re-indexing label ctx_lh_G_and_S_paracentral to a value of 48 (was 11103)
+re-indexing label ctx_lh_G_and_S_subcentral to a value of 49 (was 11104)
+re-indexing label ctx_lh_G_and_S_transv_frontopol to a value of 50 (was 11105)
+re-indexing label ctx_lh_G_and_S_cingul-Ant to a value of 51 (was 11106)
+re-indexing label ctx_lh_G_and_S_cingul-Mid-Ant to a value of 52 (was 11107)
+re-indexing label ctx_lh_G_and_S_cingul-Mid-Post to a value of 53 (was 11108)
+re-indexing label ctx_lh_G_cingul-Post-dorsal to a value of 54 (was 11109)
+re-indexing label ctx_lh_G_cingul-Post-ventral to a value of 55 (was 11110)
+re-indexing label ctx_lh_G_cuneus to a value of 56 (was 11111)
+re-indexing label ctx_lh_G_front_inf-Opercular to a value of 57 (was 11112)
+re-indexing label ctx_lh_G_front_inf-Orbital to a value of 58 (was 11113)
+re-indexing label ctx_lh_G_front_inf-Triangul to a value of 59 (was 11114)
+re-indexing label ctx_lh_G_front_middle to a value of 60 (was 11115)
+re-indexing label ctx_lh_G_front_sup to a value of 61 (was 11116)
+re-indexing label ctx_lh_G_Ins_lg_and_S_cent_ins to a value of 62 (was 11117)
+re-indexing label ctx_lh_G_insular_short to a value of 63 (was 11118)
+re-indexing label ctx_lh_G_occipital_middle to a value of 64 (was 11119)
+re-indexing label ctx_lh_G_occipital_sup to a value of 65 (was 11120)
+re-indexing label ctx_lh_G_oc-temp_lat-fusifor to a value of 66 (was 11121)
+re-indexing label ctx_lh_G_oc-temp_med-Lingual to a value of 67 (was 11122)
+re-indexing label ctx_lh_G_oc-temp_med-Parahip to a value of 68 (was 11123)
+re-indexing label ctx_lh_G_orbital to a value of 69 (was 11124)
+re-indexing label ctx_lh_G_pariet_inf-Angular to a value of 70 (was 11125)
+re-indexing label ctx_lh_G_pariet_inf-Supramar to a value of 71 (was 11126)
+re-indexing label ctx_lh_G_parietal_sup to a value of 72 (was 11127)
+re-indexing label ctx_lh_G_postcentral to a value of 73 (was 11128)
+re-indexing label ctx_lh_G_precentral to a value of 74 (was 11129)
+re-indexing label ctx_lh_G_precuneus to a value of 75 (was 11130)
+re-indexing label ctx_lh_G_rectus to a value of 76 (was 11131)
+re-indexing label ctx_lh_G_subcallosal to a value of 77 (was 11132)
+re-indexing label ctx_lh_G_temp_sup-G_T_transv to a value of 78 (was 11133)
+re-indexing label ctx_lh_G_temp_sup-Lateral to a value of 79 (was 11134)
+re-indexing label ctx_lh_G_temp_sup-Plan_polar to a value of 80 (was 11135)
+re-indexing label ctx_lh_G_temp_sup-Plan_tempo to a value of 81 (was 11136)
+re-indexing label ctx_lh_G_temporal_inf to a value of 82 (was 11137)
+re-indexing label ctx_lh_G_temporal_middle to a value of 83 (was 11138)
+re-indexing label ctx_lh_Lat_Fis-ant-Horizont to a value of 84 (was 11139)
+re-indexing label ctx_lh_Lat_Fis-ant-Vertical to a value of 85 (was 11140)
+re-indexing label ctx_lh_Lat_Fis-post to a value of 86 (was 11141)
+re-indexing label ctx_lh_Pole_occipital to a value of 87 (was 11143)
+re-indexing label ctx_lh_Pole_temporal to a value of 88 (was 11144)
+re-indexing label ctx_lh_S_calcarine to a value of 89 (was 11145)
+re-indexing label ctx_lh_S_central to a value of 90 (was 11146)
+re-indexing label ctx_lh_S_cingul-Marginalis to a value of 91 (was 11147)
+re-indexing label ctx_lh_S_circular_insula_ant to a value of 92 (was 11148)
+re-indexing label ctx_lh_S_circular_insula_inf to a value of 93 (was 11149)
+re-indexing label ctx_lh_S_circular_insula_sup to a value of 94 (was 11150)
+re-indexing label ctx_lh_S_collat_transv_ant to a value of 95 (was 11151)
+re-indexing label ctx_lh_S_collat_transv_post to a value of 96 (was 11152)
+re-indexing label ctx_lh_S_front_inf to a value of 97 (was 11153)
+re-indexing label ctx_lh_S_front_middle to a value of 98 (was 11154)
+re-indexing label ctx_lh_S_front_sup to a value of 99 (was 11155)
+re-indexing label ctx_lh_S_interm_prim-Jensen to a value of 100 (was 11156)
+re-indexing label ctx_lh_S_intrapariet_and_P_trans to a value of 101 (was 11157)
+re-indexing label ctx_lh_S_oc_middle_and_Lunatus to a value of 102 (was 11158)
+re-indexing label ctx_lh_S_oc_sup_and_transversal to a value of 103 (was 11159)
+re-indexing label ctx_lh_S_occipital_ant to a value of 104 (was 11160)
+re-indexing label ctx_lh_S_oc-temp_lat to a value of 105 (was 11161)
+re-indexing label ctx_lh_S_oc-temp_med_and_Lingual to a value of 106 (was 11162)
+re-indexing label ctx_lh_S_orbital_lateral to a value of 107 (was 11163)
+re-indexing label ctx_lh_S_orbital_med-olfact to a value of 108 (was 11164)
+re-indexing label ctx_lh_S_orbital-H_Shaped to a value of 109 (was 11165)
+re-indexing label ctx_lh_S_parieto_occipital to a value of 110 (was 11166)
+re-indexing label ctx_lh_S_pericallosal to a value of 111 (was 11167)
+re-indexing label ctx_lh_S_postcentral to a value of 112 (was 11168)
+re-indexing label ctx_lh_S_precentral-inf-part to a value of 113 (was 11169)
+re-indexing label ctx_lh_S_precentral-sup-part to a value of 114 (was 11170)
+re-indexing label ctx_lh_S_suborbital to a value of 115 (was 11171)
+re-indexing label ctx_lh_S_subparietal to a value of 116 (was 11172)
+re-indexing label ctx_lh_S_temporal_inf to a value of 117 (was 11173)
+re-indexing label ctx_lh_S_temporal_sup to a value of 118 (was 11174)
+re-indexing label ctx_lh_S_temporal_transverse to a value of 119 (was 11175)
+re-indexing label ctx_rh_G_and_S_frontomargin to a value of 120 (was 12101)
+re-indexing label ctx_rh_G_and_S_occipital_inf to a value of 121 (was 12102)
+re-indexing label ctx_rh_G_and_S_paracentral to a value of 122 (was 12103)
+re-indexing label ctx_rh_G_and_S_subcentral to a value of 123 (was 12104)
+re-indexing label ctx_rh_G_and_S_transv_frontopol to a value of 124 (was 12105)
+re-indexing label ctx_rh_G_and_S_cingul-Ant to a value of 125 (was 12106)
+re-indexing label ctx_rh_G_and_S_cingul-Mid-Ant to a value of 126 (was 12107)
+re-indexing label ctx_rh_G_and_S_cingul-Mid-Post to a value of 127 (was 12108)
+re-indexing label ctx_rh_G_cingul-Post-dorsal to a value of 128 (was 12109)
+re-indexing label ctx_rh_G_cingul-Post-ventral to a value of 129 (was 12110)
+re-indexing label ctx_rh_G_cuneus to a value of 130 (was 12111)
+re-indexing label ctx_rh_G_front_inf-Opercular to a value of 131 (was 12112)
+re-indexing label ctx_rh_G_front_inf-Orbital to a value of 132 (was 12113)
+re-indexing label ctx_rh_G_front_inf-Triangul to a value of 133 (was 12114)
+re-indexing label ctx_rh_G_front_middle to a value of 134 (was 12115)
+re-indexing label ctx_rh_G_front_sup to a value of 135 (was 12116)
+re-indexing label ctx_rh_G_Ins_lg_and_S_cent_ins to a value of 136 (was 12117)
+re-indexing label ctx_rh_G_insular_short to a value of 137 (was 12118)
+re-indexing label ctx_rh_G_occipital_middle to a value of 138 (was 12119)
+re-indexing label ctx_rh_G_occipital_sup to a value of 139 (was 12120)
+re-indexing label ctx_rh_G_oc-temp_lat-fusifor to a value of 140 (was 12121)
+re-indexing label ctx_rh_G_oc-temp_med-Lingual to a value of 141 (was 12122)
+re-indexing label ctx_rh_G_oc-temp_med-Parahip to a value of 142 (was 12123)
+re-indexing label ctx_rh_G_orbital to a value of 143 (was 12124)
+re-indexing label ctx_rh_G_pariet_inf-Angular to a value of 144 (was 12125)
+re-indexing label ctx_rh_G_pariet_inf-Supramar to a value of 145 (was 12126)
+re-indexing label ctx_rh_G_parietal_sup to a value of 146 (was 12127)
+re-indexing label ctx_rh_G_postcentral to a value of 147 (was 12128)
+re-indexing label ctx_rh_G_precentral to a value of 148 (was 12129)
+re-indexing label ctx_rh_G_precuneus to a value of 149 (was 12130)
+re-indexing label ctx_rh_G_rectus to a value of 150 (was 12131)
+re-indexing label ctx_rh_G_subcallosal to a value of 151 (was 12132)
+re-indexing label ctx_rh_G_temp_sup-G_T_transv to a value of 152 (was 12133)
+re-indexing label ctx_rh_G_temp_sup-Lateral to a value of 153 (was 12134)
+re-indexing label ctx_rh_G_temp_sup-Plan_polar to a value of 154 (was 12135)
+re-indexing label ctx_rh_G_temp_sup-Plan_tempo to a value of 155 (was 12136)
+re-indexing label ctx_rh_G_temporal_inf to a value of 156 (was 12137)
+re-indexing label ctx_rh_G_temporal_middle to a value of 157 (was 12138)
+re-indexing label ctx_rh_Lat_Fis-ant-Horizont to a value of 158 (was 12139)
+re-indexing label ctx_rh_Lat_Fis-ant-Vertical to a value of 159 (was 12140)
+re-indexing label ctx_rh_Lat_Fis-post to a value of 160 (was 12141)
+re-indexing label ctx_rh_Pole_occipital to a value of 161 (was 12143)
+re-indexing label ctx_rh_Pole_temporal to a value of 162 (was 12144)
+re-indexing label ctx_rh_S_calcarine to a value of 163 (was 12145)
+re-indexing label ctx_rh_S_central to a value of 164 (was 12146)
+re-indexing label ctx_rh_S_cingul-Marginalis to a value of 165 (was 12147)
+re-indexing label ctx_rh_S_circular_insula_ant to a value of 166 (was 12148)
+re-indexing label ctx_rh_S_circular_insula_inf to a value of 167 (was 12149)
+re-indexing label ctx_rh_S_circular_insula_sup to a value of 168 (was 12150)
+re-indexing label ctx_rh_S_collat_transv_ant to a value of 169 (was 12151)
+re-indexing label ctx_rh_S_collat_transv_post to a value of 170 (was 12152)
+re-indexing label ctx_rh_S_front_inf to a value of 171 (was 12153)
+re-indexing label ctx_rh_S_front_middle to a value of 172 (was 12154)
+re-indexing label ctx_rh_S_front_sup to a value of 173 (was 12155)
+re-indexing label ctx_rh_S_interm_prim-Jensen to a value of 174 (was 12156)
+re-indexing label ctx_rh_S_intrapariet_and_P_trans to a value of 175 (was 12157)
+re-indexing label ctx_rh_S_oc_middle_and_Lunatus to a value of 176 (was 12158)
+re-indexing label ctx_rh_S_oc_sup_and_transversal to a value of 177 (was 12159)
+re-indexing label ctx_rh_S_occipital_ant to a value of 178 (was 12160)
+re-indexing label ctx_rh_S_oc-temp_lat to a value of 179 (was 12161)
+re-indexing label ctx_rh_S_oc-temp_med_and_Lingual to a value of 180 (was 12162)
+re-indexing label ctx_rh_S_orbital_lateral to a value of 181 (was 12163)
+re-indexing label ctx_rh_S_orbital_med-olfact to a value of 182 (was 12164)
+re-indexing label ctx_rh_S_orbital-H_Shaped to a value of 183 (was 12165)
+re-indexing label ctx_rh_S_parieto_occipital to a value of 184 (was 12166)
+re-indexing label ctx_rh_S_pericallosal to a value of 185 (was 12167)
+re-indexing label ctx_rh_S_postcentral to a value of 186 (was 12168)
+re-indexing label ctx_rh_S_precentral-inf-part to a value of 187 (was 12169)
+re-indexing label ctx_rh_S_precentral-sup-part to a value of 188 (was 12170)
+re-indexing label ctx_rh_S_suborbital to a value of 189 (was 12171)
+re-indexing label ctx_rh_S_subparietal to a value of 190 (was 12172)
+re-indexing label ctx_rh_S_temporal_inf to a value of 191 (was 12173)
+re-indexing label ctx_rh_S_temporal_sup to a value of 192 (was 12174)
+re-indexing label ctx_rh_S_temporal_transverse to a value of 193 (was 12175)
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -33.0  7.0 3.0
+the call to "ft_volumelookup" took 9 seconds and required the additional allocation of an estimated 944 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -35.0  9.0 8.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -38.0  11.0 11.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -41.0  12.0 14.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -46.0  16.0 20.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -49.0  17.0 23.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -4.0  6.0 29.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -6.0  8.0 31.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -8.0  8.0 34.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -11.0  11.0 37.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -14.0  12.0 39.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -19.0  14.0 43.0
+the call to "ft_volumelookup" took 9 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -21.0  16.0 44.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -23.0  18.0 47.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -24.0  19.0 50.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -17.0  -6.0 -16.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -22.0  -6.0 -17.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -27.0  -6.0 -17.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -31.0  -5.0 -16.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -36.0  -5.0 -16.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -42.0  -5.0 -16.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -51.0  -5.0 -16.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -19.0  -26.0 -12.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -26.0  -24.0 -12.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -31.0  -24.0 -12.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -35.0  -23.0 -12.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -40.0  -21.0 -12.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -45.0  -20.0 -12.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -49.0  -19.0 -12.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -15.0  39.0 -8.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -17.0  40.0 -5.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -18.0  41.0 -1.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -20.0  41.0 4.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -21.0  40.0 8.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -23.0  41.0 11.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -24.0  41.0 15.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -26.0  41.0 18.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -27.0  41.0 21.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -29.0  41.0 24.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -10.0  -32.0 33.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -13.0  -30.0 36.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -15.0  -27.0 41.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -19.0  -25.0 44.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -23.0  -23.0 49.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -25.0  -19.0 56.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -28.0  -17.0 59.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -29.0  -17.0 62.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -31.0  -24.0 -9.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -37.0  -24.0 -8.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -41.0  -24.0 -7.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -45.0  -23.0 -6.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -49.0  -21.0 -3.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -53.0  -19.0 -2.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -57.0  -18.0 -1.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -33.0  -14.0 -1.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -33.0  -9.0 4.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -35.0  -4.0 6.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -35.0  0.0 9.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -36.0  4.0 13.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -38.0  9.0 18.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -38.0  14.0 21.0
+the call to "ft_volumelookup" took 6 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -38.0  19.0 25.0
+the call to "ft_volumelookup" took 6 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -39.0  25.0 30.0
+the call to "ft_volumelookup" took 6 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -39.0  30.0 34.0
+the call to "ft_volumelookup" took 6 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -27.0  -31.0 10.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -31.0  -29.0 12.0
+the call to "ft_volumelookup" took 6 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -34.0  -28.0 14.0
+the call to "ft_volumelookup" took 9 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -36.0  -27.0 17.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -40.0  -27.0 18.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -42.0  -24.0 20.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -45.0  -23.0 22.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -49.0  -23.0 24.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -53.0  -21.0 26.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -57.0  -19.0 28.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -33.0  7.0 3.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -35.0  9.0 8.0
+the call to "ft_volumelookup" took 9 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -38.0  11.0 11.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -41.0  12.0 14.0
+the call to "ft_volumelookup" took 9 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -46.0  16.0 20.0
+the call to "ft_volumelookup" took 9 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -49.0  17.0 23.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -4.0  6.0 29.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -6.0  8.0 31.0
+the call to "ft_volumelookup" took 9 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -8.0  8.0 34.0
+the call to "ft_volumelookup" took 9 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -11.0  11.0 37.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -14.0  12.0 39.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -19.0  14.0 43.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -21.0  16.0 44.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -23.0  18.0 47.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -24.0  19.0 50.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -17.0  -6.0 -16.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -22.0  -6.0 -17.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -27.0  -6.0 -17.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -31.0  -5.0 -16.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -36.0  -5.0 -16.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -42.0  -5.0 -16.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -51.0  -5.0 -16.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -19.0  -26.0 -12.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -26.0  -24.0 -12.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -31.0  -24.0 -12.0
+the call to "ft_volumelookup" took 7 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -35.0  -23.0 -12.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -40.0  -21.0 -12.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -45.0  -20.0 -12.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -49.0  -19.0 -12.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -15.0  39.0 -8.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -17.0  40.0 -5.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -18.0  41.0 -1.0
+the call to "ft_volumelookup" took 9 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -20.0  41.0 4.0
+the call to "ft_volumelookup" took 9 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -21.0  40.0 8.0
+the call to "ft_volumelookup" took 9 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -23.0  41.0 11.0
+the call to "ft_volumelookup" took 9 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -24.0  41.0 15.0
+the call to "ft_volumelookup" took 9 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -26.0  41.0 18.0
+the call to "ft_volumelookup" took 9 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -27.0  41.0 21.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -29.0  41.0 24.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -10.0  -32.0 33.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -13.0  -30.0 36.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -15.0  -27.0 41.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -19.0  -25.0 44.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -23.0  -23.0 49.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -25.0  -19.0 56.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -28.0  -17.0 59.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -29.0  -17.0 62.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -31.0  -24.0 -9.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -37.0  -24.0 -8.0
+the call to "ft_volumelookup" took 9 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -41.0  -24.0 -7.0
+the call to "ft_volumelookup" took 9 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -45.0  -23.0 -6.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -49.0  -21.0 -3.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -53.0  -19.0 -2.0
+the call to "ft_volumelookup" took 9 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -57.0  -18.0 -1.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -33.0  -14.0 -1.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -33.0  -9.0 4.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -35.0  -4.0 6.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -35.0  0.0 9.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -36.0  4.0 13.0
+the call to "ft_volumelookup" took 9 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -38.0  9.0 18.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -38.0  14.0 21.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -38.0  19.0 25.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -39.0  25.0 30.0
+the call to "ft_volumelookup" took 8 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -39.0  30.0 34.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -27.0  -31.0 10.0
+the call to "ft_volumelookup" took 12 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -31.0  -29.0 12.0
+the call to "ft_volumelookup" took 9 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -34.0  -28.0 14.0
+the call to "ft_volumelookup" took 11 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -36.0  -27.0 17.0
+the call to "ft_volumelookup" took 12 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -40.0  -27.0 18.0
+the call to "ft_volumelookup" took 13 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -42.0  -24.0 20.0
+the call to "ft_volumelookup" took 13 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -45.0  -23.0 22.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -49.0  -23.0 24.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -53.0  -21.0 26.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+     transform: [4x4 double]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+
+] 
+[Warning: could not reshape "name" to the expected dimensions] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [256x256x256 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [256x256x256 logical]
+           pos: [16777216x3 double]
+
+] 
+[Warning: could not determine dimord of "name" in:
+
+           dim: [256 256 256]
+           hdr: [1x1 struct]
+          unit: 'mm'
+         aparc: [16777216x1 double]
+    aparclabel: {193x1 cell}
+      coordsys: 'acpc'
+          name: 'Dx'
+        inside: [16777216x1 logical]
+           pos: [16777216x3 double]
+
+] 
+coordinates of voi: -57.0  -19.0 28.0
+the call to "ft_volumelookup" took 10 seconds and required the additional allocation of an estimated 896 MB
+Saving /home/knight/hoycw/PRJ_Stroop/data/IR68/05_recon/IR68_elec_main_ft_pat_orig_Dx.mat
+==================================================================
+>> 

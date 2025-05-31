@@ -1,0 +1,9 @@
+{Unrecognized function or variable 'fn_gm_weight'.
+
+Error in fn_elec_match_atlas (line 63)
+        elec.gm_weight(e) = fn_gm_weight(elec.tissue{e},elec.tissue2{e});
+} 
+
+real	10m17.806s
+user	12m1.505s
+sys	3m11.207s

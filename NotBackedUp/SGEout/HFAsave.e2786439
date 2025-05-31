@@ -1,0 +1,12 @@
+{Error using run (line 72)
+RUN cannot execute the file
+'/home/knight/hoycw/PRJ_Stroop/scripts/an_vars/HGm_S2t251_zbtA_sm0_wn200_vars.m'.
+RUN requires a valid MATLAB script
+
+Error in SBJ08a_HFA_save (line 17)
+eval(an_vars_cmd);
+} 
+
+real	0m40.693s
+user	0m21.932s
+sys	0m10.554s

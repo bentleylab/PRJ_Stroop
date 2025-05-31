@@ -1,0 +1,12 @@
+{Error using run (line 72)
+RUN cannot execute the file
+'/home/knight/hoycw/PRJ_Stroop/scripts/an_vars/HGm_S2t251_zbtA_sm0_wn200_vars.m'.
+RUN requires a valid MATLAB script
+
+Error in SBJ10a_crRT_smANOVA (line 27)
+eval(['run ' root_dir 'PRJ_Stroop/scripts/an_vars/' an_id '_vars.m']);
+} 
+
+real	0m26.540s
+user	0m19.724s
+sys	0m1.518s

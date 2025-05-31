@@ -1,0 +1,10 @@
+{Error using fn_load_recon_atlas (line 19)
+altas: Yeo7 not compatible with specific SBJ
+
+Error in fn_match_elec_atlas_ROI_tiss (line 38)
+atlas = fn_load_recon_atlas(SBJ,atlas_id);
+} 
+
+real	0m22.946s
+user	0m19.408s
+sys	0m1.634s
